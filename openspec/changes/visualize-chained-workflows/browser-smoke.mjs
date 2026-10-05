@@ -25,7 +25,9 @@ import {
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../../../', import.meta.url));
 const build = resolve(root, 'packages/jentic-arazzo-ui/build');
-const evidence = fileURLToPath(new URL('./browser-evidence/', import.meta.url));
+const evidence = process.env.BROWSER_EVIDENCE_DIR
+  ? resolve(process.env.BROWSER_EVIDENCE_DIR)
+  : fileURLToPath(new URL('./browser-evidence/', import.meta.url));
 await mkdir(evidence, { recursive: true });
 const builtHTML = await readFile(resolve(build, 'index.html'), 'utf8');
 // retain the built assets and CSS, mounting fixtures through the production imperative API.
@@ -459,6 +461,38 @@ try {
   assert.equal(await article.locator('img').count(), 0);
   await screenshot('review-return-and-commonmark');
   record('review fixes: external/local-step retry and external-call returns render; cross-workflow action is inert; CommonMark links and emphasis render');
+  // Exercise the public callback through the production React Flow edge click.
+  for (const [name, document, activeWorkflowId, action] of [
+    ['overview', relationshipGraph, null, false],
+    ['overview-action', relationshipGraph, null, true],
+    ['step-prerequisite', localPrerequisites, 'payment', false],
+  ]) {
+    await page.goto(url);
+    await page.evaluate(({ document, activeWorkflowId }) => {
+      window.edgeEvents = [];
+      window.instance = ArazzoUIStandalone({ dom_id: '#root', document, initialView: 'diagram', activeWorkflowId,
+        onEdgeSelect: (id, edge) => window.edgeEvents.push({ id, type: edge.type, data: edge.data }) });
+    }, { document, activeWorkflowId });
+    let edge = page.locator('.react-flow__edge-relationship');
+    if (action) edge = edge.filter({ has: page.locator('title').filter({ hasText: 'failure/retry' }) });
+    edge = edge.first();
+    await edge.waitFor();
+    await fit();
+    await edge.locator('path').first().dispatchEvent('click');
+    const events = await page.evaluate(() => window.edgeEvents);
+    assert.equal(events.length, 1);
+    const [event] = events;
+    assert.equal(event.type, 'relationship');
+    assert.equal(event.data.type, 'relationship');
+    assert(['prerequisite', 'call', 'action'].includes(event.data.kind));
+    assert.equal(typeof event.data.label, 'string');
+    assert(Object.keys(event.data).every((key) => ['type', 'kind', 'label', 'warning', 'channel', 'actionType'].includes(key)));
+    if (action) {
+      assert.equal(event.data.channel, 'failure');
+      assert.equal(event.data.actionType, 'retry');
+    }
+    record(`${name} production relationship callback exposes only public data`, { event });
+  }
   assert.deepEqual(externalRequests, [], 'source descriptions must not be fetched');
   assert.deepEqual(failures, [], `browser errors: ${failures.join('\n')}`);
   await writeFile(

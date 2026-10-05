@@ -69,3 +69,10 @@
 - [x] 9.6 Improve dense overview readability with compact labels, separated lane label anchors and keyboard-accessible selected relationship details; verify component and built-browser behavior.
 - [x] 9.7 Record a logical upstream contribution split and the required feature-discussion step without rewriting existing history or claiming maintainer approval.
 - [x] 9.8 Run targeted and monorepo tests, UI type/lint/build checks, built-browser smoke tests, strict OpenSpec validation, and independent review; reconcile the review findings with fresh evidence.
+
+## 10. Architecture verification follow-up (2026-10-05)
+
+- [x] 10.1 Fix W1 with structural schema-location traversal; verify component/map key invariance, inline inputs, reference preservation, supported dialect controls, and opaque literals/extensions using the real parser/resolver.
+- [x] 10.2 Fix W2 with an exported public relationship-edge projection, honest edge unions, cast-free converter construction, private callback boundaries, runtime callback assertions, and consumer compilation against both rolled declarations.
+- [x] 10.3 Fix W3 in the published README and unreleased changelog: controlled overview/clearing, callback values and additive edge variant, selected 1.1 limits, external/reference behavior, and inspection-order versus runner semantics.
+- [x] 10.4 Run fresh monorepo tests, UI types/lint/build, rolled-declaration consumers, built-browser smoke and callback probes, strict OpenSpec validation, and diff checks; reconcile W1–W3 and S1–S2 with explicit evidence and limits.

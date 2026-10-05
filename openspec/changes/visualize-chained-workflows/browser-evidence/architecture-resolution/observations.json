@@ -1,0 +1,416 @@
+{
+  "date": "2026-10-05",
+  "browser": "153.0.8010.12",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "buildAssets": [
+    "href=\"./arazzo-ui.62e11273.css\"",
+    "src=\"./arazzo-ui-standalone.2ffb09a4.js\""
+  ],
+  "observations": [
+    {
+      "name": "built standalone app boot and view switch"
+    },
+    {
+      "name": "compact overview labels retain full relationship details through keyboard-accessible selection"
+    },
+    {
+      "name": "dense SCC overview: disjoint cards, all parallel/self-loop routes, scoped cycle warnings, deterministic positions",
+      "cards": [
+        {
+          "id": "doc-workflow-viewer-[\"a0754de1-3b10-4798-8be5-dde861809c82\",\"workflow\",0]",
+          "text": "WORKFLOWentry1 stepOpen workflow",
+          "x": 236.8918914794922,
+          "y": 243.75,
+          "width": 260.1351318359375,
+          "height": 167.229736328125,
+          "right": 497.0270233154297,
+          "bottom": 410.979736328125,
+          "cardRight": 497.0270233154297,
+          "cardBottom": 410.979736328125,
+          "style": "translate(0px, 0px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"a0754de1-3b10-4798-8be5-dde861809c82\",\"workflow\",1]",
+          "text": "WORKFLOWwfA2 stepsPrerequisite cycleOpen workflow",
+          "x": 236.8918914794922,
+          "y": 503.8851318359375,
+          "width": 260.1351318359375,
+          "height": 167.229736328125,
+          "right": 497.0270233154297,
+          "bottom": 671.1148681640625,
+          "cardRight": 497.0270233154297,
+          "cardBottom": 671.1148681640625,
+          "style": "translate(0px, 280px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"a0754de1-3b10-4798-8be5-dde861809c82\",\"workflow\",2]",
+          "text": "WORKFLOWwfB1 stepPrerequisite cycleOpen workflow",
+          "x": 589.9324340820312,
+          "y": 503.8851318359375,
+          "width": 260.13519287109375,
+          "height": 167.229736328125,
+          "right": 850.067626953125,
+          "bottom": 671.1148681640625,
+          "cardRight": 850.067626953125,
+          "cardBottom": 671.1148681640625,
+          "style": "translate(380px, 280px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"a0754de1-3b10-4798-8be5-dde861809c82\",\"workflow\",3]",
+          "text": "WORKFLOWexit1 stepOpen workflow",
+          "x": 236.8918914794922,
+          "y": 764.020263671875,
+          "width": 260.1351318359375,
+          "height": 167.229736328125,
+          "right": 497.0270233154297,
+          "bottom": 931.25,
+          "cardRight": 497.0270233154297,
+          "cardBottom": 931.25,
+          "style": "translate(0px, 560px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"a0754de1-3b10-4798-8be5-dde861809c82\",\"workflow\",4]",
+          "text": "WORKFLOWselfPrerequisite1 stepPrerequisite cycleOpen workflow",
+          "x": 589.9324340820312,
+          "y": 243.75,
+          "width": 260.13519287109375,
+          "height": 167.229736328125,
+          "right": 850.067626953125,
+          "bottom": 410.979736328125,
+          "cardRight": 850.067626953125,
+          "cardBottom": 410.979736328125,
+          "style": "translate(380px, 0px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"a0754de1-3b10-4798-8be5-dde861809c82\",\"workflow\",5]",
+          "text": "WORKFLOWdisconnected1 stepOpen workflow",
+          "x": 942.9730224609375,
+          "y": 243.75,
+          "width": 260.1351318359375,
+          "height": 167.229736328125,
+          "right": 1203.108154296875,
+          "bottom": 410.979736328125,
+          "cardRight": 1203.108154296875,
+          "cardBottom": 410.979736328125,
+          "style": "translate(760px, 0px)"
+        }
+      ],
+      "edges": [
+        {
+          "title": "Call from init · 0 parameters · provenance: {\"workflowId\":\"wfA\",\"stepId\":\"init\",\"path\":[\"workflows\",1,\"steps\",0,\"workflowId\"]}",
+          "label": "R1 · call",
+          "path": "M 139.99996948242188 464.0000305175781 L 139.99996948242188 490.0000305175781 L 709.9999694824219 490.0000305175781 L 709.9999694824219 249.99998474121094 L 519.9999694824219 249.99998474121094 L 519.9999694824219 275.99998474121094",
+          "length": 1052,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "same · success/goto · step init · 0 parameters · provenance: {\"workflowId\":\"wfA\",\"stepId\":\"init\",\"path\":[\"workflows\",1,\"steps\",0,\"onSuccess\",0]}",
+          "label": "R2 · goto",
+          "path": "M 139.99996948242188 464.0000305175781 L 139.99996948242188 514.0000305175781 L 733.9999694824219 514.0000305175781 L 733.9999694824219 225.99998474121094 L 519.9999694824219 225.99998474121094 L 519.9999694824219 275.99998474121094",
+          "length": 1196,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "same · failure/goto · step init · 0 parameters · provenance: {\"workflowId\":\"wfA\",\"stepId\":\"init\",\"path\":[\"workflows\",1,\"steps\",0,\"onFailure\",0]}",
+          "label": "R3 · goto",
+          "path": "M 139.99996948242188 464.0000305175781 L 139.99996948242188 538.0000305175781 L 757.9999694824219 538.0000305175781 L 757.9999694824219 201.99998474121094 L 519.9999694824219 201.99998474121094 L 519.9999694824219 275.99998474121094",
+          "length": 1340,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "self · failure/retry · step init · 0 parameters · provenance: {\"workflowId\":\"wfA\",\"stepId\":\"init\",\"path\":[\"workflows\",1,\"steps\",0,\"onFailure\",1]}",
+          "label": "R4 · retry",
+          "path": "M 139.99996948242188 464.0000305175781 L 139.99996948242188 490.0000305175781 L 329.9999694824219 490.0000305175781 L 329.9999694824219 249.99998474121094 L 139.99996948242188 249.99998474121094 L 139.99996948242188 275.99998474121094",
+          "length": 672.0000610351562,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "same · failure/goto · step another · 0 parameters · provenance: {\"workflowId\":\"wfA\",\"stepId\":\"another\",\"path\":[\"workflows\",1,\"steps\",1,\"onFailure\",0]}",
+          "label": "R5 · goto",
+          "path": "M 139.99996948242188 464.0000305175781 L 139.99996948242188 562.0000305175781 L 781.9999694824219 562.0000305175781 L 781.9999694824219 177.99998474121094 L 519.9999694824219 177.99998474121094 L 519.9999694824219 275.99998474121094",
+          "length": 1484,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Prerequisite entry · provenance: {\"workflowId\":\"wfA\",\"path\":[\"workflows\",1,\"dependsOn\",0]}",
+          "label": "R6 · prerequisite",
+          "path": "M 139.99996948242188 184.00003051757812 L 139.99996948242188 218.00000762939453 L 174.99996948242188 218.00000762939453 L 174.99996948242188 242.00000762939453 L 139.99996948242188 242.00000762939453 L 139.99996948242188 275.99998474121094",
+          "length": 161.99996948242188,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Prerequisite wfB · Prerequisite cycle · provenance: {\"workflowId\":\"wfA\",\"path\":[\"workflows\",1,\"dependsOn\",1]}",
+          "label": "R7 · prerequisite · warning",
+          "path": "M 519.9999694824219 464.0000305175781 L 519.9999694824219 586.0000305175781 L 805.9999694824219 586.0000305175781 L 805.9999694824219 153.99998474121094 L 139.99996948242188 153.99998474121094 L 139.99996948242188 275.99998474121094",
+          "length": 1628.0001220703125,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Call from init · 0 parameters · provenance: {\"workflowId\":\"wfB\",\"stepId\":\"init\",\"path\":[\"workflows\",2,\"steps\",0,\"workflowId\"]}",
+          "label": "R8 · call",
+          "path": "M 519.9999694824219 464.0000305175781 L 519.9999694824219 610.0000305175781 L 829.9999694824219 610.0000305175781 L 829.9999694824219 129.99998474121094 L 139.99996948242188 129.99998474121094 L 139.99996948242188 275.99998474121094",
+          "length": 1772.0001220703125,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Prerequisite wfA · Prerequisite cycle · provenance: {\"workflowId\":\"wfB\",\"path\":[\"workflows\",2,\"dependsOn\",0]}",
+          "label": "R9 · prerequisite · warning",
+          "path": "M 139.99996948242188 464.0000305175781 L 139.99996948242188 634.0000305175781 L 853.9999694824219 634.0000305175781 L 853.9999694824219 105.99998474121094 L 519.9999694824219 105.99998474121094 L 519.9999694824219 275.99998474121094",
+          "length": 1916,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Prerequisite wfB · provenance: {\"workflowId\":\"exit\",\"path\":[\"workflows\",3,\"dependsOn\",0]}",
+          "label": "R10 · prerequisite",
+          "path": "M 519.9999694824219 464.0000305175781 L 519.9999694824219 498.0000457763672 L 364.9999694824219 498.0000457763672 L 364.9999694824219 522.0000457763672 L 139.99996948242188 522.0000457763672 L 139.99996948242188 556.0000610351562",
+          "length": 472.00006103515625,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Prerequisite selfPrerequisite · Prerequisite cycle · provenance: {\"workflowId\":\"selfPrerequisite\",\"path\":[\"workflows\",4,\"dependsOn\",0]}",
+          "label": "R11 · prerequisite · warning",
+          "path": "M 519.9999694824219 184.00003051757812 L 519.9999694824219 210.00003051757812 L 709.9999694824219 210.00003051757812 L 709.9999694824219 -29.999977111816406 L 519.9999694824219 -29.999977111816406 L 519.9999694824219 -3.9999771118164062",
+          "length": 672,
+          "marker": "url('#1__type=arrowclosed')"
+        }
+      ]
+    },
+    {
+      "name": "call-recovery cycle has no prerequisite-cycle warning",
+      "nodes": 2,
+      "edges": 2
+    },
+    {
+      "name": "mixed cycle has no prerequisite-cycle warning",
+      "nodes": 2,
+      "edges": 2
+    },
+    {
+      "name": "unlinked overview uses bounded three-column grid",
+      "cards": [
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",0]",
+          "text": "WORKFLOWunlinked-01 stepOpen workflow",
+          "x": 210.54054260253906,
+          "y": 202.5,
+          "width": 274.3243408203125,
+          "height": 176.35134887695312,
+          "right": 484.86488342285156,
+          "bottom": 378.8513488769531,
+          "cardRight": 484.86488342285156,
+          "cardBottom": 378.8513488769531,
+          "style": "translate(0px, 0px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",1]",
+          "text": "WORKFLOWunlinked-11 stepOpen workflow",
+          "x": 582.8378295898438,
+          "y": 202.5,
+          "width": 274.32427978515625,
+          "height": 176.35134887695312,
+          "right": 857.162109375,
+          "bottom": 378.8513488769531,
+          "cardRight": 857.162109375,
+          "cardBottom": 378.8513488769531,
+          "style": "translate(380px, 0px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",2]",
+          "text": "WORKFLOWunlinked-21 stepOpen workflow",
+          "x": 955.1351318359375,
+          "y": 202.5,
+          "width": 274.3243408203125,
+          "height": 176.35134887695312,
+          "right": 1229.45947265625,
+          "bottom": 378.8513488769531,
+          "cardRight": 1229.45947265625,
+          "cardBottom": 378.8513488769531,
+          "style": "translate(760px, 0px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",3]",
+          "text": "WORKFLOWunlinked-31 stepOpen workflow",
+          "x": 210.54054260253906,
+          "y": 476.8243103027344,
+          "width": 274.3243408203125,
+          "height": 176.35134887695312,
+          "right": 484.86488342285156,
+          "bottom": 653.1756591796875,
+          "cardRight": 484.86488342285156,
+          "cardBottom": 653.1756591796875,
+          "style": "translate(0px, 280px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",4]",
+          "text": "WORKFLOWunlinked-41 stepOpen workflow",
+          "x": 582.8378295898438,
+          "y": 476.8243103027344,
+          "width": 274.32427978515625,
+          "height": 176.35134887695312,
+          "right": 857.162109375,
+          "bottom": 653.1756591796875,
+          "cardRight": 857.162109375,
+          "cardBottom": 653.1756591796875,
+          "style": "translate(380px, 280px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",5]",
+          "text": "WORKFLOWunlinked-51 stepOpen workflow",
+          "x": 955.1351318359375,
+          "y": 476.8243103027344,
+          "width": 274.3243408203125,
+          "height": 176.35134887695312,
+          "right": 1229.45947265625,
+          "bottom": 653.1756591796875,
+          "cardRight": 1229.45947265625,
+          "cardBottom": 653.1756591796875,
+          "style": "translate(760px, 280px)"
+        },
+        {
+          "id": "doc-workflow-viewer-[\"9f79f57f-577e-4518-af78-af97b1942a6f\",\"workflow\",6]",
+          "text": "WORKFLOWunlinked-61 stepOpen workflow",
+          "x": 210.54054260253906,
+          "y": 751.1486206054688,
+          "width": 274.3243408203125,
+          "height": 176.35137939453125,
+          "right": 484.86488342285156,
+          "bottom": 927.5,
+          "cardRight": 484.86488342285156,
+          "cardBottom": 927.5,
+          "style": "translate(0px, 560px)"
+        }
+      ]
+    },
+    {
+      "name": "prerequisites have real side routes without reordering authored steps",
+      "steps": [
+        {
+          "id": "processPayment",
+          "y": 322.05804443359375
+        },
+        {
+          "id": "validateCard",
+          "y": 533.4366455078125
+        },
+        {
+          "id": "checkInventory",
+          "y": 707.034912109375
+        }
+      ],
+      "edges": [
+        {
+          "title": "Prerequisite validateCard · provenance: {\"workflowId\":\"payment\",\"stepId\":\"processPayment\",\"path\":[\"workflows\",0,\"steps\",0,\"dependsOn\",0],\"reference\":\"validateCard\",\"authoredIndex\":0,\"target\":{\"reference\":\"validateCard\",\"role\":\"step-prerequisite\",\"navigable\":true,\"kind\":\"local-step\",\"workflowId\":\"payment\",\"stepId\":\"validateCard\"}}",
+          "label": "Prerequisite validateCard",
+          "path": "M -4 720 L -64 720 L -64 298 L -4 298",
+          "length": 542,
+          "marker": "url('#1__type=arrowclosed')"
+        },
+        {
+          "title": "Prerequisite checkInventory · provenance: {\"workflowId\":\"payment\",\"stepId\":\"processPayment\",\"path\":[\"workflows\",0,\"steps\",0,\"dependsOn\",1],\"reference\":\"checkInventory\",\"authoredIndex\":1,\"target\":{\"reference\":\"checkInventory\",\"role\":\"step-prerequisite\",\"navigable\":true,\"kind\":\"local-step\",\"workflowId\":\"payment\",\"stepId\":\"checkInventory\"}}",
+          "label": "Prerequisite checkInventory",
+          "path": "M -4 1083 L -90 1083 L -90 298 L -4 298",
+          "length": 957,
+          "marker": "url('#1__type=arrowclosed')"
+        }
+      ]
+    },
+    {
+      "name": "expanded authored action/step details remain within disjoint card bounds"
+    },
+    {
+      "name": "duplicate init navigation centers flowB.init, scrolls owning docs and survives later layout effects",
+      "center": {
+        "dx": 0,
+        "dy": 0.000030517578125
+      },
+      "docFocus": {
+        "open": true,
+        "y": 407.390625,
+        "bottom": 652.171875,
+        "paneTop": 60,
+        "paneBottom": 1000
+      }
+    },
+    {
+      "name": "docs-only prerequisite link focuses and scrolls the scoped destination",
+      "docsOnlyFocus": {
+        "y": 407.296875,
+        "bottom": 652.078125,
+        "paneTop": 60,
+        "paneBottom": 1000
+      }
+    },
+    {
+      "name": "external/missing target chips stay inert with original reference and classification",
+      "disabled": [
+        "Prerequisite: missing (missing)",
+        "Prerequisite: $sourceDescriptions.remote.flowB.steps.init (external-step)",
+        "Prerequisite: $sourceDescriptions.absent.flowB.steps.init (missing)",
+        "Prerequisite: $sourceDescriptions.http.flowB.steps.init (malformed)",
+        "Prerequisite: $workflows.flowB.steps.absent (missing)",
+        "Prerequisite: $workflows.absent.steps.init (missing)",
+        "Prerequisite: $workflows. (malformed)",
+        "Call $sourceDescriptions.remote.flowB (external-workflow)",
+        "Call absent (missing)"
+      ]
+    },
+    {
+      "name": "async send/receive metadata, opaque locators and whole querystring survive cards/docs; both Mermaid views render"
+    },
+    {
+      "name": "older profile reports unsupported 1.1 intent without inferred prerequisite edges"
+    },
+    {
+      "name": "parseable future profile retains exact authored data in raw fallback without semantic graph"
+    },
+    {
+      "name": "browser imperative retrieval preserves unknown content, authored identity, custom dialect and opaque references"
+    },
+    {
+      "name": "review fixes: external/local-step retry and external-call returns render; cross-workflow action is inert; CommonMark links and emphasis render"
+    },
+    {
+      "name": "overview production relationship callback exposes only public data",
+      "event": {
+        "id": "[\"e2640e48-1524-4dac-9a17-95aed7e2972d\",\"call\",\"wfA\",\"init\",null,null,null,[\"workflows\",1,\"steps\",0,\"workflowId\"],null,\"local-workflow\",null,\"wfB\",null]",
+        "type": "relationship",
+        "data": {
+          "type": "relationship",
+          "kind": "call",
+          "label": "Call from init · 0 parameters"
+        }
+      }
+    },
+    {
+      "name": "overview-action production relationship callback exposes only public data",
+      "event": {
+        "id": "[\"f6400075-4402-44fd-855e-27e9b4a2b0cf\",\"action\",\"wfA\",\"init\",\"onFailure\",1,\"retry\",[\"workflows\",1,\"steps\",0,\"onFailure\",1],null,\"local-workflow\",null,\"wfA\",null]",
+        "type": "relationship",
+        "data": {
+          "type": "relationship",
+          "kind": "action",
+          "label": "self · failure/retry · step init · 0 parameters",
+          "channel": "failure",
+          "actionType": "retry"
+        }
+      }
+    },
+    {
+      "name": "step-prerequisite production relationship callback exposes only public data",
+      "event": {
+        "id": "[\"8fe0dc38-d793-496f-9258-b8e95809b255\",\"payment\",\"processPayment\",\"prerequisite\",[\"workflows\",0,\"steps\",0,\"dependsOn\",0]]",
+        "type": "relationship",
+        "data": {
+          "type": "relationship",
+          "kind": "prerequisite",
+          "label": "Prerequisite validateCard"
+        }
+      }
+    }
+  ],
+  "browserErrors": [],
+  "externalRequests": []
+}
