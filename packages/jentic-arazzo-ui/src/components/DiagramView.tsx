@@ -43,7 +43,7 @@ import { WorkflowTabs } from './WorkflowTabs';
 import { ArazzoNode, ArazzoEdge } from '../types/index';
 import { ErrorBoundary } from './ErrorBoundary';
 import './WorkflowTabs.css';
-import type { RelationshipEdgeData } from '../edges/RelationshipEdge';
+import { publicEdgeSelection, type RelationshipEdgeData } from '../edges/RelationshipEdge';
 
 const nodeTypes = {
   step: StepNode,
@@ -97,7 +97,7 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
   const reactFlow = useReactFlow();
   const relationshipEdges = edges.filter(
     (edge) => edge.type === 'relationship',
-  ) as unknown as Edge<RelationshipEdgeData>[];
+  ) as Edge<RelationshipEdgeData>[];
   const selectedRelationship = relationshipEdges.find((edge) => edge.selected);
   const relationshipData = selectedRelationship?.data;
   const relationship = relationshipData?.relationship;
@@ -189,7 +189,7 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
       }
 
       if (events?.onEdgeSelect) {
-        events.onEdgeSelect(edge.id, edge);
+        events.onEdgeSelect(edge.id, publicEdgeSelection(edge));
       }
     },
     [events, nodes, reactFlow, setSelectedNode],

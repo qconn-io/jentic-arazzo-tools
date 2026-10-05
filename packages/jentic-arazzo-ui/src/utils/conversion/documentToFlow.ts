@@ -163,7 +163,6 @@ export function convertDocumentToFlow(
       },
       relationship,
     };
-    // React Flow supports private edge payloads without widening the public legacy union.
     edges.push({
       id: edge.id,
       source: edge.source,
@@ -174,7 +173,7 @@ export function convertDocumentToFlow(
       targetHandle: 'relationship-in',
       markerEnd: { type: MarkerType.ArrowClosed },
       data,
-    } as unknown as ArazzoEdge);
+    });
   }
   return { nodes, edges };
 }
