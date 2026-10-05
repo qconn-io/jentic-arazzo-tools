@@ -44,6 +44,7 @@ export type {
   ExternalWorkflowNodeData,
   ArazzoEdge,
   ArazzoEdgeData,
+  RelationshipEdgeData,
   SequentialEdgeData,
   SuccessEdgeData,
   FailureEdgeData,

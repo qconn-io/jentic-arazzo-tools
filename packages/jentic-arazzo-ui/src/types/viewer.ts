@@ -295,6 +295,7 @@ export type ArazzoNode = Node<ArazzoNodeData>;
 
 /** @public */
 export type ArazzoEdgeType =
+  | 'relationship'
   | 'sequential'
   | 'success'
   | 'failure'
@@ -302,6 +303,21 @@ export type ArazzoEdgeType =
   | 'bundled-success'
   | 'bundled-failure'
   | 'bundled-retry';
+
+/**
+ * Public inspection details for a workflow relationship or step prerequisite.
+ * This describes authored relationships, not predicted execution. Rendering and
+ * internal inspection-model details are excluded from onEdgeSelect payloads.
+ * @public
+ */
+export interface RelationshipEdgeData {
+  type: 'relationship';
+  kind: 'prerequisite' | 'call' | 'action';
+  label: string;
+  warning?: string;
+  channel?: 'success' | 'failure';
+  actionType?: string;
+}
 
 /** @public */
 export interface SequentialEdgeData {
@@ -365,6 +381,7 @@ export interface BundledRetryEdgeData {
 
 /** @public */
 export type ArazzoEdgeData =
+  | RelationshipEdgeData
   | SequentialEdgeData
   | SuccessEdgeData
   | FailureEdgeData

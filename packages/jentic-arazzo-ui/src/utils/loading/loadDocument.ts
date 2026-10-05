@@ -53,22 +53,66 @@ function validateIdentities(document: ArazzoDocument): void {
   }
 }
 
+// Traverse known schema locations only. Map keys are authored names; literal and
+// extension payloads (including unknown vocabulary) are not schema locations.
 function hasCustomDialect(value: unknown): boolean {
-  if (!value || typeof value !== 'object') return false;
-  if (Array.isArray(value)) return value.some(hasCustomDialect);
-  const record = value as unknown as Record<string, unknown>;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const schema = value as Record<string, unknown>;
   if (
-    typeof record.$schema === 'string' &&
-    !/^https?:\/\/json-schema.org\/draft\/(2020-12|2019-09)\/schema#?$/.test(record.$schema) &&
-    !/^https?:\/\/json-schema.org\/draft-0[467]\/schema#?$/.test(record.$schema)
+    typeof schema.$schema === 'string' &&
+    !/^https?:\/\/json-schema.org\/draft\/(2020-12|2019-09)\/schema#?$/.test(schema.$schema) &&
+    !/^https?:\/\/json-schema.org\/draft-0[467]\/schema#?$/.test(schema.$schema)
   )
     return true;
-  return Object.entries(record).some(
-    ([key, child]) =>
-      !key.startsWith('x-') &&
-      !['example', 'examples', 'default', 'const', 'enum'].includes(key) &&
-      hasCustomDialect(child),
-  );
+  for (const keyword of [
+    'properties',
+    'patternProperties',
+    '$defs',
+    'definitions',
+    'dependentSchemas',
+  ]) {
+    const map = schema[keyword];
+    if (
+      map &&
+      typeof map === 'object' &&
+      !Array.isArray(map) &&
+      Object.values(map).some(hasCustomDialect)
+    )
+      return true;
+  }
+  // Draft 4–7 dependencies can contain schemas or arrays of property names.
+  const dependencies = schema.dependencies;
+  if (
+    dependencies &&
+    typeof dependencies === 'object' &&
+    !Array.isArray(dependencies) &&
+    Object.values(dependencies).some(hasCustomDialect)
+  )
+    return true;
+  for (const keyword of ['allOf', 'anyOf', 'oneOf', 'prefixItems']) {
+    const schemas = schema[keyword];
+    if (Array.isArray(schemas) && schemas.some(hasCustomDialect)) return true;
+  }
+  // Older drafts permit tuple items; newer drafts use a single schema.
+  if (
+    Array.isArray(schema.items)
+      ? schema.items.some(hasCustomDialect)
+      : hasCustomDialect(schema.items)
+  )
+    return true;
+  return [
+    'additionalProperties',
+    'additionalItems',
+    'contains',
+    'not',
+    'if',
+    'then',
+    'else',
+    'propertyNames',
+    'unevaluatedProperties',
+    'unevaluatedItems',
+    'contentSchema',
+  ].some((keyword) => hasCustomDialect(schema[keyword]));
 }
 
 function transformApi(root: ParseResultElement, visitor: object): ParseResultElement {
@@ -109,8 +153,8 @@ export async function loadDocument(
   }
   const unsupportedResolution =
     self !== undefined ||
-    hasCustomDialect(authoredDocument.workflows?.map((w) => w.inputs)) ||
-    hasCustomDialect(authoredDocument.components?.inputs) ||
+    authoredDocument.workflows?.some((workflow) => hasCustomDialect(workflow.inputs)) ||
+    Object.values(authoredDocument.components?.inputs ?? {}).some(hasCustomDialect) ||
     !baseURI;
   if (profile && !unsupportedResolution) {
     const missing = new Map<

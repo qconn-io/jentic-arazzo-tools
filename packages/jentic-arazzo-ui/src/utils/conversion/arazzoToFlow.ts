@@ -255,7 +255,7 @@ export function convertWorkflowToFlow(
         type: 'relationship',
         data,
         markerEnd: { type: MarkerType.ArrowClosed },
-      } as unknown as ArazzoEdge);
+      });
     });
   });
   // positions are owned by sequentialLayout; options are retained for caller compatibility.

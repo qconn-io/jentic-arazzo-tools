@@ -1,20 +1,26 @@
 import React from 'react';
 import { EdgeProps } from 'reactflow';
+import type {
+  ArazzoEdge,
+  RelationshipEdgeData as PublicRelationshipEdgeData,
+} from '../types/viewer';
 import type { WorkflowRelationship } from '../utils/model/viewerModel';
 
-export interface RelationshipEdgeData {
-  type: 'relationship';
-  kind: 'prerequisite' | 'call' | 'action';
-  label: string;
+export interface RelationshipEdgeData extends PublicRelationshipEdgeData {
   compactLabel?: string;
   lane: number;
   selfLoop: boolean;
   sideRoute?: boolean;
-  warning?: string;
-  channel?: 'success' | 'failure';
-  actionType?: string;
   provenance?: unknown;
   relationship?: WorkflowRelationship;
+}
+
+// Keep the event contract independent of private renderer/model extensions.
+export function publicEdgeSelection(edge: ArazzoEdge): ArazzoEdge {
+  if (edge.data?.type !== 'relationship') return edge;
+  const { type, kind, label, warning, channel, actionType } = edge.data;
+  const data: PublicRelationshipEdgeData = { type, kind, label, warning, channel, actionType };
+  return { ...edge, data };
 }
 
 // explicit orthogonal lanes preserve parallel occurrences and loops.
