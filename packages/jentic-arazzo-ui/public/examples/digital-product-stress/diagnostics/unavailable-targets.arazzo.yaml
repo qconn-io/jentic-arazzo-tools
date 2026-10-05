@@ -1,0 +1,46 @@
+arazzo: 1.1.0
+info:
+  title: Intentionally incomplete or invalid target diagnostics
+  version: 1.0.0
+sourceDescriptions:
+  - name: coordinator
+    url: ../coordinator.openapi.yaml
+    type: openapi
+  - name: license
+    url: ../license.openapi.yaml
+    type: openapi
+  - name: commerce
+    url: ../arazzo.yaml
+    type: arazzo
+  - name: not-supplied
+    url: ./not-supplied.arazzo.yaml
+    type: arazzo
+workflows:
+  - workflowId: diagnostic-probe
+    description: Inspection only. Healthy operation, supplied external workflow, unavailable external
+      document, missing local workflow and unqualified ambiguous operation. A structural schema pass
+      is not semantic conformance.
+    steps:
+      - stepId: healthy
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: supplied-external
+        workflowId: $sourceDescriptions.commerce.reconcile-license
+        parameters:
+          - name: purchaseId
+            value: purchase-1001-A
+          - name: serviceToken
+            value: demo-service-token
+      - stepId: unavailable-external
+        workflowId: $sourceDescriptions.not-supplied.remote-workflow
+        parameters: []
+      - stepId: missing-local
+        workflowId: does-not-exist
+        parameters: []
+      - stepId: ambiguous-operation
+        operationId: getLicenseByKey

@@ -151,11 +151,15 @@ export async function loadDocument(
     if (!parseReusableReference(occurrence.reference))
       throw new Error(`Resolution: malformed reusable reference ${occurrence.reference}`);
   }
-  const unsupportedResolution =
-    self !== undefined ||
+  const resolutionReasons: NonNullable<InspectionDiagnostic['resolutionReasons']> = [];
+  if (self !== undefined) resolutionReasons.push('self');
+  if (
     authoredDocument.workflows?.some((workflow) => hasCustomDialect(workflow.inputs)) ||
-    Object.values(authoredDocument.components?.inputs ?? {}).some(hasCustomDialect) ||
-    !baseURI;
+    Object.values(authoredDocument.components?.inputs ?? {}).some(hasCustomDialect)
+  )
+    resolutionReasons.push('schema-dialect');
+  if (!baseURI) resolutionReasons.push('base-uri');
+  const unsupportedResolution = resolutionReasons.length > 0;
   if (profile && !unsupportedResolution) {
     const missing = new Map<
       string,
@@ -242,8 +246,8 @@ export async function loadDocument(
       phase: 'resolution',
       category: 'unsupported-resolution',
       severity: 'warning',
-      message:
-        'Reference expansion bypassed: unavailable base URI or unsupported $self/schema dialect semantics. Authored references are preserved.',
+      message: `Reference expansion bypassed: ${resolutionReasons.map((reason) => ({ self: 'unsupported $self semantics', 'schema-dialect': 'unsupported schema dialect', 'base-uri': 'unavailable base URI' })[reason]).join('; ')}. Authored references are preserved.`,
+      resolutionReasons,
       path: [],
       code: 'expansion-bypassed',
     });

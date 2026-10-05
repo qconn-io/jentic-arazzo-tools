@@ -1,0 +1,44 @@
+@startuml digital-product-purchase
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam roundCorner 8
+skinparam ArrowColor #666666
+skinparam ArrowFontColor #666666
+skinparam wrapWidth 200
+skinparam maxMessageSize 160
+title Digital product purchase, license retrieval and activation report
+autonumber
+
+actor "Client application" as client
+participant "Purchase Coordinator" as coordinator
+participant "Inventory Service" as inventory
+participant "Payment Service" as payment
+participant "License Service" as license
+
+client -> coordinator: POST /purchases\n(productId, customerId, authorized amount/currency, paymentToken)
+note over client,coordinator: Stable purchase key; the coordinator assigns one purchaseId.\nfulfil-purchase runs inside this exchange before its response.
+group fulfil-purchase / reserve-and-capture
+coordinator -> inventory: POST /reservations\n(productId, quantity: 1)
+inventory --> coordinator: 201 (reservationId, current amount/currency, RESERVED)
+note over coordinator,inventory: Compare product, amount and currency with customer authorization.\nMismatch stops payment and issuance.
+coordinator -> payment: POST /captures\n(reservationId, amountMinor, currency, paymentToken)
+payment --> coordinator: 200 (paymentId, actual capture state) or uncertainty
+note over coordinator,payment: Only matching CAPTURED evidence allows continuation.\nDECLINED or UNKNOWN stops issuance; reconcile the original attempt.
+end
+
+group fulfil-purchase / issue-license (eligible path only)
+coordinator -> license: POST /licenses\n(purchaseId, customerId, productId, reservationId, paymentId)
+license --> coordinator: 201 (licenseId, purchaseId, READY)
+note over coordinator,license: One license for the original issuance key.\nPersist the scoped purchase/license before confirming the client.
+end
+coordinator --> client: 201 (purchaseId, licenseId, READY) only after confirmed fulfilment
+
+client -> coordinator: GET /purchases/{purchaseId}/bundle?deviceId=...
+note over client,coordinator: Check customer ownership and READY state; bind material to this device.
+coordinator --> client: 200 (licenseId, protectedBundle, deviceId, READY)
+note over client: Device attempts activation outside this HTTP workflow.
+client -> coordinator: POST /purchases/{purchaseId}/activation-events\n(licenseId, deviceId, ACTIVATED or FAILED)
+coordinator --> client: 204 (event received)
+note over client,coordinator: Receipt acknowledgement does not assert activation success.\nFailure follow-up is outside this small example.
+@enduml

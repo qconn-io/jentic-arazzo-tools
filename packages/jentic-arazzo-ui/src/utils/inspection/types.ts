@@ -30,6 +30,7 @@ export interface Provenance extends Owner {
   reference?: string;
 }
 export interface InspectionDiagnostic extends Provenance {
+  resolutionReasons?: ('self' | 'schema-dialect' | 'base-uri')[];
   phase: 'parsing' | 'resolution' | 'inspection';
   category:
     | 'missing-reference'

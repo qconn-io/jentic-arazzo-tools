@@ -14,6 +14,10 @@ import type { DocumentSnapshot } from './utils/inspection/types';
 import { ArazzoViewerProvider, useArazzoViewer } from './context/ArazzoViewerContext';
 import { DiagramView, DiagramViewRef } from './components/DiagramView';
 import { DocsView } from './components/DocsView';
+import { WorkflowNavigation } from './components/WorkflowNavigation';
+import { CallerNavigation } from './components/CallerNavigation';
+import { SelectionDetails } from './components/SelectionDetails';
+import { InspectionStatus } from './components/InspectionStatus';
 import type { ArazzoDocument, ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 
 export type {
@@ -151,7 +155,7 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
 
   const inspection = useMemo(() => (snapshot ? inspect(snapshot) : null), [snapshot]);
 
-  if (loading) {
+  if (loading && !parsedDocument) {
     return (
       <div
         className={`arazzo-ui ${className ?? ''}`}
@@ -279,18 +283,24 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
   const showDocs = view === 'docs' || view === 'split';
 
   return (
-    <>
-      {showDiagram && (
-        <div style={{ flex: 1, minWidth: 0, height: '100%' }}>
-          <DiagramView ref={diagramRef} showWorkflowTabs={true} />
-        </div>
-      )}
-      {showDocs && (
-        <div style={{ flex: 1, minWidth: 0, height: '100%', overflow: 'auto' }}>
-          <DocsView />
-        </div>
-      )}
-    </>
+    <div className="arazzo-viewer-shell">
+      <WorkflowNavigation />
+      <InspectionStatus />
+      <CallerNavigation />
+      <div className="arazzo-viewer-panes">
+        {showDiagram && (
+          <div style={{ flex: 1, minWidth: 0, height: '100%' }}>
+            <DiagramView ref={diagramRef} showWorkflowTabs={false} />
+          </div>
+        )}
+        {showDocs && (
+          <div style={{ flex: 1, minWidth: 0, height: '100%', overflow: 'auto' }}>
+            <DocsView />
+          </div>
+        )}
+      </div>
+      <SelectionDetails />
+    </div>
   );
 });
 

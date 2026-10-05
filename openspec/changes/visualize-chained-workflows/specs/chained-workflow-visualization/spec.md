@@ -1,6 +1,6 @@
 ## Purpose
 
-Enables consistent, version-aware inspection, reference/capability diagnostics, documentation, and navigation of composed Arazzo workflows, including prerequisites, action parameters, recovery loops, transport-neutral source bindings, and document-level relationships. Inspection does not certify schema conformance or execution support.
+Enables readers to discover workflow relationships, follow connected sequences into downstream interactions, inspect mappings and details, and return to the caller without reading YAML. Version-aware inspection preserves prerequisites, actions, recovery loops, transport-neutral source bindings, and document provenance while presenting limitations in context; inspection does not certify schema conformance or execution support.
 
 ## ADDED Requirements
 
@@ -13,7 +13,7 @@ The viewer SHALL distinguish the document's declared Arazzo feature version from
 
 #### Scenario: Selected Arazzo 1.1 inspection
 - **WHEN** a 1.1 document uses step prerequisites, action parameters, querystring values, or asynchronous step metadata
-- **THEN** those selected features are inspectable consistently in the viewer and documentation, with a visible statement that full 1.1 validation and execution support have not been established
+- **THEN** those selected features are inspectable consistently in the viewer and documentation, with a compact visible inspection-status control whose details explain that full 1.1 validation and execution support have not been established, without repeating that statement on each interaction
 
 #### Scenario: New feature in an older feature version
 - **WHEN** a 1.0 document contains a 1.1-only step prerequisite or asynchronous field
@@ -36,7 +36,7 @@ The viewer and documentation SHALL preserve and describe authored operation/work
 
 #### Scenario: Asynchronous send and receive
 - **WHEN** a 1.1 workflow declares an AsyncAPI send or receive step using an operation or channel locator, timeout, correlation expression, and explicit prerequisites
-- **THEN** cards, documentation, and Mermaid labels retain that authored intent and metadata, prerequisite edges remain prerequisites, and no HTTP method, message-delivery prediction, or additional call/retry edge is invented
+- **THEN** cards, documentation, and sequence interactions show the authored intent and direction, retain the metadata in accessible details, keep prerequisites distinguishable from calls, and invent no HTTP method, message-delivery prediction, or additional call/retry edge
 
 #### Scenario: Opaque source locators
 - **WHEN** an operation locator addresses a webhook, a channel, or a source operation outside an HTTP paths layout
@@ -52,7 +52,7 @@ The viewer and documentation SHALL preserve and describe authored operation/work
 
 #### Scenario: Querystring value preservation
 - **WHEN** a 1.1 parameter uses querystring with a literal or expression-containing string
-- **THEN** every view preserves the location and complete authored value without splitting it into individual query parameters or evaluating expressions
+- **THEN** every view exposes the location and complete authored value through its details without splitting it into individual query parameters or evaluating expressions; the default diagram need not print the full value
 
 ### Requirement: Unknown Content and Document Provenance Preservation
 Inspection and document retrieval SHALL preserve unknown authored fields, extensions, identifiers, schema dialect declarations, and unevaluated expressions. Reference diagnostics SHALL distinguish declaration and use-site ownership and retain available document/occurrence provenance. Supported reference expansion SHALL honor native resolution context; an unsupported identity/dialect rule SHALL preserve its affected references with a limitation instead of substituting semantics or resolving against a known-wrong base.
@@ -82,15 +82,27 @@ Inspection and document retrieval SHALL preserve unknown authored fields, extens
 - **THEN** document retrieval preserves that content, selection remains uniquely scoped independently of it, and only bookkeeping created by the viewer is excluded from the returned document
 
 ### Requirement: Document Overview Access and Navigation Compatibility
-For workflows inspected under a supported profile, the viewer SHALL provide an "All workflows" tab with bidirectional overview/workflow navigation. An uncontrolled viewer SHALL initially select the first workflow; an explicit null active-workflow prop SHALL select overview immediately. Existing public callback signatures SHALL remain compatible.
+For workflows inspected under a supported profile, the viewer SHALL provide a visible "All workflows" control and workflow selection in Docs, Diagram, and Split modes, with bidirectional overview/workflow navigation. Selecting overview SHALL display a document overview in the current mode rather than only changing hidden diagram state. An uncontrolled viewer SHALL initially select the first workflow; an explicit null active-workflow prop SHALL select overview immediately. Existing public callback signatures SHALL remain compatible.
 
 #### Scenario: Uncontrolled initial view
 - **WHEN** a multi-workflow document is mounted without an active-workflow prop
-- **THEN** its first workflow diagram is selected and the "All workflows" tab is available
+- **THEN** its first workflow is selected in the current mode and the "All workflows" control and workflow selection are visible without switching modes
 
 #### Scenario: Explicit overview and round-trip navigation
-- **WHEN** a viewer is mounted with an explicit null active-workflow prop, and a user subsequently selects a workflow node and returns through "All workflows"
-- **THEN** the initial and final views show the overview and the intermediate view shows that workflow
+- **WHEN** a viewer is mounted with an explicit null active-workflow prop, and a user subsequently selects a workflow from the overview and returns through "All workflows"
+- **THEN** the initial and final views show the overview and the intermediate view shows that workflow, in each supported view mode
+
+#### Scenario: Overview from default Docs mode
+- **WHEN** a user loads a supported multi-workflow document in the default Docs mode and selects "All workflows"
+- **THEN** the user sees the workflows and their classified relationships, can select an entry workflow, and does not need to discover or switch to Diagram or Split mode first
+
+#### Scenario: Switching view modes
+- **WHEN** a user switches between Docs, Diagram, and Split while viewing an overview or selected workflow
+- **THEN** the selected destination and visible overview/workflow navigation remain consistent, with one shared selection in Split mode
+
+#### Scenario: Many workflows and limited width
+- **WHEN** a document contains many long workflow names or the viewer has limited horizontal space
+- **THEN** "All workflows" remains discoverable and workflow selection remains operable with keyboard and pointer without hiding navigation behind an offscreen diagram tab strip
 
 #### Scenario: Controlled workflow selection
 - **WHEN** a user requests a different workflow while the active-workflow prop is controlled
@@ -128,7 +140,7 @@ The loader SHALL recover from syntactically valid missing reusable components wh
 - **THEN** the viewer displays a load error instead of rendering a partially resolved document
 
 ### Requirement: Consistent Semantics and Scoped Step Identity
-Diagrams and documentation SHALL display the same actions, parameter values, targets, and warnings for each owning workflow and step. Identical step IDs in different workflows SHALL remain distinct in selection, diagnostics, and reference resolution.
+Diagrams and documentation SHALL expose the same actions, parameter values, targets, and warnings for each owning workflow and step through concise summaries and inspectable details. Semantic parity SHALL NOT require duplicating full metadata or general limitations on the default canvas. Identical step IDs in different workflows SHALL remain distinct in selection, diagnostics, and reference resolution.
 
 #### Scenario: Identical step IDs with different actions
 - **WHEN** flowA.init and flowB.init define different failure actions and parameters
@@ -193,7 +205,7 @@ The overview SHALL render workflow prerequisites, sub-workflow calls, and effect
 
 #### Scenario: Sub-workflow and action transitions
 - **WHEN** a checkout step calls paymentWorkflow and an effective failure action targets refreshTokenWorkflow with mapped parameters
-- **THEN** distinct directed call and action edges show the calling step, action details, and mapped parameter count
+- **THEN** distinct directed call and action edges identify their kind and calling step, with action details and mapped parameter counts available through selection
 
 #### Scenario: Same label across parallel action channels
 - **WHEN** a step has success and failure goto actions with the same name and workflow target, and another step targets that workflow too
@@ -256,6 +268,14 @@ The viewer SHALL distinguish local workflows, scoped steps, external references,
 - **WHEN** a reference names an absent source, a non-arazzo workflow source, a malformed target, or a missing workflow/step
 - **THEN** the original target remains visible with a warning and activation leaves the active workflow unchanged
 
+#### Scenario: Return to the calling occurrence
+- **WHEN** a user follows a local call from flowA.callPayment into flowB and activates the visible return-to-caller control
+- **THEN** navigation returns to flowA.callPayment with its context and selection restored, rather than to an arbitrary caller or the first step; the same behavior is available in Docs, Diagram, and Split
+
+#### Scenario: Same callee reached from different calls
+- **WHEN** the same workflow is called from multiple steps or through nested call paths
+- **THEN** the visible caller context identifies the followed occurrence and returning follows that path, while replacement documents or unrelated controlled navigation cannot restore a stale caller
+
 ### Requirement: Destination-Aware Step Focus
 Step navigation SHALL retain the full destination until its nodes are available, honor controlled selection, and cancel stale requests. Focus SHALL land on the newest valid request for the current document and workflow, including when the destination is already active.
 
@@ -315,7 +335,7 @@ Documentation SHALL show workflow/step prerequisites, ordered effective actions 
 - **THEN** its documentation shows effective values, source provenance, and original unresolved content/warnings matching the diagram
 
 ### Requirement: Mermaid Relationship Semantics
-For supported inspection profiles, generated Mermaid flowcharts SHALL include every understood effective action transition and explicit prerequisite with authored labels/parameters, safe identifiers, and correct transfer semantics. Unsupported content SHALL remain inspectable without fabricated semantic edges.
+For supported inspection profiles, generated Mermaid flowcharts SHALL include every understood effective action transition and explicit prerequisite with concise authored labels, safe identifiers, and correct transfer semantics. Complete authored parameters SHALL remain available in associated details or an explicitly requested detailed rendering rather than being mandatory text on the default diagram. Unsupported content SHALL remain inspectable without fabricated semantic edges.
 
 #### Scenario: Prerequisites and multiple transitions
 - **WHEN** a workflow contains step prerequisites, inherited actions, and several action workflow targets
@@ -330,19 +350,23 @@ For supported inspection profiles, generated Mermaid flowcharts SHALL include ev
 - **THEN** generated Mermaid remains parseable and retains readable authored labels
 
 ### Requirement: Mermaid Inspection Sequence
-Generated sequence diagrams SHALL use the same classified source bindings, supported actions, parameter values, and inspection limitations as other views. They SHALL be presented as schematic authored interactions, without predicting evaluated outcomes or guessing source ownership and message delivery behavior.
+Generated sequence diagrams SHALL use the same classified source bindings, supported actions, parameter values, and inspection limitations as other views. They SHALL present connected schematic authored interactions with concise labels and relevant participants, retaining complete metadata in associated inspectable details. They SHALL NOT predict evaluated outcomes or guess source ownership and message delivery behavior. Local workflow calls SHALL follow the connected sequence requirements below rather than appearing only as notes.
 
 #### Scenario: Authored asynchronous interaction
 - **WHEN** an inspected workflow has AsyncAPI send/receive steps with prerequisites, correlation expressions, and timeouts
-- **THEN** the sequence shows authored message direction and metadata/prerequisite notes without inventing a synchronous response, activation lifetime, or successful criterion result
+- **THEN** the sequence shows authored message direction and concise prerequisite annotations, exposes correlation, timeout, and other metadata through details, and invents no synchronous response, activation lifetime, or successful criterion result
 
 #### Scenario: Ambiguous source participant
-- **WHEN** an operation has no verified source assignment or several candidate sources
-- **THEN** its sequence participant is explicitly unverified rather than arbitrarily selecting the first source description
+- **WHEN** an operation has no identifiable declared source assignment or several candidate sources
+- **THEN** its sequence uses an explicitly unknown or ambiguous destination and exposes the original locator and explanation without arbitrarily selecting the first source description
+
+#### Scenario: Declared source has not been fetched
+- **WHEN** an operation explicitly identifies a declared source whose document has not been fetched
+- **THEN** the sequence names that declared source as its destination and exposes the source-not-checked status in details, without treating the known declaration as an ambiguous destination or asserting that the operation has been verified
 
 #### Scenario: Action and parameter parity
 - **WHEN** steps inherit or override actions and reusable parameters
-- **THEN** the sequence's notes retain the same effective action order and parameter details as documentation, labeled as inspection policy rather than an execution trace
+- **THEN** selection exposes the same effective action order and full parameter details as documentation, labeled as inspection policy rather than an execution trace, without filling the default sequence with repeated parameter or action-object notes
 
 #### Scenario: Participant identity and escaped labels
 - **WHEN** distinct source names collide under punctuation removal or contain Mermaid delimiters
@@ -351,3 +375,87 @@ Generated sequence diagrams SHALL use the same classified source bindings, suppo
 #### Scenario: Unsupported version sequence
 - **WHEN** the document has no supported semantic inspection profile
 - **THEN** raw documentation and the limitation remain available without generating a guessed sequence diagram
+
+### Requirement: Connected Local Workflow Sequences
+For a selected workflow under a supported inspection profile, the sequence view SHALL show standard local workflow calls as identifiable call interactions and expandable groups containing the callee's authored interactions. Direct local calls SHALL initially be expanded within visible display limits; deeper calls SHALL offer explicit expansion controls. Each occurrence SHALL retain its caller, call step, callee, and authored input/output mappings. Structural call and return boundaries SHALL distinguish workflow composition from API exchanges and SHALL NOT imply a successful execution or fabricate an API response.
+
+#### Scenario: Direct call contains downstream interactions
+- **WHEN** checkout calls payment and payment contains an operation targeting a declared payment API
+- **THEN** the initial checkout sequence shows the checkout-to-payment call, a labeled payment group containing that API interaction, and the structural return to checkout's continuation, rather than only a call note or a disconnected payment diagram
+
+#### Scenario: Deeper call expansion and collapse
+- **WHEN** payment calls another local workflow and the reader expands that call, then collapses the payment group
+- **THEN** the deeper interactions appear within the correct call path and collapse restores a concise call summary without losing the reader's root workflow or inventing a new execution order
+
+#### Scenario: Repeated callee with distinct mappings
+- **WHEN** two steps call the same local workflow with different parameter values
+- **THEN** the sequence retains two distinct call occurrences whose selection exposes their respective values, callee inputs, and authored output expressions without evaluating them or merging their identities
+
+#### Scenario: Structural return is not an outcome assertion
+- **WHEN** a local call group displays a return boundary
+- **THEN** its presentation identifies workflow-control continuation, does not label it as an evaluated success or HTTP response, and keeps conditional transfers distinguishable from the ordinary structural continuation
+
+#### Scenario: Goto, retry, and prerequisite distinctions
+- **WHEN** a workflow contains a conditional goto, retry recovery targeting another workflow, and a prerequisite
+- **THEN** the sequence distinguishes possible one-way transfer, recovery returning to retry the source step, and prerequisite dependence; it does not depict them as ordinary calls returning to the next step or as branches known to execute
+
+#### Scenario: Recursion and bounded expansion
+- **WHEN** expansion encounters a call already on the current path or exceeds a depth or displayed-interaction limit
+- **THEN** it stops at a visible marker identifying the target and reason, offers inspection or navigation to available local content, and neither hangs nor silently drops the relationship or claims that the workflow ends at the display boundary
+
+#### Scenario: External or missing callee
+- **WHEN** a call targets an unfetched external workflow or an absent local workflow
+- **THEN** the sequence retains the call and its external or missing status, explains why expansion is unavailable, and does not fetch content, substitute a same-named local workflow, or fabricate the callee's interactions
+
+#### Scenario: Descriptive implementation association
+- **WHEN** an API operation's internal implementation is described only in prose or x-internal-processing, including the D1 sample's client/server association
+- **THEN** the content remains inspectable but produces no inferred call edge or nested sequence group; separate standard adapter-to-ABT workflow calls remain expandable, and the absence of a standard relationship is explained without declaring the extension invalid
+
+### Requirement: Readable Diagrams and Details on Selection
+Default diagrams SHALL prioritize workflow, participant, step, and relationship identity over raw metadata. Full parameters, criteria, input/output mappings, provenance, unresolved authored content, and contextual diagnostics SHALL remain accessible through selection or explicitly labeled detail controls. Controls SHALL be operable by keyboard and pointer with understandable names and visible focus. Sequence participants SHALL be limited to the displayed interactions and necessary call context rather than all source descriptions in the document.
+
+#### Scenario: Metadata-heavy workflow
+- **WHEN** a workflow contains long criteria, structured parameters, multiple actions, and timeouts
+- **THEN** the initial sequence remains focused on interactions without full JSON objects or repeated parameter/criteria notes, and selecting an interaction reveals its complete authored details without loading a different document
+
+#### Scenario: Input and output mapping inspection
+- **WHEN** a reader selects a workflow call
+- **THEN** details distinguish caller-supplied parameter names and values, declared callee inputs and outputs, and caller-side output expressions; unavailable mappings are identified rather than fabricated
+
+#### Scenario: Relevant participants and long labels
+- **WHEN** the document declares unused sources or lengthy workflow and operation names
+- **THEN** the sequence shows participants for its displayed interactions, concise distinguishable labels, and access to full names without overlapping labels that prevent following the call path
+
+#### Scenario: Keyboard interaction
+- **WHEN** a reader navigates the workflow selector, call expansion, details, and return-to-caller controls using a keyboard
+- **THEN** each action is available with visible focus and an understandable accessible name, and closing details returns focus to the relevant interaction or its control
+
+### Requirement: Contextual Inspection Status
+The viewer SHALL consolidate general inspection limitations in one compact document-level status control whose details describe what was and was not checked. It SHALL distinguish unfetched sources from invalid sources and explain how unsupported resolution affects displayed references. Actionable missing or ambiguous relationships SHALL retain visible occurrence markers with accessible explanations. General limitations SHALL NOT be repeated on every diagram participant or interaction.
+
+#### Scenario: Sources not checked
+- **WHEN** source descriptions were not fetched
+- **THEN** the compact status reports that source documents were not checked and its details explain that this does not establish invalidity or inaccessibility, without repeating a validation/execution disclaimer on each sequence step
+
+#### Scenario: Reference expansion bypassed
+- **WHEN** expansion is bypassed because of unsupported $self semantics, unavailable base URI, or an unsupported schema dialect
+- **THEN** status details name the detected cause and explain that affected references remain authored, without listing unrelated possible causes as though they were all detected or implying that every understood local workflow call is unavailable
+
+#### Scenario: Missing target needs attention
+- **WHEN** one call has a missing or ambiguous target in an otherwise inspectable document
+- **THEN** its occurrence has a visible marker and an explanation identifying the target and unavailable action, while general document status remains consolidated and unrelated interactions remain readable
+
+### Requirement: Workflow Chaining Comprehension Acceptance
+Acceptance SHALL include browser walkthrough evidence for the D1 standard sample and a reproducible nested-call fixture. The walkthrough SHALL demonstrate the reader tasks below from the default view without requiring raw YAML, hidden mode knowledge, or explanations from the implementer. Screenshots and observations SHALL record the relevant states and any failed tasks; semantic assertions and parseable diagram syntax alone SHALL NOT establish visual UX acceptance.
+
+#### Scenario: Find and follow a chain
+- **WHEN** a reader opens the nested-call fixture in the default view
+- **THEN** the reader can find All workflows, select an entry workflow, identify caller and callee, follow the callee's downstream API interaction, inspect its mappings, and return to the original calling occurrence using visible controls
+
+#### Scenario: D1 standard composition and its boundary
+- **WHEN** a reader opens the D1 standard sample
+- **THEN** the overview exposes its six standard adapter-to-ABT calls, an adapter implementation sequence exposes the called ABT workflow's API interactions, and the separate client workflows are not falsely connected through their descriptive implementation associations
+
+#### Scenario: Usability across modes and difficult documents
+- **WHEN** the walkthrough covers Docs, Diagram, and Split modes plus repeated calls, recursion, an external target, and a metadata-heavy workflow
+- **THEN** navigation and details remain discoverable, call occurrences stay distinguishable, expansion boundaries and unavailable content are understandable, and the default diagrams remain usable without repeated general warnings or raw metadata dominating the interactions

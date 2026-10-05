@@ -1,0 +1,272 @@
+[
+  {
+    "task": "Default Docs → All workflows → payment → visible Sequence choice",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "Nested expansion, distinct repeated calls, full mapping inspection, keyboard close, exact caller return across modes, expansion restoration and collapse",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "Readable SVG labels and horizontal canvas scrolling",
+    "width": 1440,
+    "outcome": "passed",
+    "labels": [
+      {
+        "size": 13,
+        "width": 58.890625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 56.84375,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 57.921875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 57.40625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 33.171875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 127.6875,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 210.19775390625,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 177.140625,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 209.34375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 194.578125,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 198.109375,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 121.8125,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 103.25,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 201.09375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 195.40185546875,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 194.578125,
+        "height": 31
+      }
+    ],
+    "canvasWidth": "1150"
+  },
+  {
+    "task": "recursion markers, long labels and mode round trips",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "difficult markers, long labels and mode round trips",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "Default Docs → All workflows → payment → visible Sequence choice",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "Nested expansion, distinct repeated calls, full mapping inspection, keyboard close, exact caller return across modes, expansion restoration and collapse",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "Readable SVG labels and horizontal canvas scrolling",
+    "width": 480,
+    "outcome": "passed",
+    "labels": [
+      {
+        "size": 13,
+        "width": 58.890625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 56.84375,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 57.921875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 57.40625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 33.171875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "width": 127.6875,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 210.19775390625,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 177.140625,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 209.34375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 194.578125,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 198.109375,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 121.8125,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 103.25,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "width": 201.09375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 195.40185546875,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "width": 194.578125,
+        "height": 31
+      }
+    ],
+    "canvasWidth": "1150"
+  },
+  {
+    "task": "recursion markers, long labels and mode round trips",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "difficult markers, long labels and mode round trips",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "outcome": "failed",
+    "message": "The expression evaluated to a falsy value:\n\n  assert((await scene.locator('li').count()) > 3)\n"
+  }
+]

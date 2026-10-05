@@ -10,6 +10,7 @@ import type { InspectedStepData } from '../src/nodes/StepNode';
 import { RelationshipEdge, relationshipPath } from '../src/edges/RelationshipEdge';
 import type { RelationshipEdgeData } from '../src/edges/RelationshipEdge';
 import type { ArazzoDocument } from '../src/types/arazzo';
+import { SelectionDetails } from '../src/components/SelectionDetails';
 
 const doc: ArazzoDocument = {
   arazzo: '1.1.0',
@@ -44,6 +45,7 @@ function Cards() {
   return (
     <>
       <InspectionStepCard id={node.id} data={node.data as InspectedStepData} />
+      <SelectionDetails />
       <svg>
         <RelationshipEdge
           id={edge.id}
@@ -71,9 +73,6 @@ describe('shared-model cards and prerequisite paths', () => {
       </ReactFlowProvider>,
     );
     expect(screen.getByText('Authored intent: receive')).toBeTruthy();
-    expect(screen.getByText('Timeout: 123 ms')).toBeTruthy();
-    expect(screen.getByText('Correlation: $message.header.id')).toBeTruthy();
-    expect(screen.getByText('wholeQuery (querystring): false')).toBeTruthy();
     const step = screen.getByText('stepFirst');
     const inherited = screen.getByText('default');
     expect(step.compareDocumentPosition(inherited) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -82,6 +81,13 @@ describe('shared-model cards and prerequisite paths', () => {
         .getByRole('button', { name: 'Prerequisite: absent (missing)' })
         .hasAttribute('disabled'),
     ).toBe(true);
+    expect(screen.queryByText('Timeout: 123 ms')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Details for a.receive' }));
+    const details = screen.getByRole('region', { name: 'Selection details' });
+    expect(details.textContent).toContain('"timeout": 123');
+    expect(details.textContent).toContain('$message.header.id');
+    expect(details.textContent).toContain('querystring');
+    expect(details.textContent).toContain('"value": false');
   });
 
   it('uses scoped prerequisite navigation and renders the real left side route', () => {
@@ -145,16 +151,52 @@ it('renders inherited reusable action values, unresolved occurrences, criteria a
       </ArazzoViewerProvider>
     </ReactFlowProvider>,
   );
-  expect(screen.getByText('effective-token: 0')).toBeTruthy();
-  expect(screen.getByText('$components.parameters.missing: false (unresolved)')).toBeTruthy();
-  expect(screen.getByText('empty: ""')).toBeTruthy();
-  expect(screen.getByText('nullable: null')).toBeTruthy();
-  expect(screen.getByText('array: [0,false]')).toBeTruthy();
-  expect(screen.getByText('object: {"enabled":false}')).toBeTruthy();
-  expect(container.textContent).toContain('$statusCode == 401');
-  expect(container.textContent).toContain('Declaration: /components/failureActions/recovery');
-  expect(container.textContent).toContain('Use: /workflows/0/failureActions/0');
+  expect(container.textContent).not.toContain('$statusCode == 401');
+  fireEvent.click(screen.getByRole('button', { name: 'Details for a.receive' }));
+  const details = screen.getByRole('region', { name: 'Selection details' });
+  expect(details.textContent).toContain('effective-token');
+  expect(details.textContent).toContain('"value": 0');
+  expect(details.textContent).toContain('"value": false');
+  expect(details.textContent).toContain('"value": ""');
+  expect(details.textContent).toContain('"value": null');
+  expect(details.textContent).toContain('"enabled": false');
+  expect(details.textContent).toContain('$statusCode == 401');
+  expect(details.textContent).toContain('"declarationPath"');
+  expect(details.textContent).toContain('recovery');
   expect(container.textContent).toContain(
     'reusable component $components.parameters.missing is unavailable',
   );
+});
+
+it('opens graph calls even when they fall beyond the sequence display budget', () => {
+  const large: ArazzoDocument = {
+    arazzo: '1.0.0',
+    info: { title: 'large', version: '1' },
+    sourceDescriptions: [],
+    workflows: [
+      {
+        workflowId: 'root',
+        steps: [
+          ...Array.from({ length: 199 }, (_, i) => ({ stepId: `step${i}`, operationId: 'opaque' })),
+          { stepId: 'lateCall', workflowId: 'callee' },
+        ],
+      },
+      { workflowId: 'callee', steps: [{ stepId: 'work', operationId: 'opaque' }] },
+    ],
+  };
+  function LateCard() {
+    const viewer = useArazzoViewer();
+    const node = viewer.nodes.find((n) => n.data.type === 'workflowRef')!;
+    return node ? <InspectionStepCard id={node.id} data={node.data as InspectedStepData} /> : null;
+  }
+  const onWorkflowSelect = vi.fn();
+  render(
+    <ReactFlowProvider>
+      <ArazzoViewerProvider document={large} events={{ onWorkflowSelect }}>
+        <LateCard />
+      </ArazzoViewerProvider>
+    </ReactFlowProvider>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Call callee (local-workflow)' }));
+  expect(onWorkflowSelect).toHaveBeenCalledWith('callee');
 });

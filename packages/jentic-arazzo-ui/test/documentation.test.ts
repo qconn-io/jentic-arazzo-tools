@@ -25,6 +25,21 @@ const document = (value: unknown) => value as ArazzoDocument;
 mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
 
 describe('shared-model documentation', () => {
+  test('source links resolve relative to the retrieved workflow rather than the UI page', () => {
+    const input = document({
+      ...structuredClone(asynchronous),
+      sourceDescriptions: [{ name: 'wallet', type: 'openapi', url: '../vendor/wallet.yaml' }],
+    });
+    const output = generateDocumentation(input, {
+      documentURL: 'http://localhost:3000/openapi_samples/workflows/wallet.arazzo.yaml',
+    });
+    const container = globalThis.document.createElement('div');
+    container.innerHTML = output.headerMarkdown;
+    expect(container.querySelector('.source-card a')?.getAttribute('href')).toBe(
+      'http://localhost:3000/openapi_samples/vendor/wallet.yaml',
+    );
+    expect(container.querySelector('.source-card a')?.textContent).toBe('../vendor/wallet.yaml');
+  });
   test('effective actions apply channel/name/type policy once with original defaults retained', () => {
     const output = generateDocumentation(document(scopedActions));
     const step = output.workflows[0].steps[0];
@@ -211,11 +226,12 @@ describe('schematic Mermaid consumers', () => {
   test('sequence preserves authored send/receive, ambiguous source and all effective actions without predictions', async () => {
     const input = document(asynchronous);
     const sequence = generateMermaidSequence(input.workflows[0], input);
-    expect(sequence).toContain('Client->>Source0');
-    expect(sequence).toContain('Source1->>Client');
-    expect(sequence).toContain('Unverified');
-    expect(sequence).toContain('correlation');
-    expect(sequence).toContain('timeout');
+    expect(sequence).toContain('P0->>P1');
+    expect(sequence).toContain('P2->>P0');
+    expect(sequence).toContain('Ambiguous destination');
+    const metadata = generateDocumentation(input).markdown;
+    expect(metadata).toContain('correlation');
+    expect(metadata).toContain('timeout');
     expect(sequence).not.toContain('Response');
     expect(sequence).not.toContain('->>+');
     expect(sequence).not.toContain('✓');
@@ -224,8 +240,9 @@ describe('schematic Mermaid consumers', () => {
       document(scopedActions).workflows[0],
       document(scopedActions),
     );
-    expect(actions).toContain('Viewer inspection order');
-    expect(actions).toContain('default-end');
+    const actionDocs = generateDocumentation(document(scopedActions)).markdown;
+    expect(actionDocs).toContain('Viewer inspection order');
+    expect(actionDocs).toContain('default-end');
     expect(actions).toContain('extra');
     await expect(mermaid.parse(actions)).resolves.toBeTruthy();
   });

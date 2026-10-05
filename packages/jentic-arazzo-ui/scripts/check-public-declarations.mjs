@@ -20,6 +20,16 @@ import type { WorkflowRelationship } from ${JSON.stringify(declaration)};
 import type { EffectiveAction } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private native snapshots must not become public exports.
 import type { DocumentSnapshot } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private sequence scenes must not become public exports.
+import type { SequenceScene } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private occurrence paths must not become public exports.
+import type { CallPath } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private caller navigation must not become public exports.
+import type { CallerFrame } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private detail projections must not become public exports.
+import type { OccurrenceDetails } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private session presentation must not become public exports.
+import type { Session } from ${JSON.stringify(declaration)};
 const variant: ArazzoEdgeType = 'relationship';
 const legacy: WorkflowRefNodeData = { type: 'workflowRef', step: { stepId: 'call', workflowId: 'child' }, targetWorkflowId: 'child', isValid: true };
 export const onEdgeSelect: NonNullable<ArazzoUIProps['onEdgeSelect']> = (id, edge) => {

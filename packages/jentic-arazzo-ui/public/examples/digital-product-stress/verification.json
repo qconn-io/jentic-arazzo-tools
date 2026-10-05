@@ -1,0 +1,254 @@
+{
+  "verifiedOn": "2026-10-05",
+  "scope": "Example contracts, mappings and current viewer; no live API or broker execution.",
+  "counts": {
+    "httpWorkflows": 18,
+    "httpOperations": 15,
+    "eventWorkflows": 4,
+    "asyncapiOperations": 8,
+    "eventMessages": 4,
+    "yamlDocuments": 13,
+    "authoredScenarios": 27
+  },
+  "contractChecks": {
+    "status": "passed",
+    "arazzoVersion": "1.1.0",
+    "arazzoSchema": "https://spec.openapis.org/arazzo/1.1/schema/2026-04-15",
+    "openapiVersion": "3.1.0",
+    "openapiSchema": "https://spec.openapis.org/oas/3.1/schema/2022-10-07",
+    "asyncapiVersion": "3.0.0",
+    "asyncapiParserVersion": "3.6.3",
+    "checks": [
+      "Published document schemas",
+      "HTTP operation and event message examples",
+      "Workflow, action and prerequisite references in reference documents",
+      "Required input mappings",
+      "Repository validator: zero diagnostics for both reference Arazzo documents"
+    ]
+  },
+  "exampleValueProbes": {
+    "status": "passed",
+    "http": [
+      "Successful-path requests and nested inputs satisfy schemas",
+      "Two distinct capture and issuance mappings; eight distinct original operation keys",
+      "Six evidence mismatch cases rejected",
+      "Authored HTTP expression owners resolve"
+    ],
+    "events": [
+      "Three independent actor example probes",
+      "Header, payload and external workflow input mappings satisfy schemas",
+      "Unrelated correlation filtered",
+      "FAILED completion rejected",
+      "Wrong activation event in audit receipt rejected",
+      "FAILED activation remains FAILED in publication"
+    ],
+    "method": "Evaluate expressions and criteria against supplied examples, not a workflow engine execution."
+  },
+  "viewerModels": [
+    {
+      "file": "arazzo.yaml",
+      "workflows": 18,
+      "relationships": 19,
+      "fullyExpandedRows": 48,
+      "participants": 17,
+      "markers": [],
+      "diagnostics": []
+    },
+    {
+      "file": "event-based.arazzo.yaml",
+      "workflows": 4,
+      "relationships": 2,
+      "fullyExpandedRows": 12,
+      "participants": 4,
+      "markers": [],
+      "diagnostics": []
+    },
+    {
+      "file": "boundaries/depth-limit.arazzo.yaml",
+      "workflows": 12,
+      "relationships": 11,
+      "fullyExpandedRows": 18,
+      "participants": 10,
+      "markers": [
+        "depth"
+      ],
+      "diagnostics": []
+    },
+    {
+      "file": "boundaries/metadata-heavy.arazzo.yaml",
+      "workflows": 2,
+      "relationships": 1,
+      "fullyExpandedRows": 3,
+      "participants": 3,
+      "markers": [],
+      "diagnostics": []
+    },
+    {
+      "file": "boundaries/recursion.arazzo.yaml",
+      "workflows": 2,
+      "relationships": 2,
+      "fullyExpandedRows": 6,
+      "participants": 3,
+      "markers": [
+        "recursion"
+      ],
+      "diagnostics": []
+    },
+    {
+      "file": "boundaries/row-limit.arazzo.yaml",
+      "workflows": 1,
+      "relationships": 0,
+      "fullyExpandedRows": 200,
+      "participants": 2,
+      "markers": [
+        "rows"
+      ],
+      "diagnostics": []
+    },
+    {
+      "file": "diagnostics/prerequisite-cycle.arazzo.yaml",
+      "workflows": 2,
+      "relationships": 2,
+      "fullyExpandedRows": 2,
+      "participants": 2,
+      "markers": [],
+      "diagnostics": [
+        "prerequisite-cycle",
+        "prerequisite-cycle"
+      ]
+    },
+    {
+      "file": "diagnostics/unavailable-targets.arazzo.yaml",
+      "workflows": 1,
+      "relationships": 3,
+      "fullyExpandedRows": 8,
+      "participants": 6,
+      "markers": [
+        "external-workflow",
+        "external-workflow",
+        "missing"
+      ],
+      "diagnostics": [
+        "ambiguous-source",
+        "call-target",
+        "ambiguous-source"
+      ]
+    }
+  ],
+  "limitations": [
+    "The 27 scenarios are authored expectations, not 27 executed runtime tests.",
+    "Browser checks use the existing built viewer; model checks use current source via Vite SSR.",
+    "No live transport, broker, retry timer, consumer dispatcher or compensation execution was tested.",
+    "Deliberately invalid diagnostics fixtures are excluded from semantic reference validity claims.",
+    "The recursion fixture is structurally valid and intentionally nonterminating; inspect only.",
+    "The viewer does not fetch/inline the supplied external commerce workflow, evaluate branches or display HTTP response arrows."
+  ],
+  "checksums": {
+    "arazzo.yaml": "58086e94bc72622b100c08d329ed3f06022d0b1f4a084f5d39b0c1c3b2e01fa0",
+    "audit-worker-inputs.json": "c56410ff208631afd8cf8af4eb009e96945ace4aab3f0147043c48fb04e0ad66",
+    "boundaries/depth-limit.arazzo.yaml": "62456e3fd5ec0d4aaa4818e7888d3d367e34cffa412a9de9cc71653b98bd0e0b",
+    "boundaries/metadata-heavy.arazzo.yaml": "8fce882eb7ffee0dfb8f3a745b77cd1e01dbba53b05f0e28597c179e1bcafc54",
+    "boundaries/recursion.arazzo.yaml": "92b3888975b45d1f207c4f7843451f32dd40dc27ef9c0873970ec261448857a8",
+    "boundaries/row-limit.arazzo.yaml": "8089a1b1e28eb6e7f8e0f4d4b71c6910414b1cb5c62aec58f2ffa80f6a768dbc",
+    "coordinator.openapi.yaml": "c700c404ad0abbb77800ae8cf496b3a89ae7f5a3e5b616facf65c42cdcb25312",
+    "diagnostics/prerequisite-cycle.arazzo.yaml": "91e7b7fb1c2c7743e095fcfb035b375ad78b608ac74e1187fc651a64d6ffbb38",
+    "diagnostics/unavailable-targets.arazzo.yaml": "40e57edaa566d0e645f643c4b60b4d9f8553a8bd2478880379bb019a46dee8b6",
+    "event-based.arazzo.yaml": "8cf8380f3e9c296873ead824c011f52d0972968be70acf5ca45199b36311fad0",
+    "event-inputs.json": "722413c12f9621653dd3e5ca7d32c557adec60dc682e4f53197af1601d88acd1",
+    "events.asyncapi.yaml": "33ae21c35e9a0c92a1c3a564569434c8973167e2de7c4f6f9459ed6d468e21a8",
+    "inputs.json": "e7c5777a857073821e02d3670540b9627fa04911ed1f850264f7dc83720cb9cc",
+    "inventory.openapi.yaml": "e1377ed00151e57057100528cdf55ca5a037320e8345eec91522d4337347cd98",
+    "license.openapi.yaml": "e596c8b34124220d066e4569a5eab672be8ffe19fb7eefba925ffef02b00d760",
+    "payment.openapi.yaml": "d569d297557246a62f7eae4ff84c7252af918d5c9c2db2335a7ee420a181f51b",
+    "scenarios.json": "6376886b7a8a0ab7e436077b0caff00d652d544eddd61a446f5aa80b77c5b77b",
+    "worker-inputs.json": "0021d1a8745b5edc9ff4a8622c9b0301eb4ef2fc6a89b99f5327e22770af73b2"
+  },
+  "browserChecks": {
+    "status": "passed",
+    "viewportWidths": [
+      1440,
+      480
+    ],
+    "outcomes": [
+      {
+        "task": "HTTP overview, deep expansion, distinct repeated capture occurrences and recovery labels",
+        "width": 1440,
+        "expansions": 12,
+        "outcome": "passed"
+      },
+      {
+        "task": "Compensation path, goto distinction and mode retention",
+        "width": 1440,
+        "outcome": "passed"
+      },
+      {
+        "task": "Event send/receive direction, join prerequisites, timeout/source details",
+        "width": 1440,
+        "outcome": "passed"
+      },
+      {
+        "task": "Visible recursion boundary marker",
+        "width": 1440,
+        "outcome": "passed"
+      },
+      {
+        "task": "Visible depth boundary marker",
+        "width": 1440,
+        "outcome": "passed"
+      },
+      {
+        "task": "Visible rows boundary marker",
+        "width": 1440,
+        "outcome": "passed"
+      },
+      {
+        "task": "Long labels and full structured metadata access",
+        "width": 1440,
+        "outcome": "passed"
+      },
+      {
+        "task": "HTTP overview, deep expansion, distinct repeated capture occurrences and recovery labels",
+        "width": 480,
+        "expansions": 12,
+        "outcome": "passed"
+      },
+      {
+        "task": "Compensation path, goto distinction and mode retention",
+        "width": 480,
+        "outcome": "passed"
+      },
+      {
+        "task": "Event send/receive direction, join prerequisites, timeout/source details",
+        "width": 480,
+        "outcome": "passed"
+      },
+      {
+        "task": "Visible recursion boundary marker",
+        "width": 480,
+        "outcome": "passed"
+      },
+      {
+        "task": "Visible depth boundary marker",
+        "width": 480,
+        "outcome": "passed"
+      },
+      {
+        "task": "Visible rows boundary marker",
+        "width": 480,
+        "outcome": "passed"
+      },
+      {
+        "task": "Long labels and full structured metadata access",
+        "width": 480,
+        "outcome": "passed"
+      },
+      {
+        "task": "Installed Mermaid parser accepts all generated static sequence diagrams",
+        "count": 42,
+        "outcome": "passed"
+      }
+    ],
+    "pageErrors": 0,
+    "sequenceVisibilityAsserted": true
+  }
+}

@@ -1,0 +1,171 @@
+arazzo: 1.1.0
+info:
+  title: Long labels and large structured input details
+  version: 1.0.0
+sourceDescriptions:
+  - name: coordinator
+    url: ../coordinator.openapi.yaml
+    type: openapi
+  - name: inventory
+    url: ../inventory.openapi.yaml
+    type: openapi
+  - name: payment
+    url: ../payment.openapi.yaml
+    type: openapi
+  - name: license
+    url: ../license.openapi.yaml
+    type: openapi
+components:
+  parameters:
+    service-authorization:
+      name: Authorization
+      in: header
+      value: Bearer {$inputs.serviceToken}
+    operation-key:
+      name: Idempotency-Key
+      in: header
+      value: $inputs.purchaseId
+  failureActions:
+    stop-and-reconcile:
+      name: stop-and-reconcile
+      type: end
+    retry-transient:
+      name: retry-transient
+      type: retry
+      retryAfter: 1
+      retryLimit: 2
+      criteria:
+        - condition: $statusCode == 503
+  successActions:
+    finish:
+      name: finish
+      type: end
+workflows:
+  - workflowId: metadata-heavy-entry
+    summary: One deeply described call with long identities and structured values
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+        licenseId:
+          type: string
+        serviceToken:
+          type: string
+        context:
+          type: object
+          default:
+            debug: false
+            retryBudget: 0
+            fallback: null
+            emptyString: ""
+            tags:
+              - stress
+              - long-labels
+              - metadata
+            policy:
+              originalKeyRequired: true
+              authorizedAmount:
+                minor: 1299
+                currency: EUR
+              reconciliation:
+                readOriginal: true
+                replayNewKey: false
+            explanation: >-
+              This deliberately lengthy authored note contains "quotes", [brackets], semicolons; a
+              literal {$inputs.productId} and a newline
+
+              so that shortening diagram labels does not discard the inspectable source content.
+    steps:
+      - stepId: persist-verified-purchase-with-structured-policy-and-long-authored-name
+        workflowId: record-ready
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: licenseId
+            value: $inputs.licenseId
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+        x-example-heavy-metadata:
+          debug: false
+          retryBudget: 0
+          fallback: null
+          emptyString: ""
+          tags:
+            - stress
+            - long-labels
+            - metadata
+          policy:
+            originalKeyRequired: true
+            authorizedAmount:
+              minor: 1299
+              currency: EUR
+            reconciliation:
+              readOriginal: true
+              replayNewKey: false
+          explanation: >-
+            This deliberately lengthy authored note contains "quotes", [brackets], semicolons; a
+            literal {$inputs.productId} and a newline
+
+            so that shortening diagram labels does not discard the inspectable source content.
+  - workflowId: record-ready
+    summary: Persist the scoped READY result and demonstrate a reusable success end
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        licenseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context: {}
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: persist-ready
+        operationId: $sourceDescriptions.coordinator.updatePurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-ready"
+        requestBody:
+          contentType: application/json
+          payload:
+            state: READY
+            licenseId: $inputs.licenseId
+            reason: confirmed fulfilment
+            context: $inputs.context
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+          - condition: $response.body#/licenseId == $inputs.licenseId
+        outputs:
+          state: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        onSuccess:
+          - reference: $components.successActions.finish
+    outputs:
+      state: $steps.persist-ready.outputs.state

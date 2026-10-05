@@ -1,0 +1,326 @@
+arazzo: 1.1.0
+info:
+  title: Digital product purchase and activation
+  version: 1.0.0
+  summary: A small fictional purchase journey with explicit downstream workflow composition.
+  description: >-
+    A client purchases a digital product, retrieves its ready license and reports the actual
+    device activation outcome. The coordinator reserves inventory, captures the authorized
+    payment and issues one license before returning the purchase response. Client exchanges
+    and coordinator implementation are separate perspectives of the same purchase exchange.
+    All API contracts are local; example.test servers and authorization tokens are illustrative.
+sourceDescriptions:
+  - name: coordinator
+    url: ./coordinator.openapi.yaml
+    type: openapi
+  - name: inventory
+    url: ./inventory.openapi.yaml
+    type: openapi
+  - name: payment
+    url: ./payment.openapi.yaml
+    type: openapi
+  - name: license
+    url: ./license.openapi.yaml
+    type: openapi
+
+# Example-specific presentation metadata, not standard invocation semantics.
+# Definitions and the boundary mapping are documented in README.md.
+x-example-participants:
+  client: Client application
+  coordinator: Purchase Coordinator
+  inventory: Inventory Service
+  payment: Payment Service
+  license: License Service
+
+workflows:
+  - workflowId: client-journey
+    summary: Purchase, retrieve a license and report activation
+    description: >-
+      Client perspective. purchaseProduct encloses fulfil-purchase on the server; the client
+      does not invoke that internal workflow separately. A FAILED activation event is still
+      acknowledged as received. This workflow records the report, not device installation.
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - purchaseKey
+        - clientToken
+        - deviceId
+        - activationKey
+        - activationOutcome
+      properties:
+        customerId: { type: string, minLength: 1 }
+        productId: { type: string, minLength: 1 }
+        amountMinor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        paymentToken: { type: string, minLength: 1 }
+        purchaseKey: { type: string, minLength: 1 }
+        clientToken: { type: string, minLength: 1 }
+        deviceId: { type: string, minLength: 1 }
+        activationKey: { type: string, minLength: 1 }
+        activationOutcome: { type: string, enum: [ACTIVATED, FAILED] }
+    failureActions:
+      - name: stop-client-journey
+        type: end
+    steps:
+      - stepId: purchase
+        description: >-
+          Purchase one product. Server-side fulfil-purchase runs before the 201 response;
+          readiness requires reservation, matching captured payment and issued license evidence.
+        operationId: $sourceDescriptions.coordinator.purchaseProduct
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$inputs.clientToken}'
+          - name: Idempotency-Key
+            in: header
+            value: $inputs.purchaseKey
+        requestBody:
+          contentType: application/json
+          payload:
+            customerId: $inputs.customerId
+            productId: $inputs.productId
+            amountMinor: $inputs.amountMinor
+            currency: $inputs.currency
+            paymentToken: $inputs.paymentToken
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/state == 'READY'
+        outputs:
+          purchaseId: $response.body#/purchaseId
+          licenseId: $response.body#/licenseId
+        x-example-actor: client
+        x-example-target: coordinator
+        x-example-implementation:
+          workflowId: fulfil-purchase
+          timing: before-response
+          inputs:
+            customerId: $request.body#/customerId
+            productId: $request.body#/productId
+            amountMinor: $request.body#/amountMinor
+            currency: $request.body#/currency
+            paymentToken: $request.body#/paymentToken
+          serverInputs:
+            purchaseId: Generated once and durably associated with the scoped purchase key.
+            serviceToken: Coordinator service identity from server configuration.
+          response:
+            purchaseId: $workflows.fulfil-purchase.outputs.purchaseId
+            licenseId: $workflows.fulfil-purchase.outputs.licenseId
+            state: $workflows.fulfil-purchase.outputs.state
+      - stepId: retrieve-bundle
+        description: Read protected material only for the authenticated customer's ready purchase.
+        operationId: $sourceDescriptions.coordinator.getLicenseBundle
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$inputs.clientToken}'
+          - name: purchaseId
+            in: path
+            value: $steps.purchase.outputs.purchaseId
+          - name: deviceId
+            in: query
+            value: $inputs.deviceId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $steps.purchase.outputs.purchaseId
+          - condition: $response.body#/licenseId == $steps.purchase.outputs.licenseId
+          - condition: $response.body#/deviceId == $inputs.deviceId
+        outputs:
+          protectedBundle: $response.body#/protectedBundle
+        x-example-actor: client
+        x-example-target: coordinator
+      - stepId: report-activation
+        description: >-
+          Send the actual device result as an HTTP notification. A 204 acknowledges receipt;
+          it does not turn a FAILED outcome into successful activation.
+        operationId: $sourceDescriptions.coordinator.recordActivation
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$inputs.clientToken}'
+          - name: purchaseId
+            in: path
+            value: $steps.purchase.outputs.purchaseId
+          - name: Idempotency-Key
+            in: header
+            value: $inputs.activationKey
+        requestBody:
+          contentType: application/json
+          payload:
+            licenseId: $steps.purchase.outputs.licenseId
+            deviceId: $inputs.deviceId
+            outcome: $inputs.activationOutcome
+        successCriteria:
+          - condition: $statusCode == 204
+        x-example-actor: client
+        x-example-target: coordinator
+    outputs:
+      purchaseId: $steps.purchase.outputs.purchaseId
+      licenseId: $steps.purchase.outputs.licenseId
+      protectedBundle: $steps.retrieve-bundle.outputs.protectedBundle
+      reportedOutcome: $inputs.activationOutcome
+
+  - workflowId: fulfil-purchase
+    summary: Coordinator implementation of purchaseProduct
+    description: >-
+      Coordinator perspective inside the client's purchase exchange. Reserve and pay through
+      a standard local workflow call, then issue one license. The enclosing endpoint persists
+      the scoped purchase and returned license before sending 201. Workflow completion alone
+      does not model that HTTP response or persistence transaction.
+    inputs:
+      type: object
+      additionalProperties: false
+      required: [purchaseId, customerId, productId, amountMinor, currency, paymentToken, serviceToken]
+      properties:
+        purchaseId: { type: string, minLength: 1 }
+        customerId: { type: string, minLength: 1 }
+        productId: { type: string, minLength: 1 }
+        amountMinor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        paymentToken: { type: string, minLength: 1 }
+        serviceToken: { type: string, minLength: 1 }
+    failureActions:
+      - name: stop-fulfilment-and-reconcile
+        type: end
+    steps:
+      - stepId: reserve-and-pay
+        description: Obtain matching reservation and confirmed payment before license issuance.
+        workflowId: reserve-and-capture
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: productId
+            value: $inputs.productId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: $inputs.paymentToken
+          - name: serviceToken
+            value: $inputs.serviceToken
+        outputs:
+          reservationId: $workflows.reserve-and-capture.outputs.reservationId
+          paymentId: $workflows.reserve-and-capture.outputs.paymentId
+          paymentState: $workflows.reserve-and-capture.outputs.paymentState
+        successCriteria:
+          - condition: $workflows.reserve-and-capture.outputs.paymentState == 'CAPTURED'
+      - stepId: issue-license
+        description: Issue once for the verified reservation and captured payment.
+        operationId: $sourceDescriptions.license.issueLicense
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$inputs.serviceToken}'
+          - name: Idempotency-Key
+            in: header
+            value: '{$inputs.purchaseId}-license'
+        requestBody:
+          contentType: application/json
+          payload:
+            purchaseId: $inputs.purchaseId
+            customerId: $inputs.customerId
+            productId: $inputs.productId
+            reservationId: $steps.reserve-and-pay.outputs.reservationId
+            paymentId: $steps.reserve-and-pay.outputs.paymentId
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+          state: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: license
+    outputs:
+      purchaseId: $inputs.purchaseId
+      licenseId: $steps.issue-license.outputs.licenseId
+      state: $steps.issue-license.outputs.state
+
+  - workflowId: reserve-and-capture
+    summary: Reserve inventory and capture the matching authorized amount
+    description: >-
+      Compare the authoritative reservation price and currency with the customer's authorization
+      before payment. HTTP 200 from capture is insufficient: only matching CAPTURED evidence
+      permits continuation. Stop on price drift, decline, conflict, timeout or uncertainty.
+      No automatic retry, refund or reservation-release workflow is included in this example.
+    inputs:
+      type: object
+      additionalProperties: false
+      required: [purchaseId, productId, amountMinor, currency, paymentToken, serviceToken]
+      properties:
+        purchaseId: { type: string, minLength: 1 }
+        productId: { type: string, minLength: 1 }
+        amountMinor: { type: integer, minimum: 1 }
+        currency: { type: string, pattern: '^[A-Z]{3}$' }
+        paymentToken: { type: string, minLength: 1 }
+        serviceToken: { type: string, minLength: 1 }
+    failureActions:
+      - name: stop-before-issuance
+        type: end
+    steps:
+      - stepId: reserve-product
+        description: Reserve one unit at its current price; verify product, amount and currency.
+        operationId: $sourceDescriptions.inventory.reserveProduct
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$inputs.serviceToken}'
+          - name: Idempotency-Key
+            in: header
+            value: '{$inputs.purchaseId}-reservation'
+        requestBody:
+          contentType: application/json
+          payload:
+            productId: $inputs.productId
+            quantity: 1
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/state == 'RESERVED'
+          - condition: $response.body#/productId == $inputs.productId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          reservationId: $response.body#/reservationId
+          amountMinor: $response.body#/amountMinor
+          currency: $response.body#/currency
+        x-example-actor: coordinator
+        x-example-target: inventory
+      - stepId: capture-payment
+        description: Require matching CAPTURED evidence; DECLINED and UNKNOWN stop the workflow.
+        operationId: $sourceDescriptions.payment.capturePayment
+        parameters:
+          - name: Authorization
+            in: header
+            value: 'Bearer {$inputs.serviceToken}'
+          - name: Idempotency-Key
+            in: header
+            value: '{$inputs.purchaseId}-payment'
+        requestBody:
+          contentType: application/json
+          payload:
+            reservationId: $steps.reserve-product.outputs.reservationId
+            amountMinor: $steps.reserve-product.outputs.amountMinor
+            currency: $steps.reserve-product.outputs.currency
+            paymentToken: $inputs.paymentToken
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'CAPTURED'
+          - condition: $response.body#/reservationId == $steps.reserve-product.outputs.reservationId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          paymentId: $response.body#/paymentId
+          paymentState: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: payment
+    outputs:
+      reservationId: $steps.reserve-product.outputs.reservationId
+      paymentId: $steps.capture-payment.outputs.paymentId
+      paymentState: $steps.capture-payment.outputs.paymentState

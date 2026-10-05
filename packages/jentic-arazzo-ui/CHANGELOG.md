@@ -7,11 +7,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+- **ui:** expose shared All workflows navigation and a labeled workflow selector in Docs, Diagram, and Split, with a relationship overview in Docs.
+- **ui:** add connected React/SVG sequences with per-occurrence expansion, bounded recursion, accessible interaction controls, caller breadcrumbs and exact Back to caller navigation.
+- **ui:** share complete mapping/action details across documentation, graphs and sequences; use concise default graph/Mermaid labels and one inspection-status control with detected resolution causes.
 - **ui:** add All workflows navigation and chained relationship inspection, shared documentation/Mermaid semantics, and selected Arazzo 1.1 inspection with explicit support limits.
 - **ui:** export `RelationshipEdgeData` through both entry points and include `relationship` in edge unions. Exhaustive edge-data consumers must handle the additive variant; callback signatures remain unchanged.
 
 ### Bug Fixes
 
+- **ui:** exclude local `openapi_samples` from standalone app packaging.
 - **ui:** preserve references under unsupported schema dialects regardless of component or subschema names, while keeping literal and extension payloads opaque.
 - **ui:** project relationship selection events onto the public contract without leaking private model or routing data.
 

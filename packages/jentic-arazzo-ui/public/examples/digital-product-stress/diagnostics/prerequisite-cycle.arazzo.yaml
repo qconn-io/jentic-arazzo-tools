@@ -1,0 +1,33 @@
+arazzo: 1.1.0
+info:
+  title: Intentionally invalid prerequisite cycle
+  version: 1.0.0
+sourceDescriptions:
+  - name: coordinator
+    url: ../coordinator.openapi.yaml
+    type: openapi
+workflows:
+  - workflowId: cycle-A
+    dependsOn:
+      - cycle-B
+    steps:
+      - stepId: observe
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+  - workflowId: cycle-B
+    dependsOn:
+      - cycle-A
+    steps:
+      - stepId: observe
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200

@@ -228,7 +228,7 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
       {/* Workflow Tabs */}
       {showWorkflowTabs && <WorkflowTabs />}
       <p style={{ margin: '6px 12px', fontSize: 12 }}>
-        {model.orderLabel}. {model.support.limitations.join(' ')} {navigationDiagnostic}
+        {model.orderLabel}. {navigationDiagnostic}
       </p>
       {activeWorkflowId === null && relationshipEdges.length > 0 && (
         <div style={{ margin: '0 12px 8px', fontSize: 12 }}>

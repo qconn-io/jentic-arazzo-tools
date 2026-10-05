@@ -9,14 +9,28 @@ import type {
 } from '../../types/viewer';
 import type { EffectiveAction } from '../model/viewerModel';
 import type { InspectionDiagnostic, PlainObject } from '../inspection';
+import type { OccurrenceDetails } from '../sequence/occurrenceDetails';
 
 export interface FormatOptions {
   includeMetadata?: boolean;
   includeDiagrams?: boolean;
+  includeStatus?: boolean;
 }
 type InspectionDetails = { authored?: PlainObject; diagnostics?: InspectionDiagnostic[] };
 type InspectedStep = StepDocumentation &
-  InspectionDetails & { actionDetails?: Record<'onSuccess' | 'onFailure', EffectiveAction[]> };
+  InspectionDetails & {
+    actionDetails?: Record<'onSuccess' | 'onFailure', EffectiveAction[]>;
+    occurrenceDetails?: OccurrenceDetails;
+  };
+
+function sourceURL(url: string, documentURL?: string | null): string {
+  if (!documentURL) return safeURL(url);
+  try {
+    return safeURL(new URL(url, documentURL).href);
+  } catch {
+    return safeURL(url);
+  }
+}
 
 export function escapeHTML(value: unknown): string {
   return String(value ?? '')
@@ -128,12 +142,16 @@ export function formatHeaderAsMarkdown(
   if (metadata.summary) sections.push(`<p>${escapeHTML(metadata.summary)}</p>`);
   // Keep CommonMark outside generated HTML blocks; authored HTML remains literal data.
   if (metadata.description) sections.push(`\n${safeDescriptionMarkdown(metadata.description)}\n`);
-  if (metadata.support)
+  if (metadata.support && options.includeStatus !== false)
     sections.push(
+      '<details class="inspection-support"><summary>Inspection status</summary>',
       `<div class="inspection-support">Semantic inspection: ${metadata.support.semanticInspection ? `profile ${escapeHTML(metadata.support.profile ?? 'selected')}` : 'unsupported version; raw content only'}. Schema validation and execution support are not established. Source documents and versions are unverified.</div>`,
       ...(metadata.support.limitations ?? []).map(
         (limit) => `<div class="inspection-warning">${escapeHTML(limit)}</div>`,
       ),
+      '<p>Source documents were not fetched; this does not establish that they are invalid or inaccessible.</p>',
+      warnings(details.diagnostics?.filter((diagnostic) => diagnostic.phase === 'resolution')),
+      '</details>',
     );
   if (metadata.provenance) sections.push(rawDetails('Document provenance', metadata.provenance));
   if (options.includeMetadata !== false)
@@ -141,11 +159,13 @@ export function formatHeaderAsMarkdown(
       '<div class="sources-section"><h2>Source Descriptions</h2>',
       ...metadata.sourceDescriptions.map(
         (source) =>
-          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>${escapeHTML(source.type ?? 'unknown')} — unverified</span> <a href="${safeURL(source.url)}">${escapeHTML(source.url)}</a></div>`,
+          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>${escapeHTML(source.type ?? 'unknown')} — unverified</span> <a href="${sourceURL(source.url, metadata.documentURL)}">${escapeHTML(source.url)}</a></div>`,
       ),
       '</div>',
     );
-  sections.push(warnings(details.diagnostics));
+  sections.push(
+    warnings(details.diagnostics?.filter((diagnostic) => diagnostic.phase !== 'resolution')),
+  );
   if (details.authored)
     sections.push(
       rawDetails(
@@ -174,6 +194,12 @@ export function formatWorkflowAsMarkdown(
       `<div class="timeline-item" data-workflow-id="${escapeHTML(workflow.workflowId)}" data-step-id="${escapeHTML(step.stepId)}"><div class="timeline-marker">${index + 1}</div><div class="timeline-content"><div class="step-card"><h3>${escapeHTML(step.stepId)}</h3>`,
     );
     if (step.description) sections.push(`<p>${escapeHTML(step.description)}</p>`);
+    if (step.occurrenceDetails)
+      sections.push(
+        ...step.occurrenceDetails.sections.map((section) =>
+          rawDetails(section.title, section.value),
+        ),
+      );
     for (const [key, locator] of Object.entries({
       operationId: step.operationId,
       operationPath: step.operationPath,
