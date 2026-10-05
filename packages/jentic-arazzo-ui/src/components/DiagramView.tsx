@@ -17,6 +17,7 @@ import {
   EdgeChange,
   useReactFlow,
   useNodesInitialized,
+  type Edge,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
@@ -42,6 +43,7 @@ import { WorkflowTabs } from './WorkflowTabs';
 import { ArazzoNode, ArazzoEdge } from '../types/index';
 import { ErrorBoundary } from './ErrorBoundary';
 import './WorkflowTabs.css';
+import type { RelationshipEdgeData } from '../edges/RelationshipEdge';
 
 const nodeTypes = {
   step: StepNode,
@@ -93,6 +95,12 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
     navigationDiagnostic,
   } = useArazzoViewer();
   const reactFlow = useReactFlow();
+  const relationshipEdges = edges.filter(
+    (edge) => edge.type === 'relationship',
+  ) as unknown as Edge<RelationshipEdgeData>[];
+  const selectedRelationship = relationshipEdges.find((edge) => edge.selected);
+  const relationshipData = selectedRelationship?.data;
+  const relationship = relationshipData?.relationship;
 
   const [ready, setReady] = useState(false);
   const nodesInitialized = useNodesInitialized();
@@ -222,6 +230,65 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
       <p style={{ margin: '6px 12px', fontSize: 12 }}>
         {model.orderLabel}. {model.support.limitations.join(' ')} {navigationDiagnostic}
       </p>
+      {activeWorkflowId === null && relationshipEdges.length > 0 && (
+        <div style={{ margin: '0 12px 8px', fontSize: 12 }}>
+          <label>
+            Inspect relationship{' '}
+            <select
+              aria-label="Inspect relationship"
+              style={{ maxWidth: '100%', width: 640, display: 'block' }}
+              value={selectedRelationship?.id ?? ''}
+              onChange={(event) => {
+                const id = event.target.value;
+                setEdges(edges.map((edge) => ({ ...edge, selected: edge.id === id })));
+              }}
+            >
+              <option value="">Select a relationship</option>
+              {relationshipEdges.map((edge) => {
+                const data = edge.data!;
+                return (
+                  <option key={edge.id} value={edge.id}>
+                    {data.compactLabel} — {data.label}
+                  </option>
+                );
+              })}
+            </select>
+          </label>
+          {relationshipData && (
+            <section
+              aria-label="Selected relationship"
+              style={{ maxHeight: 160, overflow: 'auto', overflowWrap: 'anywhere' }}
+            >
+              <strong>{relationshipData.label}</strong>
+              {relationshipData.warning && <p>{relationshipData.warning}</p>}
+              {relationship && (
+                <>
+                  <p>
+                    {relationship.sourceWorkflowId}
+                    {relationship.sourceStepId ? `.${relationship.sourceStepId}` : ''} →{' '}
+                    {relationship.target.reference} ({relationship.target.kind})
+                  </p>
+                  {relationship.parameters.length > 0 && (
+                    <pre style={{ whiteSpace: 'pre-wrap' }}>
+                      Parameters:{' '}
+                      {JSON.stringify(
+                        relationship.parameters.map((parameter) => parameter.value),
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  )}
+                  {relationship.criteria?.length ? (
+                    <pre style={{ whiteSpace: 'pre-wrap' }}>
+                      Criteria: {JSON.stringify(relationship.criteria, null, 2)}
+                    </pre>
+                  ) : null}
+                </>
+              )}
+            </section>
+          )}
+        </div>
+      )}
 
       {/* React Flow Canvas */}
       <div style={{ flex: 1, minHeight: 0 }}>

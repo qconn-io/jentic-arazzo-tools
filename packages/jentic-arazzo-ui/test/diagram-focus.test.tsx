@@ -125,3 +125,49 @@ test('superseded centering timers cannot focus a stale selection', async () => {
   unmount();
   vi.useRealTimers();
 });
+
+test('overview relationship selection exposes full labels and authored criteria and clears with the graph', () => {
+  const context = value(null);
+  context.activeWorkflowId = null;
+  context.activeWorkflow = null;
+  context.edges = [
+    {
+      id: 'relationship',
+      source: 'start',
+      target: 'target',
+      type: 'relationship',
+      selected: true,
+      data: {
+        type: 'relationship',
+        kind: 'action',
+        label: 'Full recovery label',
+        compactLabel: 'R1 · retry',
+        lane: 0,
+        selfLoop: false,
+        relationship: {
+          sourceWorkflowId: 'A',
+          sourceStepId: 'init',
+          target: { reference: 'B', kind: 'local-workflow' },
+          criteria: [{ condition: '$statusCode == 503' }],
+          parameters: [{ value: { name: 'attempt', value: 0 } }],
+        },
+      },
+    } as unknown as ArazzoViewerContextValue['edges'][number],
+  ];
+  const { getByRole, rerender, queryByRole } = render(
+    <ArazzoViewerProvider value={context}>
+      <DiagramView />
+    </ArazzoViewerProvider>,
+  );
+  const details = getByRole('region', { name: 'Selected relationship' });
+  expect(details.textContent).toContain('Full recovery label');
+  expect(details.textContent).toContain('$statusCode == 503');
+  expect(details.textContent).toContain('attempt');
+  expect(getByRole('combobox', { name: 'Inspect relationship' })).toBeTruthy();
+  rerender(
+    <ArazzoViewerProvider value={{ ...context, edges: [] }}>
+      <DiagramView />
+    </ArazzoViewerProvider>,
+  );
+  expect(queryByRole('region', { name: 'Selected relationship' })).toBeNull();
+});
