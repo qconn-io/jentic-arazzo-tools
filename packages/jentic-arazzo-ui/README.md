@@ -173,8 +173,8 @@ In split view, clicking a step node in the diagram expands the workflow and scro
 
 The **All workflows** button and **Select workflow** menu are visible above the
 panes in Docs, Diagram, and Split modes. Start in the default Docs view, select
-All workflows to see Calls, Called by, Prerequisites, and Transfers, then open a
-workflow entry. Its header offers Documentation, Sequence, and Flowchart.
+All workflows to see classified incoming and outgoing relationships, filter by
+Call, Prerequisite, One-way goto, or Retry recovery, then open a workflow entry. Its header offers Documentation, Sequence, and Flowchart.
 All workflows returns to the document overview; Sequence shows the selected
 workflow's authored interactions. Changing view mode retains the destination.
 
@@ -197,14 +197,39 @@ In **Sequence**, direct local calls initially show their downstream interactions
 Use **Expand** on a deeper call; each call occurrence has its own expansion and
 mapping context. **Collapse** retains the selected root workflow. Workflow lanes
 show control context, API lanes show declared sources, and ambiguous destinations
-remain separate. Large canvases scroll at a readable text size.
+remain separate. Large canvases scroll at a readable text size, with participant
+headings retained at the top. Focus a shortened participant name to read its full
+value. The selected root and caller path stay outside the scrolling canvas.
+Operation, action, and boundary controls identify their role and call occurrence.
 
 Choose **Details** in the ordered interaction list or on a diagram card to inspect
-caller-supplied parameters, declared callee inputs/outputs, caller-side output
-expressions, action ordering, criteria, source metadata and provenance. Values
-remain authored: `0`, `false`, `null`, structured values and expressions are not
-evaluated. Missing mappings are labeled unavailable. Closing details returns
-focus to the originating control. Documentation uses the same detail projection.
+owning workflow/caller context, parameters, request or message payload trees,
+outputs, success criteria, prerequisites, and possible recovery actions. Caller
+mappings and callee declarations are separate. Recovery cards show target
+classification, inherited/overridden origin, criteria, and authored retry settings;
+inspection order does not evaluate or choose actions. Recognized event receive
+fields include exact correlation and timeout declarations.
+
+Values remain authored: `0`, `false`, `null`, empty containers/strings, and
+expressions are not evaluated. Scalar type labels distinguish a string from a
+number or boolean; expressions remain selectable in full. **Not declared** means
+absence. **Advanced authored content and provenance** retains original snapshots,
+resolved inspection facts, unresolved references, and diagnostics. Default Docs
+keeps concise step descriptions and shared inspection controls; exported Markdown
+retains full values and provenance.
+
+Use **Search workflows and steps** for document-local, case-insensitive matches
+on authored IDs, titles, summaries/descriptions, and operation locators. Results
+show the owning workflow and authored step, including steps beyond sequence display
+limits. Searching a repeated callee step opens its authored location rather than
+guessing a caller occurrence. Payloads and parameter values are not searched.
+
+**Escape** and **Close details** dismiss inspection and restore focus to the
+initiating control; if it is unavailable, focus returns to visible workflow
+navigation. Desktop inspection is nonmodal. At widths of 600 pixels or below,
+inspection is a covering dialog: Tab/Shift+Tab stay inside it and background
+controls are unavailable until dismissal. The standalone header wraps on narrow
+screens; diagrams scroll inside their pane.
 
 **Open workflow** follows a particular call. The caller path and **Back to caller**
 restore that occurrence, its expansion context and step focus across Docs,
@@ -231,7 +256,7 @@ including `x-internal-processing`, do not imply workflow relationships.
 Static Mermaid sequences use the same bounded scene with deterministic direct-call
 expansion. They show call groups, structural continuations and visible omissions,
 and do not have interactive expansion controls. Default flowcharts keep parameters
-and criteria out of labels; full values remain in associated documentation.
+and criteria out of labels; full values remain in the shared inspector and exported documentation.
 
 ```tsx
 import { useState } from 'react';

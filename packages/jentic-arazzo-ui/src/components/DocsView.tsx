@@ -191,6 +191,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
   const documentation = useMemo(() => {
     if (!document) return null;
     return generateDocumentation(document, {
+      compact: true,
       includeMetadata: true,
       includeDiagrams: false,
       includeStatus: false,

@@ -8,19 +8,19 @@ import type {
   WorkflowDocumentation,
 } from '../../types/viewer';
 import type { EffectiveAction } from '../model/viewerModel';
-import type { InspectionDiagnostic, PlainObject } from '../inspection';
-import type { OccurrenceDetails } from '../sequence/occurrenceDetails';
+import type { InspectionDiagnostic, ParameterFact, PlainObject } from '../inspection';
 
 export interface FormatOptions {
   includeMetadata?: boolean;
   includeDiagrams?: boolean;
   includeStatus?: boolean;
+  compact?: boolean;
 }
 type InspectionDetails = { authored?: PlainObject; diagnostics?: InspectionDiagnostic[] };
 type InspectedStep = StepDocumentation &
   InspectionDetails & {
     actionDetails?: Record<'onSuccess' | 'onFailure', EffectiveAction[]>;
-    occurrenceDetails?: OccurrenceDetails;
+    parameterDetails?: ParameterFact[];
   };
 
 function sourceURL(url: string, documentURL?: string | null): string {
@@ -166,7 +166,7 @@ export function formatHeaderAsMarkdown(
   sections.push(
     warnings(details.diagnostics?.filter((diagnostic) => diagnostic.phase !== 'resolution')),
   );
-  if (details.authored)
+  if (!options.compact && details.authored)
     sections.push(
       rawDetails(
         metadata.support?.semanticInspection === false
@@ -181,6 +181,7 @@ export function formatHeaderAsMarkdown(
 export function formatWorkflowAsMarkdown(
   _metadata: DocumentationMetadata,
   workflow: WorkflowDocumentation,
+  options: FormatOptions = {},
 ): string {
   const sections: string[] = [];
   if (workflow.description)
@@ -194,12 +195,6 @@ export function formatWorkflowAsMarkdown(
       `<div class="timeline-item" data-workflow-id="${escapeHTML(workflow.workflowId)}" data-step-id="${escapeHTML(step.stepId)}"><div class="timeline-marker">${index + 1}</div><div class="timeline-content"><div class="step-card"><h3>${escapeHTML(step.stepId)}</h3>`,
     );
     if (step.description) sections.push(`<p>${escapeHTML(step.description)}</p>`);
-    if (step.occurrenceDetails)
-      sections.push(
-        ...step.occurrenceDetails.sections.map((section) =>
-          rawDetails(section.title, section.value),
-        ),
-      );
     for (const [key, locator] of Object.entries({
       operationId: step.operationId,
       operationPath: step.operationPath,
@@ -208,21 +203,24 @@ export function formatWorkflowAsMarkdown(
     }))
       if (locator !== undefined)
         sections.push(`<div>${key}: <code>${escapeHTML(locator)}</code></div>`);
-    if (step.sourceBinding)
+    if (!options.compact && step.sourceBinding)
       sections.push(
         rawDetails('Source binding — unverified authored metadata', step.sourceBinding),
       );
     sections.push(
       prerequisites(step.prerequisites),
-      parameters(step.parameters),
-      actions(step, workflow),
+      options.compact ? '' : parameters(step.parameters),
+      options.compact ? '' : actions(step, workflow),
       warnings(step.diagnostics),
     );
-    if (step.successCriteria)
+    if (!options.compact && step.parameterDetails?.length)
+      sections.push(rawDetails('Parameter provenance', step.parameterDetails));
+    if (!options.compact && step.successCriteria)
       sections.push(rawDetails('Authored success criteria (not evaluated)', step.successCriteria));
-    if (step.outputs) sections.push(rawDetails('Outputs', step.outputs));
-    if (step.provenance) sections.push(rawDetails('Occurrence provenance', step.provenance));
-    if (step.authored)
+    if (!options.compact && step.outputs) sections.push(rawDetails('Outputs', step.outputs));
+    if (!options.compact && step.provenance)
+      sections.push(rawDetails('Occurrence provenance', step.provenance));
+    if (!options.compact && step.authored)
       sections.push(rawDetails('Authored step and generic details', step.authored));
     sections.push('</div></div></div>');
   });
@@ -230,7 +228,7 @@ export function formatWorkflowAsMarkdown(
   if (workflow.outputs) sections.push(rawDetails('Workflow outputs', workflow.outputs));
   const details = workflow as WorkflowDocumentation & InspectionDetails;
   sections.push(warnings(details.diagnostics));
-  if (details.authored)
+  if (!options.compact && details.authored)
     sections.push(rawDetails('Authored workflow and generic details', details.authored));
   return sections.join('\n');
 }
@@ -247,7 +245,7 @@ export function formatAsMarkdown(
       : '',
     ...workflows.map(
       (workflow) =>
-        `<details class="workflow-details" data-workflow-id="${escapeHTML(workflow.workflowId)}"><summary class="workflow-summary-bar"><span class="step-count-badge">${workflow.steps.length} Steps</span><span class="workflow-summary-title">${escapeHTML(workflow.workflowId)}</span>${workflow.summary ? `<span class="workflow-summary-text">${escapeHTML(workflow.summary)}</span>` : ''}</summary><div class="workflow-details-content">${formatWorkflowAsMarkdown(metadata, workflow)}</div></details>`,
+        `<details class="workflow-details" data-workflow-id="${escapeHTML(workflow.workflowId)}"><summary class="workflow-summary-bar"><span class="step-count-badge">${workflow.steps.length} Steps</span><span class="workflow-summary-title">${escapeHTML(workflow.workflowId)}</span>${workflow.summary ? `<span class="workflow-summary-text">${escapeHTML(workflow.summary)}</span>` : ''}</summary><div class="workflow-details-content">${formatWorkflowAsMarkdown(metadata, workflow, options)}</div></details>`,
     ),
   ].join('\n');
 }

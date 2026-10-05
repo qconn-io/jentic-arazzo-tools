@@ -23,8 +23,8 @@ test('default Docs exposes shared navigation and a meaningful overview without s
   );
   fireEvent.click(within(nav).getByRole('button', { name: 'All workflows' }));
   const overview = screen.getByRole('region', { name: 'Workflow overview' });
-  expect(within(overview).getAllByText('Calls').length).toBeGreaterThan(0);
-  expect(within(overview).getAllByText('Called by').length).toBeGreaterThan(0);
+  expect(within(overview).getAllByText('Call').length).toBeGreaterThan(0);
+  expect(within(overview).getAllByText('Incoming').length).toBeGreaterThan(0);
   expect(container.querySelector('details[data-workflow-id]')).toBeNull();
   expect(callback).toHaveBeenCalledExactlyOnceWith('');
   fireEvent.click(within(overview).getByRole('button', { name: 'Open workflow payment' }));

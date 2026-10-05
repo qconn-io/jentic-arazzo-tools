@@ -25,7 +25,9 @@ interface Session {
   details: DetailSelection | null;
   inspectRow: (row: SequenceRow, origin?: HTMLElement) => void;
   inspectStep: (workflowId: string, stepId: string, origin?: HTMLElement) => void;
+  openAuthoredStep: (workflowId: string, stepId: string, origin?: HTMLElement) => void;
   closeDetails: () => void;
+  restoreDetailsFocus: (fallback?: HTMLElement) => void;
   followCall: (root: string, row: SequenceRow) => void;
   backToCaller: () => void;
   trail: CallerFrame[];
@@ -51,6 +53,12 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
   const [focusRowId, setFocusRowId] = useState<string>();
   const origin = useRef<HTMLElement>();
   const requestedSelection = useRef<string>();
+  const authoredRequest = useRef<{
+    workflowId: string;
+    stepId: string;
+    control?: HTMLElement;
+    version: number;
+  }>();
   const pending = useRef<{
     destination: string;
     frame: CallerFrame;
@@ -62,6 +70,23 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
   useEffect(() => {
     const prior = previous.current;
     previous.current = { active: activeWorkflowId, selection: selectedNodeId };
+    const authored = authoredRequest.current;
+    if (authored) {
+      if (
+        authored.version !== viewer.selectionRequestVersion ||
+        (prior.selection !== selectedNodeId &&
+          (activeWorkflowId !== authored.workflowId ||
+            (selectedNodeId != null &&
+              selectedNodeId !== model.nodeIds.get(authored.workflowId)?.get(authored.stepId)))) ||
+        (prior.active !== activeWorkflowId && activeWorkflowId !== authored.workflowId)
+      ) {
+        authoredRequest.current = undefined;
+      } else if (activeWorkflowId === authored.workflowId) {
+        authoredRequest.current = undefined;
+        inspectStep(authored.workflowId, authored.stepId, authored.control);
+        return;
+      }
+    }
     if (
       pending.current &&
       pending.current.selectionRequestVersion !== viewer.selectionRequestVersion
@@ -122,6 +147,8 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
       if (owner && node && (node.data.type === 'step' || node.data.type === 'workflowRef')) {
         const stepId = node.data.step.stepId;
         if (selectedNodeId !== requestedSelection.current) {
+          origin.current =
+            document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
           setSelectedRow(undefined);
           setDetails({ workflowId: owner, stepId });
         }
@@ -136,6 +163,7 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     row?: SequenceRow,
   ) => {
     pending.current = undefined;
+    authoredRequest.current = undefined;
     origin.current = control;
     setDetails({ workflowId, stepId, row });
     setSelectedRow(row);
@@ -165,24 +193,71 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
       if (row.step) inspectStep(row.workflowId, row.step.stepId, control, row);
       else {
         pending.current = undefined;
+        authoredRequest.current = undefined;
         origin.current = control;
         setDetails({ workflowId: row.workflowId, row });
         setSelectedRow(row);
       }
     },
     inspectStep,
+    openAuthoredStep: (workflowId, stepId, control) => {
+      pending.current = undefined;
+      setTrail([]);
+      setSelectedRow(undefined);
+      if (workflowId === activeWorkflowId) inspectStep(workflowId, stepId, control);
+      else {
+        authoredRequest.current = {
+          workflowId,
+          stepId,
+          control,
+          version: viewer.selectionRequestVersion,
+        };
+        viewer.navigateToTarget({
+          kind: 'local-step',
+          role: 'call',
+          reference: `${workflowId}.${stepId}`,
+          workflowId,
+          stepId,
+          navigable: true,
+        });
+      }
+    },
     closeDetails: () => {
       setDetails(null);
-      if (origin.current?.isConnected) origin.current.focus();
+    },
+    restoreDetailsFocus: (fallback) => {
+      let control = origin.current;
+      if (control?.isConnected) {
+        let ancestor: HTMLElement | null = control;
+        while (ancestor) {
+          if (
+            ancestor.hidden ||
+            ancestor.hasAttribute('inert') ||
+            ancestor.matches(':disabled') ||
+            (ancestor.tagName === 'DETAILS' &&
+              !ancestor.hasAttribute('open') &&
+              !(control.tagName === 'SUMMARY' && control.parentElement === ancestor)) ||
+            getComputedStyle(ancestor).display === 'none' ||
+            getComputedStyle(ancestor).visibility === 'hidden'
+          ) {
+            control = undefined;
+            break;
+          }
+          ancestor = ancestor.parentElement;
+        }
+      } else control = undefined;
+      (control ?? fallback)?.focus();
     },
     clearTrail: () => {
       pending.current = undefined;
+      authoredRequest.current = undefined;
       setTrail([]);
       setSelectedRow(undefined);
       setDetails(null);
       setFocusRowId(undefined);
     },
     followCall: (root, row) => {
+      authoredRequest.current = undefined;
       if (!row.target?.navigable || !row.target.workflowId || !row.step) return;
       pending.current = {
         selectionRequestVersion: viewer.selectionRequestVersion,

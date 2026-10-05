@@ -1,0 +1,5902 @@
+{
+  "generatedAt": "2026-10-05T19:07:40.600Z",
+  "sourceCommit": "87f272b32f629a2332f19f399acf7e35fb8cac09",
+  "sourceDiff": "ad3c8286a0ba02a5465bd389b4542839f1250fd09fe263ca22b7b9bb5a549102",
+  "buildHashes": {
+    "arazzo-ui-standalone.9e8ab12c.js": "e2dd85be4a071ca13150531b9368adde0cc95c3e400a6fe225db36cc9ceecd27",
+    "arazzo-ui.fee2bb28.css": "23a1662c6ffc17d1407a605e02689bec7096a0f4a163c5d2e2e3ac01c1938377"
+  },
+  "observations": [
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "authoredSteps": 3,
+      "rows": 3,
+      "context": "ContextOwning workflowclient-journeySteppurchaseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "step": "purchase"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "step": "retrieve-bundle"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "step": "report-activation"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-purchase",
+      "authoredSteps": 2,
+      "rows": 5,
+      "context": "ContextOwning workflowfulfil-purchaseStepreserve-and-payCall pathfulfil-purchase.reserve-and-payCalleereserve-and-capture · local-workflow"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-purchase",
+      "step": "reserve-and-pay"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-purchase",
+      "step": "issue-license"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "authoredSteps": 2,
+      "rows": 2,
+      "context": "ContextOwning workflowreserve-and-captureStepreserve-productCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "step": "reserve-product"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "step": "capture-payment"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "label": "client-journey"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "shared facts across modes and removed-origin navigation fallback",
+      "width": 1440,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "full-stress-journey",
+      "authoredSteps": 2,
+      "rows": 12,
+      "context": "ContextOwning workflowfull-stress-journeyStepinitializeCall pathfull-stress-journey.initializeCalleeinitialize-session · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "initialize-session",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowinitialize-sessionStepreadinessCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "batch-fulfilment",
+      "authoredSteps": 2,
+      "rows": 23,
+      "context": "ContextOwning workflowbatch-fulfilmentStepWorkflow contextCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-item",
+      "authoredSteps": 3,
+      "rows": 11,
+      "context": "ContextOwning workflowfulfil-itemStepprepareCall pathfulfil-item.prepareCalleeprepare-commerce · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "prepare-commerce",
+      "authoredSteps": 1,
+      "rows": 8,
+      "context": "ContextOwning workflowprepare-commerceStepcommerceCall pathprepare-commerce.commerceCalleereserve-and-capture · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "authoredSteps": 2,
+      "rows": 9,
+      "context": "ContextOwning workflowreserve-and-captureStepreserveCall pathreserve-and-capture.reserveCalleereserve-inventory · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-inventory",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowreserve-inventoryStepreserve-productCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "capture-authorized-payment",
+      "authoredSteps": 1,
+      "rows": 3,
+      "context": "ContextOwning workflowcapture-authorized-paymentStepcapture-paymentCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reconcile-payment",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowreconcile-paymentStepobserve-paymentCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reconcile-license",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowreconcile-licenseStepobserve-licenseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "compensate-purchase",
+      "authoredSteps": 5,
+      "rows": 11,
+      "context": "ContextOwning workflowcompensate-purchaseStepinspect-issued-licenseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "release-reservation",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrelease-reservationStepreleaseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "abort-purchase",
+      "authoredSteps": 2,
+      "rows": 6,
+      "context": "ContextOwning workflowabort-purchaseStepreleaseCall pathabort-purchase.releaseCalleerelease-reservation · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "record-ready",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrecord-readySteppersist-readyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "record-failure",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrecord-failureSteppersist-failedCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "poll-purchase-until-ready",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowpoll-purchase-until-readySteppollCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "resume-existing-purchase",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowresume-existing-purchaseStepread-licenseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "step-recovery-probe",
+      "authoredSteps": 3,
+      "rows": 5,
+      "context": "ContextOwning workflowstep-recovery-probeSteprequire-readyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "label": "full-stress-journey"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "call",
+      "relationships": 26
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "prerequisite",
+      "relationships": 2
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "goto",
+      "relationships": 6
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "retry",
+      "relationships": 4
+    },
+    {
+      "task": "48-row scene sticky participants and unique occurrence controls",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "geometry": {
+        "scrollTop": 4424,
+        "scrollLeft": 2610,
+        "headerTop": -1395.734375,
+        "canvasTop": -1396.734375,
+        "width": 1300,
+        "scrollWidth": 3910
+      },
+      "names": [
+        "Inspect full-stress-journey.initialize · call · root full-stress-journey · path full-stress-journey.initialize · row 1",
+        "Collapse full-stress-journey.initialize → initialize-session · call · root full-stress-journey · path full-stress-journey.initialize · row 1",
+        "Open workflow initialize-session from full-stress-journey.initialize · call · root full-stress-journey · path full-stress-journey.initialize · row 1",
+        "Inspect initialize-session.readiness · operation · root full-stress-journey · path full-stress-journey.initialize · row 2",
+        "Inspect context for full-stress-journey.initialize · continuation · root full-stress-journey · path full-stress-journey.initialize · row 3",
+        "Inspect full-stress-journey.two-products · call · root full-stress-journey · path full-stress-journey.two-products · row 4",
+        "Collapse full-stress-journey.two-products → batch-fulfilment · call · root full-stress-journey · path full-stress-journey.two-products · row 4",
+        "Open workflow batch-fulfilment from full-stress-journey.two-products · call · root full-stress-journey · path full-stress-journey.two-products · row 4",
+        "Inspect context for batch-fulfilment · prerequisite · root full-stress-journey · path full-stress-journey.two-products · row 5",
+        "Inspect batch-fulfilment.first-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 6",
+        "Collapse batch-fulfilment.first-item → fulfil-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 6",
+        "Open workflow fulfil-item from batch-fulfilment.first-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 6",
+        "Inspect fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 7",
+        "Collapse fulfil-item.prepare → prepare-commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 7",
+        "Open workflow prepare-commerce from fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 7",
+        "Inspect prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 8",
+        "Collapse prepare-commerce.commerce → reserve-and-capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 8",
+        "Open workflow reserve-and-capture from prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 8",
+        "Inspect reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 9",
+        "Collapse reserve-and-capture.reserve → reserve-inventory · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 9",
+        "Open workflow reserve-inventory from reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 9",
+        "Inspect reserve-inventory.reserve-product · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 10",
+        "Inspect reserve-inventory.reserve-product · transfer onFailure retry retry-transient position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 11",
+        "Inspect context for reserve-and-capture.reserve · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 12",
+        "Inspect reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 13",
+        "Collapse reserve-and-capture.capture → capture-authorized-payment · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 13",
+        "Open workflow capture-authorized-payment from reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 13",
+        "Inspect capture-authorized-payment.capture-payment · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 14",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure retry reconcile-before-capture-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 15",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure goto release-after-definite-decline position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 16",
+        "Inspect context for reserve-and-capture.capture · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 17",
+        "Inspect context for prepare-commerce.commerce · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 18",
+        "Inspect context for fulfil-item.prepare · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 19",
+        "Inspect fulfil-item.issue-license · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 20",
+        "Inspect fulfil-item.issue-license · transfer onFailure retry reconcile-issuance-before-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 21",
+        "Inspect fulfil-item.issue-license · transfer onFailure goto compensate-definite-issuance-rejection position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 22",
+        "Inspect fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 23",
+        "Collapse fulfil-item.record-ready → record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 23",
+        "Open workflow record-ready from fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 23",
+        "Inspect record-ready.persist-ready · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 24",
+        "Inspect context for fulfil-item.record-ready · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 25",
+        "Inspect context for batch-fulfilment.first-item · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 26",
+        "Inspect batch-fulfilment.second-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 27",
+        "Collapse batch-fulfilment.second-item → fulfil-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 27",
+        "Open workflow fulfil-item from batch-fulfilment.second-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 27",
+        "Inspect fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 28",
+        "Collapse fulfil-item.prepare → prepare-commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 28",
+        "Open workflow prepare-commerce from fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 28",
+        "Inspect prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 29",
+        "Collapse prepare-commerce.commerce → reserve-and-capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 29",
+        "Open workflow reserve-and-capture from prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 29",
+        "Inspect reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 30",
+        "Collapse reserve-and-capture.reserve → reserve-inventory · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 30",
+        "Open workflow reserve-inventory from reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 30",
+        "Inspect reserve-inventory.reserve-product · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 31",
+        "Inspect reserve-inventory.reserve-product · transfer onFailure retry retry-transient position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 32",
+        "Inspect context for reserve-and-capture.reserve · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 33",
+        "Inspect reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 34",
+        "Collapse reserve-and-capture.capture → capture-authorized-payment · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 34",
+        "Open workflow capture-authorized-payment from reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 34",
+        "Inspect capture-authorized-payment.capture-payment · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 35",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure retry reconcile-before-capture-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 36",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure goto release-after-definite-decline position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 37",
+        "Inspect context for reserve-and-capture.capture · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 38",
+        "Inspect context for prepare-commerce.commerce · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 39",
+        "Inspect context for fulfil-item.prepare · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 40",
+        "Inspect fulfil-item.issue-license · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 41",
+        "Inspect fulfil-item.issue-license · transfer onFailure retry reconcile-issuance-before-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 42",
+        "Inspect fulfil-item.issue-license · transfer onFailure goto compensate-definite-issuance-rejection position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 43",
+        "Inspect fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 44",
+        "Collapse fulfil-item.record-ready → record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 44",
+        "Open workflow record-ready from fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 44",
+        "Inspect record-ready.persist-ready · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 45",
+        "Inspect context for fulfil-item.record-ready · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 46",
+        "Inspect context for batch-fulfilment.second-item · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 47",
+        "Inspect context for full-stress-journey.two-products · continuation · root full-stress-journey · path full-stress-journey.two-products · row 48"
+      ]
+    },
+    {
+      "task": "selected caller context outside scrolling canvas",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "selectedContext": "Root: full-stress-journey · Selected capture-authorized-payment.capture-payment · operation · Caller path: full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture"
+    },
+    {
+      "task": "capture uncertainty, bounded recovery and distinct abort evidence",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "second-item mappings and exact caller return",
+      "width": 1440,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "event-driven-purchase",
+      "authoredSteps": 5,
+      "rows": 12,
+      "context": "ContextOwning workflowevent-driven-purchaseSteppublish-commandCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "purchase-event-worker",
+      "authoredSteps": 4,
+      "rows": 8,
+      "context": "ContextOwning workflowpurchase-event-workerStepreceive-commandCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "activation-audit-worker",
+      "authoredSteps": 3,
+      "rows": 5,
+      "context": "ContextOwning workflowactivation-audit-workerStepreceive-activationCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "poll-purchase-until-ready",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowpoll-purchase-until-readySteppollCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "label": "event-driven-purchase"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "correlation, timeout, receive retry and polling fallback",
+      "width": 1440,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "metadata-heavy-entry",
+      "authoredSteps": 1,
+      "rows": 3,
+      "context": "ContextOwning workflowmetadata-heavy-entrySteppersist-verified-purchase-with-structured-policy-and-long-authored-nameCall pathmetadata-heavy-entry.persist-verified-purchase-with-structured-policy-and-long-authored-nameCalleerecord-ready · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "record-ready",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrecord-readySteppersist-readyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "label": "metadata-heavy-entry"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "recursive-A",
+      "authoredSteps": 2,
+      "rows": 7,
+      "context": "ContextOwning workflowrecursive-AStepobserve-ACall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "recursive-B",
+      "authoredSteps": 2,
+      "rows": 7,
+      "context": "ContextOwning workflowrecursive-BStepobserve-BCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "label": "recursive-A"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "boundary destination navigation",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-0",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-0StepnextCall pathlayer-0.nextCalleelayer-1 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-1",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-1StepnextCall pathlayer-1.nextCalleelayer-2 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-2",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-2StepnextCall pathlayer-2.nextCalleelayer-3 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-3",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-3StepnextCall pathlayer-3.nextCalleelayer-4 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-4",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-4StepnextCall pathlayer-4.nextCalleelayer-5 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-5",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-5StepnextCall pathlayer-5.nextCalleelayer-6 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-6",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-6StepnextCall pathlayer-6.nextCalleelayer-7 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-7",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-7StepnextCall pathlayer-7.nextCalleelayer-8 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-8",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-8StepnextCall pathlayer-8.nextCalleelayer-9 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-9",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-9StepnextCall pathlayer-9.nextCalleelayer-10 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-10",
+      "authoredSteps": 1,
+      "rows": 3,
+      "context": "ContextOwning workflowlayer-10StepnextCall pathlayer-10.nextCalleelayer-11 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-11",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowlayer-11StepleafCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "label": "layer-0"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "boundary destination navigation",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "row-limit",
+      "authoredSteps": 250,
+      "rows": 200,
+      "context": "ContextOwning workflowrow-limitStepobservation-001Call pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "label": "row-limit"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "row-boundary authored search",
+      "width": 1440,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "diagnostic-probe",
+      "authoredSteps": 5,
+      "rows": 8,
+      "context": "ContextOwning workflowdiagnostic-probeStephealthyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "label": "diagnostic-probe"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 1440,
+      "scrollWidth": 1440,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 401.546875,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 845.46875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 929.546875,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 1240.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "cycle-A",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowcycle-AStepWorkflow contextCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "cycle-B",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowcycle-BStepWorkflow contextCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "label": "cycle-A"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1317.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.171875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.09375,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.171875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1239.34375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1314.71875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1370.09375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 1440,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 1440,
+        "scrollWidth": 1440,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 401.546875,
+            "y": 15.5,
+            "width": 435.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 845.46875,
+            "y": 16.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 929.546875,
+            "y": 14,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 1240.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 1315.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 1373.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "authoredSteps": 3,
+      "rows": 3,
+      "context": "ContextOwning workflowclient-journeySteppurchaseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "step": "purchase"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "step": "retrieve-bundle"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "client-journey",
+      "step": "report-activation"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-purchase",
+      "authoredSteps": 2,
+      "rows": 5,
+      "context": "ContextOwning workflowfulfil-purchaseStepreserve-and-payCall pathfulfil-purchase.reserve-and-payCalleereserve-and-capture · local-workflow"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-purchase",
+      "step": "reserve-and-pay"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-purchase",
+      "step": "issue-license"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "authoredSteps": 2,
+      "rows": 2,
+      "context": "ContextOwning workflowreserve-and-captureStepreserve-productCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "step": "reserve-product"
+    },
+    {
+      "task": "small-pack step details",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "step": "capture-payment"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "label": "client-journey"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "full-stress-journey",
+      "authoredSteps": 2,
+      "rows": 12,
+      "context": "ContextOwning workflowfull-stress-journeyStepinitializeCall pathfull-stress-journey.initializeCalleeinitialize-session · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "initialize-session",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowinitialize-sessionStepreadinessCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "batch-fulfilment",
+      "authoredSteps": 2,
+      "rows": 23,
+      "context": "ContextOwning workflowbatch-fulfilmentStepWorkflow contextCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "fulfil-item",
+      "authoredSteps": 3,
+      "rows": 11,
+      "context": "ContextOwning workflowfulfil-itemStepprepareCall pathfulfil-item.prepareCalleeprepare-commerce · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "prepare-commerce",
+      "authoredSteps": 1,
+      "rows": 8,
+      "context": "ContextOwning workflowprepare-commerceStepcommerceCall pathprepare-commerce.commerceCalleereserve-and-capture · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-and-capture",
+      "authoredSteps": 2,
+      "rows": 9,
+      "context": "ContextOwning workflowreserve-and-captureStepreserveCall pathreserve-and-capture.reserveCalleereserve-inventory · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reserve-inventory",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowreserve-inventoryStepreserve-productCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "capture-authorized-payment",
+      "authoredSteps": 1,
+      "rows": 3,
+      "context": "ContextOwning workflowcapture-authorized-paymentStepcapture-paymentCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reconcile-payment",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowreconcile-paymentStepobserve-paymentCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "reconcile-license",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowreconcile-licenseStepobserve-licenseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "compensate-purchase",
+      "authoredSteps": 5,
+      "rows": 11,
+      "context": "ContextOwning workflowcompensate-purchaseStepinspect-issued-licenseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "release-reservation",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrelease-reservationStepreleaseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "abort-purchase",
+      "authoredSteps": 2,
+      "rows": 6,
+      "context": "ContextOwning workflowabort-purchaseStepreleaseCall pathabort-purchase.releaseCalleerelease-reservation · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "record-ready",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrecord-readySteppersist-readyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "record-failure",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrecord-failureSteppersist-failedCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "poll-purchase-until-ready",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowpoll-purchase-until-readySteppollCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "resume-existing-purchase",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowresume-existing-purchaseStepread-licenseCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "step-recovery-probe",
+      "authoredSteps": 3,
+      "rows": 5,
+      "context": "ContextOwning workflowstep-recovery-probeSteprequire-readyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "label": "full-stress-journey"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "call",
+      "relationships": 26
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "prerequisite",
+      "relationships": 2
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "goto",
+      "relationships": 6
+    },
+    {
+      "task": "classified incoming/outgoing filter",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "type": "retry",
+      "relationships": 4
+    },
+    {
+      "task": "48-row scene sticky participants and unique occurrence controls",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "geometry": {
+        "scrollTop": 4424,
+        "scrollLeft": 3506,
+        "headerTop": -2837.46875,
+        "canvasTop": -2838.46875,
+        "width": 404,
+        "scrollWidth": 3910
+      },
+      "names": [
+        "Inspect full-stress-journey.initialize · call · root full-stress-journey · path full-stress-journey.initialize · row 1",
+        "Collapse full-stress-journey.initialize → initialize-session · call · root full-stress-journey · path full-stress-journey.initialize · row 1",
+        "Open workflow initialize-session from full-stress-journey.initialize · call · root full-stress-journey · path full-stress-journey.initialize · row 1",
+        "Inspect initialize-session.readiness · operation · root full-stress-journey · path full-stress-journey.initialize · row 2",
+        "Inspect context for full-stress-journey.initialize · continuation · root full-stress-journey · path full-stress-journey.initialize · row 3",
+        "Inspect full-stress-journey.two-products · call · root full-stress-journey · path full-stress-journey.two-products · row 4",
+        "Collapse full-stress-journey.two-products → batch-fulfilment · call · root full-stress-journey · path full-stress-journey.two-products · row 4",
+        "Open workflow batch-fulfilment from full-stress-journey.two-products · call · root full-stress-journey · path full-stress-journey.two-products · row 4",
+        "Inspect context for batch-fulfilment · prerequisite · root full-stress-journey · path full-stress-journey.two-products · row 5",
+        "Inspect batch-fulfilment.first-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 6",
+        "Collapse batch-fulfilment.first-item → fulfil-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 6",
+        "Open workflow fulfil-item from batch-fulfilment.first-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 6",
+        "Inspect fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 7",
+        "Collapse fulfil-item.prepare → prepare-commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 7",
+        "Open workflow prepare-commerce from fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 7",
+        "Inspect prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 8",
+        "Collapse prepare-commerce.commerce → reserve-and-capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 8",
+        "Open workflow reserve-and-capture from prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 8",
+        "Inspect reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 9",
+        "Collapse reserve-and-capture.reserve → reserve-inventory · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 9",
+        "Open workflow reserve-inventory from reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 9",
+        "Inspect reserve-inventory.reserve-product · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 10",
+        "Inspect reserve-inventory.reserve-product · transfer onFailure retry retry-transient position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 11",
+        "Inspect context for reserve-and-capture.reserve · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 12",
+        "Inspect reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 13",
+        "Collapse reserve-and-capture.capture → capture-authorized-payment · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 13",
+        "Open workflow capture-authorized-payment from reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 13",
+        "Inspect capture-authorized-payment.capture-payment · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 14",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure retry reconcile-before-capture-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 15",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure goto release-after-definite-decline position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 16",
+        "Inspect context for reserve-and-capture.capture · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 17",
+        "Inspect context for prepare-commerce.commerce · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare → prepare-commerce.commerce · row 18",
+        "Inspect context for fulfil-item.prepare · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.prepare · row 19",
+        "Inspect fulfil-item.issue-license · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 20",
+        "Inspect fulfil-item.issue-license · transfer onFailure retry reconcile-issuance-before-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 21",
+        "Inspect fulfil-item.issue-license · transfer onFailure goto compensate-definite-issuance-rejection position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 22",
+        "Inspect fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 23",
+        "Collapse fulfil-item.record-ready → record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 23",
+        "Open workflow record-ready from fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 23",
+        "Inspect record-ready.persist-ready · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 24",
+        "Inspect context for fulfil-item.record-ready · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item → fulfil-item.record-ready · row 25",
+        "Inspect context for batch-fulfilment.first-item · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.first-item · row 26",
+        "Inspect batch-fulfilment.second-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 27",
+        "Collapse batch-fulfilment.second-item → fulfil-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 27",
+        "Open workflow fulfil-item from batch-fulfilment.second-item · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 27",
+        "Inspect fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 28",
+        "Collapse fulfil-item.prepare → prepare-commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 28",
+        "Open workflow prepare-commerce from fulfil-item.prepare · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 28",
+        "Inspect prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 29",
+        "Collapse prepare-commerce.commerce → reserve-and-capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 29",
+        "Open workflow reserve-and-capture from prepare-commerce.commerce · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 29",
+        "Inspect reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 30",
+        "Collapse reserve-and-capture.reserve → reserve-inventory · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 30",
+        "Open workflow reserve-inventory from reserve-and-capture.reserve · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 30",
+        "Inspect reserve-inventory.reserve-product · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 31",
+        "Inspect reserve-inventory.reserve-product · transfer onFailure retry retry-transient position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 32",
+        "Inspect context for reserve-and-capture.reserve · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.reserve · row 33",
+        "Inspect reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 34",
+        "Collapse reserve-and-capture.capture → capture-authorized-payment · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 34",
+        "Open workflow capture-authorized-payment from reserve-and-capture.capture · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 34",
+        "Inspect capture-authorized-payment.capture-payment · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 35",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure retry reconcile-before-capture-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 36",
+        "Inspect capture-authorized-payment.capture-payment · transfer onFailure goto release-after-definite-decline position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 37",
+        "Inspect context for reserve-and-capture.capture · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture · row 38",
+        "Inspect context for prepare-commerce.commerce · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce · row 39",
+        "Inspect context for fulfil-item.prepare · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare · row 40",
+        "Inspect fulfil-item.issue-license · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 41",
+        "Inspect fulfil-item.issue-license · transfer onFailure retry reconcile-issuance-before-retry position 1 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 42",
+        "Inspect fulfil-item.issue-license · transfer onFailure goto compensate-definite-issuance-rejection position 2 · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 43",
+        "Inspect fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 44",
+        "Collapse fulfil-item.record-ready → record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 44",
+        "Open workflow record-ready from fulfil-item.record-ready · call · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 44",
+        "Inspect record-ready.persist-ready · operation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 45",
+        "Inspect context for fulfil-item.record-ready · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.record-ready · row 46",
+        "Inspect context for batch-fulfilment.second-item · continuation · root full-stress-journey · path full-stress-journey.two-products → batch-fulfilment.second-item · row 47",
+        "Inspect context for full-stress-journey.two-products · continuation · root full-stress-journey · path full-stress-journey.two-products · row 48"
+      ]
+    },
+    {
+      "task": "selected caller context outside scrolling canvas",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed",
+      "selectedContext": "Root: full-stress-journey · Selected capture-authorized-payment.capture-payment · operation · Caller path: full-stress-journey.two-products → batch-fulfilment.second-item → fulfil-item.prepare → prepare-commerce.commerce → reserve-and-capture.capture"
+    },
+    {
+      "task": "capture uncertainty, bounded recovery and distinct abort evidence",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "second-item mappings and exact caller return",
+      "width": 480,
+      "document": "digital-product-stress/arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "event-driven-purchase",
+      "authoredSteps": 5,
+      "rows": 12,
+      "context": "ContextOwning workflowevent-driven-purchaseSteppublish-commandCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "purchase-event-worker",
+      "authoredSteps": 4,
+      "rows": 8,
+      "context": "ContextOwning workflowpurchase-event-workerStepreceive-commandCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "activation-audit-worker",
+      "authoredSteps": 3,
+      "rows": 5,
+      "context": "ContextOwning workflowactivation-audit-workerStepreceive-activationCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "poll-purchase-until-ready",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowpoll-purchase-until-readySteppollCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "label": "event-driven-purchase"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "correlation, timeout, receive retry and polling fallback",
+      "width": 480,
+      "document": "digital-product-stress/event-based.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "metadata-heavy-entry",
+      "authoredSteps": 1,
+      "rows": 3,
+      "context": "ContextOwning workflowmetadata-heavy-entrySteppersist-verified-purchase-with-structured-policy-and-long-authored-nameCall pathmetadata-heavy-entry.persist-verified-purchase-with-structured-policy-and-long-authored-nameCalleerecord-ready · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "record-ready",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowrecord-readySteppersist-readyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "label": "metadata-heavy-entry"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "recursive-A",
+      "authoredSteps": 2,
+      "rows": 7,
+      "context": "ContextOwning workflowrecursive-AStepobserve-ACall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "recursive-B",
+      "authoredSteps": 2,
+      "rows": 7,
+      "context": "ContextOwning workflowrecursive-BStepobserve-BCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "label": "recursive-A"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "boundary destination navigation",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-0",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-0StepnextCall pathlayer-0.nextCalleelayer-1 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-1",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-1StepnextCall pathlayer-1.nextCalleelayer-2 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-2",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-2StepnextCall pathlayer-2.nextCalleelayer-3 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-3",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-3StepnextCall pathlayer-3.nextCalleelayer-4 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-4",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-4StepnextCall pathlayer-4.nextCalleelayer-5 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-5",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-5StepnextCall pathlayer-5.nextCalleelayer-6 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-6",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-6StepnextCall pathlayer-6.nextCalleelayer-7 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-7",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-7StepnextCall pathlayer-7.nextCalleelayer-8 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-8",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-8StepnextCall pathlayer-8.nextCalleelayer-9 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-9",
+      "authoredSteps": 1,
+      "rows": 5,
+      "context": "ContextOwning workflowlayer-9StepnextCall pathlayer-9.nextCalleelayer-10 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-10",
+      "authoredSteps": 1,
+      "rows": 3,
+      "context": "ContextOwning workflowlayer-10StepnextCall pathlayer-10.nextCalleelayer-11 · local-workflow"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "layer-11",
+      "authoredSteps": 1,
+      "rows": 1,
+      "context": "ContextOwning workflowlayer-11StepleafCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "label": "layer-0"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "boundary destination navigation",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "row-limit",
+      "authoredSteps": 250,
+      "rows": 200,
+      "context": "ContextOwning workflowrow-limitStepobservation-001Call pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "label": "row-limit"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "row-boundary authored search",
+      "width": 480,
+      "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "outcome": "passed"
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "diagnostic-probe",
+      "authoredSteps": 5,
+      "rows": 8,
+      "context": "ContextOwning workflowdiagnostic-probeStephealthyCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "label": "diagnostic-probe"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "header and navigation geometry",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "pageWidth": 480,
+      "scrollWidth": 480,
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ]
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "cycle-A",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowcycle-AStepWorkflow contextCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "workflow sequence and keyboard inspection",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "workflow": "cycle-B",
+      "authoredSteps": 1,
+      "rows": 2,
+      "context": "ContextOwning workflowcycle-BStepWorkflow contextCall pathAuthored location (no call occurrence selected)"
+    },
+    {
+      "task": "full participant label on keyboard focus",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "label": "cycle-A"
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "diagram",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.34375,
+            "y": 18.5,
+            "width": 78.34375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 357.6875,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "split",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 279.359375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 354.734375,
+            "y": 18.5,
+            "width": 55.375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 410.109375,
+            "y": 18.5,
+            "width": 52.890625,
+            "height": 23
+          }
+        ]
+      }
+    },
+    {
+      "task": "root mode and contained page width",
+      "width": 480,
+      "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "outcome": "passed",
+      "mode": "docs",
+      "geometry": {
+        "pageWidth": 480,
+        "scrollWidth": 480,
+        "controls": [
+          {
+            "label": "Supported by Jentic",
+            "x": 16,
+            "y": 10,
+            "width": 108,
+            "height": 40
+          },
+          {
+            "label": "Arazzo document URL",
+            "x": 16,
+            "y": 63.5,
+            "width": 323.921875,
+            "height": 29
+          },
+          {
+            "label": "Explore",
+            "x": 347.921875,
+            "y": 64.5,
+            "width": 76.078125,
+            "height": 27
+          },
+          {
+            "label": "Upload Arazzo document",
+            "x": 432,
+            "y": 62,
+            "width": 32,
+            "height": 32
+          },
+          {
+            "label": "diagram",
+            "x": 280.09375,
+            "y": 18.5,
+            "width": 75.375,
+            "height": 23
+          },
+          {
+            "label": "docs",
+            "x": 355.46875,
+            "y": 18.5,
+            "width": 57.59375,
+            "height": 23
+          },
+          {
+            "label": "split",
+            "x": 413.0625,
+            "y": 18.5,
+            "width": 49.9375,
+            "height": 23
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "humanComprehension": "Not measured; see comprehension-protocol.md"
+}

@@ -1,0 +1,6 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test:declarations
+> node scripts/check-public-declarations.mjs
+
+PASS arazzo-ui: relationship callback narrowing and private-model boundary
+PASS arazzo-ui-standalone: relationship callback narrowing and private-model boundary
