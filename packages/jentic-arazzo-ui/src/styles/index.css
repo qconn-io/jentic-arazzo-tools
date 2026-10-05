@@ -250,3 +250,199 @@
   outline: 3px solid #2563eb;
   outline-offset: 3px;
 }
+
+/* readable values and exact expressions share the same inspector in every view. */
+.arazzo-reading-section {
+  margin-block: 20px;
+  padding-block-start: 12px;
+  border-top: 1px solid #cbd5e1;
+}
+.arazzo-reading-section h3 {
+  margin: 0 0 10px;
+}
+.arazzo-value-rows,
+.arazzo-value-tree {
+  margin: 8px 0;
+}
+.arazzo-value-rows > div {
+  margin: 10px 0;
+}
+.arazzo-value-rows dt,
+.arazzo-value-tree dt {
+  font-weight: 600;
+}
+.arazzo-value-rows dd,
+.arazzo-value-tree dd {
+  margin: 4px 0 4px 12px;
+  min-width: 0;
+}
+.arazzo-value-tree {
+  padding-left: 12px;
+  border-left: 2px solid #e2e8f0;
+}
+.arazzo-exact-value {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+.arazzo-absent {
+  color: #64748b;
+}
+.arazzo-recovery-card {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 12px 0;
+}
+.arazzo-recovery-card h4 {
+  margin: 0;
+}
+.arazzo-search-results {
+  flex-basis: 100%;
+  max-height: 24vh;
+  overflow: auto;
+}
+.arazzo-workflow-navigation input {
+  min-width: 0;
+  flex: 1;
+  padding: 6px;
+}
+.arazzo-sequence-context {
+  overflow-wrap: anywhere;
+  background: #f8fafc;
+  padding: 8px;
+}
+.arazzo-sequence-participants {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  background: #f1f5f9;
+  border-bottom: 1px solid #94a3b8;
+}
+.arazzo-sequence-participants > div {
+  flex-shrink: 0;
+  padding: 10px;
+  text-align: center;
+  border-right: 1px solid #cbd5e1;
+}
+.arazzo-sequence-participants small {
+  display: block;
+}
+.arazzo-full-label {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.arazzo-full-label:focus {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.arazzo-ui,
+.arazzo-ui-standalone {
+  min-width: 0;
+  min-height: 0;
+}
+.arazzo-ui-standalone,
+.arazzo-ui-standalone * {
+  box-sizing: border-box;
+}
+.arazzo-ui-standalone .arazzo-ui-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 560px) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-block: 10px !important;
+}
+.arazzo-toolbar-source {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.arazzo-toolbar-logo {
+  display: block;
+}
+.arazzo-toolbar-mode {
+  min-width: 0;
+}
+.arazzo-viewer-shell {
+  min-height: 0;
+  overflow: hidden;
+}
+.arazzo-workflow-navigation {
+  flex-shrink: 0;
+  max-height: 42%;
+  overflow: auto;
+}
+.arazzo-workflow-navigation label {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+.arazzo-workflow-navigation input,
+.arazzo-workflow-navigation select {
+  max-width: 100%;
+}
+.arazzo-inspection-status,
+.arazzo-caller-navigation {
+  flex-shrink: 0;
+}
+.arazzo-selection-details {
+  top: 0;
+  overflow-wrap: anywhere;
+}
+.arazzo-ui input:focus-visible,
+.arazzo-ui [tabindex]:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+@media (max-width: 1000px) {
+  .arazzo-ui-standalone .arazzo-ui-toolbar {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .arazzo-toolbar-logo {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .arazzo-toolbar-mode {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .arazzo-toolbar-source {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+@media (max-width: 600px) {
+  .arazzo-selection-details {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+  .arazzo-viewer-panes {
+    flex-direction: column;
+  }
+  .arazzo-viewer-panes > div {
+    height: 50% !important;
+    min-height: 0;
+  }
+  .arazzo-viewer-panes > div:only-child {
+    height: 100% !important;
+  }
+  .arazzo-workflow-navigation label {
+    flex-basis: 100%;
+  }
+  .arazzo-workflow-navigation {
+    gap: 8px;
+  }
+  .arazzo-docs-prose table {
+    display: block;
+    overflow: auto;
+    max-width: 100%;
+  }
+}

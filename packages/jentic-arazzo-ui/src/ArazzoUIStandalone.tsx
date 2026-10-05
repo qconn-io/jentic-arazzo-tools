@@ -218,12 +218,10 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
           className="arazzo-ui-toolbar"
           style={{
             position: 'relative',
-            height: '60px',
+            minHeight: '60px',
+            flexShrink: 0,
             padding: '0 16px',
             borderBottom: '1px solid #333',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             background: '#1B1B1B',
           }}
         >
@@ -232,26 +230,21 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
             target="_blank"
             rel="noopener noreferrer"
             title="Supported by Jentic"
-            style={{ position: 'absolute', left: '16px' }}
+            className="arazzo-toolbar-logo"
           >
             <JenticLogo style={{ height: '36px' }} />
           </a>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              width: '560px',
-            }}
-          >
+          <div className="arazzo-toolbar-source">
             <input
               type="text"
+              aria-label="Arazzo document URL"
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Enter Arazzo document URL..."
               style={{
                 flex: 1,
+                minWidth: 0,
                 padding: '6px 12px',
                 border: '1px solid #444',
                 borderRadius: '6px',
@@ -299,11 +292,11 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
               <UploadIcon size={16} />
             </button>
           </div>
-          <div style={{ position: 'absolute', right: '16px' }}>
+          <div className="arazzo-toolbar-mode">
             <ViewModeControl value={view} onChange={handleViewChange} />
           </div>
         </div>
-        <div style={{ flex: 1, minHeight: 0 }}>
+        <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
           <ArazzoUI
             ref={ref}
             {...rest}

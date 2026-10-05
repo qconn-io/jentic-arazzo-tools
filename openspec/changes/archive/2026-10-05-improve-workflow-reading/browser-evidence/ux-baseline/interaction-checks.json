@@ -1,0 +1,147 @@
+{
+  "taskChecks": [
+    {
+      "task": "close restores focus first-item",
+      "focus": "Inspect batch-fulfilment.first-item"
+    },
+    {
+      "task": "close restores focus second-item",
+      "focus": "Inspect batch-fulfilment.second-item"
+    },
+    {
+      "task": "caller trail",
+      "selected": "fulfil-item"
+    },
+    {
+      "task": "return exact caller",
+      "selected": "full-stress-journey",
+      "focus": "Collapse batch-fulfilment.first-item → fulfil-item",
+      "captureOccurrences": 2
+    },
+    {
+      "task": "reload selected recovery workflow",
+      "prior": {
+        "workflow": "capture-authorized-payment",
+        "url": "http://127.0.0.1:4175/?document=http%3A%2F%2F127.0.0.1%3A4175%2Fexamples%2Fdigital-product-stress%2Farazzo.yaml"
+      },
+      "after": "full-stress-journey",
+      "sequenceVisible": 0
+    }
+  ],
+  "mappingChecks": [
+    {
+      "step": "first-item",
+      "sections": [
+        {
+          "title": "Context",
+          "value": "{\n  \"owningWorkflow\": \"batch-fulfilment\",\n  \"step\": \"first-item\",\n  \"caller\": \"batch-fulfilment\",\n  \"callee\": \"fulfil-item\",\n  \"classification\": \"local-workflow\",\n  \"callPath\": [\n    [\n      \"full-stress-journey\",\n      \"two-products\"\n    ],\n    [\n      \"batch-fulfilment\",\n      \"first-item\"\n    ]\n  ]\n}"
+        },
+        {
+          "title": "Caller-supplied parameters",
+          "value": "[\n  {\n    \"name\": \"purchaseId\",\n    \"value\": \"{$inputs.purchaseId}-A\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"purchaseId\",\n      \"value\": \"{$inputs.purchaseId}-A\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"customerId\",\n    \"value\": \"$inputs.customerId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"customerId\",\n      \"value\": \"$inputs.customerId\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      1\n    ]\n  },\n  {\n    \"name\": \"productId\",\n    \"value\": \"$inputs.productId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"productId\",\n      \"value\": \"$inputs.productId\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      2\n    ]\n  },\n  {\n    \"name\": \"amountMinor\",\n    \"value\": \"$inputs.amountMinor\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"amountMinor\",\n      \"value\": \"$inputs.amountMinor\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      3\n    ]\n  },\n  {\n    \"name\": \"currency\",\n    \"value\": \"$inputs.currency\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"currency\",\n      \"value\": \"$inputs.currency\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      4\n    ]\n  },\n  {\n    \"name\": \"paymentToken\",\n    \"value\": \"$inputs.paymentToken\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"paymentToken\",\n      \"value\": \"$inputs.paymentToken\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      5\n    ]\n  },\n  {\n    \"name\": \"serviceToken\",\n    \"value\": \"$inputs.serviceToken\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"serviceToken\",\n      \"value\": \"$inputs.serviceToken\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      6\n    ]\n  },\n  {\n    \"name\": \"context\",\n    \"value\": \"$inputs.context\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"context\",\n      \"value\": \"$inputs.context\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      7\n    ]\n  }\n]"
+        },
+        {
+          "title": "Caller-side output expressions",
+          "value": "{\n  \"licenseId\": \"$workflows.fulfil-item.outputs.licenseId\",\n  \"purchaseId\": \"$workflows.fulfil-item.outputs.purchaseId\"\n}"
+        },
+        {
+          "title": "Declared callee inputs",
+          "value": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"purchaseId\",\n    \"customerId\",\n    \"productId\",\n    \"amountMinor\",\n    \"currency\",\n    \"paymentToken\",\n    \"serviceToken\",\n    \"context\"\n  ],\n  \"properties\": {\n    \"purchaseId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"customerId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"productId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"amountMinor\": {\n      \"type\": \"integer\",\n      \"minimum\": 1\n    },\n    \"currency\": {\n      \"type\": \"string\",\n      \"pattern\": \"^[A-Z]{3}$\"\n    },\n    \"paymentToken\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"serviceToken\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"context\": {\n      \"type\": \"object\"\n    }\n  }\n}"
+        },
+        {
+          "title": "Declared callee outputs",
+          "value": "{\n  \"purchaseId\": \"$inputs.purchaseId\",\n  \"licenseId\": \"$steps.issue-license.outputs.licenseId\"\n}"
+        },
+        {
+          "title": "Viewer inspection order — effective actions",
+          "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"reference\": \"$components.failureActions.stop-and-reconcile\"\n    },\n    \"effective\": {\n      \"name\": \"stop-and-reconcile\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      2,\n      \"failureActions\",\n      0\n    ],\n    \"declarationPath\": [\n      \"components\",\n      \"failureActions\",\n      \"stop-and-reconcile\"\n    ]\n  }\n]"
+        },
+        {
+          "title": "Authored action lists",
+          "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"reference\": \"$components.failureActions.stop-and-reconcile\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+        },
+        {
+          "title": "Criteria",
+          "value": "Unavailable: no authored mapping or declaration"
+        },
+        {
+          "title": "Source metadata",
+          "value": "{\n  \"workflowId\": \"batch-fulfilment\",\n  \"stepId\": \"first-item\",\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    0\n  ],\n  \"status\": \"unverified\",\n  \"verification\": \"unverified\",\n  \"candidates\": [],\n  \"locators\": {\n    \"workflowId\": \"fulfil-item\"\n  }\n}"
+        },
+        {
+          "title": "Prerequisites",
+          "value": "[]"
+        },
+        {
+          "title": "Provenance",
+          "value": "{\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    0\n  ],\n  \"callPath\": [\n    [\n      \"full-stress-journey\",\n      \"two-products\"\n    ],\n    [\n      \"batch-fulfilment\",\n      \"first-item\"\n    ]\n  ]\n}"
+        },
+        {
+          "title": "Diagnostics",
+          "value": "[]"
+        },
+        {
+          "title": "Authored content",
+          "value": "{\n  \"stepId\": \"first-item\",\n  \"workflowId\": \"fulfil-item\",\n  \"parameters\": [\n    {\n      \"name\": \"purchaseId\",\n      \"value\": \"{$inputs.purchaseId}-A\"\n    },\n    {\n      \"name\": \"customerId\",\n      \"value\": \"$inputs.customerId\"\n    },\n    {\n      \"name\": \"productId\",\n      \"value\": \"$inputs.productId\"\n    },\n    {\n      \"name\": \"amountMinor\",\n      \"value\": \"$inputs.amountMinor\"\n    },\n    {\n      \"name\": \"currency\",\n      \"value\": \"$inputs.currency\"\n    },\n    {\n      \"name\": \"paymentToken\",\n      \"value\": \"$inputs.paymentToken\"\n    },\n    {\n      \"name\": \"serviceToken\",\n      \"value\": \"$inputs.serviceToken\"\n    },\n    {\n      \"name\": \"context\",\n      \"value\": \"$inputs.context\"\n    }\n  ],\n  \"outputs\": {\n    \"licenseId\": \"$workflows.fulfil-item.outputs.licenseId\",\n    \"purchaseId\": \"$workflows.fulfil-item.outputs.purchaseId\"\n  }\n}"
+        }
+      ]
+    },
+    {
+      "step": "second-item",
+      "sections": [
+        {
+          "title": "Context",
+          "value": "{\n  \"owningWorkflow\": \"batch-fulfilment\",\n  \"step\": \"second-item\",\n  \"caller\": \"batch-fulfilment\",\n  \"callee\": \"fulfil-item\",\n  \"classification\": \"local-workflow\",\n  \"callPath\": [\n    [\n      \"full-stress-journey\",\n      \"two-products\"\n    ],\n    [\n      \"batch-fulfilment\",\n      \"second-item\"\n    ]\n  ]\n}"
+        },
+        {
+          "title": "Caller-supplied parameters",
+          "value": "[\n  {\n    \"name\": \"purchaseId\",\n    \"value\": \"{$inputs.purchaseId}-B\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"purchaseId\",\n      \"value\": \"{$inputs.purchaseId}-B\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"customerId\",\n    \"value\": \"$inputs.customerId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"customerId\",\n      \"value\": \"$inputs.customerId\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      1\n    ]\n  },\n  {\n    \"name\": \"productId\",\n    \"value\": \"digital-upgrade\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"productId\",\n      \"value\": \"digital-upgrade\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      2\n    ]\n  },\n  {\n    \"name\": \"amountMinor\",\n    \"value\": 2499,\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"amountMinor\",\n      \"value\": 2499\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      3\n    ]\n  },\n  {\n    \"name\": \"currency\",\n    \"value\": \"$inputs.currency\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"currency\",\n      \"value\": \"$inputs.currency\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      4\n    ]\n  },\n  {\n    \"name\": \"paymentToken\",\n    \"value\": \"authorization-demo-upgrade\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"paymentToken\",\n      \"value\": \"authorization-demo-upgrade\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      5\n    ]\n  },\n  {\n    \"name\": \"serviceToken\",\n    \"value\": \"$inputs.serviceToken\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"serviceToken\",\n      \"value\": \"$inputs.serviceToken\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      6\n    ]\n  },\n  {\n    \"name\": \"context\",\n    \"value\": \"$inputs.context\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"context\",\n      \"value\": \"$inputs.context\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      7\n    ]\n  }\n]"
+        },
+        {
+          "title": "Caller-side output expressions",
+          "value": "{\n  \"licenseId\": \"$workflows.fulfil-item.outputs.licenseId\",\n  \"purchaseId\": \"$workflows.fulfil-item.outputs.purchaseId\"\n}"
+        },
+        {
+          "title": "Declared callee inputs",
+          "value": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"purchaseId\",\n    \"customerId\",\n    \"productId\",\n    \"amountMinor\",\n    \"currency\",\n    \"paymentToken\",\n    \"serviceToken\",\n    \"context\"\n  ],\n  \"properties\": {\n    \"purchaseId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"customerId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"productId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"amountMinor\": {\n      \"type\": \"integer\",\n      \"minimum\": 1\n    },\n    \"currency\": {\n      \"type\": \"string\",\n      \"pattern\": \"^[A-Z]{3}$\"\n    },\n    \"paymentToken\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"serviceToken\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"context\": {\n      \"type\": \"object\"\n    }\n  }\n}"
+        },
+        {
+          "title": "Declared callee outputs",
+          "value": "{\n  \"purchaseId\": \"$inputs.purchaseId\",\n  \"licenseId\": \"$steps.issue-license.outputs.licenseId\"\n}"
+        },
+        {
+          "title": "Viewer inspection order — effective actions",
+          "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"reference\": \"$components.failureActions.stop-and-reconcile\"\n    },\n    \"effective\": {\n      \"name\": \"stop-and-reconcile\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      2,\n      \"failureActions\",\n      0\n    ],\n    \"declarationPath\": [\n      \"components\",\n      \"failureActions\",\n      \"stop-and-reconcile\"\n    ]\n  }\n]"
+        },
+        {
+          "title": "Authored action lists",
+          "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"reference\": \"$components.failureActions.stop-and-reconcile\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+        },
+        {
+          "title": "Criteria",
+          "value": "Unavailable: no authored mapping or declaration"
+        },
+        {
+          "title": "Source metadata",
+          "value": "{\n  \"workflowId\": \"batch-fulfilment\",\n  \"stepId\": \"second-item\",\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    1\n  ],\n  \"status\": \"unverified\",\n  \"verification\": \"unverified\",\n  \"candidates\": [],\n  \"locators\": {\n    \"workflowId\": \"fulfil-item\"\n  }\n}"
+        },
+        {
+          "title": "Prerequisites",
+          "value": "[]"
+        },
+        {
+          "title": "Provenance",
+          "value": "{\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    1\n  ],\n  \"callPath\": [\n    [\n      \"full-stress-journey\",\n      \"two-products\"\n    ],\n    [\n      \"batch-fulfilment\",\n      \"second-item\"\n    ]\n  ]\n}"
+        },
+        {
+          "title": "Diagnostics",
+          "value": "[]"
+        },
+        {
+          "title": "Authored content",
+          "value": "{\n  \"stepId\": \"second-item\",\n  \"workflowId\": \"fulfil-item\",\n  \"parameters\": [\n    {\n      \"name\": \"purchaseId\",\n      \"value\": \"{$inputs.purchaseId}-B\"\n    },\n    {\n      \"name\": \"customerId\",\n      \"value\": \"$inputs.customerId\"\n    },\n    {\n      \"name\": \"productId\",\n      \"value\": \"digital-upgrade\"\n    },\n    {\n      \"name\": \"amountMinor\",\n      \"value\": 2499\n    },\n    {\n      \"name\": \"currency\",\n      \"value\": \"$inputs.currency\"\n    },\n    {\n      \"name\": \"paymentToken\",\n      \"value\": \"authorization-demo-upgrade\"\n    },\n    {\n      \"name\": \"serviceToken\",\n      \"value\": \"$inputs.serviceToken\"\n    },\n    {\n      \"name\": \"context\",\n      \"value\": \"$inputs.context\"\n    }\n  ],\n  \"outputs\": {\n    \"licenseId\": \"$workflows.fulfil-item.outputs.licenseId\",\n    \"purchaseId\": \"$workflows.fulfil-item.outputs.purchaseId\"\n  }\n}"
+        }
+      ]
+    }
+  ]
+}

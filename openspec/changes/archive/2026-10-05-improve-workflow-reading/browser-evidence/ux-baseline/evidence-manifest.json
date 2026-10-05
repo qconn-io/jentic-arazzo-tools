@@ -1,0 +1,108 @@
+{
+  "baselineCommit": "87f272b32f629a2332f19f399acf7e35fb8cac09",
+  "captureMode": "Current-source Vite server and Playwright Chromium",
+  "originalScreenshotCount": 183,
+  "preservedScreenshots": 11,
+  "files": [
+    {
+      "name": "summary.json",
+      "bytes": 335,
+      "sha256": "f2d2758890a495050ca6fbd56ac71676b0b3572ea8f2a603d5ebedd7164c05d1"
+    },
+    {
+      "name": "walkthrough.json",
+      "bytes": 283043,
+      "sha256": "fd7daf8203153f06b6219fbff59ff4ded68581c716f9242d168130c601efca06"
+    },
+    {
+      "name": "scenarios-inspected.json",
+      "bytes": 202566,
+      "sha256": "a8846847d9b52ff7ca2111387c62391c7e94a69d250024fd5d2acbb4e6c15372"
+    },
+    {
+      "name": "view-checks.json",
+      "bytes": 82729,
+      "sha256": "1712f5b2793b8c5fa6006b022d4de2fc22c72115a0c8884d3ae6011d76a4d34a"
+    },
+    {
+      "name": "narrow.json",
+      "bytes": 2725,
+      "sha256": "6cbe770987cb3618f2e8976525c2c9a1cb821920406c9b34c0f45f5811e4b8b7"
+    },
+    {
+      "name": "interaction-checks.json",
+      "bytes": 16213,
+      "sha256": "2eea72ebe0d6517b60fa704efbeb4cb62e84d37b90431de4b839adab7de597d8"
+    },
+    {
+      "name": "extra-checks.json",
+      "bytes": 830,
+      "sha256": "d0d00cb5bf198a6c786af9914d2c5532cfbb3e8d13f5e388dd74d1d188d8bd79"
+    },
+    {
+      "name": "boundaries.json",
+      "bytes": 5272,
+      "sha256": "883459836ccc9ce0a07e1cad41f7af0765484d10bb15ecbc62690a9917efed2a"
+    },
+    {
+      "name": "small-details.json",
+      "bytes": 38356,
+      "sha256": "2438d18eb362f07e5f2bef45ab97a9e8588693abd834976c9fcc304a1d4ce77e"
+    },
+    {
+      "name": "small-default-docs-1440.png",
+      "bytes": 127287,
+      "sha256": "73b9aeaf8dc024f15f4ea9b82ea7fc9e3bad611ceeffc084450add90421915b4"
+    },
+    {
+      "name": "small-client-sequence-1440.png",
+      "bytes": 70864,
+      "sha256": "f4cfa00d77715a6bfe8bfbc432e7cdd5d54e93b776348d251893135bea658c58"
+    },
+    {
+      "name": "small-coordinator-sequence-1440.png",
+      "bytes": 83803,
+      "sha256": "b3d3085224eaa0bf1edda84661f0d12b81b797c7b5fe113d0078980fb4cd053c"
+    },
+    {
+      "name": "http-full-expanded-1440.png",
+      "bytes": 83573,
+      "sha256": "6c608800d3d2ca4198ad3d5239f96ae7a59e86d91b1a0ee30345f1cb4ab15f2e"
+    },
+    {
+      "name": "http-full-expanded-480.png",
+      "bytes": 59189,
+      "sha256": "1f0151fc8934126f669a43f959d32d1ff0de0ccd01fd3bf31c82ecd3c3a566be"
+    },
+    {
+      "name": "http-overview-fit-1440.png",
+      "bytes": 99979,
+      "sha256": "bf886f62e4718825cdb6e0931ebd03d2b3c8c51a87f0ff970b76c6b459f01f76"
+    },
+    {
+      "name": "mapping-second-item-1440.png",
+      "bytes": 190812,
+      "sha256": "7614f8ea64ed343d6a89ab484b0dceb3df91fd74c4303aad2416f29ebccfa9e8"
+    },
+    {
+      "name": "scenario-completion-timeout-1440.png",
+      "bytes": 149740,
+      "sha256": "fbb31f11dcade3c5a390046bfad8897405bfb385396a42321c7517a95ea3bf26"
+    },
+    {
+      "name": "d0-landing-480.png",
+      "bytes": 110638,
+      "sha256": "d4693fcdc4722910c7e89ba898c4a777cb124433399b1364d50464f32964b3ed"
+    },
+    {
+      "name": "d0-details-480.png",
+      "bytes": 65508,
+      "sha256": "905b4e99172b3511a5cd1e52563534d79aa5acac69ecb35e4f0f26bc9d8035f3"
+    },
+    {
+      "name": "source-contract-navigation-1440.png",
+      "bytes": 108003,
+      "sha256": "1e635fbb34db18bf7d71adccd5c7604db0409560d1c4700602215a0143607e9b"
+    }
+  ]
+}

@@ -1,0 +1,384 @@
+[
+  {
+    "workflow": "client-journey",
+    "step": "purchase",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"client-journey\",\n  \"step\": \"purchase\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Parameters",
+        "value": "[\n  {\n    \"name\": \"Authorization\",\n    \"in\": \"header\",\n    \"value\": \"Bearer {$inputs.clientToken}\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.clientToken}\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      0,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"Idempotency-Key\",\n    \"in\": \"header\",\n    \"value\": \"$inputs.purchaseKey\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"$inputs.purchaseKey\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      0,\n      \"parameters\",\n      1\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "{\n  \"purchaseId\": \"$response.body#/purchaseId\",\n  \"licenseId\": \"$response.body#/licenseId\"\n}"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-client-journey\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-client-journey\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      0,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-client-journey\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$statusCode == 201\"\n  },\n  {\n    \"condition\": \"$response.body#/state == 'READY'\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"client-journey\",\n  \"stepId\": \"purchase\",\n  \"path\": [\n    \"workflows\",\n    0,\n    \"steps\",\n    0\n  ],\n  \"status\": \"declared\",\n  \"verification\": \"unverified\",\n  \"sourceName\": \"coordinator\",\n  \"sourceType\": \"openapi\",\n  \"source\": {\n    \"name\": \"coordinator\",\n    \"url\": \"./coordinator.openapi.yaml\",\n    \"type\": \"openapi\"\n  },\n  \"candidates\": [\n    \"coordinator\"\n  ],\n  \"locators\": {\n    \"operationId\": \"$sourceDescriptions.coordinator.purchaseProduct\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    0,\n    \"steps\",\n    0\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"purchase\",\n  \"description\": \"Purchase one product. Server-side fulfil-purchase runs before the 201 response; readiness requires reservation, matching captured payment and issued license evidence.\",\n  \"operationId\": \"$sourceDescriptions.coordinator.purchaseProduct\",\n  \"parameters\": [\n    {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.clientToken}\"\n    },\n    {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"$inputs.purchaseKey\"\n    }\n  ],\n  \"requestBody\": {\n    \"contentType\": \"application/json\",\n    \"payload\": {\n      \"customerId\": \"$inputs.customerId\",\n      \"productId\": \"$inputs.productId\",\n      \"amountMinor\": \"$inputs.amountMinor\",\n      \"currency\": \"$inputs.currency\",\n      \"paymentToken\": \"$inputs.paymentToken\"\n    }\n  },\n  \"successCriteria\": [\n    {\n      \"condition\": \"$statusCode == 201\"\n    },\n    {\n      \"condition\": \"$response.body#/state == 'READY'\"\n    }\n  ],\n  \"outputs\": {\n    \"purchaseId\": \"$response.body#/purchaseId\",\n    \"licenseId\": \"$response.body#/licenseId\"\n  },\n  \"x-example-actor\": \"client\",\n  \"x-example-target\": \"coordinator\",\n  \"x-example-implementation\": {\n    \"workflowId\": \"fulfil-purchase\",\n    \"timing\": \"before-response\",\n    \"inputs\": {\n      \"customerId\": \"$request.body#/customerId\",\n      \"productId\": \"$request.body#/productId\",\n      \"amountMinor\": \"$request.body#/amountMinor\",\n      \"currency\": \"$request.body#/currency\",\n      \"paymentToken\": \"$request.body#/paymentToken\"\n    },\n    \"serverInputs\": {\n      \"purchaseId\": \"Generated once and durably associated with the scoped purchase key.\",\n      \"serviceToken\": \"Coordinator service identity from server configuration.\"\n    },\n    \"response\": {\n      \"purchaseId\": \"$workflows.fulfil-purchase.outputs.purchaseId\",\n      \"licenseId\": \"$workflows.fulfil-purchase.outputs.licenseId\",\n      \"state\": \"$workflows.fulfil-purchase.outputs.state\"\n    }\n  }\n}"
+      },
+      {
+        "title": "Descriptive associations",
+        "value": "No standard workflow-call relationship is declared by descriptions or extensions."
+      }
+    ]
+  },
+  {
+    "workflow": "client-journey",
+    "step": "retrieve-bundle",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"client-journey\",\n  \"step\": \"retrieve-bundle\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Parameters",
+        "value": "[\n  {\n    \"name\": \"Authorization\",\n    \"in\": \"header\",\n    \"value\": \"Bearer {$inputs.clientToken}\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.clientToken}\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      1,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"purchaseId\",\n    \"in\": \"path\",\n    \"value\": \"$steps.purchase.outputs.purchaseId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"purchaseId\",\n      \"in\": \"path\",\n      \"value\": \"$steps.purchase.outputs.purchaseId\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      1,\n      \"parameters\",\n      1\n    ]\n  },\n  {\n    \"name\": \"deviceId\",\n    \"in\": \"query\",\n    \"value\": \"$inputs.deviceId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"deviceId\",\n      \"in\": \"query\",\n      \"value\": \"$inputs.deviceId\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      1,\n      \"parameters\",\n      2\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "{\n  \"protectedBundle\": \"$response.body#/protectedBundle\"\n}"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-client-journey\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-client-journey\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      0,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-client-journey\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$statusCode == 200\"\n  },\n  {\n    \"condition\": \"$response.body#/state == 'READY'\"\n  },\n  {\n    \"condition\": \"$response.body#/purchaseId == $steps.purchase.outputs.purchaseId\"\n  },\n  {\n    \"condition\": \"$response.body#/licenseId == $steps.purchase.outputs.licenseId\"\n  },\n  {\n    \"condition\": \"$response.body#/deviceId == $inputs.deviceId\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"client-journey\",\n  \"stepId\": \"retrieve-bundle\",\n  \"path\": [\n    \"workflows\",\n    0,\n    \"steps\",\n    1\n  ],\n  \"status\": \"declared\",\n  \"verification\": \"unverified\",\n  \"sourceName\": \"coordinator\",\n  \"sourceType\": \"openapi\",\n  \"source\": {\n    \"name\": \"coordinator\",\n    \"url\": \"./coordinator.openapi.yaml\",\n    \"type\": \"openapi\"\n  },\n  \"candidates\": [\n    \"coordinator\"\n  ],\n  \"locators\": {\n    \"operationId\": \"$sourceDescriptions.coordinator.getLicenseBundle\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    0,\n    \"steps\",\n    1\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"retrieve-bundle\",\n  \"description\": \"Read protected material only for the authenticated customer's ready purchase.\",\n  \"operationId\": \"$sourceDescriptions.coordinator.getLicenseBundle\",\n  \"parameters\": [\n    {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.clientToken}\"\n    },\n    {\n      \"name\": \"purchaseId\",\n      \"in\": \"path\",\n      \"value\": \"$steps.purchase.outputs.purchaseId\"\n    },\n    {\n      \"name\": \"deviceId\",\n      \"in\": \"query\",\n      \"value\": \"$inputs.deviceId\"\n    }\n  ],\n  \"successCriteria\": [\n    {\n      \"condition\": \"$statusCode == 200\"\n    },\n    {\n      \"condition\": \"$response.body#/state == 'READY'\"\n    },\n    {\n      \"condition\": \"$response.body#/purchaseId == $steps.purchase.outputs.purchaseId\"\n    },\n    {\n      \"condition\": \"$response.body#/licenseId == $steps.purchase.outputs.licenseId\"\n    },\n    {\n      \"condition\": \"$response.body#/deviceId == $inputs.deviceId\"\n    }\n  ],\n  \"outputs\": {\n    \"protectedBundle\": \"$response.body#/protectedBundle\"\n  },\n  \"x-example-actor\": \"client\",\n  \"x-example-target\": \"coordinator\"\n}"
+      },
+      {
+        "title": "Descriptive associations",
+        "value": "No standard workflow-call relationship is declared by descriptions or extensions."
+      }
+    ]
+  },
+  {
+    "workflow": "client-journey",
+    "step": "report-activation",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"client-journey\",\n  \"step\": \"report-activation\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Parameters",
+        "value": "[\n  {\n    \"name\": \"Authorization\",\n    \"in\": \"header\",\n    \"value\": \"Bearer {$inputs.clientToken}\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.clientToken}\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      2,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"purchaseId\",\n    \"in\": \"path\",\n    \"value\": \"$steps.purchase.outputs.purchaseId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"purchaseId\",\n      \"in\": \"path\",\n      \"value\": \"$steps.purchase.outputs.purchaseId\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      2,\n      \"parameters\",\n      1\n    ]\n  },\n  {\n    \"name\": \"Idempotency-Key\",\n    \"in\": \"header\",\n    \"value\": \"$inputs.activationKey\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"$inputs.activationKey\"\n    },\n    \"path\": [\n      \"workflows\",\n      0,\n      \"steps\",\n      2,\n      \"parameters\",\n      2\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "Unavailable: no authored mapping or declaration"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-client-journey\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-client-journey\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      0,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-client-journey\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$statusCode == 204\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"client-journey\",\n  \"stepId\": \"report-activation\",\n  \"path\": [\n    \"workflows\",\n    0,\n    \"steps\",\n    2\n  ],\n  \"status\": \"declared\",\n  \"verification\": \"unverified\",\n  \"sourceName\": \"coordinator\",\n  \"sourceType\": \"openapi\",\n  \"source\": {\n    \"name\": \"coordinator\",\n    \"url\": \"./coordinator.openapi.yaml\",\n    \"type\": \"openapi\"\n  },\n  \"candidates\": [\n    \"coordinator\"\n  ],\n  \"locators\": {\n    \"operationId\": \"$sourceDescriptions.coordinator.recordActivation\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    0,\n    \"steps\",\n    2\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"report-activation\",\n  \"description\": \"Send the actual device result as an HTTP notification. A 204 acknowledges receipt; it does not turn a FAILED outcome into successful activation.\",\n  \"operationId\": \"$sourceDescriptions.coordinator.recordActivation\",\n  \"parameters\": [\n    {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.clientToken}\"\n    },\n    {\n      \"name\": \"purchaseId\",\n      \"in\": \"path\",\n      \"value\": \"$steps.purchase.outputs.purchaseId\"\n    },\n    {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"$inputs.activationKey\"\n    }\n  ],\n  \"requestBody\": {\n    \"contentType\": \"application/json\",\n    \"payload\": {\n      \"licenseId\": \"$steps.purchase.outputs.licenseId\",\n      \"deviceId\": \"$inputs.deviceId\",\n      \"outcome\": \"$inputs.activationOutcome\"\n    }\n  },\n  \"successCriteria\": [\n    {\n      \"condition\": \"$statusCode == 204\"\n    }\n  ],\n  \"x-example-actor\": \"client\",\n  \"x-example-target\": \"coordinator\"\n}"
+      },
+      {
+        "title": "Descriptive associations",
+        "value": "No standard workflow-call relationship is declared by descriptions or extensions."
+      }
+    ]
+  },
+  {
+    "workflow": "fulfil-purchase",
+    "step": "reserve-and-pay",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"fulfil-purchase\",\n  \"step\": \"reserve-and-pay\",\n  \"caller\": \"fulfil-purchase\",\n  \"callee\": \"reserve-and-capture\",\n  \"classification\": \"local-workflow\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Caller-supplied parameters",
+        "value": "[\n  {\n    \"name\": \"purchaseId\",\n    \"value\": \"$inputs.purchaseId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"purchaseId\",\n      \"value\": \"$inputs.purchaseId\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      0,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"productId\",\n    \"value\": \"$inputs.productId\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"productId\",\n      \"value\": \"$inputs.productId\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      0,\n      \"parameters\",\n      1\n    ]\n  },\n  {\n    \"name\": \"amountMinor\",\n    \"value\": \"$inputs.amountMinor\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"amountMinor\",\n      \"value\": \"$inputs.amountMinor\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      0,\n      \"parameters\",\n      2\n    ]\n  },\n  {\n    \"name\": \"currency\",\n    \"value\": \"$inputs.currency\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"currency\",\n      \"value\": \"$inputs.currency\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      0,\n      \"parameters\",\n      3\n    ]\n  },\n  {\n    \"name\": \"paymentToken\",\n    \"value\": \"$inputs.paymentToken\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"paymentToken\",\n      \"value\": \"$inputs.paymentToken\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      0,\n      \"parameters\",\n      4\n    ]\n  },\n  {\n    \"name\": \"serviceToken\",\n    \"value\": \"$inputs.serviceToken\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"serviceToken\",\n      \"value\": \"$inputs.serviceToken\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      0,\n      \"parameters\",\n      5\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "{\n  \"reservationId\": \"$workflows.reserve-and-capture.outputs.reservationId\",\n  \"paymentId\": \"$workflows.reserve-and-capture.outputs.paymentId\",\n  \"paymentState\": \"$workflows.reserve-and-capture.outputs.paymentState\"\n}"
+      },
+      {
+        "title": "Declared callee inputs",
+        "value": "{\n  \"type\": \"object\",\n  \"additionalProperties\": false,\n  \"required\": [\n    \"purchaseId\",\n    \"productId\",\n    \"amountMinor\",\n    \"currency\",\n    \"paymentToken\",\n    \"serviceToken\"\n  ],\n  \"properties\": {\n    \"purchaseId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"productId\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"amountMinor\": {\n      \"type\": \"integer\",\n      \"minimum\": 1\n    },\n    \"currency\": {\n      \"type\": \"string\",\n      \"pattern\": \"^[A-Z]{3}$\"\n    },\n    \"paymentToken\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    },\n    \"serviceToken\": {\n      \"type\": \"string\",\n      \"minLength\": 1\n    }\n  }\n}"
+      },
+      {
+        "title": "Declared callee outputs",
+        "value": "{\n  \"reservationId\": \"$steps.reserve-product.outputs.reservationId\",\n  \"paymentId\": \"$steps.capture-payment.outputs.paymentId\",\n  \"paymentState\": \"$steps.capture-payment.outputs.paymentState\"\n}"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-fulfilment-and-reconcile\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-fulfilment-and-reconcile\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      1,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-fulfilment-and-reconcile\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$workflows.reserve-and-capture.outputs.paymentState == 'CAPTURED'\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"fulfil-purchase\",\n  \"stepId\": \"reserve-and-pay\",\n  \"path\": [\n    \"workflows\",\n    1,\n    \"steps\",\n    0\n  ],\n  \"status\": \"unverified\",\n  \"verification\": \"unverified\",\n  \"candidates\": [],\n  \"locators\": {\n    \"workflowId\": \"reserve-and-capture\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    1,\n    \"steps\",\n    0\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"reserve-and-pay\",\n  \"description\": \"Obtain matching reservation and confirmed payment before license issuance.\",\n  \"workflowId\": \"reserve-and-capture\",\n  \"parameters\": [\n    {\n      \"name\": \"purchaseId\",\n      \"value\": \"$inputs.purchaseId\"\n    },\n    {\n      \"name\": \"productId\",\n      \"value\": \"$inputs.productId\"\n    },\n    {\n      \"name\": \"amountMinor\",\n      \"value\": \"$inputs.amountMinor\"\n    },\n    {\n      \"name\": \"currency\",\n      \"value\": \"$inputs.currency\"\n    },\n    {\n      \"name\": \"paymentToken\",\n      \"value\": \"$inputs.paymentToken\"\n    },\n    {\n      \"name\": \"serviceToken\",\n      \"value\": \"$inputs.serviceToken\"\n    }\n  ],\n  \"outputs\": {\n    \"reservationId\": \"$workflows.reserve-and-capture.outputs.reservationId\",\n    \"paymentId\": \"$workflows.reserve-and-capture.outputs.paymentId\",\n    \"paymentState\": \"$workflows.reserve-and-capture.outputs.paymentState\"\n  },\n  \"successCriteria\": [\n    {\n      \"condition\": \"$workflows.reserve-and-capture.outputs.paymentState == 'CAPTURED'\"\n    }\n  ]\n}"
+      }
+    ]
+  },
+  {
+    "workflow": "fulfil-purchase",
+    "step": "issue-license",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"fulfil-purchase\",\n  \"step\": \"issue-license\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Parameters",
+        "value": "[\n  {\n    \"name\": \"Authorization\",\n    \"in\": \"header\",\n    \"value\": \"Bearer {$inputs.serviceToken}\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.serviceToken}\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      1,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"Idempotency-Key\",\n    \"in\": \"header\",\n    \"value\": \"{$inputs.purchaseId}-license\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"{$inputs.purchaseId}-license\"\n    },\n    \"path\": [\n      \"workflows\",\n      1,\n      \"steps\",\n      1,\n      \"parameters\",\n      1\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "{\n  \"licenseId\": \"$response.body#/licenseId\",\n  \"state\": \"$response.body#/state\"\n}"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-fulfilment-and-reconcile\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-fulfilment-and-reconcile\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      1,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-fulfilment-and-reconcile\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$statusCode == 201\"\n  },\n  {\n    \"condition\": \"$response.body#/state == 'READY'\"\n  },\n  {\n    \"condition\": \"$response.body#/purchaseId == $inputs.purchaseId\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"fulfil-purchase\",\n  \"stepId\": \"issue-license\",\n  \"path\": [\n    \"workflows\",\n    1,\n    \"steps\",\n    1\n  ],\n  \"status\": \"declared\",\n  \"verification\": \"unverified\",\n  \"sourceName\": \"license\",\n  \"sourceType\": \"openapi\",\n  \"source\": {\n    \"name\": \"license\",\n    \"url\": \"./license.openapi.yaml\",\n    \"type\": \"openapi\"\n  },\n  \"candidates\": [\n    \"license\"\n  ],\n  \"locators\": {\n    \"operationId\": \"$sourceDescriptions.license.issueLicense\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    1,\n    \"steps\",\n    1\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"issue-license\",\n  \"description\": \"Issue once for the verified reservation and captured payment.\",\n  \"operationId\": \"$sourceDescriptions.license.issueLicense\",\n  \"parameters\": [\n    {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.serviceToken}\"\n    },\n    {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"{$inputs.purchaseId}-license\"\n    }\n  ],\n  \"requestBody\": {\n    \"contentType\": \"application/json\",\n    \"payload\": {\n      \"purchaseId\": \"$inputs.purchaseId\",\n      \"customerId\": \"$inputs.customerId\",\n      \"productId\": \"$inputs.productId\",\n      \"reservationId\": \"$steps.reserve-and-pay.outputs.reservationId\",\n      \"paymentId\": \"$steps.reserve-and-pay.outputs.paymentId\"\n    }\n  },\n  \"successCriteria\": [\n    {\n      \"condition\": \"$statusCode == 201\"\n    },\n    {\n      \"condition\": \"$response.body#/state == 'READY'\"\n    },\n    {\n      \"condition\": \"$response.body#/purchaseId == $inputs.purchaseId\"\n    }\n  ],\n  \"outputs\": {\n    \"licenseId\": \"$response.body#/licenseId\",\n    \"state\": \"$response.body#/state\"\n  },\n  \"x-example-actor\": \"coordinator\",\n  \"x-example-target\": \"license\"\n}"
+      },
+      {
+        "title": "Descriptive associations",
+        "value": "No standard workflow-call relationship is declared by descriptions or extensions."
+      }
+    ]
+  },
+  {
+    "workflow": "reserve-and-capture",
+    "step": "reserve-product",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"reserve-and-capture\",\n  \"step\": \"reserve-product\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Parameters",
+        "value": "[\n  {\n    \"name\": \"Authorization\",\n    \"in\": \"header\",\n    \"value\": \"Bearer {$inputs.serviceToken}\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.serviceToken}\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"Idempotency-Key\",\n    \"in\": \"header\",\n    \"value\": \"{$inputs.purchaseId}-reservation\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"{$inputs.purchaseId}-reservation\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      0,\n      \"parameters\",\n      1\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "{\n  \"reservationId\": \"$response.body#/reservationId\",\n  \"amountMinor\": \"$response.body#/amountMinor\",\n  \"currency\": \"$response.body#/currency\"\n}"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-before-issuance\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-before-issuance\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      2,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-before-issuance\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$statusCode == 201\"\n  },\n  {\n    \"condition\": \"$response.body#/state == 'RESERVED'\"\n  },\n  {\n    \"condition\": \"$response.body#/productId == $inputs.productId\"\n  },\n  {\n    \"condition\": \"$response.body#/amountMinor == $inputs.amountMinor\"\n  },\n  {\n    \"condition\": \"$response.body#/currency == $inputs.currency\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"reserve-and-capture\",\n  \"stepId\": \"reserve-product\",\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    0\n  ],\n  \"status\": \"declared\",\n  \"verification\": \"unverified\",\n  \"sourceName\": \"inventory\",\n  \"sourceType\": \"openapi\",\n  \"source\": {\n    \"name\": \"inventory\",\n    \"url\": \"./inventory.openapi.yaml\",\n    \"type\": \"openapi\"\n  },\n  \"candidates\": [\n    \"inventory\"\n  ],\n  \"locators\": {\n    \"operationId\": \"$sourceDescriptions.inventory.reserveProduct\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    0\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"reserve-product\",\n  \"description\": \"Reserve one unit at its current price; verify product, amount and currency.\",\n  \"operationId\": \"$sourceDescriptions.inventory.reserveProduct\",\n  \"parameters\": [\n    {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.serviceToken}\"\n    },\n    {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"{$inputs.purchaseId}-reservation\"\n    }\n  ],\n  \"requestBody\": {\n    \"contentType\": \"application/json\",\n    \"payload\": {\n      \"productId\": \"$inputs.productId\",\n      \"quantity\": 1\n    }\n  },\n  \"successCriteria\": [\n    {\n      \"condition\": \"$statusCode == 201\"\n    },\n    {\n      \"condition\": \"$response.body#/state == 'RESERVED'\"\n    },\n    {\n      \"condition\": \"$response.body#/productId == $inputs.productId\"\n    },\n    {\n      \"condition\": \"$response.body#/amountMinor == $inputs.amountMinor\"\n    },\n    {\n      \"condition\": \"$response.body#/currency == $inputs.currency\"\n    }\n  ],\n  \"outputs\": {\n    \"reservationId\": \"$response.body#/reservationId\",\n    \"amountMinor\": \"$response.body#/amountMinor\",\n    \"currency\": \"$response.body#/currency\"\n  },\n  \"x-example-actor\": \"coordinator\",\n  \"x-example-target\": \"inventory\"\n}"
+      },
+      {
+        "title": "Descriptive associations",
+        "value": "No standard workflow-call relationship is declared by descriptions or extensions."
+      }
+    ]
+  },
+  {
+    "workflow": "reserve-and-capture",
+    "step": "capture-payment",
+    "sections": [
+      {
+        "title": "Context",
+        "value": "{\n  \"owningWorkflow\": \"reserve-and-capture\",\n  \"step\": \"capture-payment\",\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Parameters",
+        "value": "[\n  {\n    \"name\": \"Authorization\",\n    \"in\": \"header\",\n    \"value\": \"Bearer {$inputs.serviceToken}\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.serviceToken}\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      0\n    ]\n  },\n  {\n    \"name\": \"Idempotency-Key\",\n    \"in\": \"header\",\n    \"value\": \"{$inputs.purchaseId}-payment\",\n    \"status\": \"resolved\",\n    \"authored\": {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"{$inputs.purchaseId}-payment\"\n    },\n    \"path\": [\n      \"workflows\",\n      2,\n      \"steps\",\n      1,\n      \"parameters\",\n      1\n    ]\n  }\n]"
+      },
+      {
+        "title": "Caller-side output expressions",
+        "value": "{\n  \"paymentId\": \"$response.body#/paymentId\",\n  \"paymentState\": \"$response.body#/state\"\n}"
+      },
+      {
+        "title": "Viewer inspection order — effective actions",
+        "value": "[\n  {\n    \"channel\": \"onFailure\",\n    \"inspectionIndex\": 0,\n    \"origin\": \"workflow\",\n    \"status\": \"resolved\",\n    \"isOverride\": false,\n    \"authored\": {\n      \"name\": \"stop-before-issuance\",\n      \"type\": \"end\"\n    },\n    \"effective\": {\n      \"name\": \"stop-before-issuance\",\n      \"type\": \"end\"\n    },\n    \"parameters\": [],\n    \"path\": [\n      \"workflows\",\n      2,\n      \"failureActions\",\n      0\n    ]\n  }\n]"
+      },
+      {
+        "title": "Authored action lists",
+        "value": "{\n  \"workflow\": {\n    \"failureActions\": [\n      {\n        \"name\": \"stop-before-issuance\",\n        \"type\": \"end\"\n      }\n    ]\n  },\n  \"step\": {}\n}"
+      },
+      {
+        "title": "Criteria",
+        "value": "[\n  {\n    \"condition\": \"$statusCode == 200\"\n  },\n  {\n    \"condition\": \"$response.body#/state == 'CAPTURED'\"\n  },\n  {\n    \"condition\": \"$response.body#/reservationId == $steps.reserve-product.outputs.reservationId\"\n  },\n  {\n    \"condition\": \"$response.body#/amountMinor == $inputs.amountMinor\"\n  },\n  {\n    \"condition\": \"$response.body#/currency == $inputs.currency\"\n  }\n]"
+      },
+      {
+        "title": "Source metadata",
+        "value": "{\n  \"workflowId\": \"reserve-and-capture\",\n  \"stepId\": \"capture-payment\",\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    1\n  ],\n  \"status\": \"declared\",\n  \"verification\": \"unverified\",\n  \"sourceName\": \"payment\",\n  \"sourceType\": \"openapi\",\n  \"source\": {\n    \"name\": \"payment\",\n    \"url\": \"./payment.openapi.yaml\",\n    \"type\": \"openapi\"\n  },\n  \"candidates\": [\n    \"payment\"\n  ],\n  \"locators\": {\n    \"operationId\": \"$sourceDescriptions.payment.capturePayment\"\n  }\n}"
+      },
+      {
+        "title": "Prerequisites",
+        "value": "[]"
+      },
+      {
+        "title": "Provenance",
+        "value": "{\n  \"path\": [\n    \"workflows\",\n    2,\n    \"steps\",\n    1\n  ],\n  \"callPath\": []\n}"
+      },
+      {
+        "title": "Diagnostics",
+        "value": "[]"
+      },
+      {
+        "title": "Authored content",
+        "value": "{\n  \"stepId\": \"capture-payment\",\n  \"description\": \"Require matching CAPTURED evidence; DECLINED and UNKNOWN stop the workflow.\",\n  \"operationId\": \"$sourceDescriptions.payment.capturePayment\",\n  \"parameters\": [\n    {\n      \"name\": \"Authorization\",\n      \"in\": \"header\",\n      \"value\": \"Bearer {$inputs.serviceToken}\"\n    },\n    {\n      \"name\": \"Idempotency-Key\",\n      \"in\": \"header\",\n      \"value\": \"{$inputs.purchaseId}-payment\"\n    }\n  ],\n  \"requestBody\": {\n    \"contentType\": \"application/json\",\n    \"payload\": {\n      \"reservationId\": \"$steps.reserve-product.outputs.reservationId\",\n      \"amountMinor\": \"$steps.reserve-product.outputs.amountMinor\",\n      \"currency\": \"$steps.reserve-product.outputs.currency\",\n      \"paymentToken\": \"$inputs.paymentToken\"\n    }\n  },\n  \"successCriteria\": [\n    {\n      \"condition\": \"$statusCode == 200\"\n    },\n    {\n      \"condition\": \"$response.body#/state == 'CAPTURED'\"\n    },\n    {\n      \"condition\": \"$response.body#/reservationId == $steps.reserve-product.outputs.reservationId\"\n    },\n    {\n      \"condition\": \"$response.body#/amountMinor == $inputs.amountMinor\"\n    },\n    {\n      \"condition\": \"$response.body#/currency == $inputs.currency\"\n    }\n  ],\n  \"outputs\": {\n    \"paymentId\": \"$response.body#/paymentId\",\n    \"paymentState\": \"$response.body#/state\"\n  },\n  \"x-example-actor\": \"coordinator\",\n  \"x-example-target\": \"payment\"\n}"
+      },
+      {
+        "title": "Descriptive associations",
+        "value": "No standard workflow-call relationship is declared by descriptions or extensions."
+      }
+    ]
+  }
+]

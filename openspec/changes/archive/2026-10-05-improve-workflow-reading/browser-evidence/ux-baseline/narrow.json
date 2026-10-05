@@ -1,0 +1,137 @@
+[
+  {
+    "document": "digital-product/arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 660,
+      "clientHeight": 438,
+      "scrollHeight": 438
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 3910,
+      "clientHeight": 580,
+      "scrollHeight": 4938
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/event-based.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 920,
+      "clientHeight": 580,
+      "scrollHeight": 1338
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 690,
+      "clientHeight": 438,
+      "scrollHeight": 438
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/boundaries/recursion.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 690,
+      "clientHeight": 580,
+      "scrollHeight": 838
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 2300,
+      "clientHeight": 580,
+      "scrollHeight": 1938
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/boundaries/row-limit.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 660,
+      "clientHeight": 580,
+      "scrollHeight": 20138
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 1380,
+      "clientHeight": 580,
+      "scrollHeight": 938
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  },
+  {
+    "document": "digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+    "metrics": {
+      "clientWidth": 404,
+      "scrollWidth": 660,
+      "clientHeight": 338,
+      "scrollHeight": 338
+    },
+    "drawer": {
+      "x": 0,
+      "y": 128,
+      "width": 480,
+      "height": 872
+    }
+  }
+]

@@ -1,0 +1,65 @@
+{
+  "planningOnly": true,
+  "changes": [
+    {
+      "name": "improve-workflow-reading",
+      "artifacts": 4,
+      "requirements": 7,
+      "scenarios": 11,
+      "uncheckedTasks": 12
+    },
+    {
+      "name": "add-workflow-deep-links",
+      "artifacts": 4,
+      "requirements": 5,
+      "scenarios": 8,
+      "uncheckedTasks": 10
+    },
+    {
+      "name": "inspect-api-contracts",
+      "artifacts": 4,
+      "requirements": 6,
+      "scenarios": 10,
+      "uncheckedTasks": 11
+    },
+    {
+      "name": "add-system-interaction-view",
+      "artifacts": 4,
+      "requirements": 5,
+      "scenarios": 7,
+      "uncheckedTasks": 12
+    },
+    {
+      "name": "add-authored-scenario-explorer",
+      "artifacts": 4,
+      "requirements": 5,
+      "scenarios": 7,
+      "uncheckedTasks": 11
+    },
+    {
+      "name": "add-workflow-capability-catalog",
+      "artifacts": 4,
+      "requirements": 6,
+      "scenarios": 8,
+      "uncheckedTasks": 12
+    },
+    {
+      "name": "compare-workflow-revisions",
+      "artifacts": 4,
+      "requirements": 5,
+      "scenarios": 6,
+      "uncheckedTasks": 11
+    }
+  ],
+  "totals": {
+    "changes": 7,
+    "artifacts": 28,
+    "requirements": 39,
+    "scenarios": 57,
+    "uncheckedTasks": 79
+  },
+  "evidenceChecksumsVerified": 20,
+  "dependencyGraphAcyclic": true,
+  "applicationPackageChanges": [],
+  "issues": []
+}

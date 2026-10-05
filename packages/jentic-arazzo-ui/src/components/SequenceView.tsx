@@ -4,9 +4,18 @@ import { useViewerSession } from '../context/ViewerSessionContext';
 import { buildSequence, type SequenceRow } from '../utils/sequence/sequenceModel';
 
 function wrap(label: string, width = 30): string[] {
-  const text = label.replace(/[\r\n]+/g, ' ');
-  const chunks = text.match(new RegExp(`.{1,${width}}`, 'g')) ?? [''];
-  return chunks.length > 3 ? [...chunks.slice(0, 2), chunks[2].slice(0, width - 1) + '…'] : chunks;
+  const words = label.replace(/[\r\n]+/g, ' ').split(/\s+/);
+  const lines: string[] = [''];
+  for (const word of words) {
+    const index = lines.length - 1;
+    if (lines[index] && lines[index].length + word.length + 1 > width) lines.push(word);
+    else lines[index] += (lines[index] ? ' ' : '') + word;
+  }
+  return lines
+    .slice(0, 3)
+    .map((line, i) =>
+      line.length > width || (i === 2 && lines.length > 3) ? line.slice(0, width - 1) + '…' : line,
+    );
 }
 
 export function SequenceView({ workflowId }: { workflowId: string }) {
@@ -22,6 +31,8 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
   const width = Math.max(660, scene.participants.length * 230);
   const height = 130 + scene.rows.length * 100;
   const xs = new Map(scene.participants.map((p, i) => [p.id, 115 + i * 230]));
+  const contextName = (row: SequenceRow) =>
+    ` · ${row.kind}${row.action ? ` ${row.action.channel} ${row.action.value.type} ${row.action.value.name} position ${row.action.effectiveIndex + 1}` : ''}${row.reason ? ` ${row.reason}` : ''} · root ${workflowId} · path ${row.path.map(([owner, step]) => `${owner}.${step}`).join(' → ') || 'root'} · row ${scene.rows.indexOf(row) + 1}`;
   const rowMap = new Map(scene.rows.map((row) => [row.id, row]));
   const descendant = (row: SequenceRow, parentId: string) => {
     let cursor = row.parentId;
@@ -49,7 +60,36 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
   return (
     <section aria-label={`Sequence ${workflowId}`} className="arazzo-sequence">
       <p>Schematic authored interactions · structural continuations are not evaluated outcomes.</p>
+      <p role="status" className="arazzo-sequence-context">
+        Root: {workflowId}
+        {session.selectedRow && (
+          <>
+            {' '}
+            · Selected {session.selectedRow.workflowId}.
+            {session.selectedRow.step?.stepId ?? session.selectedRow.kind} ·{' '}
+            {session.selectedRow.kind} · Caller path:{' '}
+            {session.selectedRow.path.map(([owner, step]) => `${owner}.${step}`).join(' → ') ||
+              'root'}
+          </>
+        )}
+      </p>
       <div className="arazzo-sequence-canvas" ref={container}>
+        <div
+          aria-label="Sequence participants"
+          className="arazzo-sequence-participants"
+          style={{ width }}
+        >
+          {scene.participants.map((participant) => (
+            <div key={participant.id} style={{ width: 230 }}>
+              <span tabIndex={0} title={participant.name} className="arazzo-full-label">
+                {participant.name}
+              </span>
+              <small>
+                {participant.kind} · {participant.id}
+              </small>
+            </div>
+          ))}
+        </div>
         <svg
           width={width}
           height={height}
@@ -66,29 +106,10 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
               <title>
                 {participant.name} ({participant.kind}) · {participant.id}
               </title>
-              <rect
-                x={xs.get(participant.id)! - 105}
-                y={8}
-                width={210}
-                height={80}
-                rx={5}
-                fill="#f1f5f9"
-                stroke="#94a3b8"
-              />
-              <text x={xs.get(participant.id)} y={28} textAnchor="middle" fontSize={13}>
-                {wrap(participant.name, 26).map((line, i) => (
-                  <tspan x={xs.get(participant.id)} dy={i ? 16 : 0} key={i}>
-                    {line}
-                  </tspan>
-                ))}
-              </text>
-              <text x={xs.get(participant.id)} y={79} textAnchor="middle" fontSize={11}>
-                {participant.kind} · {participant.id}
-              </text>
               <line
                 x1={xs.get(participant.id)}
                 x2={xs.get(participant.id)}
-                y1={90}
+                y1={0}
                 y2={height}
                 stroke="#94a3b8"
                 strokeDasharray="4 5"
@@ -131,7 +152,10 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                   if (control) select(row, control);
                 }}
               >
-                <title>{row.label}</title>
+                <title>
+                  {row.label}
+                  {contextName(row)}
+                </title>
                 {selected && (
                   <rect
                     x={8}
@@ -189,13 +213,15 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
       <ol aria-label="Ordered interactions" className="arazzo-sequence-list">
         {scene.rows.map((row) => (
           <li key={row.id} style={{ paddingLeft: Math.min(row.depth, 8) * 12 }}>
-            <span>{row.label}</span>{' '}
+            <span tabIndex={0} title={row.label}>
+              {row.label}
+            </span>{' '}
             {(row.step || row.kind === 'prerequisite' || row.kind === 'marker') && (
               <button
                 ref={(element) => {
                   if (row.kind !== 'call' && element) controls.current.set(row.id, element);
                 }}
-                aria-label={`${['operation', 'call', 'transfer'].includes(row.kind) ? 'Inspect' : 'Inspect context for'} ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}`}
+                aria-label={`${['operation', 'call', 'transfer'].includes(row.kind) ? 'Inspect' : 'Inspect context for'} ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}${contextName(row)}`}
                 onClick={(event) => select(row, event.currentTarget)}
               >
                 {row.kind === 'operation' || row.kind === 'call' || row.kind === 'transfer'
@@ -210,7 +236,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                     if (element) controls.current.set(row.id, element);
                     else controls.current.delete(row.id);
                   }}
-                  aria-label={`${row.expanded ? 'Collapse' : 'Expand'} ${row.workflowId}.${row.step?.stepId} → ${row.target.workflowId}`}
+                  aria-label={`${row.expanded ? 'Collapse' : 'Expand'} ${row.workflowId}.${row.step?.stepId} → ${row.target.workflowId}${contextName(row)}`}
                   onClick={(event) => {
                     if (
                       row.expanded &&
@@ -227,7 +253,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                   {row.expanded ? 'Collapse' : 'Expand'}
                 </button>
                 <button
-                  aria-label={`Open workflow ${row.target.workflowId} from ${row.workflowId}.${row.step?.stepId}`}
+                  aria-label={`Open workflow ${row.target.workflowId} from ${row.workflowId}.${row.step?.stepId}${contextName(row)}`}
                   onClick={() => session.followCall(workflowId, row)}
                 >
                   Open workflow
@@ -236,6 +262,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
             )}
             {row.kind === 'marker' && row.reason === 'rows' && (
               <button
+                aria-label={`View complete documentation for ${row.workflowId}${contextName(row)}`}
                 onClick={() => {
                   if (row.workflowId !== workflowId && row.target) {
                     session.clearTrail();
@@ -252,7 +279,10 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
               row.reason !== 'rows' &&
               row.step &&
               row.target?.navigable && (
-                <button onClick={() => session.followCall(workflowId, row)}>
+                <button
+                  aria-label={`Open workflow ${row.target.workflowId}${contextName(row)}`}
+                  onClick={() => session.followCall(workflowId, row)}
+                >
                   Open workflow {row.target.workflowId}
                 </button>
               )}

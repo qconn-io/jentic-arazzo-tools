@@ -1,0 +1,19 @@
+## 1. Manifest and guide contract
+
+- [ ] 1.1 Confirm readable details and versioned location restoration are available; verify prerequisite acceptance records and ordinary document navigation still works without scenario state.
+- [ ] 1.2 Define/export scenario manifest, waypoint/focus, selection, and optional control/callback types; verify declaration consumers and legacy array normalization preserve every id/expected/evidence value.
+- [ ] 1.3 Validate manifest bounds, duplicate IDs, relative document bases, waypoint/action references, and localized failures; verify prose-only entries, stale waypoints, missing documents, and unaffected valid guides in focused adapter tests.
+
+## 2. Reading-guide UI
+
+- [ ] 2.1 Add searchable guide selection and assumptions/expectations/evidence presentation; verify authored-expectation labeling and exact text for all 27 legacy stress entries.
+- [ ] 2.2 Implement Next/Previous, explicit location/focus requests, inspect/return, and leave-guide behavior; verify no criteria evaluation, business operation requests, document mutation, or pass/fail coverage state is introduced.
+- [ ] 2.3 Add explicit standalone manifest loading and namespaced scenario/waypoint share restoration; verify fresh-session addressable guide links, no sibling crawling, headless host document handoff, and cancellation on replacement.
+- [ ] 2.4 Make guide controls and inspector interaction usable by keyboard and at 480 pixels; verify focus/return behavior and nonoverlapping layout through component tests and Playwright.
+
+## 3. Authored examples and acceptance
+
+- [ ] 3.1 Enrich all 27 stress scenarios with manually authored relevant waypoints while preserving current IDs and expected/evidence text; verify each waypoint resolves to the intended workflow/step/action/mapping or intentional diagnostic boundary.
+- [ ] 3.2 Add a small-pack manifest for its seven documented failure cases; verify every guide points to actual authored criteria, mappings, or recovery declarations and adds no execution semantics to Arazzo files.
+- [ ] 3.3 Run Playwright through every stress scenario and small failure guide, emphasizing UNKNOWN versus DECLINED capture, guarded compensation, receive timeout without republishing, and FAILED activation/RECORDED receipt; verify saved observations distinguish expectations from observed execution.
+- [ ] 3.4 Document manifest versioning, addressability, stale references, and guide limits; verify examples, UI suite, types, declarations, and production build pass.

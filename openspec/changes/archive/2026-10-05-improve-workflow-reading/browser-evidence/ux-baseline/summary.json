@@ -1,0 +1,15 @@
+{
+  "source": "current source served by Vite, not production build",
+  "documents": 9,
+  "workflows": 45,
+  "scenarios": 27,
+  "smallSteps": 7,
+  "widths": [
+    1440,
+    480
+  ],
+  "graphFitStyle": "transform: translate(513.295px, 35.2273px) scale(0.291134);",
+  "repeatedCaptureOperations": 2,
+  "errors": [],
+  "screenshots": 183
+}

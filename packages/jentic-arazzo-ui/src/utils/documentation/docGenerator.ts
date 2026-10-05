@@ -16,7 +16,6 @@ import { createSnapshot, inspect } from '../inspection';
 import type { ClassifiedTarget, Provenance } from '../inspection';
 import { buildViewerModel } from '../model/viewerModel';
 import type { ArazzoViewerModel } from '../model/viewerModel';
-import { projectOccurrenceDetails } from '../sequence/occurrenceDetails';
 import { generateMetadata } from './metadataGenerator';
 import {
   formatAsMarkdown,
@@ -30,6 +29,7 @@ export interface GenerateDocumentationOptions {
   documentURL?: string | null;
   model?: ArazzoViewerModel;
   includeStatus?: boolean;
+  compact?: boolean;
 }
 export interface DocumentationOutput {
   metadata: DocumentationMetadata;
@@ -113,7 +113,7 @@ export function generateDocumentation(
       authored: step.authored,
       diagnostics: step.diagnostics,
       actionDetails: step.effectiveActions,
-      occurrenceDetails: projectOccurrenceDetails(model, workflow.workflowId, step.stepId),
+      parameterDetails: step.parameters,
       prerequisites: step.prerequisites.map((fact) => prerequisite(fact.target, fact)),
       parameters: step.parameters.map((parameter) => parameter.value as Parameter | ReusableObject),
       onSuccess: step.effectiveActions.onSuccess.map(
@@ -151,7 +151,7 @@ export function generateDocumentation(
   const workflowMarkdowns = new Map(
     documentationWorkflows.map((workflow) => [
       workflow.workflowId,
-      formatWorkflowAsMarkdown(metadata, workflow),
+      formatWorkflowAsMarkdown(metadata, workflow, options),
     ]),
   );
   return {

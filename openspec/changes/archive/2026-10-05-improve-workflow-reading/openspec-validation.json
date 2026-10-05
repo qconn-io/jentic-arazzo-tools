@@ -1,0 +1,72 @@
+{
+  "items": [
+    {
+      "id": "add-authored-scenario-explorer",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 29
+    },
+    {
+      "id": "add-system-interaction-view",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 28
+    },
+    {
+      "id": "add-workflow-capability-catalog",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 28
+    },
+    {
+      "id": "add-workflow-deep-links",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 28
+    },
+    {
+      "id": "compare-workflow-revisions",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 28
+    },
+    {
+      "id": "improve-workflow-reading",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 28
+    },
+    {
+      "id": "inspect-api-contracts",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 3
+    }
+  ],
+  "summary": {
+    "totals": {
+      "items": 7,
+      "passed": 7,
+      "failed": 0
+    },
+    "byType": {
+      "change": {
+        "items": 7,
+        "passed": 7,
+        "failed": 0
+      }
+    }
+  },
+  "version": "1.0",
+  "root": {
+    "path": "/home/mkogan/work/jentic-arazzo-tools",
+    "source": "nearest"
+  }
+}

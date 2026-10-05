@@ -1,0 +1,25 @@
+[
+  {
+    "task": "open API contract from source",
+    "href": "http://127.0.0.1:4175/examples/digital-product/coordinator.openapi.yaml",
+    "url": "http://127.0.0.1:4175/examples/digital-product/coordinator.openapi.yaml",
+    "bodyStart": "openapi: 3.1.0\ninfo:\n  title: Purchase Coordinator API\n  version: 1.0.0\n  description: Fictional local contract for the digital-product example. Servers under example.test\n    are illustrative, not live services.\nservers",
+    "workflowNavigationPresent": 0
+  },
+  {
+    "task": "visible repeated capture occurrences after return",
+    "count": 2
+  },
+  {
+    "task": "Escape closes mobile drawer",
+    "stillOpen": 1
+  },
+  {
+    "task": "reverse Tab from mobile drawer close",
+    "focus": {
+      "tag": "BUTTON",
+      "text": "Details",
+      "insideDetails": false
+    }
+  }
+]
