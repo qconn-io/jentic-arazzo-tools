@@ -447,3 +447,24 @@ typed optional state. Unavailable/invalid adapters are ignored with a notice whi
 JSON is retained for sharing. Adapters restore presentation state; hosts should keep
 credentials and evaluated values out of extensions and never evaluate extension strings.
 Extensions cannot replace document, root, or occurrence identity.
+
+## API Contract Inspection
+
+The Arazzo UI viewer integrates standalone contract panels for source operations. It supports OpenAPI 3.1.0 and AsyncAPI 2.x/3.x profiles, projecting `$sourceDescriptions` into operations. The viewer is capable of dynamically retrieving URL-based Arazzo workflow sources, resolving operations, and displaying exact constraints without fabricating responses or simulating the underlying servers.
+
+### Source Document Providers and Limits
+
+The default standalone view includes a **Browser Fetch Adapter** which is limited by standard browser CORS rules, caching heuristics, and cannot relay host credentials implicit for internal endpoints. Hosts supplying `sourceProvider={customAdapter}` can integrate specialized retrieval logic. To prevent run-away fetch chains or deeply circular document loops, source provision relies on explicit limits (the viewer caps operation and nested-target discovery traversal limits).
+
+### Provenance and Located Status
+
+The viewer assigns a distinct state to each requested API contract:
+
+- **idle** / **loading**: The contract source request is enqueued or fetching.
+- **located**: The specific referenced operation is successfully verified inside the matched source document schema.
+- **ambiguous**: Multiple operations map to the same lookup query within the contract.
+- **missing**: The expected operation is not present in the retrieved contract.
+- **failed**: The operation's contract source failed to parse or was completely unavailable.
+- **unsupported**: The referenced document type dialect (such as OpenAPI 2.0 Swagger) is unsupported.
+
+A `baseURI` property maintains origin document provenance across loaded instances, enforcing accurate relative `$ref` evaluations without falling back incorrectly.

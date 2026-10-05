@@ -8,6 +8,13 @@ export type {
   WorkflowLocationAdapter,
   WorkflowLocationDecodeResult,
 } from './types/location';
+export type {
+  SourceDocumentRequest,
+  SourceDocumentContent,
+  SourceDocumentProvider,
+  ProvidedSourceProvenance,
+  ExternalNavigationRequest,
+} from './types/source';
 export {
   encodeLocation,
   decodeLocation,

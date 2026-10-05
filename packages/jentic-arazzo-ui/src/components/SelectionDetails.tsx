@@ -3,6 +3,7 @@ import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 import { CopyLocationControl } from '../context/CopyLinkContext';
 import { ReadingDetails } from './ReadingDetails';
+import { ContractPanel } from './ContractPanel';
 import { projectOccurrenceDetails } from '../utils/sequence/occurrenceDetails';
 
 function useCoveringInspector() {
@@ -175,6 +176,7 @@ export function SelectionDetails() {
         </dl>
       </section>
       <ReadingDetails sections={details.reading.sections} />
+      {selection?.stepId && <ContractPanel workflowId={selection.workflowId} stepId={selection.stepId} />}
       <details data-advanced>
         <summary>Advanced authored content and provenance</summary>
         {details.sections.map((section) => (

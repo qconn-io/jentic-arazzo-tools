@@ -24,6 +24,10 @@ import type {
   PendingSelection,
 } from '../utils/inspection';
 import { buildViewerModel, type ArazzoViewerModel } from '../utils/model/viewerModel';
+import { useSourceRegistry } from '../utils/source/useSourceRegistry';
+import type { SourceRegistry } from '../utils/source/SourceRegistry';
+import type { SourceDocumentProvider } from '../types/source';
+import { BrowserFetchProvider } from '../utils/source/BrowserFetchProvider';
 import { ViewerSessionProvider } from './ViewerSessionContext';
 
 interface InternalContext extends ArazzoViewerContextValue {
@@ -34,6 +38,7 @@ interface InternalContext extends ArazzoViewerContextValue {
   navigationDiagnostic: string | null;
   selectionRequestVersion: number;
   getNodeOwner: (node: ArazzoNode) => string | undefined;
+  sourceRegistry: SourceRegistry;
 }
 const ArazzoViewerContext = createContext<InternalContext | null>(null);
 export const useArazzoViewer = () => {
@@ -49,6 +54,7 @@ interface StandaloneProviderProps {
   initialActiveWorkflowId?: string | null;
   initialSelectedNodeId?: string | null;
   events?: ViewerEvents;
+  sourceProvider?: SourceDocumentProvider;
   children: React.ReactNode;
 }
 type ProviderProps =
@@ -81,6 +87,7 @@ function InjectedProvider({
   value: ArazzoViewerContextValue;
   children: React.ReactNode;
 }) {
+  const sourceRegistry = useSourceRegistry(new BrowserFetchProvider());
   const snapshot = useMemo(
     () => createSnapshot(value.document, { trustedInternalIds: true }),
     [value.document],
@@ -163,6 +170,7 @@ function InjectedProvider({
         selectionRequestVersion,
         navigateToTarget,
         getNodeOwner: (node) => ownerLookup(node, model, value.document),
+        sourceRegistry,
       }}
     >
       <ViewerSessionProvider key={model.documentId}>{children}</ViewerSessionProvider>
@@ -180,8 +188,10 @@ function StandaloneProvider({
   initialActiveWorkflowId,
   initialSelectedNodeId,
   events,
+  sourceProvider,
   children,
 }: StandaloneProviderProps) {
+  const sourceRegistry = useSourceRegistry(sourceProvider || new BrowserFetchProvider());
   const snapshot = useMemo(
     () => suppliedSnapshot ?? createSnapshot(rawDocument),
     [suppliedSnapshot, rawDocument],
@@ -388,6 +398,7 @@ function StandaloneProvider({
     navigationDiagnostic,
     selectionRequestVersion,
     getNodeOwner: (node) => ownerLookup(node, model, rawDocument),
+    sourceRegistry,
   };
   return (
     <ArazzoViewerContext.Provider value={value}>

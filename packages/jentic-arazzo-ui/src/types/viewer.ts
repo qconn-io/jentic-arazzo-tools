@@ -15,6 +15,7 @@ import {
   ReusableObject,
   Parameter,
 } from './arazzo';
+import type { SourceDocumentProvider, ExternalNavigationRequest } from './source';
 
 // ============================================================================
 // Viewer Mode & Events
@@ -56,6 +57,8 @@ export interface ArazzoUIProps {
   onEdgeSelect?: (edgeId: string, edge: ArazzoEdge) => void;
   onWorkflowSelect?: (workflowId: string) => void;
   onViewChange?: (view: ViewerMode) => void;
+  sourceProvider?: SourceDocumentProvider;
+  onExternalNavigation?: (request: ExternalNavigationRequest) => void;
 }
 
 /** @public */
