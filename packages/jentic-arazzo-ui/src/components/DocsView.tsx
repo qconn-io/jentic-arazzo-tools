@@ -68,7 +68,18 @@ const markdownPlugins = [remarkGfm];
 const rehypePlugins = [rehypeHighlight, rehypeRaw];
 
 export const DocsView: React.FC<DocsViewProps> = () => {
-  const { document, documentURL, selectedNodeId, nodes, activeWorkflowId } = useArazzoViewer();
+  const {
+    document,
+    documentURL,
+    selectedNodeId,
+    nodes,
+    activeWorkflowId,
+    model,
+    getNodeOwner,
+    navigateToTarget,
+    navigationDiagnostic,
+  } = useArazzoViewer();
+  const [ownershipDiagnostic, setOwnershipDiagnostic] = useState<string | null>(null);
   const mermaidInitialized = useRef(false);
   const docsContainerRef = useRef<HTMLDivElement>(null);
   const [workflowViews, setWorkflowViews] = useState<Record<string, WorkflowViewMode>>({});
@@ -122,24 +133,31 @@ export const DocsView: React.FC<DocsViewProps> = () => {
     if (!node || (node.data.type !== 'step' && node.data.type !== 'workflowRef')) return;
 
     const stepId = node.data.step.stepId;
-    const workflowId =
-      node.data.type === 'step' ? node.data.workflowId : node.data.targetWorkflowId;
+    const workflowId = getNodeOwner(node);
+    if (!workflowId) {
+      setOwnershipDiagnostic('Selected card has unavailable ownership.');
+      return;
+    }
+    setOwnershipDiagnostic(null);
 
     // expand the workflow <details> if closed
-    const details = docsContainerRef.current.querySelector(
-      `details[data-workflow-id="${workflowId}"]`,
-    ) as HTMLDetailsElement | null;
+    const details = Array.from(
+      docsContainerRef.current.querySelectorAll<HTMLDetailsElement>('details[data-workflow-id]'),
+    ).find((element) => element.getAttribute('data-workflow-id') === workflowId);
     if (details && !details.open) {
       details.open = true;
       setExpandedWorkflows((prev) => new Set(prev).add(workflowId));
     }
 
     // scroll to the step after DOM updates
-    requestAnimationFrame(() => {
-      const stepEl = docsContainerRef.current?.querySelector(`[data-step-id="${stepId}"]`);
+    const frame = requestAnimationFrame(() => {
+      const stepEl = Array.from(
+        details?.querySelectorAll<HTMLElement>('[data-step-id]') ?? [],
+      ).find((element) => element.getAttribute('data-step-id') === stepId);
       stepEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
-  }, [selectedNodeId, nodes]);
+    return () => cancelAnimationFrame(frame);
+  }, [selectedNodeId, nodes, getNodeOwner]);
 
   // Scroll to workflow when switching workflow tabs in diagram (skip initial value)
   const prevActiveWorkflowId = useRef(activeWorkflowId);
@@ -148,10 +166,15 @@ export const DocsView: React.FC<DocsViewProps> = () => {
     prevActiveWorkflowId.current = activeWorkflowId;
 
     if (!activeWorkflowId || !docsContainerRef.current) return;
+    if (
+      selectedNodeId &&
+      nodes.some((node) => node.id === selectedNodeId && getNodeOwner(node) === activeWorkflowId)
+    )
+      return;
 
-    const details = docsContainerRef.current.querySelector(
-      `details[data-workflow-id="${activeWorkflowId}"]`,
-    ) as HTMLDetailsElement | null;
+    const details = Array.from(
+      docsContainerRef.current.querySelectorAll<HTMLDetailsElement>('details[data-workflow-id]'),
+    ).find((element) => element.getAttribute('data-workflow-id') === activeWorkflowId);
     if (!details) return;
 
     if (!details.open) {
@@ -159,10 +182,11 @@ export const DocsView: React.FC<DocsViewProps> = () => {
       setExpandedWorkflows((prev) => new Set(prev).add(activeWorkflowId));
     }
 
-    requestAnimationFrame(() => {
+    const frame = requestAnimationFrame(() => {
       details.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-  }, [activeWorkflowId]);
+    return () => cancelAnimationFrame(frame);
+  }, [activeWorkflowId, selectedNodeId, nodes, getNodeOwner]);
 
   // Generate documentation (memoized)
   const documentation = useMemo(() => {
@@ -171,27 +195,28 @@ export const DocsView: React.FC<DocsViewProps> = () => {
       includeMetadata: true,
       includeDiagrams: false,
       documentURL,
+      model,
     });
-  }, [document, documentURL]);
+  }, [document, documentURL, model]);
 
   // Pre-generate all diagrams (memoized)
   const sequenceDiagrams = useMemo(() => {
     if (!document) return new Map<string, string>();
     const diagrams = new Map<string, string>();
     document.workflows.forEach((workflow) => {
-      diagrams.set(workflow.workflowId, generateMermaidSequence(workflow, document));
+      diagrams.set(workflow.workflowId, generateMermaidSequence(workflow, document, model));
     });
     return diagrams;
-  }, [document]);
+  }, [document, model]);
 
   const flowchartDiagrams = useMemo(() => {
     if (!document) return new Map<string, string>();
     const diagrams = new Map<string, string>();
     document.workflows.forEach((workflow) => {
-      diagrams.set(workflow.workflowId, generateMermaidFlowchart(workflow));
+      diagrams.set(workflow.workflowId, generateMermaidFlowchart(workflow, model));
     });
     return diagrams;
-  }, [document]);
+  }, [document, model]);
 
   // Handle expand/collapse all button
   const [allExpanded, setAllExpanded] = useState(false);
@@ -210,7 +235,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
         (prev) => new Set([...prev, ...document.workflows.map((w) => w.workflowId)]),
       );
     }
-  }, [document]);
+  }, [document, model]);
 
   if (!document || !documentation) {
     return (
@@ -892,7 +917,38 @@ export const DocsView: React.FC<DocsViewProps> = () => {
           }
 
         `}</style>
-        <article className="arazzo-docs-prose">
+        <p role="status">
+          {ownershipDiagnostic} {navigationDiagnostic}
+        </p>
+        <article
+          className="arazzo-docs-prose"
+          onClick={(event) => {
+            const anchor = (event.target as Element).closest<HTMLAnchorElement>('a');
+            const href = anchor?.getAttribute('href');
+            if (!href?.startsWith('#arazzo-target=')) return;
+            event.preventDefault();
+            try {
+              const destination = JSON.parse(
+                decodeURIComponent(href.slice('#arazzo-target='.length)),
+              ) as { workflowId?: string; stepId?: string };
+              if (!destination.workflowId) return;
+              const target = destination.stepId
+                ? model.stepsByWorkflow.get(destination.workflowId)?.get(destination.stepId)
+                : model.workflowsById.get(destination.workflowId);
+              if (target)
+                navigateToTarget({
+                  kind: destination.stepId ? 'local-step' : 'local-workflow',
+                  role: 'step-prerequisite',
+                  reference: href,
+                  workflowId: destination.workflowId,
+                  stepId: destination.stepId,
+                  navigable: true,
+                });
+            } catch {
+              /* authored links outside the classified target grammar stay inert. */
+            }
+          }}
+        >
           {/* Header: title, version, sources */}
           <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
             {documentation.headerMarkdown}

@@ -13,11 +13,12 @@ export const SequentialEdge: React.FC<EdgeProps<SequentialEdgeData>> = ({
   style = {},
   markerEnd,
   selected,
+  label,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   // Use SmoothStep for orthogonal (right-angle) edges that route around nodes
-  const [edgePath] = getSmoothStepPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
@@ -34,6 +35,7 @@ export const SequentialEdge: React.FC<EdgeProps<SequentialEdgeData>> = ({
 
   return (
     <g onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+      {typeof label === 'string' && <title>{label}</title>}
       {/* Invisible wider path for better hit detection */}
       <path
         d={edgePath}
@@ -55,6 +57,23 @@ export const SequentialEdge: React.FC<EdgeProps<SequentialEdgeData>> = ({
         d={edgePath}
         markerEnd={markerEnd}
       />
+      {typeof label === 'string' && (
+        <text
+          x={labelX}
+          y={labelY - 7}
+          textAnchor="middle"
+          style={{
+            fontSize: 11,
+            fill: '#475569',
+            paintOrder: 'stroke',
+            stroke: '#fff',
+            strokeWidth: 5,
+            strokeLinejoin: 'round',
+          }}
+        >
+          {label}
+        </text>
+      )}
       {/* Selection glow effect */}
       {selected && (
         <path

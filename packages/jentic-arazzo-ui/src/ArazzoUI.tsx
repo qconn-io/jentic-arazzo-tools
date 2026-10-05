@@ -7,9 +7,9 @@ import React, {
   useEffect,
 } from 'react';
 import { ReactFlowProvider } from 'reactflow';
-import { parseArazzo } from '@jentic/arazzo-parser';
-import { dereferenceArazzoElement } from '@jentic/arazzo-resolver';
-import { toValue } from '@speclynx/apidom-core';
+import { loadDocument } from './utils/loading/loadDocument';
+import { inspect } from './utils/inspection';
+import type { DocumentSnapshot } from './utils/inspection/types';
 
 import { ArazzoViewerProvider, useArazzoViewer } from './context/ArazzoViewerContext';
 import { DiagramView, DiagramViewRef } from './components/DiagramView';
@@ -21,6 +21,19 @@ export type {
   ArazzoUIRef,
   ViewerMode,
   DiagramType,
+  ViewerEvents,
+  DocsViewConfig,
+  DocumentationMetadata,
+  WorkflowDocumentation,
+  StepDocumentation,
+  DocumentationSection,
+  DocumentationSupport,
+  DocumentationProvenance,
+  DocumentationSourceBinding,
+  DocumentationPrerequisite,
+  ArazzoNodeType,
+  ArazzoEdgeType,
+  ConversionOptions,
   ArazzoNode,
   ArazzoNodeData,
   StepNodeData,
@@ -57,31 +70,11 @@ export type {
   ComponentsObject,
   JSONSchema,
 } from './types/arazzo';
-import { stripInternalIds } from './utils/internalIds';
 
 import './styles/index.css';
 
 function detectUrl(value: ArazzoDocument | string): string | null {
   return typeof value === 'string' && /^https?:\/\//i.test(value.trim()) ? value.trim() : null;
-}
-
-async function parseDocument(input: ArazzoDocument | string): Promise<ArazzoDocument> {
-  const parseResult = await parseArazzo(input as any, {}); // eslint-disable-line @typescript-eslint/no-explicit-any
-  const dereferenced = await dereferenceArazzoElement(parseResult, {
-    parse: {
-      parserOpts: {
-        sourceDescriptions: false,
-      },
-    },
-    resolve: {
-      baseURI: document.baseURI,
-    },
-    dereference: {
-      circular: 'error',
-      immutable: false,
-    },
-  });
-  return toValue(dereferenced.result) as ArazzoDocument;
 }
 
 /**
@@ -114,6 +107,7 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
 
   const documentURL = detectUrl(rawDocument);
   const [parsedDocument, setParsedDocument] = useState<ArazzoDocument | null>(null);
+  const [snapshot, setSnapshot] = useState<DocumentSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -123,10 +117,11 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     setLoading(true);
     setError(null);
 
-    parseDocument(rawDocument)
-      .then((doc) => {
+    loadDocument(rawDocument, { baseURI: globalThis.document?.baseURI })
+      .then((loaded) => {
         if (!cancelled) {
-          setParsedDocument(doc);
+          setParsedDocument(loaded.document);
+          setSnapshot(loaded.snapshot);
           setLoading(false);
         }
       })
@@ -152,6 +147,8 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     }),
     [onNodeSelect, onEdgeSelect, onWorkflowSelect, onViewChange],
   );
+
+  const inspection = useMemo(() => (snapshot ? inspect(snapshot) : null), [snapshot]);
 
   if (loading) {
     return (
@@ -205,6 +202,16 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     );
   }
 
+  if (inspection?.support.semanticInspection === 'unsupported') {
+    return (
+      <RawInspectionView
+        ref={ref}
+        snapshot={snapshot!}
+        messages={inspection.diagnostics.map((d) => d.message)}
+      />
+    );
+  }
+
   return (
     <div
       className={`arazzo-ui ${className ?? ''}`}
@@ -212,6 +219,8 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     >
       <ArazzoViewerProvider
         document={parsedDocument}
+        snapshot={snapshot ?? undefined}
+        inspection={inspection ?? undefined}
         documentURL={documentURL}
         initialActiveWorkflowId={controlledWorkflowId}
         initialSelectedNodeId={controlledSelectedNodeId}
@@ -241,7 +250,7 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
     () => ({
       fitView: () => diagramRef.current?.fitView(),
       setZoom: (level: number) => diagramRef.current?.setZoom(level),
-      getDocument: () => stripInternalIds(ctx.document),
+      getDocument: () => structuredClone(ctx.snapshot.document),
       setActiveWorkflow: (id: string | null) => ctx.setActiveWorkflow(id),
       selectStep: (stepId: string) => {
         const node = ctx.nodes.find(
@@ -281,5 +290,31 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
         </div>
       )}
     </>
+  );
+});
+
+const RawInspectionView = forwardRef<
+  ArazzoUIRef,
+  { snapshot: DocumentSnapshot; messages: string[] }
+>(function RawInspectionView({ snapshot, messages }, ref) {
+  useImperativeHandle(
+    ref,
+    () => ({
+      getDocument: () => structuredClone(snapshot.document),
+      fitView: () => {},
+      setZoom: () => {},
+      setActiveWorkflow: () => {},
+      selectStep: () => {},
+      clearSelection: () => {},
+      getActiveWorkflowId: () => null,
+      getSelectedStepId: () => null,
+    }),
+    [snapshot],
+  );
+  return (
+    <div className="arazzo-ui" style={{ overflow: 'auto', padding: 24 }}>
+      <p>{messages.join(' ')}</p>
+      <pre>{JSON.stringify(snapshot.document, null, 2)}</pre>
+    </div>
   );
 });

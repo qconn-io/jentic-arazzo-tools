@@ -1,141 +1,143 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { WorkflowNodeData } from '../types/index';
+import { OVERVIEW_WIDTH, OVERVIEW_HEIGHT } from '../utils/model/graphLayout';
 
-export const WorkflowNode: React.FC<NodeProps<WorkflowNodeData>> = ({ data, selected }) => {
-  const { workflow, onClick } = data;
+// supplementary overview references share card bounds, with no local navigation.
+export interface OverviewWorkflowNodeData extends WorkflowNodeData {
+  referenceKind?: 'external' | 'missing' | 'malformed' | 'unsupported';
+  referenceLabel?: string;
+  warning?: string;
+}
 
-  const borderColor = selected ? '#3b82f6' : '#e5e7eb';
-  const boxShadow = selected
-    ? '0 0 0 3px rgba(59, 130, 246, 0.3), 0 8px 24px rgba(59, 130, 246, 0.25)'
-    : '0 2px 8px rgba(0,0,0,0.1)';
-
-  const handleClick = () => {
-    if (onClick) {
-      onClick(workflow.workflowId);
-    }
-  };
-
+export const WorkflowNode: React.FC<NodeProps<OverviewWorkflowNodeData>> = ({ data, selected }) => {
+  const { workflow, onClick, referenceKind, referenceLabel, warning } = data;
+  const description = workflow.summary || workflow.description;
+  const label = referenceLabel || workflow.workflowId;
+  const activate = () => onClick?.(workflow.workflowId);
   return (
     <div
-      onClick={handleClick}
+      onClick={onClick ? activate : undefined}
+      onKeyDown={
+        onClick
+          ? (event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activate();
+              }
+            }
+          : undefined
+      }
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      title={[label, description, warning].filter(Boolean).join('\n')}
       style={{
-        background: selected ? '#fafbff' : '#fff',
-        border: `2px solid ${borderColor}`,
-        borderRadius: '12px',
-        minWidth: '240px',
-        maxWidth: '320px',
-        boxShadow,
-        transition: 'all 0.15s ease-in-out',
-        transform: selected ? 'scale(1.02)' : 'scale(1)',
-        cursor: 'pointer',
+        width: OVERVIEW_WIDTH,
+        height: OVERVIEW_HEIGHT,
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+        background: selected ? '#eff6ff' : '#fff',
+        border: `2px solid ${warning || referenceKind ? '#d97706' : selected ? '#3b82f6' : '#e5e7eb'}`,
+        borderRadius: 12,
+        boxShadow: '0 2px 8px rgba(0,0,0,.1)',
+        cursor: onClick ? 'pointer' : 'default',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      {/* Header */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="relationship-in"
+        style={{ background: '#64748b' }}
+      />
       <div
         style={{
-          padding: '14px 16px',
-          borderBottom: `1px solid ${selected ? '#bfdbfe' : '#e5e7eb'}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: selected ? '#eff6ff' : '#f9fafb',
-          borderRadius: '10px 10px 0 0',
+          padding: '12px 14px',
+          borderBottom: '1px solid #e5e7eb',
+          background: '#f9fafb',
+          minWidth: 0,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '20px' }}>⚡</span>
-          <span style={{ fontWeight: 600, fontSize: '15px', color: '#1f2937' }}>
-            {workflow.workflowId}
-          </span>
+        <div
+          style={{ fontSize: 10, color: referenceKind ? '#92400e' : '#1e40af', marginBottom: 5 }}
+        >
+          {referenceKind ? `${referenceKind.toUpperCase()} REFERENCE` : 'WORKFLOW'}
         </div>
-        <span
+        <div
           style={{
-            fontSize: '11px',
+            fontSize: 15,
             fontWeight: 600,
-            padding: '3px 10px',
-            borderRadius: '4px',
-            background: '#dbeafe',
-            color: '#1e40af',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
           }}
         >
-          WORKFLOW
-        </span>
+          {label}
+        </div>
       </div>
-
-      {/* Body */}
-      <div style={{ padding: '14px 16px' }}>
-        {workflow.summary && (
-          <p
+      <div
+        style={{
+          padding: '10px 14px',
+          flex: 1,
+          overflow: 'hidden',
+          fontSize: 12,
+          color: '#64748b',
+        }}
+      >
+        {description && (
+          <div
             style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              margin: '0 0 12px',
-              lineHeight: '1.5',
-            }}
-          >
-            {workflow.summary}
-          </p>
-        )}
-
-        {workflow.description && !workflow.summary && (
-          <p
-            style={{
-              fontSize: '12px',
-              color: '#6b7280',
-              margin: '0 0 12px',
-              lineHeight: '1.5',
+              lineHeight: '16px',
+              maxHeight: 32,
               overflow: 'hidden',
-              textOverflow: 'ellipsis',
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
             }}
           >
-            {workflow.description}
-          </p>
-        )}
-
-        <div style={{ display: 'flex', gap: '16px', fontSize: '12px', color: '#6b7280' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>📋</span>
-            <span>
-              {workflow.steps.length} step{workflow.steps.length !== 1 ? 's' : ''}
-            </span>
+            {description}
           </div>
-          {workflow.inputs && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>📥</span>
-              <span>Has inputs</span>
-            </div>
-          )}
-          {workflow.outputs && Object.keys(workflow.outputs).length > 0 && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>📤</span>
-              <span>Has outputs</span>
-            </div>
-          )}
+        )}
+        <div style={{ marginTop: 7 }}>
+          {referenceKind === 'external'
+            ? 'Source not verified'
+            : referenceKind
+              ? 'Target unavailable'
+              : `${workflow.steps.length} step${workflow.steps.length === 1 ? '' : 's'}`}
         </div>
+        {warning && (
+          <div
+            style={{
+              color: '#92400e',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {warning}
+          </div>
+        )}
       </div>
-
-      {/* Click hint */}
-      <div
-        style={{
-          padding: '10px 16px',
-          borderTop: '1px solid #f3f4f6',
-          textAlign: 'center',
-          fontSize: '11px',
-          color: '#9ca3af',
-          background: '#fafafa',
-          borderRadius: '0 0 10px 10px',
-        }}
-      >
-        Click to open workflow
-      </div>
-
-      {/* Hidden handles for layout purposes */}
-      <Handle type="target" position={Position.Top} style={{ visibility: 'hidden' }} />
-      <Handle type="source" position={Position.Bottom} style={{ visibility: 'hidden' }} />
+      {onClick && (
+        <div
+          style={{
+            fontSize: 11,
+            textAlign: 'center',
+            padding: '7px 12px',
+            borderTop: '1px solid #f3f4f6',
+            color: '#64748b',
+          }}
+        >
+          Open workflow
+        </div>
+      )}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="relationship-out"
+        style={{ background: '#64748b' }}
+      />
     </div>
   );
 };
