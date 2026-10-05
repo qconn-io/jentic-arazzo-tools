@@ -2,7 +2,7 @@
 
 Date: 2026-10-05. Schema: spec-driven. Implementation, automated verification and browser smoke testing are complete.
 
-Package-local Vitest: 136/136 tests passed in 20 test files; zero failed, skipped or pending tests. An unmatched test filter was independently checked to exit 1. The old Mocha bootstrap is excluded from discovery and UI type checking.
+Package-local Vitest: 155/155 tests passed in 21 test files; zero failed, skipped or pending tests. An unmatched test filter was independently checked to exit 1. The old Mocha bootstrap is excluded from discovery and UI type checking.
 
 Commands run with `nvm use` (Node 26.3.1):
 
@@ -14,7 +14,7 @@ Commands run with `nvm use` (Node 26.3.1):
 
 ## Browser acceptance
 
-The initial connected-browser blocker was resolved by the user's explicit authorization to use Playwright in VS Code. Playwright is installed outside the repository in `/tmp/arazzo-browser-smoke`; no browser-test dependencies or test runners were added to other packages. The checked-in smoke script starts a temporary localhost server, loads the actual built standalone assets and mounts existing regression fixtures through the production imperative API. Chromium 153.0.8010.12 ran headless at 1440 by 1000 pixels. All 14 smoke observations passed with zero browser page/console errors and zero external requests. The temporary browser and server close on completion.
+The initial connected-browser blocker was resolved by the user's explicit authorization to use Playwright in VS Code. Playwright is installed outside the repository in `/tmp/arazzo-browser-smoke`; no browser-test dependencies or test runners were added to other packages. The checked-in smoke script starts a temporary localhost server, loads the actual built standalone assets and mounts existing regression fixtures through the production imperative API. Chromium 153.0.8010.12 ran headless at 1440 by 1000 pixels. All 16 smoke observations passed with zero browser page/console errors and zero external requests. The temporary browser and server close on completion.
 
 Reproduce after building the UI and installing Playwright/Chromium (Node from `.nvmrc`):
 
@@ -59,7 +59,7 @@ These contract checks pass, with the browser evidence above confirming the rende
 
 ## Scenario accounting
 
-Each scenario is associated with the named tests listed by file below; browser-sensitive presentation observations are recorded above for task 8.3.
+The file associations below are an inventory, not proof of every combination. Named review regressions below explicitly cover the previously missing combinations. Browser-sensitive presentation observations are recorded above for tasks 8.3 and 9.6/9.8.
 
 | Specification scenario | Regression files |
 | --- | --- |
@@ -342,8 +342,42 @@ Each scenario is associated with the named tests listed by file below; browser-s
 
 A fresh reviewer confirmed no Critical findings and identified three Important gaps. Regression tests and fixes now cover external/local overview name collisions, injected cancellation, and full effective action parameter/inherited warning rendering. Follow-up review identified the simultaneous controlled destination/selection cancellation race; it now has a failing-before/passing-after regression and the same consumption guard in both providers. Additional loader and docs tests fixed valid reusable occurrence extension loss and workflow scrolling overriding step scrolling. A final loader regression verifies malformed reusable suffixes remain fatal before missing-reference recovery or resolution bypass; shared validation matches the installed resolver identifier grammar and preserves dotted names.
 
-Final follow-up review reports no remaining Critical or Important findings; navigation and injected cancellation tests pass 13/13. The final loader delta also passed independent review, with loader/inspection/model regressions passing 50/50. Overall task progress is 37/37 after browser acceptance and final reconciliation.
+The pre-verification-review follow-up reported no remaining Critical or Important findings; navigation and injected cancellation tests pass 13/13. The final loader delta also passed independent review, with loader/inspection/model regressions passing 50/50. Overall task progress is 37/37 after browser acceptance and final reconciliation.
 
-Final acceptance review independently checked the smoke script, observations, selected screenshots, all six design criteria and strict OpenSpec validation; no Important unmet product or design criteria were found.
+The earlier acceptance review independently checked the smoke script, observations, selected screenshots, all six design criteria and strict OpenSpec validation; no Important unmet product or design criteria were found.
 
-No change is archived, committed, pushed or published. No required implementation or acceptance work remains.
+The later independent verification in `verification-review.md` identified W1–W5 and two suggestions. The review follow-up below supersedes the earlier approval wording. At completion of remediation, corrective work was uncommitted. The user subsequently requested commit and push, with separate signed-off commits for semantic fixes, overview readability and verification evidence. No PR or archive was performed.
+
+
+## Verification-review follow-up
+
+Task progress is 45/45, including all eight review follow-up tasks. All five findings in [verification-review.md](verification-review.md) have targeted fixes with observed failing-before/passing-after regression tests. The shared native/generic occurrence-field helper preserves effective projection data; the shared transfer helper supplies call/retry return behavior to interactive and Mermaid consumers. Cross-workflow action-step syntax stays diagnostic rather than navigable. Mermaid parameter notes retain complete authored data, and parser-aware description escaping preserves CommonMark while rendering authored HTML literally.
+
+### Named additional test evidence
+
+`verification-review.test.tsx` adds 16 cases:
+
+- W1 owner-bound action-step classification for Arazzo 1.0.1 and 1.1.0, with paired cross-workflow prerequisites and unsupported-locator diagnostics.
+- W2 native, bypassed and supplied reusable occurrences: native export, native/effective equality, declaration/use fields and paths, nested generic parameters, documentation projection, and unchanged caller input.
+- W3 local workflow, external workflow, local-step recovery, explicit self retry, implicit self retry, and missing-target return parity; installed Mermaid parsing and final interactive layout.
+- W3 local/external workflow call returns and one-way goto.
+- W4 complete querystring, structured/falsy and unresolved parameter notes, checked for content retention and Mermaid syntax.
+- W5 rendered CommonMark links/emphasis/multiline content and authored-HTML escaping; autolinks plus inline/fenced code containing angle brackets.
+
+Three additional component cases cover compact/full accessible relationship labels, separated reciprocal/self-loop label anchors, and selected relationship detail/clearing. Existing tests remain enabled. Independent read-only review checked W1–W5/S1 and found no substantive remaining issues after the CommonMark autolink/code correction.
+
+### Fresh checks and scope
+
+Node 26.3.1 from `.nvmrc`:
+
+- UI suite: 155 tests in 21 files, zero failures or skips.
+- Monorepo `npm test`: parser, resolver, runner, validator and UI suites; all five projects passed (628 tests).
+- UI type checking: passed.
+- UI lint: zero errors, 36 existing warnings.
+- UI build: ESM/UMD entries, both declaration bundles, CSS and hashed standalone app passed; private snapshot/model/transfer/recovery types remain absent from public declarations.
+- Strict OpenSpec validation and `git diff --check`: passed.
+- Built-app Chromium smoke: 16 observations, zero page/console errors and zero external requests.
+
+The refreshed [observations](browser-evidence/observations.json) and screenshots include [compact overview](browser-evidence/dense-cyclic-overview.png), [selected relationship detail](browser-evidence/dense-selected-relationship.png), and [return/CommonMark behavior](browser-evidence/review-return-and-commonmark.png). The async flowchart SVG assertion now proves querystring location and full authored value retention. Return checks cover external and local-step recovery plus external calls; invalid cross-workflow actions remain inert. Rich-description checks exercise links, emphasis, autolinks and code with safe HTML handling.
+
+Dense routing still permits paths behind unrelated cards; compact text, separated anchors and keyboard-accessible full details address the presentation suggestion without claiming optimal routing. This remains a single Chromium viewport, not an exhaustive accessibility or conformance audit. The contribution split and required upstream discussion are documented in `verification-review.md`; existing history was not rewritten.

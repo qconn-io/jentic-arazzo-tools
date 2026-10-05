@@ -171,9 +171,18 @@ try {
   routed(routes);
   assert.equal(routes.length, 11);
   assert.equal(new Set(routes.map((e) => e.path)).size, 11);
-  assert.equal(routes.filter((e) => e.label?.includes('Prerequisite cycle')).length, 3);
+  assert.equal(routes.filter((e) => e.title?.includes('Prerequisite cycle')).length, 3);
+  assert(routes.every((e) => e.label.length < 32), 'overview relationship labels stay compact');
   const positions = dense.map((n) => n.style);
   await screenshot('dense-cyclic-overview');
+  const relationshipPicker = page.getByRole('combobox', { name: 'Inspect relationship' });
+  await relationshipPicker.selectOption({ index: 4 });
+  const relationshipDetails = page.getByRole('region', { name: 'Selected relationship' });
+  assert((await relationshipDetails.innerText()).includes('parameters'));
+  await screenshot('dense-selected-relationship');
+  await relationshipPicker.selectOption('');
+  assert.equal(await relationshipDetails.count(), 0);
+  record('compact overview labels retain full relationship details through keyboard-accessible selection');
   await tab('wfA');
   await tab('All workflows');
   await fit();
@@ -376,6 +385,10 @@ try {
     await workflow.getByRole('button', { name: mode, exact: true }).click();
     await workflow.locator('.mermaid-rendered svg:visible').waitFor();
     assert((await workflow.locator('.mermaid-rendered svg:visible').textContent()).length > 0);
+    if (mode === 'Flowchart') {
+      const rendered = await workflow.locator('.mermaid-rendered svg:visible').textContent();
+      assert(rendered.includes('querystring') && rendered.includes('q={$inputs.q}&literal=a%26b&empty='));
+    }
   }
   await screenshot('async-mermaid-sequence');
   record(
@@ -411,6 +424,41 @@ try {
   record(
     'browser imperative retrieval preserves unknown content, authored identity, custom dialect and opaque references',
   );
+  const reviewFixture = {
+    arazzo: '1.1.0',
+    info: { title: 'Review fixes', version: '1', description: 'See [API docs](https://example.test) and **important** details.\n\nSecond paragraph with *emphasis*. <https://example.test/autolink>\n\nUse `<tag>`.\n\n```xml\n<entry>&value</entry>\n```\n\n<img src="x" onerror="alert(1)">' },
+    sourceDescriptions: [{ name: 'remote', type: 'arazzo', url: 'https://example.test/remote' }],
+    workflows: [
+      { workflowId: 'owner', steps: [
+        { stepId: 'failed', operationId: 'opaque', dependsOn: ['$workflows.other.steps.y'],
+          onFailure: [
+            { name: 'external recovery', type: 'retry', workflowId: '$sourceDescriptions.remote.recover' },
+            { name: 'local recovery', type: 'retry', stepId: 'repair' },
+            { name: 'cross rejected', type: 'goto', stepId: '$workflows.other.steps.y' },
+          ] },
+        { stepId: 'repair', operationId: 'repair' },
+        { stepId: 'call', workflowId: '$sourceDescriptions.remote.recover' },
+      ] },
+      { workflowId: 'other', steps: [{ stepId: 'y', operationId: 'opaque' }] },
+    ],
+  };
+  await mount(reviewFixture, 'split');
+  await fit();
+  const reviewEdges = await edges();
+  assert.equal(reviewEdges.filter((e) => e.label === 'Retry return').length, 2);
+  assert.equal(reviewEdges.filter((e) => e.label === 'Call return').length, 1);
+  assert.equal(reviewEdges.filter((e) => e.label === 'cross rejected').length, 0);
+  routed(reviewEdges);
+  const article = page.locator('.arazzo-docs-prose');
+  assert.equal(await article.getByRole('link', { name: 'API docs', exact: true }).getAttribute('href'), 'https://example.test');
+  assert.equal(await article.locator('strong').filter({ hasText: /^important$/ }).count(), 1);
+  assert.equal(await article.locator('em').filter({ hasText: /^emphasis$/ }).count(), 1);
+  assert.equal(await article.getByRole('link', { name: 'https://example.test/autolink', exact: true }).getAttribute('href'), 'https://example.test/autolink');
+  assert.equal(await article.locator('code').filter({ hasText: /^<tag>$/ }).count(), 1);
+  assert.equal(await article.locator('code').filter({ hasText: /^<entry>&value<\/entry>\n$/ }).count(), 1);
+  assert.equal(await article.locator('img').count(), 0);
+  await screenshot('review-return-and-commonmark');
+  record('review fixes: external/local-step retry and external-call returns render; cross-workflow action is inert; CommonMark links and emphasis render');
   assert.deepEqual(externalRequests, [], 'source descriptions must not be fetched');
   assert.deepEqual(failures, [], `browser errors: ${failures.join('\n')}`);
   await writeFile(
