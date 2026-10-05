@@ -5,3 +5,4 @@ export { RetryEdge } from './RetryEdge';
 export { BundledSuccessEdge } from './BundledSuccessEdge';
 export { BundledFailureEdge } from './BundledFailureEdge';
 export { BundledRetryEdge } from './BundledRetryEdge';
+export { RelationshipEdge } from './RelationshipEdge';

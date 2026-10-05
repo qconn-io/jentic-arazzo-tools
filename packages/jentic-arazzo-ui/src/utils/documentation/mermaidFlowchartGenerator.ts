@@ -1,142 +1,130 @@
-import { Workflow } from '../../types/arazzo';
+import type { Workflow } from '../../types/arazzo';
+import { createSnapshot, inspect } from '../inspection';
+import { buildViewerModel } from '../model/viewerModel';
+import type { ArazzoViewerModel } from '../model/viewerModel';
+import type { ClassifiedTarget } from '../inspection';
 
-/**
- * Generates Mermaid flowchart diagram showing workflow control flow
- */
-export function generateMermaidFlowchart(workflow: Workflow): string {
-  const lines: string[] = ['flowchart TD'];
+// authored delimiters must not become Mermaid syntax; entities keep labels readable.
+export function mermaidLabel(value: unknown): string {
+  const entities: Record<string, string> = {
+    '&': '#38;',
+    '#': '#35;',
+    '"': '#quot;',
+    '<': '#60;',
+    '>': '#62;',
+    '|': '#124;',
+    ';': '#59;',
+  };
+  return String(value ?? '')
+    .replace(/[&#"<>|;]/g, (character) => entities[character])
+    .replace(/[\r\n]+/g, ' ');
+}
 
-  // Start node
-  lines.push('    Start([Start]) --> Step1');
-
-  workflow.steps.forEach((step, idx) => {
-    const stepNum = idx + 1;
-    const nextStepNum = stepNum + 1;
-    const stepId = `Step${stepNum}`;
-    const operation = step.operationId || step.operationPath || step.workflowId || step.stepId;
-
-    // Truncate long operation names
-    const displayOperation = operation.length > 30 ? operation.substring(0, 27) + '...' : operation;
-
-    // Step node
-    lines.push(`    ${stepId}["${stepNum}. ${displayOperation}"]`);
-
-    // Add description as note if present
-    if (step.description) {
-      const shortDesc =
-        step.description.length > 40 ? step.description.substring(0, 37) + '...' : step.description;
-      lines.push(`    ${stepId} -.-> Note${stepNum}[/"${shortDesc}"/]`);
-      lines.push(`    style Note${stepNum} fill:#f0f9ff,stroke:#3b82f6,stroke-width:1px`);
-    }
-
-    // Handle success criteria and branching
-    const hasSuccessCriteria = step.successCriteria && step.successCriteria.length > 0;
-    const hasFailureActions = step.onFailure && step.onFailure.length > 0;
-
-    if (hasSuccessCriteria || hasFailureActions) {
-      const decisionId = `Decision${stepNum}`;
-      const condition = hasSuccessCriteria ? step.successCriteria![0].condition : 'Success?';
-
-      const shortCondition = condition.length > 30 ? condition.substring(0, 27) + '...' : condition;
-
-      lines.push(`    ${stepId} --> ${decisionId}{"${shortCondition}"}`);
-
-      // Success path
-      if (step.onSuccess && step.onSuccess.length > 0) {
-        const action = step.onSuccess[0];
-        if ('type' in action) {
-          if (action.type === 'goto' && action.stepId) {
-            // Find target step index
-            const targetIdx = workflow.steps.findIndex((s) => s.stepId === action.stepId);
-            if (targetIdx !== -1) {
-              lines.push(`    ${decisionId} -->|Yes| Step${targetIdx + 1}`);
-            } else {
-              lines.push(`    ${decisionId} -->|Yes| End`);
-            }
-          } else if (action.type === 'goto' && action.workflowId) {
-            lines.push(
-              `    ${decisionId} -->|Yes| CallWorkflow${stepNum}["Call: ${action.workflowId}"]`,
-            );
-            lines.push(`    CallWorkflow${stepNum} --> Step${nextStepNum}`);
-          } else if (action.type === 'end') {
-            lines.push(`    ${decisionId} -->|Yes| End`);
-          } else {
-            // Default: continue to next step
-            if (stepNum < workflow.steps.length) {
-              lines.push(`    ${decisionId} -->|Yes| Step${nextStepNum}`);
-            } else {
-              lines.push(`    ${decisionId} -->|Yes| End`);
-            }
-          }
-        }
-      } else {
-        // No explicit success action, continue to next step
-        if (stepNum < workflow.steps.length) {
-          lines.push(`    ${decisionId} -->|Yes| Step${nextStepNum}`);
-        } else {
-          lines.push(`    ${decisionId} -->|Yes| End`);
-        }
-      }
-
-      // Failure path
-      if (hasFailureActions) {
-        const action = step.onFailure![0];
-        if ('type' in action) {
-          if (action.type === 'retry') {
-            const retryLimit = action.retryLimit ? `${action.retryLimit}x` : '∞';
-            const retryDelay = action.retryAfter ? ` (${action.retryAfter}s)` : '';
-            lines.push(
-              `    ${decisionId} -->|No| Retry${stepNum}["Retry ${retryLimit}${retryDelay}"]`,
-            );
-            lines.push(`    Retry${stepNum} --> ${stepId}`);
-            lines.push(`    style Retry${stepNum} fill:#fef3c7,stroke:#f59e0b,stroke-width:2px`);
-          } else if (action.type === 'goto' && action.stepId) {
-            const targetIdx = workflow.steps.findIndex((s) => s.stepId === action.stepId);
-            if (targetIdx !== -1) {
-              lines.push(`    ${decisionId} -->|No| Step${targetIdx + 1}`);
-            } else {
-              lines.push(`    ${decisionId} -->|No| Error${stepNum}["Error"]`);
-              lines.push(`    Error${stepNum} --> End`);
-              lines.push(`    style Error${stepNum} fill:#fee2e2,stroke:#dc2626,stroke-width:2px`);
-            }
-          } else if (action.type === 'goto' && action.workflowId) {
-            lines.push(
-              `    ${decisionId} -->|No| CallWorkflowFail${stepNum}["Call: ${action.workflowId}"]`,
-            );
-            if (stepNum < workflow.steps.length) {
-              lines.push(`    CallWorkflowFail${stepNum} --> Step${nextStepNum}`);
-            } else {
-              lines.push(`    CallWorkflowFail${stepNum} --> End`);
-            }
-          } else if (action.type === 'end') {
-            lines.push(`    ${decisionId} -->|No| Error${stepNum}["Workflow Failed"]`);
-            lines.push(`    Error${stepNum} --> End`);
-            lines.push(`    style Error${stepNum} fill:#fee2e2,stroke:#dc2626,stroke-width:2px`);
-          }
-        }
-      } else {
-        // No failure action, end with error
-        lines.push(`    ${decisionId} -->|No| Error${stepNum}["Error"]`);
-        lines.push(`    Error${stepNum} --> End`);
-        lines.push(`    style Error${stepNum} fill:#fee2e2,stroke:#dc2626,stroke-width:2px`);
-      }
-    } else {
-      // No branching, just continue to next step
-      if (stepNum < workflow.steps.length) {
-        lines.push(`    ${stepId} --> Step${nextStepNum}`);
-      } else {
-        lines.push(`    ${stepId} --> End`);
-      }
-    }
-
-    // Style the step node
-    lines.push(`    style ${stepId} fill:#dbeafe,stroke:#3b82f6,stroke-width:2px`);
+export function generateMermaidFlowchart(
+  workflow: Workflow,
+  suppliedModel?: ArazzoViewerModel,
+): string {
+  const model =
+    suppliedModel ??
+    buildViewerModel(
+      inspect(
+        createSnapshot({
+          arazzo: '1.1.0',
+          info: { title: workflow.workflowId, version: '' },
+          sourceDescriptions: [],
+          workflows: [workflow],
+        }),
+      ),
+    );
+  if (model.support.semanticInspection === 'unsupported') return '';
+  const fact = model.workflowsById.get(workflow.workflowId);
+  if (!fact) return '';
+  const lines = ['flowchart TD', '    Start([Start])', '    End([End])'];
+  lines.push(
+    `    Inspection["${mermaidLabel(`${model.orderLabel}; schema validation and execution support not established; sources unverified`)}"]`,
+  );
+  model.support.limitations.forEach((limitation, index) => {
+    lines.push(`    Limitation${index}["${mermaidLabel(limitation)}"]`);
   });
-
-  // End node
-  lines.push('    End([End])');
-  lines.push('    style End fill:#d1fae5,stroke:#10b981,stroke-width:2px');
-  lines.push('    style Start fill:#e0e7ff,stroke:#6366f1,stroke-width:2px');
-
+  const stepIds = new Map(fact.steps.map((step, index) => [step.stepId, `Step${index}`]));
+  lines.push(`    Start --> ${fact.steps.length ? 'Step0' : 'End'}`);
+  const targetNode = (target: ClassifiedTarget, id: string): string => {
+    if (
+      target.kind === 'local-step' &&
+      target.workflowId === fact.workflowId &&
+      target.stepId &&
+      stepIds.has(target.stepId)
+    )
+      return stepIds.get(target.stepId)!;
+    lines.push(`    ${id}["${mermaidLabel(`${target.kind}: ${target.reference}`)}"]`);
+    return id;
+  };
+  fact.prerequisites.forEach((prerequisite, index) => {
+    const target = prerequisite.target;
+    const from = targetNode(target, `WorkflowPrerequisite${index}`);
+    lines.push(`    ${from} -.->|prerequisite| Start`);
+  });
+  for (const [index, step] of fact.steps.entries()) {
+    const id = `Step${index}`;
+    const next = index + 1 < fact.steps.length ? `Step${index + 1}` : 'End';
+    const binding = step.sourceBinding;
+    const metadata = [
+      binding.intent,
+      binding.timeout !== undefined ? `timeout ${JSON.stringify(binding.timeout)}` : '',
+      binding.correlationId !== undefined
+        ? `correlation ${JSON.stringify(binding.correlationId)}`
+        : '',
+    ]
+      .filter(Boolean)
+      .join('; ');
+    const locators = Object.values(binding.locators)
+      .filter((value) => value !== undefined)
+      .join('; ');
+    lines.push(
+      `    ${id}["${mermaidLabel(`${index + 1}. ${step.stepId}: ${locators || step.stepId}${metadata ? `; ${metadata}` : ''}`)}"]`,
+    );
+    // array order is the inspection spine, independently of prerequisite/action overlays.
+    lines.push(`    ${id} --> ${next}`);
+    if (
+      step.callTarget &&
+      (step.callTarget.navigable || step.callTarget.kind.startsWith('external-'))
+    ) {
+      const call = targetNode(step.callTarget, `Call${index}`);
+      lines.push(`    ${id} -->|call| ${call}`);
+      lines.push(`    ${call} -->|call return| ${next}`);
+    }
+    step.prerequisites.forEach((prerequisite, prerequisiteIndex) => {
+      const target = prerequisite.target;
+      const from = targetNode(target, `Prerequisite${index}_${prerequisiteIndex}`);
+      lines.push(
+        `    ${from} -.->|${mermaidLabel(target.kind.startsWith('local-') ? 'prerequisite' : `prerequisite ${target.kind}`)}| ${id}`,
+      );
+    });
+    (['onSuccess', 'onFailure'] as const).forEach((channel, channelIndex) => {
+      step.effectiveActions[channel].forEach((action, actionIndex) => {
+        const value = action.value;
+        if (action.status !== 'resolved') {
+          lines.push(
+            `    Details${index}_${channelIndex}_${actionIndex}["${mermaidLabel(`${action.status}: ${JSON.stringify(action.authored)}`)}"]`,
+          );
+          return;
+        }
+        const details = `${channel === 'onSuccess' ? 'success' : 'failure'} ${value.name ?? ''} ${value.type}; ${action.parameters.length} parameters${action.parameters.length ? ` ${JSON.stringify(action.parameters.map((parameter) => parameter.value))}` : ''}${value.criteria ? `; criteria ${JSON.stringify(value.criteria)}` : ''}`;
+        if (value.type === 'end') {
+          lines.push(`    ${id} -->|"${mermaidLabel(details)}"| End`);
+          return;
+        }
+        if (
+          !action.target ||
+          (!action.target.navigable && !action.target.kind.startsWith('external-'))
+        )
+          return;
+        const target = targetNode(action.target, `Action${index}_${channelIndex}_${actionIndex}`);
+        lines.push(`    ${id} -->|"${mermaidLabel(details)}"| ${target}`);
+        if (value.type === 'retry' && target !== id)
+          lines.push(`    ${target} -->|retry source step| ${id}`);
+      });
+    });
+  }
   return lines.join('\n');
 }

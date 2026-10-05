@@ -4,7 +4,22 @@
     "jsx": "react-jsx",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"]
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "node",
+      "emscripten"
+    ]
   },
-  "include": ["src/**/*", "test/**/*", "public/**/*"]
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "public/**/*"
+  ],
+  "exclude": [
+    "test/mocha-bootstrap.ts"
+  ]
 }

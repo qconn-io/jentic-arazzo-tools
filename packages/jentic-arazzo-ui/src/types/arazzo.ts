@@ -1,11 +1,13 @@
 /**
- * Arazzo Specification v1.0.1 Type Definitions
- * Based on: https://spec.openapis.org/arazzo/latest.html
+ * document types for Arazzo 1.0 and selected Arazzo 1.1 inspection fields.
+ * these interfaces do not establish validation or execution support and are not
+ * a lossless representation of every specification field or extension.
  */
 
 /** @public */
 export interface ArazzoDocument {
   arazzo: string;
+  $self?: string;
   info: InfoObject;
   sourceDescriptions: SourceDescription[];
   workflows: Workflow[];
@@ -24,8 +26,8 @@ export interface InfoObject {
 export interface SourceDescription {
   name: string;
   url: string;
-  type?: 'openapi' | 'arazzo';
-  /** Internal tracking ID - not part of Arazzo spec, stripped on export */
+  type?: 'openapi' | 'arazzo' | 'asyncapi';
+  /** viewer tracking ID; authored values are preserved during export. */
   _internalId?: string;
 }
 
@@ -41,7 +43,7 @@ export interface Workflow {
   failureActions?: (FailureAction | ReusableObject)[];
   outputs?: Record<string, string>;
   parameters?: (Parameter | ReusableObject)[];
-  /** Internal tracking ID - not part of Arazzo spec, stripped on export */
+  /** viewer tracking ID; authored values are preserved during export. */
   _internalId?: string;
 }
 
@@ -52,20 +54,26 @@ export interface Step {
   operationId?: string;
   operationPath?: string;
   workflowId?: string;
+  dependsOn?: string[];
+  channelPath?: string;
+  action?: 'send' | 'receive';
+  /** maximum authored wait in milliseconds; the viewer does not execute it. */
+  timeout?: number;
+  correlationId?: string;
   parameters?: (Parameter | ReusableObject)[];
   requestBody?: RequestBody;
   successCriteria?: Criterion[];
   onSuccess?: (SuccessAction | ReusableObject)[];
   onFailure?: (FailureAction | ReusableObject)[];
   outputs?: Record<string, string>;
-  /** Internal tracking ID - not part of Arazzo spec, stripped on export */
+  /** viewer tracking ID; authored values are preserved during export. */
   _internalId?: string;
 }
 
 /** @public */
 export interface Parameter {
   name: string;
-  in?: 'path' | 'query' | 'header' | 'cookie';
+  in?: 'path' | 'query' | 'querystring' | 'header' | 'cookie';
   value: any;
 }
 
@@ -89,6 +97,7 @@ export interface SuccessAction {
   workflowId?: string;
   stepId?: string;
   criteria?: Criterion[];
+  parameters?: (Parameter | ReusableObject)[];
 }
 
 /** @public */
@@ -100,6 +109,7 @@ export interface FailureAction {
   retryAfter?: number;
   retryLimit?: number;
   criteria?: Criterion[];
+  parameters?: (Parameter | ReusableObject)[];
 }
 
 /** @public */
@@ -118,7 +128,7 @@ export interface CriterionExpressionType {
 /** @public */
 export interface ReusableObject {
   reference: string;
-  value?: string;
+  value?: Parameter['value'];
 }
 
 /** @public */

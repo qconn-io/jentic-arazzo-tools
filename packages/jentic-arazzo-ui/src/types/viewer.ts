@@ -95,12 +95,69 @@ export interface DocsViewConfig {
   diagramType?: DiagramType;
 }
 
+/**
+ * inspection limits for generated documentation; these do not certify conformance.
+ * @public
+ */
+export interface DocumentationSupport {
+  declaredVersion: string;
+  profile?: '1.0' | '1.1';
+  semanticInspection: boolean;
+  limitations?: string[];
+}
+
+/**
+ * available document and occurrence locations; absent metadata is not inferred.
+ * @public
+ */
+export interface DocumentationProvenance {
+  retrievalURI?: string;
+  baseURI?: string;
+  self?: string;
+  occurrencePath?: string;
+  declarationPath?: string;
+}
+
+/**
+ * authored source locators and intent without fetching the source document.
+ * @public
+ */
+export interface DocumentationSourceBinding {
+  sourceName?: string;
+  sourceType?: string;
+  sourceURL?: string;
+  operationId?: string;
+  operationPath?: string;
+  channelPath?: string;
+  workflowId?: string;
+  action?: 'send' | 'receive';
+  timeout?: number;
+  correlationId?: string;
+  verification: 'unverified' | 'ambiguous' | 'unresolved';
+}
+
+/**
+ * classified prerequisite information used by documentation links and badges.
+ * @public
+ */
+export interface DocumentationPrerequisite {
+  reference: string;
+  kind: 'local' | 'external' | 'missing' | 'malformed' | 'unsupported';
+  workflowId?: string;
+  stepId?: string;
+  sourceName?: string;
+  message?: string;
+  provenance?: DocumentationProvenance;
+}
+
 /** @public */
 export interface DocumentationMetadata {
   title: string;
   version: string;
   arazzoVersion: string;
   documentURL?: string | null;
+  support?: DocumentationSupport;
+  provenance?: DocumentationProvenance;
   summary?: string;
   description?: string;
   sourceDescriptions: Array<{
@@ -113,6 +170,10 @@ export interface DocumentationMetadata {
 /** @public */
 export interface WorkflowDocumentation {
   workflowId: string;
+  dependsOn?: string[];
+  prerequisites?: DocumentationPrerequisite[];
+  support?: DocumentationSupport;
+  provenance?: DocumentationProvenance;
   summary?: string;
   description?: string;
   inputs?: Record<string, any>;
@@ -125,6 +186,15 @@ export interface WorkflowDocumentation {
 /** @public */
 export interface StepDocumentation {
   stepId: string;
+  dependsOn?: string[];
+  prerequisites?: DocumentationPrerequisite[];
+  channelPath?: string;
+  action?: 'send' | 'receive';
+  timeout?: number;
+  correlationId?: string;
+  sourceBinding?: DocumentationSourceBinding;
+  support?: DocumentationSupport;
+  provenance?: DocumentationProvenance;
   description?: string;
   operationId?: string;
   operationPath?: string;
@@ -149,7 +219,8 @@ export interface DocumentationSection {
 // ============================================================================
 
 /** @public */
-export type ArazzoNodeType = 'start' | 'end' | 'step' | 'workflowRef' | 'workflow' | 'externalWorkflow';
+export type ArazzoNodeType =
+  'start' | 'end' | 'step' | 'workflowRef' | 'workflow' | 'externalWorkflow';
 
 /** @public */
 export interface StepNodeData {
@@ -169,6 +240,8 @@ export interface WorkflowRefNodeData {
   type: 'workflowRef';
   step: Step;
   targetWorkflowId: string;
+  /** workflow containing the calling step; optional for existing node consumers. */
+  workflowId?: string;
   workflowSuccessActions?: (SuccessAction | ReusableObject)[];
   workflowFailureActions?: (FailureAction | ReusableObject)[];
   isValid: boolean;
@@ -221,7 +294,14 @@ export type ArazzoNode = Node<ArazzoNodeData>;
 // ============================================================================
 
 /** @public */
-export type ArazzoEdgeType = 'sequential' | 'success' | 'failure' | 'retry' | 'bundled-success' | 'bundled-failure' | 'bundled-retry';
+export type ArazzoEdgeType =
+  | 'sequential'
+  | 'success'
+  | 'failure'
+  | 'retry'
+  | 'bundled-success'
+  | 'bundled-failure'
+  | 'bundled-retry';
 
 /** @public */
 export interface SequentialEdgeData {

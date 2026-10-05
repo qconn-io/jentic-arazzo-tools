@@ -1,348 +1,200 @@
-import { DocumentationMetadata, WorkflowDocumentation } from '../../types/viewer';
+import type {
+  DocumentationMetadata,
+  DocumentationPrerequisite,
+  StepDocumentation,
+  WorkflowDocumentation,
+} from '../../types/viewer';
+import type { EffectiveAction } from '../model/viewerModel';
+import type { InspectionDiagnostic, PlainObject } from '../inspection';
 
 export interface FormatOptions {
   includeMetadata?: boolean;
   includeDiagrams?: boolean;
 }
+type InspectionDetails = { authored?: PlainObject; diagnostics?: InspectionDiagnostic[] };
+type InspectedStep = StepDocumentation &
+  InspectionDetails & { actionDetails?: Record<'onSuccess' | 'onFailure', EffectiveAction[]> };
 
-/**
- * Formats documentation data as markdown string
- */
-function sourceIcon(type: string): string {
-  const color = type === 'openapi' ? '#6BA543' : '#94C83D';
-  return `<svg class="source-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="12" height="12" rx="3" fill="${color}" opacity="0.15" stroke="${color}" stroke-width="1"/><circle cx="7" cy="7" r="2" fill="${color}"/></svg>`;
+export function escapeHTML(value: unknown): string {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function valueText(value: unknown): string {
+  return typeof value === 'string' ? value : (JSON.stringify(value, null, 2) ?? '');
+}
+function rawDetails(title: string, value: unknown): string {
+  return `<details class="step-detail"><summary>${escapeHTML(title)}</summary><pre>${escapeHTML(valueText(value))}</pre></details>`;
+}
+function safeURL(value: string): string {
+  const compact = Array.from(value)
+    .filter((character) => character.charCodeAt(0) > 32)
+    .join('');
+  return /^[a-z][a-z\d+.-]*:/i.test(compact) && !/^https?:/i.test(compact)
+    ? '#'
+    : escapeHTML(value);
+}
+function warnings(diagnostics?: InspectionDiagnostic[]): string {
+  return (diagnostics ?? [])
+    .map(
+      (diagnostic) =>
+        `<div class="inspection-warning">${escapeHTML(diagnostic.phase)}: ${escapeHTML(diagnostic.message)}${diagnostic.declarationPath ? ` (declaration /${escapeHTML(diagnostic.declarationPath.join('/'))})` : ''}</div>`,
+    )
+    .join('\n');
+}
+function prerequisites(entries?: DocumentationPrerequisite[]): string {
+  if (!entries?.length) return '';
+  const rows = entries.map((target) => {
+    const label = escapeHTML(target.reference);
+    if (target.kind === 'local' && target.workflowId) {
+      const destination = {
+        workflowId: target.workflowId,
+        ...(target.stepId ? { stepId: target.stepId } : {}),
+      };
+      return `<li><a href="#arazzo-target=${encodeURIComponent(JSON.stringify(destination))}" data-target-workflow-id="${escapeHTML(target.workflowId)}"${target.stepId ? ` data-target-step-id="${escapeHTML(target.stepId)}"` : ''}>${label}</a> (prerequisite)</li>`;
+    }
+    return `<li>${label} (${escapeHTML(target.kind)}${target.sourceName ? ` source ${escapeHTML(target.sourceName)}` : ''})${target.message ? ` — ${escapeHTML(target.message)}` : ''}</li>`;
+  });
+  return `<div class="doc-section"><h3>Prerequisites</h3><ul>${rows.join('\n')}</ul></div>`;
+}
+function parameters(values?: PlainObject[]): string {
+  if (!values?.length) return '';
+  return `<details class="step-detail"><summary>Parameters (${values.length})</summary><table><thead><tr><th>Name / reference</th><th>Location</th><th>Authored value</th></tr></thead><tbody>${values.map((parameter) => `<tr><td>${escapeHTML(parameter.name ?? parameter.reference ?? parameter.$ref)}</td><td>${escapeHTML(parameter.in)}</td><td><pre>${escapeHTML(JSON.stringify(parameter.value, null, 2) ?? '')}</pre></td></tr>`).join('')}</tbody></table></details>`;
+}
+function actions(step: InspectedStep, workflow: WorkflowDocumentation): string {
+  const channels = ['onSuccess', 'onFailure'] as const;
+  return channels
+    .map((channel) => {
+      const collection = step.actionDetails?.[channel];
+      const entries: PlainObject[] = collection?.map((action) => action.value) ?? [
+        ...(step[channel] ?? []),
+        ...(channel === 'onSuccess'
+          ? (workflow.successActions ?? [])
+          : (workflow.failureActions ?? [])),
+      ];
+      if (!entries.length) return '';
+      return `<details class="step-detail"><summary>${channel === 'onSuccess' ? 'Success' : 'Failure'} actions (${entries.length})</summary><div>Viewer inspection order: step entries, then unmatched workflow defaults. This is not an execution trace.</div>${entries
+        .map((action, index) => {
+          const fact = collection?.[index];
+          return `<div class="step-row"><strong>${escapeHTML(action.name ?? action.reference ?? action.$ref)}</strong> ${escapeHTML(action.type ?? 'unresolved')} ${escapeHTML(action.workflowId ?? action.stepId ?? '')}${fact ? ` (${escapeHTML(fact.origin)}${fact.isOverride ? ', overrides default' : ''}; occurrence /${escapeHTML(fact.path.join('/'))}${fact.declarationPath ? `; declaration /${escapeHTML(fact.declarationPath.join('/'))}` : ''})` : ''}</div>${parameters(action.parameters)}${rawDetails('Authored action and criteria', action)}${fact ? warnings(fact.diagnostics) + fact.parameters.map((parameter) => warnings(parameter.diagnostics) + (parameter.status === 'unresolved' ? rawDetails('Unresolved parameter', parameter.authored) : '')).join('') : ''}`;
+        })
+        .join('\n')}</details>`;
+    })
+    .join('\n');
 }
 
-/**
- * Formats the document header (title, version, summary, sources) as markdown.
- */
 export function formatHeaderAsMarkdown(
   metadata: DocumentationMetadata,
   options: FormatOptions = {},
 ): string {
-  const { includeMetadata = true } = options;
-  const sections: string[] = [];
-
-  // Document header with title and inline version pills
-  sections.push(
-    `<div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: ${metadata.documentURL ? '8px' : '20px'}; flex-wrap: wrap;">`,
-  );
-  sections.push(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="215 -5 380 380" style="width: 2.25rem; height: 2.25rem; flex-shrink: 0;"><path fill="#94C83D" d="M268.3,78.8c26.8,0,48.6,21.7,48.6,48.6c0,7.3-1.6,14.1-4.4,20.3c-1.1,2.4-0.8,5.3,1.1,7.1l77.9,78.2c1.3,1.3,1.3,3.4,0,4.6l-12.8,12.9c-1.3,1.3-3.4,1.3-4.6,0l-42.1-41.9c-3.8-3.8-10-3.8-13.9,0l-4.9,4.8c-1.9,1.9-2.2,4.8-1.1,7.3c3,6.2,4.8,13.1,4.8,20.3c0,26.8-21.7,48.6-48.6,48.6c-26.8,0-48.6-21.7-48.6-48.6c0-26.8,21.7-48.6,48.6-48.6c7.1,0,14,1.7,20.3,4.8c2.4,1.2,5.4,0.9,7.3-1.1l4.8-4.8c3.8-3.8,3.8-10.1,0-13.9l-4.8-4.8c-1.9-1.9-4.7-2.2-7.1-1.1c-6.2,2.9-13.1,4.4-20.3,4.4c-26.8,0-48.6-21.7-48.6-48.6C219.8,100.5,241.5,78.8,268.3,78.8z"/><path fill="#6BA543" d="M460.7,271.2c26.8,0,48.6,21.7,48.6,48.6c0,26.8-21.7,48.6-48.6,48.6c-26.8,0-48.6-21.7-48.6-48.6c0-7.1,4-16.3,7.1-22.6c1.2-2.4-1.5-3-3.4-4.9l-5-5c-3.8-3.8-10-3.8-13.9,0l-5,5c-1.9,1.9-2.2,4.8-1.1,7.3c3,6.2,4.8,13.1,4.8,20.3c0,26.8-21.7,48.6-48.6,48.6c-26.8,0-48.6-21.7-48.6-48.6c0-26.8,21.7-48.6,48.6-48.6c7.1,0,14,1.7,20.3,4.8c2.4,1.2,5.4,0.8,7.3-1.1l77.7-78c1.3-1.3,3.4-1.3,4.6,0l13,13c1.3,1.3,1.3,3.4,0,4.6l-41.7,41.6c-3.8,3.8-3.9,10.1,0,13.9l4.9,4.9c1.9,1.9,4.8,2.2,7.3,1.1C446.7,272.9,453.5,271.2,460.7,271.2z"/><path fill="#94C83D" d="M539.5,192.4c26.8,0,48.6,21.7,48.6,48.6s-21.7,48.6-48.6,48.6c-26.8,0-48.6-21.7-48.6-48.6c0-7.1,1.7-14,4.8-20.3c1.2-2.4,0.9-5.4-1.1-7.3l-78.4-78.1c-1.3-1.3-1.3-3.4,0-4.6l13-13c1.3-1.3,3.4-1.3,4.6,0l44.1,44.2c2.6,2.6,6.7,2.6,9.3,0l7.1-7.1c1.9-1.9,2.2-4.7,1.1-7.1c-2.9-6.2-4.4-13.1-4.4-20.3c0-26.8,21.7-48.6,48.6-48.6c26.8,0,48.6,21.7,48.6,48.6s-21.7,48.6-48.6,48.6c-7.3,0-14.1-1.6-20.3-4.4c-2.4-1.1-5.3-0.8-7.1,1.1l-4.8,4.8c-3.8,3.8-3.9,10.1,0,13.9l4.8,4.8c1.9,1.9,4.8,2.2,7.3,1.1C525.5,194.1,532.4,192.4,539.5,192.4z"/><path fill="#6BA543" d="M347.1,0c26.8,0,48.6,21.7,48.6,48.6c0,7.3-1.6,14.1-4.4,20.3c-1.1,2.4-0.8,5.3,1.1,7.1l6.9,6.9c2.6,2.6,6.7,2.6,9.3,0l6.9-7c1.9-1.9,2.2-4.7,1.1-7.1c-2.9-6.2-4.4-13.1-4.4-20.3c0-26.8,21.7-48.6,48.6-48.6c26.8,0,48.6,21.7,48.6,48.6c0,26.8-21.7,48.6-48.6,48.6c-7.3,0-14.1-1.6-20.3-4.4c-2.4-1.1-5.3-0.8-7.1,1.1l-78.1,77.8c-1.3,1.3-3.4,1.3-4.6,0l-12.8-12.8c-1.3-1.3-1.3-3.4,0-4.6l44-44.1c2.6-2.6,2.5-6.7,0-9.3l-7-7c-1.9-1.9-4.7-2.2-7.1-1.1c-6.2,2.9-13.1,4.4-20.3,4.4c-26.8,0-48.6-21.7-48.6-48.6C298.6,21.8,320.3,0,347.1,0z"/></svg>`,
-  );
-  sections.push(
-    `<h1 style="margin: 0; font-size: 2.25rem; font-weight: 700; color: #111827; line-height: 1;">${metadata.title}</h1>`,
-  );
-  sections.push(
-    `<span class="version-badge doc-version" title="Document version">${metadata.version}</span>`,
-  );
-  sections.push(
-    `<span class="version-badge spec-version" title="Arazzo Specification version">Arazzo ${metadata.arazzoVersion || '1.0.1'}</span>`,
-  );
-  sections.push(`</div>\n`);
-
-  if (metadata.documentURL) {
+  const details = metadata as DocumentationMetadata & InspectionDetails;
+  const sections = [
+    `<h1>${escapeHTML(metadata.title)}</h1>`,
+    `<span class="version-badge doc-version">${escapeHTML(metadata.version)}</span> <span class="version-badge spec-version">Arazzo ${escapeHTML(metadata.arazzoVersion)}</span>`,
+  ];
+  if (metadata.documentURL)
     sections.push(
-      `<div style="margin-bottom: 20px;"><a href="${metadata.documentURL}" target="_blank" rel="noopener noreferrer" style="font-size: 0.75rem; word-break: break-all;">${metadata.documentURL}</a></div>\n`,
+      `<a href="${safeURL(metadata.documentURL)}">${escapeHTML(metadata.documentURL)}</a>`,
     );
-  }
-
-  if (metadata.summary) {
-    sections.push(`\n${metadata.summary}\n`);
-  }
-
-  if (metadata.description) {
-    sections.push(`\n${metadata.description}\n`);
-  }
-
-  // Metadata section - source cards
-  if (includeMetadata && metadata.sourceDescriptions.length > 0) {
-    sections.push('\n<div class="sources-section">\n');
-    sections.push(`<div class="sources-header">Source Descriptions</div>`);
-    sections.push(`<div class="sources-grid">`);
-    metadata.sourceDescriptions.forEach((sd) => {
-      const typeLabel = (sd.type || 'api').toUpperCase();
-      const typeClass = sd.type === 'openapi' ? 'source-type-openapi' : 'source-type-arazzo';
-      sections.push(`<div class="source-card">`);
-      sections.push(`<div class="source-card-top">`);
-      sections.push(`${sourceIcon(sd.type || 'arazzo')}`);
-      sections.push(`<span class="source-type-badge ${typeClass}">${typeLabel}</span>`);
-      sections.push(`<span class="source-name">${sd.name}</span>`);
-      sections.push(`</div>`);
-      sections.push(
-        `<a class="source-url" href="${sd.url}" target="_blank" rel="noopener noreferrer">${sd.url}</a>`,
-      );
-      sections.push(`</div>`);
-    });
-    sections.push(`</div>`);
-    sections.push('\n</div>\n');
-  }
-
+  if (metadata.summary) sections.push(`<p>${escapeHTML(metadata.summary)}</p>`);
+  if (metadata.description) sections.push(`<p>${escapeHTML(metadata.description)}</p>`);
+  if (metadata.support)
+    sections.push(
+      `<div class="inspection-support">Semantic inspection: ${metadata.support.semanticInspection ? `profile ${escapeHTML(metadata.support.profile ?? 'selected')}` : 'unsupported version; raw content only'}. Schema validation and execution support are not established. Source documents and versions are unverified.</div>`,
+      ...(metadata.support.limitations ?? []).map(
+        (limit) => `<div class="inspection-warning">${escapeHTML(limit)}</div>`,
+      ),
+    );
+  if (metadata.provenance) sections.push(rawDetails('Document provenance', metadata.provenance));
+  if (options.includeMetadata !== false)
+    sections.push(
+      '<div class="sources-section"><h2>Source Descriptions</h2>',
+      ...metadata.sourceDescriptions.map(
+        (source) =>
+          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>${escapeHTML(source.type ?? 'unknown')} — unverified</span> <a href="${safeURL(source.url)}">${escapeHTML(source.url)}</a></div>`,
+      ),
+      '</div>',
+    );
+  sections.push(warnings(details.diagnostics));
+  if (details.authored)
+    sections.push(
+      rawDetails(
+        metadata.support?.semanticInspection === false
+          ? 'Raw authored document'
+          : 'Authored document and generic details',
+        details.authored,
+      ),
+    );
   return sections.join('\n');
 }
 
-/**
- * Formats a single workflow's inner content (description, inputs, steps, outputs) as markdown.
- */
 export function formatWorkflowAsMarkdown(
-  metadata: DocumentationMetadata,
+  _metadata: DocumentationMetadata,
   workflow: WorkflowDocumentation,
 ): string {
   const sections: string[] = [];
-
-  // build source name → type lookup
-  const sourceTypes = new Map<string, string>();
-  metadata.sourceDescriptions.forEach((sd) => {
-    sourceTypes.set(sd.name, sd.type || 'arazzo');
-  });
-
-  if (workflow.description) {
-    sections.push(`<div class="workflow-description">${workflow.description}</div>\n`);
-  }
-
-  // Inputs - parse JSONSchema
-  if (workflow.inputs && typeof workflow.inputs === 'object') {
-    const properties =
-      'properties' in workflow.inputs ? (workflow.inputs.properties as Record<string, any>) : null;
-
-    if (properties && Object.keys(properties).length > 0) {
-      sections.push('\n<div class="doc-section">\n');
-      sections.push('\n### ↓ Inputs\n');
-      sections.push(
-        '\nBefore starting this workflow, you need to provide the following inputs:\n\n',
-      );
-      sections.push('| Parameter | Type | Description |');
-      sections.push('|-----------|------|-------------|');
-
-      const required =
-        'required' in workflow.inputs && Array.isArray(workflow.inputs.required)
-          ? workflow.inputs.required
-          : [];
-
-      Object.entries(properties).forEach(([key, schema]) => {
-        const typeStr =
-          typeof schema === 'object' && schema !== null && 'type' in schema
-            ? String(schema.type)
-            : 'any';
-        const desc =
-          typeof schema === 'object' && schema !== null && 'description' in schema
-            ? String(schema.description)
-            : '';
-        const reqLabel = required.includes(key) ? '**REQUIRED.** ' : '';
-        sections.push(`| \`${key}\` | ${typeStr} | ${reqLabel}${desc || 'N/A'} |`);
-      });
-      sections.push('\n</div>\n');
-    }
-  }
-
-  // Steps as timeline
-  sections.push(`\n<div class="timeline">\n`);
-  workflow.steps.forEach((step, idx) => {
-    const isLast = idx === workflow.steps.length - 1;
+  if (workflow.description)
+    sections.push(`<p class="workflow-description">${escapeHTML(workflow.description)}</p>`);
+  sections.push(prerequisites(workflow.prerequisites));
+  if (workflow.inputs) sections.push(rawDetails('Inputs', workflow.inputs));
+  sections.push('<div class="timeline">');
+  workflow.steps.forEach((plain, index) => {
+    const step = plain as InspectedStep;
     sections.push(
-      `<div class="timeline-item${isLast ? ' timeline-item-last' : ''}" data-step-id="${step.stepId}">`,
+      `<div class="timeline-item" data-workflow-id="${escapeHTML(workflow.workflowId)}" data-step-id="${escapeHTML(step.stepId)}"><div class="timeline-marker">${index + 1}</div><div class="timeline-content"><div class="step-card"><h3>${escapeHTML(step.stepId)}</h3>`,
     );
+    if (step.description) sections.push(`<p>${escapeHTML(step.description)}</p>`);
+    for (const [key, locator] of Object.entries({
+      operationId: step.operationId,
+      operationPath: step.operationPath,
+      workflowId: step.workflowId,
+      channelPath: step.channelPath,
+    }))
+      if (locator !== undefined)
+        sections.push(`<div>${key}: <code>${escapeHTML(locator)}</code></div>`);
+    if (step.sourceBinding)
+      sections.push(
+        rawDetails('Source binding — unverified authored metadata', step.sourceBinding),
+      );
     sections.push(
-      `<div class="timeline-marker"><div class="timeline-dot">${idx + 1}</div><div class="timeline-line"></div></div>`,
+      prerequisites(step.prerequisites),
+      parameters(step.parameters),
+      actions(step, workflow),
+      warnings(step.diagnostics),
     );
-    sections.push(`<div class="timeline-content">`);
-    sections.push(`<div class="step-card">`);
-
-    // Step header
-    sections.push(`<div class="timeline-step-header">`);
-    sections.push(`<span class="timeline-step-name">${step.stepId}</span>`);
-    sections.push(`</div>`);
-
-    // Description + operation combined
-    let opHtml = '';
-    if (step.operationId) {
-      const dotIdx = step.operationId.indexOf('.');
-      if (dotIdx > 0) {
-        const source = step.operationId.substring(0, dotIdx);
-        const operation = step.operationId.substring(dotIdx + 1);
-        const type = sourceTypes.get(source) || 'arazzo';
-        opHtml = `<span class="timeline-operation-group">${sourceIcon(type)}<span class="timeline-source">${source}</span><span class="timeline-op-name">${operation}</span></span>`;
-      } else {
-        const defaultType =
-          metadata.sourceDescriptions.length > 0
-            ? metadata.sourceDescriptions[0].type || 'arazzo'
-            : 'arazzo';
-        const color = defaultType === 'openapi' ? '#6BA543' : '#94C83D';
-        opHtml = `<span class="step-op-ref" style="color: ${color}">${step.operationId}</span>`;
-      }
-    } else if (step.operationPath) {
-      opHtml = `<code>${step.operationPath}</code>`;
-    } else if (step.workflowId) {
-      opHtml = `<code>${step.workflowId}</code>`;
-    }
-
-    if (step.description && opHtml) {
-      sections.push(
-        `<div class="step-description">${step.description} via ${opHtml} Operation</div>`,
-      );
-    } else if (step.description) {
-      sections.push(`<div class="step-description">${step.description}</div>`);
-    } else if (opHtml) {
-      sections.push(`<div class="step-description">via ${opHtml} Operation</div>`);
-    }
-
-    // Parameters
-    if (step.parameters && step.parameters.length > 0) {
-      sections.push(
-        `<details class="step-detail"><summary class="step-detail-summary">Parameters <span class="step-detail-count">${step.parameters.length}</span></summary>`,
-      );
-      sections.push(`<div class="step-detail-body step-grid-3">`);
-      step.parameters.forEach((param) => {
-        if ('$ref' in param) {
-          sections.push(`<div class="step-row">Reference: <code>${param.$ref}</code></div>`);
-        } else if ('name' in param && 'in' in param) {
-          const value = typeof param.value === 'string' ? param.value : JSON.stringify(param.value);
-          const arrow = typeof value === 'string' && value.startsWith('$') ? '←' : '=';
-          sections.push(
-            `<div class="step-grid-row"><span><code>${param.name}</code> <span class="step-in">${param.in}</span></span><span class="step-arrow">${arrow}</span><span><code>${value}</code></span></div>`,
-          );
-        }
-      });
-      sections.push(`</div></details>`);
-    }
-
-    // Success criteria
-    if (step.successCriteria && step.successCriteria.length > 0) {
-      sections.push(
-        `<details class="step-detail"><summary class="step-detail-summary">Success Criteria <span class="step-detail-count">${step.successCriteria.length}</span></summary>`,
-      );
-      sections.push(`<div class="step-detail-body">`);
-      step.successCriteria.forEach((c) => {
-        sections.push(`<div class="step-row"><code>${c.condition}</code></div>`);
-      });
-      sections.push(`</div></details>`);
-    }
-
-    // Outputs
-    if (step.outputs && Object.keys(step.outputs).length > 0) {
-      const outputCount = Object.keys(step.outputs).length;
-      sections.push(
-        `<details class="step-detail"><summary class="step-detail-summary">Outputs <span class="step-detail-count">${outputCount}</span></summary>`,
-      );
-      sections.push(`<div class="step-detail-body step-grid-3">`);
-      Object.entries(step.outputs).forEach(([key, value]) => {
-        sections.push(
-          `<div class="step-grid-row"><span><code>${key}</code></span><span class="step-arrow">←</span><span><code>${value}</code></span></div>`,
-        );
-      });
-      sections.push(`</div></details>`);
-    }
-
-    // Actions (combined success + failure)
-    const allSuccessActions = [...(step.onSuccess || []), ...(workflow.successActions || [])];
-    const allFailureActions = [...(step.onFailure || []), ...(workflow.failureActions || [])];
-    if (allSuccessActions.length > 0 || allFailureActions.length > 0) {
-      const actionCount = allSuccessActions.length + allFailureActions.length;
-      sections.push(
-        `<details class="step-detail"><summary class="step-detail-summary">Actions <span class="step-detail-count">${actionCount}</span></summary>`,
-      );
-      sections.push(`<div class="step-detail-body step-grid-3">`);
-      allSuccessActions.forEach((action) => {
-        if ('$ref' in action) {
-          sections.push(
-            `<div class="step-grid-row"><span><code>${action.$ref}</code></span><span></span><span></span></div>`,
-          );
-        } else if ('type' in action) {
-          const an = action.name ? `<strong>${action.name}</strong>` : '';
-          if (action.type === 'goto') {
-            const target = action.stepId || action.workflowId || 'end';
-            sections.push(
-              `<div class="step-grid-row"><span>${an}</span><span class="step-arrow">→</span><span>Continue to <code>${target}</code> <span class="badge badge-success">GOTO</span></span></div>`,
-            );
-          } else if (action.type === 'end') {
-            sections.push(
-              `<div class="step-grid-row"><span>${an}</span><span class="step-arrow">→</span><span>Workflow completes <span class="badge badge-success">END</span></span></div>`,
-            );
-          }
-        }
-      });
-      allFailureActions.forEach((action) => {
-        if ('$ref' in action) {
-          sections.push(
-            `<div class="step-grid-row"><span><code>${action.$ref}</code></span><span></span><span></span></div>`,
-          );
-        } else if ('type' in action) {
-          const an = action.name ? `<strong>${action.name}</strong>` : '';
-          if (action.type === 'goto') {
-            const target = action.stepId || action.workflowId || 'end';
-            sections.push(
-              `<div class="step-grid-row"><span>${an}</span><span class="step-arrow">→</span><span>Jump to <code>${target}</code> <span class="badge badge-error">GOTO</span></span></div>`,
-            );
-          } else if (action.type === 'retry') {
-            const limit = action.retryLimit ? `${action.retryLimit} times` : 'unlimited';
-            const delay = action.retryAfter ? ` (wait ${action.retryAfter}s)` : '';
-            sections.push(
-              `<div class="step-grid-row"><span>${an}</span><span class="step-arrow">→</span><span>Retry ${limit}${delay} <span class="badge badge-warning">RETRY</span></span></div>`,
-            );
-          } else if (action.type === 'end') {
-            sections.push(
-              `<div class="step-grid-row"><span>${an}</span><span class="step-arrow">→</span><span>Workflow terminates <span class="badge badge-error">END</span></span></div>`,
-            );
-          }
-        }
-      });
-      sections.push(`</div></details>`);
-    }
-
-    sections.push(`</div>`); // close step-card
-    sections.push(`</div>`); // close timeline-content
-    sections.push(`</div>\n`); // close timeline-item
+    if (step.successCriteria)
+      sections.push(rawDetails('Authored success criteria (not evaluated)', step.successCriteria));
+    if (step.outputs) sections.push(rawDetails('Outputs', step.outputs));
+    if (step.provenance) sections.push(rawDetails('Occurrence provenance', step.provenance));
+    if (step.authored)
+      sections.push(rawDetails('Authored step and generic details', step.authored));
+    sections.push('</div></div></div>');
   });
-  sections.push(`</div>\n`); // close timeline
-
-  // Outputs
-  if (workflow.outputs && Object.keys(workflow.outputs).length > 0) {
-    sections.push('\n<div class="doc-section">\n');
-    sections.push('\n### ↓ Outputs\n');
-    sections.push('\nWhen this workflow completes successfully, it returns:\n\n');
-    sections.push('| Output | Source |');
-    sections.push('|--------|--------|');
-    Object.entries(workflow.outputs).forEach(([key, value]) => {
-      sections.push(`| **\`${key}\`** | \`${value}\` |`);
-    });
-    sections.push('\n</div>\n');
-  }
-
+  sections.push('</div>');
+  if (workflow.outputs) sections.push(rawDetails('Workflow outputs', workflow.outputs));
+  const details = workflow as WorkflowDocumentation & InspectionDetails;
+  sections.push(warnings(details.diagnostics));
+  if (details.authored)
+    sections.push(rawDetails('Authored workflow and generic details', details.authored));
   return sections.join('\n');
 }
 
-/**
- * Formats the full document as a single markdown string (legacy).
- */
 export function formatAsMarkdown(
   metadata: DocumentationMetadata,
   workflows: WorkflowDocumentation[],
   options: FormatOptions = {},
 ): string {
-  const sections: string[] = [];
-
-  sections.push(formatHeaderAsMarkdown(metadata, options));
-
-  sections.push(
-    `<div class="workflows-header-row"><span class="sources-header" style="margin: 0;">Workflows</span><button class="expand-all-btn">Expand All</button></div>`,
-  );
-  workflows.forEach((workflow) => {
-    const stepCount = workflow.steps.length;
-    sections.push(`\n<details class="workflow-details">\n`);
-    sections.push(`<summary class="workflow-summary-bar">`);
-    sections.push(
-      `<span class="step-count-badge">${stepCount} ${stepCount === 1 ? 'Step' : 'Steps'}</span>`,
-    );
-    sections.push(`<span class="workflow-summary-title">${workflow.workflowId}</span>`);
-    if (workflow.summary) {
-      sections.push(`<span class="workflow-summary-text">${workflow.summary}</span>`);
-    }
-    sections.push(`</summary>\n`);
-    sections.push(`<div class="workflow-details-content">\n`);
-    sections.push(formatWorkflowAsMarkdown(metadata, workflow));
-    sections.push(`\n</div>\n`);
-    sections.push(`\n</details>\n`);
-  });
-
-  return sections.join('\n');
+  return [
+    formatHeaderAsMarkdown(metadata, options),
+    workflows.length
+      ? '<div class="workflows-header-row"><span>Workflows</span><button class="expand-all-btn">Expand All</button></div>'
+      : '',
+    ...workflows.map(
+      (workflow) =>
+        `<details class="workflow-details" data-workflow-id="${escapeHTML(workflow.workflowId)}"><summary class="workflow-summary-bar"><span class="step-count-badge">${workflow.steps.length} Steps</span><span class="workflow-summary-title">${escapeHTML(workflow.workflowId)}</span>${workflow.summary ? `<span class="workflow-summary-text">${escapeHTML(workflow.summary)}</span>` : ''}</summary><div class="workflow-details-content">${formatWorkflowAsMarkdown(metadata, workflow)}</div></details>`,
+    ),
+  ].join('\n');
 }
