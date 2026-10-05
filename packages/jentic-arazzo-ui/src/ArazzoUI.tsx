@@ -8,6 +8,13 @@ export type {
   WorkflowLocationAdapter,
   WorkflowLocationDecodeResult,
 } from './types/location';
+export type {
+  SourceDocumentRequest,
+  SourceDocumentContent,
+  SourceDocumentProvider,
+  ProvidedSourceProvenance,
+  ExternalNavigationRequest,
+} from './types/source';
 export {
   encodeLocation,
   decodeLocation,
@@ -145,7 +152,11 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     setWorkflowRequest(undefined);
     setError(null);
 
-    loadDocument(rawDocument, { baseURI: globalThis.document?.baseURI })
+    const baseURI = typeof rawDocument === 'string' && /^https?:\/\//i.test(rawDocument)
+      ? rawDocument
+      : globalThis.document?.baseURI || globalThis.location?.href;
+
+    loadDocument(rawDocument, { baseURI })
       .then((loaded) => {
         if (!cancelled) {
           loadedInput.current = rawDocument;
