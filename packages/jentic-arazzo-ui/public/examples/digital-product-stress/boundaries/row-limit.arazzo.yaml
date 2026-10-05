@@ -1,0 +1,2013 @@
+arazzo: 1.1.0
+info:
+  title: 250 observations — 200-row display limit
+  version: 1.0.0
+sourceDescriptions:
+  - name: coordinator
+    url: ../coordinator.openapi.yaml
+    type: openapi
+workflows:
+  - workflowId: row-limit
+    description: Valid read-only synthetic load test. The scene must stop at 200 rows with an
+      omitted-content marker; complete documentation retains all 250 steps.
+    steps:
+      - stepId: observation-001
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-002
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-003
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-004
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-005
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-006
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-007
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-008
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-009
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-010
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-011
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-012
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-013
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-014
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-015
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-016
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-017
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-018
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-019
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-020
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-021
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-022
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-023
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-024
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-025
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-026
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-027
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-028
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-029
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-030
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-031
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-032
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-033
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-034
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-035
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-036
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-037
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-038
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-039
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-040
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-041
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-042
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-043
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-044
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-045
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-046
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-047
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-048
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-049
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-050
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-051
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-052
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-053
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-054
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-055
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-056
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-057
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-058
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-059
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-060
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-061
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-062
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-063
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-064
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-065
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-066
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-067
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-068
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-069
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-070
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-071
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-072
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-073
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-074
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-075
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-076
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-077
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-078
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-079
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-080
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-081
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-082
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-083
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-084
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-085
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-086
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-087
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-088
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-089
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-090
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-091
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-092
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-093
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-094
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-095
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-096
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-097
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-098
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-099
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-100
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-101
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-102
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-103
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-104
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-105
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-106
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-107
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-108
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-109
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-110
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-111
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-112
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-113
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-114
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-115
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-116
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-117
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-118
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-119
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-120
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-121
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-122
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-123
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-124
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-125
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-126
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-127
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-128
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-129
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-130
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-131
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-132
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-133
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-134
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-135
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-136
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-137
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-138
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-139
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-140
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-141
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-142
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-143
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-144
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-145
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-146
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-147
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-148
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-149
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-150
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-151
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-152
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-153
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-154
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-155
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-156
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-157
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-158
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-159
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-160
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-161
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-162
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-163
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-164
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-165
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-166
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-167
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-168
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-169
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-170
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-171
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-172
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-173
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-174
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-175
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-176
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-177
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-178
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-179
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-180
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-181
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-182
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-183
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-184
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-185
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-186
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-187
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-188
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-189
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-190
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-191
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-192
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-193
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-194
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-195
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-196
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-197
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-198
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-199
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-200
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-201
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-202
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-203
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-204
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-205
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-206
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-207
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-208
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-209
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-210
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-211
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-212
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-213
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-214
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-215
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-216
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-217
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-218
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-219
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-220
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-221
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-222
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-223
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-224
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-225
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-226
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-227
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-228
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-229
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-230
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-231
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-232
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-233
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-234
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-235
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-236
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-237
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-238
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-239
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-240
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-241
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-242
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-243
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-244
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-245
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-246
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-247
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-248
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-249
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: observation-250
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200

@@ -24,6 +24,7 @@ import type {
   PendingSelection,
 } from '../utils/inspection';
 import { buildViewerModel, type ArazzoViewerModel } from '../utils/model/viewerModel';
+import { ViewerSessionProvider } from './ViewerSessionContext';
 
 interface InternalContext extends ArazzoViewerContextValue {
   snapshot: DocumentSnapshot;
@@ -31,6 +32,7 @@ interface InternalContext extends ArazzoViewerContextValue {
   model: ArazzoViewerModel;
   navigateToTarget: (target: ClassifiedTarget) => void;
   navigationDiagnostic: string | null;
+  selectionRequestVersion: number;
   getNodeOwner: (node: ArazzoNode) => string | undefined;
 }
 const ArazzoViewerContext = createContext<InternalContext | null>(null);
@@ -85,6 +87,7 @@ function InjectedProvider({
   );
   const inspection = useMemo(() => inspect(snapshot), [snapshot]);
   const model = useMemo(() => buildViewerModel(inspection), [inspection]);
+  const [selectionRequestVersion, setSelectionRequestVersion] = useState(0);
   const [navigationDiagnostic, setDiagnostic] = useState<string | null>(null);
   const [pending, setPending] = useState<PendingSelection | null>(null);
   const requestId = useRef(0);
@@ -145,6 +148,7 @@ function InjectedProvider({
       value={{
         ...value,
         setSelectedNode: (id) => {
+          setSelectionRequestVersion((version) => version + 1);
           setPending(null);
           value.setSelectedNode(id);
         },
@@ -156,11 +160,12 @@ function InjectedProvider({
         inspection,
         model,
         navigationDiagnostic,
+        selectionRequestVersion,
         navigateToTarget,
         getNodeOwner: (node) => ownerLookup(node, model, value.document),
       }}
     >
-      {children}
+      <ViewerSessionProvider key={model.documentId}>{children}</ViewerSessionProvider>
     </ArazzoViewerContext.Provider>
   );
 }
@@ -200,6 +205,7 @@ function StandaloneProvider({
   const selectedNodeId =
     initialSelectedNodeId === undefined ? localSelected : initialSelectedNodeId;
   const [pending, setPending] = useState<PendingSelection | null>(null);
+  const [selectionRequestVersion, setSelectionRequestVersion] = useState(0);
   const [navigationDiagnostic, setDiagnostic] = useState<string | null>(null);
   const requestId = useRef(0);
   const cancelledRequest = useRef<number | null>(null);
@@ -297,6 +303,7 @@ function StandaloneProvider({
   );
   const setSelectedNode = useCallback(
     (id: string | null) => {
+      setSelectionRequestVersion((version) => version + 1);
       setPending(null);
       if (initialSelectedNodeId === undefined) setLocalSelected(id);
       if (id) {
@@ -379,7 +386,12 @@ function StandaloneProvider({
     model,
     navigateToTarget,
     navigationDiagnostic,
+    selectionRequestVersion,
     getNodeOwner: (node) => ownerLookup(node, model, rawDocument),
   };
-  return <ArazzoViewerContext.Provider value={value}>{children}</ArazzoViewerContext.Provider>;
+  return (
+    <ArazzoViewerContext.Provider value={value}>
+      <ViewerSessionProvider key={model.documentId}>{children}</ViewerSessionProvider>
+    </ArazzoViewerContext.Provider>
+  );
 }

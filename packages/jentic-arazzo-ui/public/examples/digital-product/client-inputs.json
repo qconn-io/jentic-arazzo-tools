@@ -1,0 +1,12 @@
+{
+  "customerId": "customer-7",
+  "productId": "digital-kit",
+  "amountMinor": 1299,
+  "currency": "EUR",
+  "paymentToken": "authorization-demo-7",
+  "purchaseKey": "purchase-attempt-7",
+  "clientToken": "demo-client-token",
+  "deviceId": "device-9",
+  "activationKey": "activation-event-9",
+  "activationOutcome": "ACTIVATED"
+}

@@ -171,7 +171,14 @@ In split view, clicking a step node in the diagram expands the workflow and scro
 
 ## Chained workflow inspection
 
-The **All workflows** tab shows prerequisites, workflow calls, and understood
+The **All workflows** button and **Select workflow** menu are visible above the
+panes in Docs, Diagram, and Split modes. Start in the default Docs view, select
+All workflows to see Calls, Called by, Prerequisites, and Transfers, then open a
+workflow entry. Its header offers Documentation, Sequence, and Flowchart.
+All workflows returns to the document overview; Sequence shows the selected
+workflow's authored interactions. Changing view mode retains the destination.
+
+The overview shows prerequisites, workflow calls, and understood
 success/failure transitions, including parallel relationships and loops. Select a
 workflow card to open its steps; prerequisite links navigate to local workflow or
 step destinations. External and missing targets remain visible with their status
@@ -185,6 +192,46 @@ manage navigation. Explicit `null` selects the overview. In controlled mode,
 empty string back to `null` when updating the prop. Prop updates do not emit an
 additional selection callback. Setting `selectedNodeId` to `null` clears a
 controlled node selection; `clearSelection()` clears an uncontrolled selection.
+
+In **Sequence**, direct local calls initially show their downstream interactions.
+Use **Expand** on a deeper call; each call occurrence has its own expansion and
+mapping context. **Collapse** retains the selected root workflow. Workflow lanes
+show control context, API lanes show declared sources, and ambiguous destinations
+remain separate. Large canvases scroll at a readable text size.
+
+Choose **Details** in the ordered interaction list or on a diagram card to inspect
+caller-supplied parameters, declared callee inputs/outputs, caller-side output
+expressions, action ordering, criteria, source metadata and provenance. Values
+remain authored: `0`, `false`, `null`, structured values and expressions are not
+evaluated. Missing mappings are labeled unavailable. Closing details returns
+focus to the originating control. Documentation uses the same detail projection.
+
+**Open workflow** follows a particular call. The caller path and **Back to caller**
+restore that occurrence, its expansion context and step focus across Docs,
+Diagram and Split. Inline expansion keeps the current root. Unrelated navigation
+and replacement documents clear stale caller paths.
+
+Sequences are schematic authored interactions, not execution traces. A structural
+continuation describes call control flow; it does not assert success or an API
+response. Goto is a possible one-way transfer, retry recovery returns to its source
+step, and prerequisites describe dependence. Recursion on the current path, eight
+nested call levels and a 200-row display budget stop expansion at visible markers.
+Open the indicated local workflow to inspect it as a new root. Row-limit markers
+offer **View complete documentation** to reach interactions omitted from the canvas. External and missing
+calls retain their classification and cannot expand unavailable content.
+
+The compact **Inspection status** control explains that source documents were not
+fetched and operations were not checked, without implying invalidity or
+inaccessibility. It names detected resolution limitations individually, including
+unsupported `$self`, unavailable base URI and unsupported schema dialects, and
+explains when references remain authored. It introduces no additional resolver
+support. Local understood calls remain available. Descriptions and extensions,
+including `x-internal-processing`, do not imply workflow relationships.
+
+Static Mermaid sequences use the same bounded scene with deterministic direct-call
+expansion. They show call groups, structural continuations and visible omissions,
+and do not have interactive expansion controls. Default flowcharts keep parameters
+and criteria out of labels; full values remain in associated documentation.
 
 ```tsx
 import { useState } from 'react';

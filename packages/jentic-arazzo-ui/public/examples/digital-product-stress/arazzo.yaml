@@ -1,0 +1,1156 @@
+arazzo: 1.1.0
+info:
+  title: Digital product stress pack — HTTP orchestration
+  version: 1.0.0
+  summary: Repeated composition, deep calls, recoveries, bounded retries, transfers and compensation.
+  description: Fictional inspection/reference workload. Full-stress-journey establishes readiness then
+    fulfils two separately authorized items. Standard calls, retries, one-way gotos and dependencies
+    are deliberately distinguishable. These documents do not claim that the installed runner
+    implements every 1.1 feature or exception propagation rule.
+sourceDescriptions:
+  - name: coordinator
+    url: ./coordinator.openapi.yaml
+    type: openapi
+  - name: inventory
+    url: ./inventory.openapi.yaml
+    type: openapi
+  - name: payment
+    url: ./payment.openapi.yaml
+    type: openapi
+  - name: license
+    url: ./license.openapi.yaml
+    type: openapi
+components:
+  parameters:
+    service-authorization:
+      name: Authorization
+      in: header
+      value: Bearer {$inputs.serviceToken}
+    operation-key:
+      name: Idempotency-Key
+      in: header
+      value: $inputs.purchaseId
+  failureActions:
+    stop-and-reconcile:
+      name: stop-and-reconcile
+      type: end
+    retry-transient:
+      name: retry-transient
+      type: retry
+      retryAfter: 1
+      retryLimit: 2
+      criteria:
+        - condition: $statusCode == 503
+  successActions:
+    finish:
+      name: finish
+      type: end
+workflows:
+  - workflowId: full-stress-journey
+    summary: Initialize then fulfil two differently mapped purchases
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context:
+          type: object
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: initialize
+        workflowId: initialize-session
+        parameters:
+          - name: serviceToken
+            value: $inputs.serviceToken
+      - stepId: two-products
+        workflowId: batch-fulfilment
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: customerId
+            value: $inputs.customerId
+          - name: productId
+            value: $inputs.productId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: $inputs.paymentToken
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+  - workflowId: initialize-session
+    summary: Readiness prerequisite; does not invoke purchase workflows
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - serviceToken
+      properties:
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: readiness
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - reference: $components.parameters.service-authorization
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+        x-example-actor: coordinator
+        x-example-target: coordinator
+  - workflowId: batch-fulfilment
+    summary: Repeated callee with distinct products, amounts and occurrence outputs
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context:
+          type: object
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: first-item
+        workflowId: fulfil-item
+        parameters:
+          - name: purchaseId
+            value: "{$inputs.purchaseId}-A"
+          - name: customerId
+            value: $inputs.customerId
+          - name: productId
+            value: $inputs.productId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: $inputs.paymentToken
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+        outputs:
+          licenseId: $workflows.fulfil-item.outputs.licenseId
+          purchaseId: $workflows.fulfil-item.outputs.purchaseId
+      - stepId: second-item
+        workflowId: fulfil-item
+        parameters:
+          - name: purchaseId
+            value: "{$inputs.purchaseId}-B"
+          - name: customerId
+            value: $inputs.customerId
+          - name: productId
+            value: digital-upgrade
+          - name: amountMinor
+            value: 2499
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: authorization-demo-upgrade
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+        outputs:
+          licenseId: $workflows.fulfil-item.outputs.licenseId
+          purchaseId: $workflows.fulfil-item.outputs.purchaseId
+    outputs:
+      firstLicenseId: $steps.first-item.outputs.licenseId
+      secondLicenseId: $steps.second-item.outputs.licenseId
+    dependsOn:
+      - initialize-session
+  - workflowId: fulfil-item
+    summary: Paid single-item fulfilment with issuance recovery and compensation
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context:
+          type: object
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: prepare
+        workflowId: prepare-commerce
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: customerId
+            value: $inputs.customerId
+          - name: productId
+            value: $inputs.productId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: $inputs.paymentToken
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+        outputs:
+          reservationId: $workflows.prepare-commerce.outputs.reservationId
+          paymentId: $workflows.prepare-commerce.outputs.paymentId
+          paymentState: $workflows.prepare-commerce.outputs.paymentState
+        successCriteria:
+          - condition: $workflows.prepare-commerce.outputs.paymentState == 'CAPTURED'
+      - stepId: issue-license
+        operationId: $sourceDescriptions.license.issueLicense
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-license"
+        requestBody:
+          contentType: application/json
+          payload:
+            purchaseId: $inputs.purchaseId
+            customerId: $inputs.customerId
+            productId: $inputs.productId
+            reservationId: $steps.prepare.outputs.reservationId
+            paymentId: $steps.prepare.outputs.paymentId
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+        x-example-actor: coordinator
+        x-example-target: license
+        onFailure:
+          - name: reconcile-issuance-before-retry
+            type: retry
+            workflowId: reconcile-license
+            retryAfter: 1
+            retryLimit: 2
+            criteria:
+              - condition: $statusCode == 503
+            parameters:
+              - name: purchaseId
+                value: $inputs.purchaseId
+              - name: serviceToken
+                value: $inputs.serviceToken
+          - name: compensate-definite-issuance-rejection
+            type: goto
+            workflowId: compensate-purchase
+            criteria:
+              - condition: $statusCode == 409
+            parameters:
+              - name: purchaseId
+                value: $inputs.purchaseId
+              - name: reservationId
+                value: $steps.prepare.outputs.reservationId
+              - name: paymentId
+                value: $steps.prepare.outputs.paymentId
+              - name: amountMinor
+                value: $inputs.amountMinor
+              - name: currency
+                value: $inputs.currency
+              - name: serviceToken
+                value: $inputs.serviceToken
+          - reference: $components.failureActions.stop-and-reconcile
+      - stepId: record-ready
+        workflowId: record-ready
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: licenseId
+            value: $steps.issue-license.outputs.licenseId
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+        outputs:
+          state: $workflows.record-ready.outputs.state
+        successCriteria:
+          - condition: $workflows.record-ready.outputs.state == 'READY'
+    outputs:
+      purchaseId: $inputs.purchaseId
+      licenseId: $steps.issue-license.outputs.licenseId
+  - workflowId: prepare-commerce
+    summary: One deeper orchestration layer around reservation/payment
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context:
+          type: object
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: commerce
+        workflowId: reserve-and-capture
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: customerId
+            value: $inputs.customerId
+          - name: productId
+            value: $inputs.productId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: $inputs.paymentToken
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+        outputs:
+          reservationId: $workflows.reserve-and-capture.outputs.reservationId
+          paymentId: $workflows.reserve-and-capture.outputs.paymentId
+          paymentState: $workflows.reserve-and-capture.outputs.paymentState
+        successCriteria:
+          - condition: $workflows.reserve-and-capture.outputs.paymentState == 'CAPTURED'
+    outputs:
+      reservationId: $steps.commerce.outputs.reservationId
+      paymentId: $steps.commerce.outputs.paymentId
+      paymentState: $steps.commerce.outputs.paymentState
+  - workflowId: reserve-and-capture
+    summary: Two nested calls, with a confirmed-capture guard
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context:
+          type: object
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: reserve
+        workflowId: reserve-inventory
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: productId
+            value: $inputs.productId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: serviceToken
+            value: $inputs.serviceToken
+        outputs:
+          reservationId: $workflows.reserve-inventory.outputs.reservationId
+      - stepId: capture
+        workflowId: capture-authorized-payment
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: amountMinor
+            value: $inputs.amountMinor
+          - name: currency
+            value: $inputs.currency
+          - name: paymentToken
+            value: $inputs.paymentToken
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: reservationId
+            value: $steps.reserve.outputs.reservationId
+        outputs:
+          paymentId: $workflows.capture-authorized-payment.outputs.paymentId
+          paymentState: $workflows.capture-authorized-payment.outputs.paymentState
+        successCriteria:
+          - condition: $workflows.capture-authorized-payment.outputs.paymentState == 'CAPTURED'
+    outputs:
+      reservationId: $steps.reserve.outputs.reservationId
+      paymentId: $steps.capture.outputs.paymentId
+      paymentState: $steps.capture.outputs.paymentState
+  - workflowId: reserve-inventory
+    summary: Reserve with a reusable retry override and immutable authorization
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - productId
+        - amountMinor
+        - currency
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.retry-transient
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: reserve-product
+        operationId: $sourceDescriptions.inventory.reserveProduct
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-reservation"
+        requestBody:
+          contentType: application/json
+          payload:
+            productId: $inputs.productId
+            quantity: 1
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/state == 'RESERVED'
+          - condition: $response.body#/productId == $inputs.productId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          reservationId: $response.body#/reservationId
+        x-example-actor: coordinator
+        x-example-target: inventory
+        onFailure:
+          - reference: $components.failureActions.retry-transient
+          - reference: $components.failureActions.stop-and-reconcile
+    outputs:
+      reservationId: $steps.reserve-product.outputs.reservationId
+  - workflowId: capture-authorized-payment
+    summary: Recover before an idempotent retry; release a definitely declined reservation
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - reservationId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        reservationId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: capture-payment
+        operationId: $sourceDescriptions.payment.capturePayment
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-payment"
+        requestBody:
+          contentType: application/json
+          payload:
+            reservationId: $inputs.reservationId
+            amountMinor: $inputs.amountMinor
+            currency: $inputs.currency
+            paymentToken: $inputs.paymentToken
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'CAPTURED'
+          - condition: $response.body#/reservationId == $inputs.reservationId
+          - condition: $response.body#/amountMinor == $inputs.amountMinor
+          - condition: $response.body#/currency == $inputs.currency
+        outputs:
+          paymentId: $response.body#/paymentId
+          paymentState: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: payment
+        onFailure:
+          - name: reconcile-before-capture-retry
+            type: retry
+            workflowId: reconcile-payment
+            retryAfter: 0.5
+            retryLimit: 3
+            criteria:
+              - condition: $statusCode == 503 || $response.body#/state == 'UNKNOWN'
+            parameters:
+              - name: purchaseId
+                value: $inputs.purchaseId
+              - name: serviceToken
+                value: $inputs.serviceToken
+          - name: release-after-definite-decline
+            type: goto
+            workflowId: abort-purchase
+            criteria:
+              - condition: $statusCode == 200 && $response.body#/state == 'DECLINED'
+            parameters:
+              - name: purchaseId
+                value: $inputs.purchaseId
+              - name: reservationId
+                value: $inputs.reservationId
+              - name: serviceToken
+                value: $inputs.serviceToken
+          - reference: $components.failureActions.stop-and-reconcile
+    outputs:
+      paymentId: $steps.capture-payment.outputs.paymentId
+      paymentState: $steps.capture-payment.outputs.paymentState
+  - workflowId: reconcile-payment
+    summary: Read the original capture before retrying its same-key request
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: observe-payment
+        operationId: $sourceDescriptions.payment.getCaptureByKey
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: attemptKey
+            in: query
+            value: "{$inputs.purchaseId}-payment"
+        successCriteria:
+          - condition: $statusCode == 200
+        outputs:
+          paymentState: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: payment
+        onFailure:
+          - reference: $components.failureActions.retry-transient
+          - reference: $components.failureActions.stop-and-reconcile
+    outputs:
+      paymentState: $steps.observe-payment.outputs.paymentState
+  - workflowId: reconcile-license
+    summary: Read original issuance identity; do not invent successful creation
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: observe-license
+        operationId: $sourceDescriptions.license.getLicenseByKey
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: attemptKey
+            in: query
+            value: "{$inputs.purchaseId}-license"
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+          state: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: license
+    outputs:
+      licenseId: $steps.observe-license.outputs.licenseId
+      state: $steps.observe-license.outputs.state
+  - workflowId: compensate-purchase
+    summary: Observe, optionally revoke, refund, release and persist failure
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - reservationId
+        - paymentId
+        - amountMinor
+        - currency
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        reservationId:
+          type: string
+          minLength: 1
+        paymentId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: inspect-issued-license
+        operationId: $sourceDescriptions.license.getLicenseByKey
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: attemptKey
+            in: query
+            value: "{$inputs.purchaseId}-license"
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+        x-example-actor: coordinator
+        x-example-target: license
+        onSuccess:
+          - name: skip-revoke-when-no-active-license
+            type: goto
+            stepId: refund-payment
+            criteria:
+              - condition: $response.body#/state == 'ABSENT' || $response.body#/state == 'REVOKED'
+      - stepId: revoke-license
+        operationId: $sourceDescriptions.license.revokeLicense
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: licenseId
+            in: path
+            value: $steps.inspect-issued-license.outputs.licenseId
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-revoke"
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'REVOKED'
+        x-example-actor: coordinator
+        x-example-target: license
+      - stepId: refund-payment
+        operationId: $sourceDescriptions.payment.refundPayment
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-refund"
+        requestBody:
+          contentType: application/json
+          payload:
+            paymentId: $inputs.paymentId
+            amountMinor: $inputs.amountMinor
+            currency: $inputs.currency
+        successCriteria:
+          - condition: $statusCode == 201
+          - condition: $response.body#/state == 'REFUNDED'
+          - condition: $response.body#/paymentId == $inputs.paymentId
+        x-example-actor: coordinator
+        x-example-target: payment
+        onFailure:
+          - reference: $components.failureActions.retry-transient
+          - reference: $components.failureActions.stop-and-reconcile
+      - stepId: release-reservation
+        workflowId: release-reservation
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: reservationId
+            value: $inputs.reservationId
+          - name: serviceToken
+            value: $inputs.serviceToken
+      - stepId: record-failure
+        workflowId: record-failure
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: serviceToken
+            value: $inputs.serviceToken
+  - workflowId: release-reservation
+    summary: Release only the original reservation with a stable release key
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - reservationId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        reservationId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: release
+        operationId: $sourceDescriptions.inventory.releaseReservation
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: reservationId
+            in: path
+            value: $inputs.reservationId
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-release"
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'RELEASED'
+          - condition: $response.body#/reservationId == $inputs.reservationId
+        x-example-actor: coordinator
+        x-example-target: inventory
+  - workflowId: abort-purchase
+    summary: "Declined payment: release reservation and record failure without refund"
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - reservationId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        reservationId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: release
+        workflowId: release-reservation
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: reservationId
+            value: $inputs.reservationId
+          - name: serviceToken
+            value: $inputs.serviceToken
+      - stepId: record-failure
+        workflowId: record-failure
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: serviceToken
+            value: $inputs.serviceToken
+  - workflowId: record-ready
+    summary: Persist the scoped READY result and demonstrate a reusable success end
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        licenseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context: {}
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: persist-ready
+        operationId: $sourceDescriptions.coordinator.updatePurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-ready"
+        requestBody:
+          contentType: application/json
+          payload:
+            state: READY
+            licenseId: $inputs.licenseId
+            reason: confirmed fulfilment
+            context: $inputs.context
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+          - condition: $response.body#/licenseId == $inputs.licenseId
+        outputs:
+          state: $response.body#/state
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        onSuccess:
+          - reference: $components.successActions.finish
+    outputs:
+      state: $steps.persist-ready.outputs.state
+  - workflowId: record-failure
+    summary: Persist a terminal failure without fabricating activation success
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: persist-failed
+        operationId: $sourceDescriptions.coordinator.updatePurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+          - reference: $components.parameters.operation-key
+            value: "{$inputs.purchaseId}-failure"
+        requestBody:
+          contentType: application/json
+          payload:
+            state: FAILED
+            licenseId: ""
+            reason: reconciled abort or compensation
+            context:
+              debug: false
+              retryBudget: 0
+              fallback: null
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'FAILED'
+        x-example-actor: coordinator
+        x-example-target: coordinator
+  - workflowId: poll-purchase-until-ready
+    summary: Bounded same-step retry for PENDING; end for FAILED
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: poll
+        operationId: $sourceDescriptions.coordinator.getPurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        onFailure:
+          - name: wait-for-ready
+            type: retry
+            retryAfter: 1
+            retryLimit: 3
+            criteria:
+              - condition: $statusCode == 200 && $response.body#/state == 'PENDING'
+          - reference: $components.failureActions.stop-and-reconcile
+  - workflowId: resume-existing-purchase
+    summary: Success goto another workflow is a one-way transfer, not an invocation
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context: {}
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: read-license
+        operationId: $sourceDescriptions.license.getLicenseByKey
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: attemptKey
+            in: query
+            value: "{$inputs.purchaseId}-license"
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        x-example-actor: coordinator
+        x-example-target: license
+        onSuccess:
+          - name: persist-existing-ready-license
+            type: goto
+            workflowId: record-ready
+            criteria:
+              - condition: $response.body#/state == 'READY'
+            parameters:
+              - name: purchaseId
+                value: $inputs.purchaseId
+              - name: licenseId
+                value: $response.body#/licenseId
+              - name: serviceToken
+                value: $inputs.serviceToken
+              - name: context
+                value: $inputs.context
+          - reference: $components.successActions.finish
+  - workflowId: step-recovery-probe
+    summary: Retry current read after a different local recovery step
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: require-ready
+        operationId: $sourceDescriptions.coordinator.getPurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        onFailure:
+          - name: refresh-before-retrying-source-step
+            type: retry
+            stepId: refresh-state
+            retryAfter: 0.5
+            retryLimit: 2
+            criteria:
+              - condition: $statusCode == 200 && $response.body#/state == 'PENDING'
+          - reference: $components.failureActions.stop-and-reconcile
+        onSuccess:
+          - name: skip-recovery-on-normal-success
+            type: goto
+            stepId: finish
+      - stepId: refresh-state
+        operationId: $sourceDescriptions.coordinator.getPurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+        successCriteria:
+          - condition: $statusCode == 200
+        x-example-actor: coordinator
+        x-example-target: coordinator
+      - stepId: finish
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - reference: $components.parameters.service-authorization
+        successCriteria:
+          - condition: $statusCode == 200
+        x-example-actor: coordinator
+        x-example-target: coordinator

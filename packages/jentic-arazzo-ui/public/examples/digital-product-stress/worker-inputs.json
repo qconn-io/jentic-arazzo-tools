@@ -1,0 +1,27 @@
+{
+  "purchaseId": "purchase-1001-A",
+  "serviceToken": "demo-service-token",
+  "context": {
+    "debug": false,
+    "retryBudget": 0,
+    "fallback": null,
+    "emptyString": "",
+    "tags": [
+      "stress",
+      "long-labels",
+      "metadata"
+    ],
+    "policy": {
+      "originalKeyRequired": true,
+      "authorizedAmount": {
+        "minor": 1299,
+        "currency": "EUR"
+      },
+      "reconciliation": {
+        "readOriginal": true,
+        "replayNewKey": false
+      }
+    },
+    "explanation": "This deliberately lengthy authored note contains \"quotes\", [brackets], semicolons; a literal {$inputs.productId} and a newline\nso that shortening diagram labels does not discard the inspectable source content."
+  }
+}

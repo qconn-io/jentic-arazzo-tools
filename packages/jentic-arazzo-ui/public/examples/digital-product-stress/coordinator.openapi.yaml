@@ -1,0 +1,463 @@
+openapi: 3.1.0
+info:
+  title: Purchase Coordinator API — stress contracts
+  version: 1.0.0
+  description: Fictional local contract for the digital-product example. Servers under example.test
+    are illustrative, not live services.
+servers:
+  - url: https://coordinator.example.test
+security:
+  - bearerAuth: []
+paths:
+  /purchases:
+    post:
+      operationId: purchaseProduct
+      summary: Purchase and issue one digital product
+      description: The coordinator performs fulfil-purchase inside this exchange, persists its result and
+        returns 201 only when ready. Purchase identity is generated once per customer and
+        Idempotency-Key. A declined or uncertain payment never authorizes issuance.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Stable for this operation and payload. Reuse returns its original result; different
+            payload with the same key returns 409. Never use a new key to resolve an uncertain
+            outcome.
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "201":
+          description: Reservation, capture, issuance and durable ownership are confirmed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Purchase"
+              example:
+                purchaseId: purchase-1001
+                licenseId: license-3001
+                state: READY
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseRequest"
+            example:
+              customerId: customer-7
+              productId: digital-kit
+              amountMinor: 1299
+              currency: EUR
+              paymentToken: authorization-demo-7
+  /purchases/{purchaseId}/bundle:
+    get:
+      operationId: getLicenseBundle
+      summary: Retrieve the device-bound license bundle
+      description: Check purchase ownership and READY status before releasing protected material. Bind the
+        existing license to the requested device; do not create a second license.
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          description: purchaseId
+          schema:
+            type: string
+            minLength: 1
+        - name: deviceId
+          in: query
+          required: true
+          description: deviceId
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Ready bundle for the authenticated customer and requested device.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LicenseBundle"
+              example:
+                purchaseId: purchase-1001
+                licenseId: license-3001
+                deviceId: device-9
+                protectedBundle: demo-device-bound-material
+                state: READY
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+  /purchases/{purchaseId}/activation-events:
+    post:
+      operationId: recordActivation
+      summary: Record the actual device activation outcome
+      description: Verify customer ownership and matching purchase, license and device. Record the device
+        outcome. Failure follow-up is outside this small example.
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          description: purchaseId
+          schema:
+            type: string
+            minLength: 1
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Stable for this operation and payload. Reuse returns its original result; different
+            payload with the same key returns 409. Never use a new key to resolve an uncertain
+            outcome.
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "204":
+          description: Event recorded. A FAILED outcome is acknowledged as received; this does not mean
+            activation succeeded.
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivationEvent"
+            example:
+              licenseId: license-3001
+              deviceId: device-9
+              outcome: ACTIVATED
+  /readiness:
+    get:
+      operationId: checkReadiness
+      summary: Check service readiness before batch processing
+      description: Check service readiness before batch processing
+      parameters: []
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Readiness"
+              example:
+                state: READY
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+  /purchases/{purchaseId}:
+    get:
+      operationId: getPurchaseState
+      summary: Read original purchase state without triggering another purchase
+      description: Read original purchase state without triggering another purchase
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseState"
+              example:
+                purchaseId: purchase-1001-A
+                licenseId: license-3001
+                state: READY
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+    patch:
+      operationId: updatePurchaseState
+      summary: Persist the verified purchase result or terminal failure
+      description: Persist the verified purchase result or terminal failure
+      parameters:
+        - name: purchaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PurchaseState"
+              example:
+                purchaseId: purchase-1001-A
+                licenseId: license-3001
+                state: READY
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PurchaseUpdate"
+            example:
+              state: READY
+              licenseId: license-3001
+              reason: confirmed fulfilment
+              context:
+                debug: false
+                tags:
+                  - stress
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Client or service identity appropriate to this API. Tokens in example inputs are
+        placeholders.
+  schemas:
+    Problem:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+    PurchaseRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+      properties:
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+          description: Amount in minor currency units; 1299 means EUR 12.99.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          description: Opaque authorization reference; no payment account data.
+    Purchase:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - state
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        licenseId:
+          type: string
+          minLength: 1
+        state:
+          type: string
+          enum:
+            - READY
+    LicenseBundle:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - deviceId
+        - protectedBundle
+        - state
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        licenseId:
+          type: string
+          minLength: 1
+        deviceId:
+          type: string
+          minLength: 1
+        protectedBundle:
+          type: string
+          description: Fictional opaque device-bound license material.
+          minLength: 1
+        state:
+          type: string
+          enum:
+            - READY
+    ActivationEvent:
+      type: object
+      additionalProperties: false
+      required:
+        - licenseId
+        - deviceId
+        - outcome
+      properties:
+        licenseId:
+          type: string
+          minLength: 1
+        deviceId:
+          type: string
+          minLength: 1
+        outcome:
+          type: string
+          enum:
+            - ACTIVATED
+            - FAILED
+    Readiness:
+      type: object
+      additionalProperties: false
+      required:
+        - state
+      properties:
+        state:
+          type: string
+          enum:
+            - READY
+    PurchaseState:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - state
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        licenseId:
+          type: string
+        state:
+          type: string
+          enum:
+            - PENDING
+            - READY
+            - FAILED
+    PurchaseUpdate:
+      type: object
+      additionalProperties: false
+      required:
+        - state
+        - licenseId
+        - reason
+        - context
+      properties:
+        state:
+          type: string
+          enum:
+            - READY
+            - FAILED
+        licenseId:
+          type: string
+        reason:
+          type: string
+        context: {}

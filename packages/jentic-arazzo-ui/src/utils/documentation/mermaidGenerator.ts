@@ -1,7 +1,7 @@
 import type { Workflow, ArazzoDocument } from '../../types/arazzo';
 import { createSnapshot, inspect } from '../inspection';
-import { buildViewerModel } from '../model/viewerModel';
-import type { ArazzoViewerModel } from '../model/viewerModel';
+import { buildViewerModel, type ArazzoViewerModel } from '../model/viewerModel';
+import { buildSequence } from '../sequence/sequenceModel';
 import { mermaidLabel } from './mermaidFlowchartGenerator';
 
 export function generateMermaidSequence(
@@ -11,82 +11,56 @@ export function generateMermaidSequence(
 ): string {
   const model = suppliedModel ?? buildViewerModel(inspect(createSnapshot(document)));
   if (model.support.semanticInspection === 'unsupported') return '';
-  const fact = model.workflowsById.get(workflow.workflowId);
-  if (!fact) return '';
-  const lines = [
-    'sequenceDiagram',
-    '    participant Client as Workflow inspector',
-    '    participant Unverified as Unverified source',
-  ];
-  const participants = new Map<string, string>();
-  model.inspection.raw.sourceDescriptions.forEach((source, index) => {
-    const id = `Source${index}`;
-    participants.set(source.name, id);
+  const scene = buildSequence(model, workflow.workflowId);
+  if (!scene.participants.length) return '';
+  const lines = ['sequenceDiagram'];
+  for (const participant of scene.participants)
     lines.push(
-      `    participant ${id} as ${mermaidLabel(`${source.name} (${source.type ?? 'unknown'}, unverified)`)}`,
+      `    participant ${participant.id} as ${mermaidLabel(`${participant.name} (${participant.kind})`)}`,
     );
-  });
-  lines.push('    Note over Client: Schematic authored interactions — no evaluated outcomes');
   lines.push(
-    '    Note over Client: Schema validation and execution support not established — sources unverified',
+    `    Note over ${scene.participants[0].id}: ${mermaidLabel('Schematic authored interactions; bounded to eight call levels and 200 rows. Full metadata in documentation.')}`,
   );
-  for (const limitation of model.support.limitations)
-    lines.push(`    Note over Client: ${mermaidLabel(limitation)}`);
-  for (const prerequisite of fact.prerequisites) {
-    lines.push(
-      `    Note over Client: ${mermaidLabel(`workflow prerequisite ${prerequisite.target.kind}: ${prerequisite.target.reference}`)}`,
-    );
-  }
-  for (const [index, step] of fact.steps.entries()) {
-    const binding = step.sourceBinding;
-    const target =
-      binding.status !== 'ambiguous' && binding.status !== 'unsupported' && binding.sourceName
-        ? (participants.get(binding.sourceName) ?? 'Unverified')
-        : 'Unverified';
-    const locators = Object.entries(binding.locators)
-      .map(([key, value]) => `${key}: ${value}`)
-      .join('; ');
-    const label = mermaidLabel(
-      `${index + 1}. ${step.stepId}; ${binding.intent ?? 'authored operation'}; ${locators}`,
-    );
-    if (step.callTarget)
+  const rowMap = new Map(scene.rows.map((row) => [row.id, row]));
+  const lastRows = new Map<string, number>();
+  scene.rows.forEach((row, index) => {
+    let parent = row.parentId;
+    while (parent) {
+      lastRows.set(parent, index);
+      parent = rowMap.get(parent)?.parentId;
+    }
+  });
+  const groups: { id: string; end: number }[] = [];
+  for (const [index, row] of scene.rows.entries()) {
+    if (row.kind === 'call' && row.expanded) {
+      lines.push('    rect rgb(245, 243, 255)');
+      groups.push({ id: row.id, end: lastRows.get(row.id) ?? index });
+    }
+    const label = mermaidLabel(row.label);
+    if (row.kind === 'operation' || row.kind === 'call')
+      lines.push(`    ${row.from}->>${row.to}: ${label}`);
+    else if (row.kind === 'continuation') lines.push(`    ${row.from}-->>${row.to}: ${label}`);
+    else if (row.kind === 'transfer') {
       lines.push(
-        `    Note over Client: ${mermaidLabel(`Call ${step.callTarget.kind}: ${step.callTarget.reference}`)}`,
+        `    opt ${label}`,
+        `    ${row.from}->>${row.to}: ${mermaidLabel(`${row.action?.value.name} (${row.action?.value.type})`)}`,
       );
-    else if (binding.status === 'ambiguous' || binding.status === 'unsupported')
-      lines.push(`    Note over Client,Unverified: ${label}`);
-    else if (binding.intent === 'receive') lines.push(`    ${target}->>Client: ${label}`);
-    else lines.push(`    Client->>${target}: ${label}`);
-    if (binding.timeout !== undefined)
-      lines.push(
-        `    Note over Client: ${mermaidLabel(`timeout: ${JSON.stringify(binding.timeout)}`)}`,
-      );
-    if (binding.correlationId !== undefined)
-      lines.push(
-        `    Note over Client: ${mermaidLabel(`correlation: ${JSON.stringify(binding.correlationId)}`)}`,
-      );
-    for (const prerequisite of step.prerequisites)
-      lines.push(
-        `    Note over Client: ${mermaidLabel(`prerequisite ${prerequisite.target.kind}: ${prerequisite.target.reference}`)}`,
-      );
-    for (const parameter of step.parameters)
-      lines.push(
-        `    Note over Client: ${mermaidLabel(`parameter ${JSON.stringify(parameter.value)}`)}`,
-      );
-    if (step.value.successCriteria)
-      lines.push(
-        `    Note over Client: ${mermaidLabel(`Authored criteria (not evaluated): ${JSON.stringify(step.value.successCriteria)}`)}`,
-      );
-    (['onSuccess', 'onFailure'] as const).forEach((channel) => {
-      for (const action of step.effectiveActions[channel])
+      if (
+        row.returnTo === 'source-step' &&
+        (row.target?.navigable || row.target?.kind.startsWith('external'))
+      )
         lines.push(
-          `    Note over Client: ${mermaidLabel(`${model.orderLabel}; ${channel}; ${action.origin}; ${action.status}; ${JSON.stringify(action.value)}`)}`,
+          `    ${row.to}-->>${row.from}: Recovery returns to retry ${mermaidLabel(row.step?.stepId)}`,
         );
-    });
-    for (const diagnostic of step.diagnostics)
+      lines.push('    end');
+    } else
       lines.push(
-        `    Note over Client: ${mermaidLabel(`${diagnostic.phase}: ${diagnostic.message}`)}`,
+        `    Note over ${row.from}: ${mermaidLabel(row.reason === 'collapsed' ? `${row.target?.reference}: deeper call omitted in static view; open that workflow to inspect` : row.label)}`,
       );
+    while (groups.at(-1)?.end === index) {
+      lines.push('    end');
+      groups.pop();
+    }
   }
   return lines.join('\n');
 }

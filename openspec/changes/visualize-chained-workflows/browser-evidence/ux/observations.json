@@ -1,0 +1,502 @@
+[
+  {
+    "task": "Default Docs → All workflows → payment → visible Sequence choice",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "Nested expansion, distinct repeated calls, full mapping inspection, keyboard close, exact caller return across modes, expansion restoration and collapse",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "Readable SVG labels and horizontal canvas scrolling",
+    "width": 1440,
+    "outcome": "passed",
+    "labels": [
+      {
+        "size": 13,
+        "x": 85.5546875,
+        "y": 16,
+        "width": 58.890625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 78.2890625,
+        "y": 69,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 316.578125,
+        "y": 16,
+        "width": 56.84375,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 314.6640625,
+        "y": 69,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 546.0390625,
+        "y": 16,
+        "width": 57.921875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 538.2890625,
+        "y": 69,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 776.296875,
+        "y": 16,
+        "width": 57.40625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 774.6640625,
+        "y": 69,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 1018.4140625,
+        "y": 16,
+        "width": 33.171875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 998.2890625,
+        "y": 69,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 166.15625,
+        "y": 117,
+        "width": 127.6875,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 10.2265625,
+        "y": 217,
+        "width": 210.19775390625,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 256.4296875,
+        "y": 317,
+        "width": 177.140625,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 240.328125,
+        "y": 417,
+        "width": 209.34375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 247.7109375,
+        "y": 517,
+        "width": 194.578125,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 245.9453125,
+        "y": 617,
+        "width": 198.109375,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 629.09375,
+        "y": 717,
+        "width": 121.8125,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 753.375,
+        "y": 817,
+        "width": 103.25,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 704.453125,
+        "y": 917,
+        "width": 201.09375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 707.4453125,
+        "y": 1017,
+        "width": 195.40185546875,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 247.7109375,
+        "y": 1117,
+        "width": 194.578125,
+        "height": 31
+      }
+    ],
+    "canvasWidth": "1150"
+  },
+  {
+    "task": "recursion markers, long labels and mode round trips",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "difficult markers, long labels and mode round trips",
+    "width": 1440,
+    "outcome": "passed"
+  },
+  {
+    "task": "Default Docs → All workflows → payment → visible Sequence choice",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "Nested expansion, distinct repeated calls, full mapping inspection, keyboard close, exact caller return across modes, expansion restoration and collapse",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "Readable SVG labels and horizontal canvas scrolling",
+    "width": 480,
+    "outcome": "passed",
+    "labels": [
+      {
+        "size": 13,
+        "x": 85.5546875,
+        "y": 16,
+        "width": 58.890625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 78.2890625,
+        "y": 69,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 316.578125,
+        "y": 16,
+        "width": 56.84375,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 314.6640625,
+        "y": 69,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 546.0390625,
+        "y": 16,
+        "width": 57.921875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 538.2890625,
+        "y": 69,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 776.296875,
+        "y": 16,
+        "width": 57.40625,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 774.6640625,
+        "y": 69,
+        "width": 60.671875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 1018.4140625,
+        "y": 16,
+        "width": 33.171875,
+        "height": 15
+      },
+      {
+        "size": 11,
+        "x": 998.2890625,
+        "y": 69,
+        "width": 73.421875,
+        "height": 13
+      },
+      {
+        "size": 13,
+        "x": 166.15625,
+        "y": 117,
+        "width": 127.6875,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 10.2265625,
+        "y": 217,
+        "width": 210.19775390625,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 256.4296875,
+        "y": 317,
+        "width": 177.140625,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 240.328125,
+        "y": 417,
+        "width": 209.34375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 247.7109375,
+        "y": 517,
+        "width": 194.578125,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 245.9453125,
+        "y": 617,
+        "width": 198.109375,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 629.09375,
+        "y": 717,
+        "width": 121.8125,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 753.375,
+        "y": 817,
+        "width": 103.25,
+        "height": 15
+      },
+      {
+        "size": 13,
+        "x": 704.453125,
+        "y": 917,
+        "width": 201.09375,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 707.4453125,
+        "y": 1017,
+        "width": 195.40185546875,
+        "height": 31
+      },
+      {
+        "size": 13,
+        "x": 247.7109375,
+        "y": 1117,
+        "width": 194.578125,
+        "height": 31
+      }
+    ],
+    "canvasWidth": "1150"
+  },
+  {
+    "task": "recursion markers, long labels and mode round trips",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "difficult markers, long labels and mode round trips",
+    "width": 480,
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 adapter exposes downstream ABT operations through standard calls",
+    "workflow": "adapter-google-bootstrap-catalogue-offers",
+    "callee": "abt-catalogue-discovery",
+    "operation": "query-products",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 adapter exposes downstream ABT operations through standard calls",
+    "workflow": "adapter-shared-initial-wallet-purchase-purchase",
+    "callee": "abt-initial-issuance-basket",
+    "operation": "create-basket",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 adapter exposes downstream ABT operations through standard calls",
+    "workflow": "adapter-wallet-stored-value-topup-offers",
+    "callee": "abt-catalogue-discovery",
+    "operation": "query-products",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 adapter exposes downstream ABT operations through standard calls",
+    "workflow": "adapter-wallet-stored-value-topup-purchase",
+    "callee": "abt-stored-value-topup-order",
+    "operation": "create-basket",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 adapter exposes downstream ABT operations through standard calls",
+    "workflow": "adapter-wallet-product-purchase-offers",
+    "callee": "abt-catalogue-discovery",
+    "operation": "query-products",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 adapter exposes downstream ABT operations through standard calls",
+    "workflow": "adapter-wallet-product-purchase-purchase",
+    "callee": "abt-fare-product-order",
+    "operation": "create-basket",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "outcome": "passed"
+  },
+  {
+    "task": "D1 overview has six standard calls and no inferred calls for descriptive client workflows",
+    "samplePath": "/home/mkogan/tools/code/jentic-arazzo-tools/packages/jentic-arazzo-ui/public/openapi_samples/workflows/d1-wallet-adapter-standard.arazzo.yaml",
+    "checksum": "e999c9f24b90c61b99e1a788a01597ce5e61d9f8d56ccfc1881599255cab58bb",
+    "calls": [
+      {
+        "workflow": "google-bootstrap-catalogue",
+        "calls": 0
+      },
+      {
+        "workflow": "shared-initial-wallet-purchase",
+        "calls": 0
+      },
+      {
+        "workflow": "wallet-stored-value-topup",
+        "calls": 0
+      },
+      {
+        "workflow": "wallet-product-purchase",
+        "calls": 0
+      },
+      {
+        "workflow": "provisioning-compensation",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-catalogue-discovery",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-initial-issuance-basket",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-initial-basket-recovery",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-stored-value-topup-order",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-fare-product-order",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-external-basket-payment-registration",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-selected-basket-offer-fulfilment",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-eligible-open-basket-discard",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-current-offer-cancellation",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-external-payment-return-registration",
+        "calls": 0
+      },
+      {
+        "workflow": "abt-provisioning-failure-refund",
+        "calls": 0
+      },
+      {
+        "workflow": "adapter-google-bootstrap-catalogue-offers",
+        "calls": 1
+      },
+      {
+        "workflow": "adapter-shared-initial-wallet-purchase-purchase",
+        "calls": 1
+      },
+      {
+        "workflow": "adapter-wallet-stored-value-topup-offers",
+        "calls": 1
+      },
+      {
+        "workflow": "adapter-wallet-stored-value-topup-purchase",
+        "calls": 1
+      },
+      {
+        "workflow": "adapter-wallet-product-purchase-offers",
+        "calls": 1
+      },
+      {
+        "workflow": "adapter-wallet-product-purchase-purchase",
+        "calls": 1
+      }
+    ],
+    "outcome": "passed"
+  }
+]

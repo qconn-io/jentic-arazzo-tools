@@ -1,0 +1,74 @@
+arazzo: 1.1.0
+info:
+  title: Eleven nested calls — eight-level display limit
+  version: 1.0.0
+sourceDescriptions:
+  - name: coordinator
+    url: ../coordinator.openapi.yaml
+    type: openapi
+workflows:
+  - workflowId: layer-0
+    steps:
+      - stepId: next
+        workflowId: layer-1
+        parameters: []
+  - workflowId: layer-1
+    steps:
+      - stepId: next
+        workflowId: layer-2
+        parameters: []
+  - workflowId: layer-2
+    steps:
+      - stepId: next
+        workflowId: layer-3
+        parameters: []
+  - workflowId: layer-3
+    steps:
+      - stepId: next
+        workflowId: layer-4
+        parameters: []
+  - workflowId: layer-4
+    steps:
+      - stepId: next
+        workflowId: layer-5
+        parameters: []
+  - workflowId: layer-5
+    steps:
+      - stepId: next
+        workflowId: layer-6
+        parameters: []
+  - workflowId: layer-6
+    steps:
+      - stepId: next
+        workflowId: layer-7
+        parameters: []
+  - workflowId: layer-7
+    steps:
+      - stepId: next
+        workflowId: layer-8
+        parameters: []
+  - workflowId: layer-8
+    steps:
+      - stepId: next
+        workflowId: layer-9
+        parameters: []
+  - workflowId: layer-9
+    steps:
+      - stepId: next
+        workflowId: layer-10
+        parameters: []
+  - workflowId: layer-10
+    steps:
+      - stepId: next
+        workflowId: layer-11
+        parameters: []
+  - workflowId: layer-11
+    steps:
+      - stepId: leaf
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200

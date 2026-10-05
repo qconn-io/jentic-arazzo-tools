@@ -1,0 +1,38 @@
+@startuml digital-product-stress-events
+title Correlated event-based purchase and activation audit
+autonumber
+actor "Orchestrating client" as client
+queue "Event broker" as bus
+participant "Purchase worker" as worker
+participant "HTTP fulfilment services" as http
+participant "Activation audit worker" as audit
+participant "Coordinator state API" as state
+note over client,audit: Start consumers before publication; correlate by purchaseId.\nStable eventId deduplicates a publication.
+client ->> bus: PurchaseRequested (purchase data, correlationId, eventId)
+bus ->> worker: Matching PurchaseRequested
+worker -> http: Invoke supplied fulfil-item workflow
+http --> worker: Workflow-control continuation (not an HTTP response)
+worker -> state: GET /purchases/{purchaseId}
+state --> worker: Confirmed READY and scoped licenseId
+worker ->> bus: PurchaseCompleted (READY, purchaseId, licenseId)
+bus ->> client: Matching PurchaseCompleted
+alt Receive times out or fails criteria
+  loop At most two receive retries, 0.5s delay; each wait up to 12s
+    bus ->> client: Matching completion if available
+  end
+  client -> state: One-way polling fallback; do not republish purchase command
+  state --> client: READY / PENDING / FAILED
+else READY event received and verified
+  client ->> bus: ActivationReported (actual ACTIVATED or FAILED outcome)
+  bus ->> audit: Matching ActivationReported
+  audit -> state: POST /purchases/{purchaseId}/activation-events
+  state --> audit: 204 (report received)
+  audit ->> bus: AuditRecorded (RECORDED, original activation eventId)
+  bus ->> client: Matching AuditRecorded
+  note over client,state: Final read joins await-ready and await-audit.
+  client -> state: GET /purchases/{purchaseId}
+  state --> client: Authoritative READY state and matching licenseId
+end
+note over client,bus: Sending does not assert broker acknowledgment or delivery.\nUnrelated correlation IDs do not complete a receive step.
+note over client,audit: RECORDED acknowledges the report; it does not turn FAILED activation into success.
+@enduml

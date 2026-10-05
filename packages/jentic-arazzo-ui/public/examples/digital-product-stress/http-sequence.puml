@@ -1,0 +1,54 @@
+@startuml digital-product-stress-http
+title Digital product stress: repeated calls, recovery and compensation
+autonumber
+participant "Batch coordinator" as c
+participant "Inventory Service" as i
+participant "Payment Service" as p
+participant "License Service" as l
+loop Two independently authorized purchases (distinct occurrence mappings)
+  c -> i: POST /reservations (stable purchase-reservation key)
+  i --> c: Reservation and authoritative price
+  note over c,i: Price mismatch stops before capture.
+  c -> p: POST /captures (stable purchase-payment key)
+  p --> c: CAPTURED / DECLINED / UNKNOWN or 503
+  alt UNKNOWN or 503
+    loop At most three retries, 0.5s delay
+      c -> p: GET /captures/by-key?attemptKey=original
+      p --> c: Original attempt evidence
+      c -> p: Retry POST /captures with the same original key
+      p --> c: Current original outcome
+    end
+  else Definite DECLINED
+    c -> i: POST /reservations/{reservationId}/release
+    i --> c: RELEASED
+    c -> c: Persist FAILED; stop this fulfilment
+  end
+  group Only confirmed matching CAPTURED evidence
+    c -> l: POST /licenses (stable purchase-license key)
+    l --> c: READY / 409 / 503
+    alt Issuance 503
+      loop At most two retries, 1s delay
+        c -> l: GET /licenses/by-key?attemptKey=original
+        l --> c: Original issuance evidence
+        c -> l: Retry POST /licenses with same key
+        l --> c: Current original outcome
+      end
+    else Definite issuance 409
+      c -> l: GET /licenses/by-key
+      l --> c: ABSENT / READY / REVOKED
+      opt Observed active READY license
+        c -> l: POST /licenses/{licenseId}/revoke
+        l --> c: REVOKED
+      end
+      c -> p: POST /refunds (original captured payment)
+      p --> c: REFUNDED or stop/reconcile
+      c -> i: POST /reservations/{reservationId}/release
+      i --> c: RELEASED
+      c -> c: Persist FAILED; stop this fulfilment
+    else Confirmed READY license
+      c -> c: Persist scoped READY purchase
+    end
+  end
+end
+note over c,l: These are possible paths, not branches all known to execute.
+@enduml

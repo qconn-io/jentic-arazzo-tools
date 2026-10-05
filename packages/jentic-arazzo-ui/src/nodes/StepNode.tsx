@@ -1,10 +1,11 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
+import { useViewerSession } from '../context/ViewerSessionContext';
 import type { StepNodeData, WorkflowRefNodeData } from '../types/viewer';
 import type { ViewerStep } from '../utils/model/viewerModel';
 import { actionHandle } from '../utils/conversion/arazzoToFlow';
+import { rootCallOccurrence } from '../utils/sequence/sequenceModel';
 
 export type InspectedStepData = (StepNodeData | WorkflowRefNodeData) & {
   inspectionStep?: ViewerStep;
@@ -25,15 +26,12 @@ export function InspectionStepCard({
   id: string;
 }) {
   const context = useArazzoViewer();
+  const session = useViewerSession();
   const owner = data.workflowId ?? context.getNodeOwner({ id, data, position: { x: 0, y: 0 } });
   const fact =
     data.inspectionStep ??
     (owner ? context.model.stepsByWorkflow.get(owner)?.get(data.step.stepId) : undefined);
   const binding = fact?.sourceBinding;
-  const description = data.step.description;
-  const value = (item: unknown) =>
-    typeof item === 'string' && item !== '' ? item : JSON.stringify(item);
-  const actions = fact?.effectiveActions;
   return (
     <div
       data-step-id={data.step.stepId}
@@ -59,40 +57,35 @@ export function InspectionStepCard({
         <span>{data.type === 'workflowRef' ? 'WORKFLOW CALL' : binding?.sourceType || 'STEP'}</span>
       </div>
       <div style={{ padding: '10px 14px' }}>
-        {description && (
-          <p style={{ lineHeight: '16px', maxHeight: 64, overflow: 'hidden', margin: '0 0 8px' }}>
-            {description}
-          </p>
+        {owner && (
+          <button
+            aria-label={`Details for ${owner}.${data.step.stepId}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              session.inspectStep(owner, data.step.stepId, event.currentTarget);
+            }}
+          >
+            Details
+          </button>
         )}
-        <div>Viewer inspection order</div>
-        {binding?.sourceName && (
-          <div style={rowStyle}>
-            Source: {binding.sourceName} ({binding.verification})
-          </div>
-        )}
+        {binding?.sourceName && <div style={rowStyle}>Source: {binding.sourceName}</div>}
         {['operationId', 'operationPath', 'channelPath', 'workflowId'].map((key) => {
           const locator = (data.step as unknown as Record<string, unknown>)[key];
           return locator === undefined ? null : (
-            <div key={key} style={rowStyle} title={value(locator)}>
-              {key}: {value(locator)}
+            <div key={key} style={rowStyle} title={String(locator)}>
+              {key}: {String(locator)}
             </div>
           );
         })}
-        {binding?.intent !== undefined && (
-          <div style={rowStyle}>Authored intent: {binding.intent}</div>
-        )}
-        {binding?.timeout !== undefined && (
-          <div style={rowStyle}>Timeout: {value(binding.timeout)} ms</div>
-        )}
-        {binding?.correlationId !== undefined && (
-          <div style={rowStyle}>Correlation: {value(binding.correlationId)}</div>
-        )}
+        {binding?.intent && <div style={rowStyle}>Authored intent: {binding.intent}</div>}
         {fact?.callTarget && (
           <button
             disabled={!fact.callTarget.navigable}
+            title={fact.callTarget.reason}
             onClick={(event) => {
               event.stopPropagation();
-              context.navigateToTarget(fact.callTarget!);
+              const row = owner && rootCallOccurrence(context.model, owner, fact.stepId);
+              if (row && owner) session.followCall(owner, row);
             }}
           >
             Call {fact.callTarget.reference} ({fact.callTarget.kind})
@@ -102,62 +95,34 @@ export function InspectionStepCard({
           <div key={index} style={{ marginTop: 6 }}>
             <button
               disabled={!prerequisite.target.navigable}
+              title={prerequisite.target.reason}
               onClick={(event) => {
                 event.stopPropagation();
                 context.navigateToTarget(prerequisite.target);
               }}
-              style={{
-                maxWidth: '100%',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
+              style={{ maxWidth: '100%', ...rowStyle }}
             >
               Prerequisite: {prerequisite.target.reference} ({prerequisite.target.kind})
             </button>
           </div>
         ))}
-        {fact?.parameters.length ? (
-          <section>
-            <h4 style={{ margin: '10px 0 4px' }}>Parameters</h4>
-            {fact.parameters.map((parameter, index) => (
-              <div key={index} style={rowStyle} title={JSON.stringify(parameter.value)}>
-                {parameter.value.name || parameter.authored.reference}{' '}
-                {parameter.value.in ? `(${parameter.value.in})` : ''}:{' '}
-                {value(parameter.value.value)}{' '}
-                {parameter.status !== 'resolved' ? `(${parameter.status})` : ''}
-              </div>
-            ))}
-          </section>
-        ) : null}
-        {data.step.outputs && (
-          <section>
-            <h4 style={{ margin: '10px 0 4px' }}>Outputs</h4>
-            {Object.entries(data.step.outputs).map(([name, output]) => (
-              <div key={name} style={rowStyle} title={value(output)}>
-                {name}: {value(output)}
-              </div>
-            ))}
-          </section>
-        )}
-        {data.step.successCriteria?.length ? (
-          <div style={{ marginTop: 10 }}>
-            Authored success criteria: {data.step.successCriteria.length}
-          </div>
-        ) : null}
+        <div>
+          {fact?.parameters.length ?? 0} parameters · {Object.keys(data.step.outputs ?? {}).length}{' '}
+          output mappings
+        </div>
+        <div>Viewer inspection order</div>
         {(['onSuccess', 'onFailure'] as const).map((channel) =>
-          actions?.[channel].length ? (
+          fact?.effectiveActions[channel].length ? (
             <section key={channel}>
               <h4 style={{ margin: '10px 0 4px' }}>
                 {channel === 'onSuccess' ? 'Success actions' : 'Failure actions'} · inspection order
               </h4>
-              {actions[channel].map((action) => (
+              {fact.effectiveActions[channel].map((action) => (
                 <div
                   key={action.effectiveIndex}
                   style={{
                     position: 'relative',
                     minHeight: 54,
-                    boxSizing: 'border-box',
                     padding: '8px 10px',
                     marginTop: 6,
                     border: '1px solid #e2e8f0',
@@ -171,7 +136,7 @@ export function InspectionStepCard({
                     · {action.value.type || action.status} · {action.origin}
                     {action.isOverride ? ' override' : ''}
                   </div>
-                  {action.target ? (
+                  {action.target && (
                     <button
                       disabled={!action.target.navigable}
                       onClick={(event) => {
@@ -182,104 +147,12 @@ export function InspectionStepCard({
                     >
                       {action.target.reference} ({action.target.kind})
                     </button>
-                  ) : (
-                    <div style={rowStyle}>
-                      {action.status === 'resolved'
-                        ? 'No transition target'
-                        : JSON.stringify(action.authored)}
-                    </div>
                   )}
                   <div style={rowStyle}>
                     {action.parameters.length} parameters · {action.value.criteria?.length || 0}{' '}
                     authored criteria
                   </div>
-                  {action.parameters.map((parameter, index) => (
-                    <div key={index} style={{ marginTop: 6 }}>
-                      <pre
-                        style={{
-                          margin: 0,
-                          maxHeight: 120,
-                          overflow: 'auto',
-                          whiteSpace: 'pre-wrap',
-                          overflowWrap: 'anywhere',
-                          lineHeight: '18px',
-                        }}
-                      >{`${parameter.value.name || parameter.authored.reference || 'Parameter'}: ${value(parameter.value.value)}${parameter.status === 'resolved' ? '' : ` (${parameter.status})`}`}</pre>
-                      {parameter.authored.reference && (
-                        <div
-                          style={{ ...rowStyle, fontSize: 10 }}
-                          title={parameter.authored.reference}
-                        >
-                          Reference: {parameter.authored.reference}
-                        </div>
-                      )}
-                      {parameter.status !== 'resolved' && (
-                        <pre
-                          style={{
-                            margin: '4px 0',
-                            maxHeight: 120,
-                            overflow: 'auto',
-                            whiteSpace: 'pre-wrap',
-                            overflowWrap: 'anywhere',
-                          }}
-                        >
-                          {JSON.stringify(parameter.authored)}
-                        </pre>
-                      )}
-                    </div>
-                  ))}
-                  {action.value.criteria?.length > 0 && (
-                    <pre
-                      style={{
-                        maxHeight: 80,
-                        overflow: 'auto',
-                        whiteSpace: 'pre-wrap',
-                        overflowWrap: 'anywhere',
-                        lineHeight: '18px',
-                      }}
-                    >
-                      Authored criteria: {JSON.stringify(action.value.criteria)}
-                    </pre>
-                  )}
-                  <div style={{ fontSize: 10, marginTop: 6, lineHeight: '18px' }}>
-                    <div style={rowStyle}>
-                      Applies to: {action.applicableWorkflowId}.{action.applicableStepId}
-                    </div>
-                    <div style={rowStyle} title={JSON.stringify(action.path)}>
-                      Use: /{action.path.join('/')}
-                    </div>
-                    {action.declarationPath && (
-                      <div style={rowStyle} title={JSON.stringify(action.declarationPath)}>
-                        Declaration: /{action.declarationPath.join('/')}
-                      </div>
-                    )}
-                  </div>
-                  {action.diagnostics.map((diagnostic, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        color: '#92400e',
-                        marginTop: 6,
-                        lineHeight: '18px',
-                        overflowWrap: 'anywhere',
-                      }}
-                    >
-                      Inspection warning: {diagnostic.message}
-                    </div>
-                  ))}
-                  <details style={{ marginTop: 6 }}>
-                    <summary>Authored action details</summary>
-                    <pre
-                      style={{
-                        maxHeight: 120,
-                        overflow: 'auto',
-                        whiteSpace: 'pre-wrap',
-                        overflowWrap: 'anywhere',
-                      }}
-                    >
-                      {JSON.stringify(action.authored, null, 2)}
-                    </pre>
-                  </details>
+                  {action.status !== 'resolved' && <div>{action.status} — inspect details</div>}
                   {action.status === 'resolved' && action.target && action.value.type !== 'end' && (
                     <Handle
                       type="source"
@@ -301,24 +174,6 @@ export function InspectionStepCard({
             Inspection warning: {diagnostic.message}
           </div>
         ))}
-        {context.model.support.limitations.length > 0 && (
-          <div style={{ marginTop: 8, color: '#64748b' }}>
-            Selected inspection; validation and execution support not established.
-          </div>
-        )}
-        <details style={{ marginTop: 10 }}>
-          <summary>Authored details</summary>
-          <pre
-            style={{
-              maxHeight: 120,
-              overflow: 'auto',
-              whiteSpace: 'pre-wrap',
-              overflowWrap: 'anywhere',
-            }}
-          >
-            {JSON.stringify(fact?.authored ?? data.step, null, 2)}
-          </pre>
-        </details>
       </div>
       {fact?.callTarget && (
         <Handle type="source" position={Position.Right} id="call" style={{ top: 65 }} />

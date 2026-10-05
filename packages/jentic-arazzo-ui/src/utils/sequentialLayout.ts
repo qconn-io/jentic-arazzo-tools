@@ -28,42 +28,18 @@ export function estimateNodeHeight(node: ArazzoNode): number {
   if (!data.step) return 180;
   const fact = data.inspectionStep;
   const step = data.step;
-  let height = 280; // header, padding, support note, expanded authored details.
-  if (step.description) height += 80;
+  let height = 190; // compact header, details control, counts and inspection-order label.
   height +=
     ['operationId', 'operationPath', 'channelPath', 'workflowId'].filter(
       (key) => (step as unknown as Record<string, unknown>)[key] !== undefined,
     ).length * 22;
   if (fact?.sourceBinding.sourceName) height += 22;
   if (fact?.sourceBinding.intent !== undefined) height += 22;
-  if (fact?.sourceBinding.timeout !== undefined) height += 22;
-  if (fact?.sourceBinding.correlationId !== undefined) height += 22;
   if (fact?.callTarget) height += 30;
   height += (fact?.prerequisites.length || 0) * 36;
-  const parameters = fact?.parameters.length || step.parameters?.length || 0;
-  if (parameters) height += 32 + parameters * 22;
-  if (step.outputs) height += 32 + Object.keys(step.outputs).length * 22;
-  if (step.successCriteria?.length) height += 32;
   for (const channel of ['onSuccess', 'onFailure'] as const) {
     const count = fact?.effectiveActions[channel].length || step[channel]?.length || 0;
-    if (count) height += 36 + count * 94;
-    for (const action of fact?.effectiveActions[channel] || []) {
-      height += 230; // provenance rows and expanded original action details.
-      if (action.value.criteria?.length)
-        height +=
-          24 +
-          Math.min(80, Math.ceil((JSON.stringify(action.value.criteria).length + 18) / 42) * 18);
-      for (const parameter of action.parameters) {
-        const text = `${parameter.value.name || parameter.authored.reference || 'Parameter'}: ${JSON.stringify(parameter.value.value)} (${parameter.status})`;
-        height += 6 + Math.min(120, Math.ceil(text.length / 42) * 18);
-        if (parameter.authored.reference) height += 22;
-        if (parameter.status !== 'resolved')
-          height +=
-            8 + Math.min(120, Math.ceil(JSON.stringify(parameter.authored).length / 42) * 18);
-      }
-      for (const diagnostic of action.diagnostics)
-        height += 12 + Math.ceil(diagnostic.message.length / 44) * 18;
-    }
+    if (count) height += 36 + count * 110;
   }
   for (const diagnostic of fact?.diagnostics || [])
     height += 12 + Math.ceil(diagnostic.message.length / 48) * 18;

@@ -1,0 +1,284 @@
+asyncapi: 3.0.0
+id: urn:example:digital-product:stress-events
+info:
+  title: Digital product orchestration events
+  version: 1.0.0
+  description: Fictional event contracts. Correlation identifies one purchase; eventId deduplicates
+    one publication. Receive operations are consumers of the corresponding send operations.
+defaultContentType: application/json
+servers:
+  demo:
+    host: events.example.test:5672
+    protocol: amqp
+    description: Illustrative broker only; not a running service.
+channels:
+  purchaseRequested:
+    address: purchase.requested
+    messages:
+      PurchaseRequested:
+        name: PurchaseRequested
+        title: PurchaseRequested
+        contentType: application/json
+        headers:
+          type: object
+          additionalProperties: false
+          required:
+            - correlationId
+            - eventId
+          properties:
+            correlationId:
+              type: string
+              minLength: 1
+            eventId:
+              type: string
+              minLength: 1
+        payload:
+          type: object
+          additionalProperties: false
+          required:
+            - purchaseId
+            - customerId
+            - productId
+            - amountMinor
+            - currency
+            - paymentToken
+          properties:
+            purchaseId:
+              type: string
+              minLength: 1
+            customerId:
+              type: string
+              minLength: 1
+            productId:
+              type: string
+              minLength: 1
+            amountMinor:
+              type: integer
+              minimum: 1
+            currency:
+              type: string
+              pattern: ^[A-Z]{3}$
+            paymentToken:
+              type: string
+              minLength: 1
+        correlationId:
+          location: $message.header#/correlationId
+        examples:
+          - headers:
+              correlationId: purchase-1001-A
+              eventId: purchase-1001-A-publish-command
+            payload:
+              purchaseId: purchase-1001-A
+              customerId: customer-7
+              productId: digital-kit
+              amountMinor: 1299
+              currency: EUR
+              paymentToken: authorization-demo-7
+  purchaseCompleted:
+    address: purchase.completed
+    messages:
+      PurchaseCompleted:
+        name: PurchaseCompleted
+        title: PurchaseCompleted
+        contentType: application/json
+        headers:
+          type: object
+          additionalProperties: false
+          required:
+            - correlationId
+            - eventId
+          properties:
+            correlationId:
+              type: string
+              minLength: 1
+            eventId:
+              type: string
+              minLength: 1
+        payload:
+          type: object
+          additionalProperties: false
+          required:
+            - purchaseId
+            - licenseId
+            - state
+          properties:
+            purchaseId:
+              type: string
+              minLength: 1
+            licenseId:
+              type: string
+            state:
+              type: string
+              enum:
+                - READY
+                - FAILED
+        correlationId:
+          location: $message.header#/correlationId
+        examples:
+          - headers:
+              correlationId: purchase-1001-A
+              eventId: purchase-1001-A-publish-ready
+            payload:
+              purchaseId: purchase-1001-A
+              licenseId: license-3001
+              state: READY
+  activationReported:
+    address: activation.reported
+    messages:
+      ActivationReported:
+        name: ActivationReported
+        title: ActivationReported
+        contentType: application/json
+        headers:
+          type: object
+          additionalProperties: false
+          required:
+            - correlationId
+            - eventId
+          properties:
+            correlationId:
+              type: string
+              minLength: 1
+            eventId:
+              type: string
+              minLength: 1
+        payload:
+          type: object
+          additionalProperties: false
+          required:
+            - purchaseId
+            - licenseId
+            - deviceId
+            - outcome
+          properties:
+            purchaseId:
+              type: string
+              minLength: 1
+            licenseId:
+              type: string
+              minLength: 1
+            deviceId:
+              type: string
+              minLength: 1
+            outcome:
+              type: string
+              enum:
+                - ACTIVATED
+                - FAILED
+        correlationId:
+          location: $message.header#/correlationId
+        examples:
+          - headers:
+              correlationId: purchase-1001-A
+              eventId: activation-event-9
+            payload:
+              purchaseId: purchase-1001-A
+              licenseId: license-3001
+              deviceId: device-9
+              outcome: ACTIVATED
+  auditRecorded:
+    address: audit.recorded
+    messages:
+      AuditRecorded:
+        name: AuditRecorded
+        title: AuditRecorded
+        contentType: application/json
+        headers:
+          type: object
+          additionalProperties: false
+          required:
+            - correlationId
+            - eventId
+          properties:
+            correlationId:
+              type: string
+              minLength: 1
+            eventId:
+              type: string
+              minLength: 1
+        payload:
+          type: object
+          additionalProperties: false
+          required:
+            - purchaseId
+            - eventId
+            - state
+          properties:
+            purchaseId:
+              type: string
+              minLength: 1
+            eventId:
+              type: string
+              minLength: 1
+            state:
+              type: string
+              enum:
+                - RECORDED
+                - REJECTED
+        correlationId:
+          location: $message.header#/correlationId
+        examples:
+          - headers:
+              correlationId: purchase-1001-A
+              eventId: purchase-1001-A-publish-receipt
+            payload:
+              purchaseId: purchase-1001-A
+              eventId: activation-event-9
+              state: RECORDED
+operations:
+  sendPurchaseRequested:
+    action: send
+    channel:
+      $ref: "#/channels/purchaseRequested"
+    messages:
+      - $ref: "#/channels/purchaseRequested/messages/PurchaseRequested"
+    summary: send PurchaseRequested from the orchestration application's perspective
+  receivePurchaseRequested:
+    action: receive
+    channel:
+      $ref: "#/channels/purchaseRequested"
+    messages:
+      - $ref: "#/channels/purchaseRequested/messages/PurchaseRequested"
+    summary: receive PurchaseRequested from the orchestration application's perspective
+  sendPurchaseCompleted:
+    action: send
+    channel:
+      $ref: "#/channels/purchaseCompleted"
+    messages:
+      - $ref: "#/channels/purchaseCompleted/messages/PurchaseCompleted"
+    summary: send PurchaseCompleted from the orchestration application's perspective
+  receivePurchaseCompleted:
+    action: receive
+    channel:
+      $ref: "#/channels/purchaseCompleted"
+    messages:
+      - $ref: "#/channels/purchaseCompleted/messages/PurchaseCompleted"
+    summary: receive PurchaseCompleted from the orchestration application's perspective
+  sendActivationReported:
+    action: send
+    channel:
+      $ref: "#/channels/activationReported"
+    messages:
+      - $ref: "#/channels/activationReported/messages/ActivationReported"
+    summary: send ActivationReported from the orchestration application's perspective
+  receiveActivationReported:
+    action: receive
+    channel:
+      $ref: "#/channels/activationReported"
+    messages:
+      - $ref: "#/channels/activationReported/messages/ActivationReported"
+    summary: receive ActivationReported from the orchestration application's perspective
+  sendAuditRecorded:
+    action: send
+    channel:
+      $ref: "#/channels/auditRecorded"
+    messages:
+      - $ref: "#/channels/auditRecorded/messages/AuditRecorded"
+    summary: send AuditRecorded from the orchestration application's perspective
+  receiveAuditRecorded:
+    action: receive
+    channel:
+      $ref: "#/channels/auditRecorded"
+    messages:
+      - $ref: "#/channels/auditRecorded/messages/AuditRecorded"
+    summary: receive AuditRecorded from the orchestration application's perspective

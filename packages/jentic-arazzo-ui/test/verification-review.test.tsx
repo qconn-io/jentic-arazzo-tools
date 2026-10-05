@@ -13,10 +13,7 @@ import { buildViewerModel } from '../src/utils/model/viewerModel';
 import { convertWorkflowToFlow } from '../src/utils/conversion/arazzoToFlow';
 import { applySequentialLayout } from '../src/utils/sequentialLayout';
 import { generateDocumentation } from '../src/utils/documentation/docGenerator';
-import {
-  generateMermaidFlowchart,
-  mermaidLabel,
-} from '../src/utils/documentation/mermaidFlowchartGenerator';
+import { generateMermaidFlowchart } from '../src/utils/documentation/mermaidFlowchartGenerator';
 
 mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
 const document = (): ArazzoDocument => ({
@@ -231,14 +228,19 @@ describe('verification review regressions', () => {
       input.workflows[0],
       buildViewerModel(inspect(createSnapshot(input))),
     );
-    expect(chart).toContain('querystring');
-    expect(chart).toContain(mermaidLabel('q={$inputs.q}&literal=a%26b&empty='));
-    expect(chart).toContain(
-      mermaidLabel(JSON.stringify({ zero: 0, disabled: false, empty: '', list: ['a|b', '<tag>'] })),
-    );
-    expect(chart).toContain('$components.parameters.absent');
-    expect(chart).toContain('null');
-    expect(chart).toContain('unresolved');
+    const metadata = generateDocumentation(input).markdown;
+    expect(chart).toContain('3 parameters');
+    expect(chart).not.toContain('literal=a%26b');
+    expect(metadata).toContain('querystring');
+    expect(metadata).toContain('q={$inputs.q}&amp;literal=a%26b&amp;empty=');
+    expect(metadata).toContain('&quot;zero&quot;: 0');
+    expect(metadata).toContain('&quot;disabled&quot;: false');
+    expect(metadata).toContain('&quot;empty&quot;: &quot;&quot;');
+    expect(metadata).toContain('a|b');
+    expect(metadata).toContain('&lt;tag&gt;');
+    expect(metadata).toContain('$components.parameters.absent');
+    expect(metadata).toContain('null');
+    expect(metadata).toContain('unresolved');
     await expect(mermaid.parse(chart)).resolves.toBeTruthy();
   });
 

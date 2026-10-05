@@ -43,9 +43,6 @@ export function generateMermaidFlowchart(
   lines.push(
     `    Inspection["${mermaidLabel(`${model.orderLabel}; schema validation and execution support not established; sources unverified`)}"]`,
   );
-  model.support.limitations.forEach((limitation, index) => {
-    lines.push(`    Limitation${index}["${mermaidLabel(limitation)}"]`);
-  });
   const stepIds = new Map(fact.steps.map((step, index) => [step.stepId, `Step${index}`]));
   lines.push(`    Start --> ${fact.steps.length ? 'Step0' : 'End'}`);
   const targetNode = (target: ClassifiedTarget, id: string): string => {
@@ -68,27 +65,8 @@ export function generateMermaidFlowchart(
     const id = `Step${index}`;
     const next = index + 1 < fact.steps.length ? `Step${index + 1}` : 'End';
     const binding = step.sourceBinding;
-    const metadata = [
-      binding.intent,
-      binding.timeout !== undefined ? `timeout ${JSON.stringify(binding.timeout)}` : '',
-      binding.correlationId !== undefined
-        ? `correlation ${JSON.stringify(binding.correlationId)}`
-        : '',
-    ]
-      .filter(Boolean)
-      .join('; ');
-    const locators = Object.values(binding.locators)
-      .filter((value) => value !== undefined)
-      .join('; ');
-    lines.push(
-      `    ${id}["${mermaidLabel(`${index + 1}. ${step.stepId}: ${locators || step.stepId}${metadata ? `; ${metadata}` : ''}`)}"]`,
-    );
-    step.parameters.forEach((parameter, parameterIndex) => {
-      const details = `${parameter.status} parameter: ${JSON.stringify(parameter.value)}${parameter.status !== 'resolved' ? `; authored ${JSON.stringify(parameter.authored)}` : ''}`;
-      const parameterId = `Parameter${index}_${parameterIndex}`;
-      lines.push(`    ${parameterId}["${mermaidLabel(details)}"]`);
-      lines.push(`    ${id} -.- ${parameterId}`);
-    });
+    const label = `${index + 1}. ${step.stepId}; ${step.callTarget ? `${step.callTarget.kind}: ${step.callTarget.reference}` : (binding.intent ?? 'authored operation')}; ${step.parameters.length} parameters`;
+    lines.push(`    ${id}["${mermaidLabel(label)}"]`);
     // array order is the inspection spine, independently of prerequisite/action overlays.
     lines.push(`    ${id} --> ${next}`);
     const callTransfer = transferSemantics(step);
@@ -109,11 +87,12 @@ export function generateMermaidFlowchart(
         const value = action.value;
         if (action.status !== 'resolved') {
           lines.push(
-            `    Details${index}_${channelIndex}_${actionIndex}["${mermaidLabel(`${action.status}: ${JSON.stringify(action.authored)}`)}"]`,
+            `    Details${index}_${channelIndex}_${actionIndex}["${mermaidLabel(`${action.status}: ${action.authored.name ?? action.authored.reference ?? 'authored action'}; inspect documentation`)}"]`,
           );
           return;
         }
-        const details = `${channel === 'onSuccess' ? 'success' : 'failure'} ${value.name ?? ''} ${value.type}; ${action.parameters.length} parameters${action.parameters.length ? ` ${JSON.stringify(action.parameters.map((parameter) => parameter.value))}` : ''}${value.criteria ? `; criteria ${JSON.stringify(value.criteria)}` : ''}`;
+        const details = `${channel === 'onSuccess' ? 'success' : 'failure'} ${value.name ?? ''} ${value.type}; ${action.parameters.length} parameters; ${value.criteria?.length ?? 0} criteria`;
+
         if (value.type === 'end') {
           lines.push(`    ${id} -->|"${mermaidLabel(details)}"| End`);
           return;

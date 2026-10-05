@@ -4,12 +4,11 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
+import { WorkflowOverview } from './WorkflowOverview';
+import { SequenceView } from './SequenceView';
+import { useViewerSession } from '../context/ViewerSessionContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
-import {
-  generateDocumentation,
-  generateMermaidSequence,
-  generateMermaidFlowchart,
-} from '../utils/documentation/index';
+import { generateDocumentation, generateMermaidFlowchart } from '../utils/documentation/index';
 
 export interface DocsViewProps {
   diagramType?: string;
@@ -82,7 +81,8 @@ export const DocsView: React.FC<DocsViewProps> = () => {
   const [ownershipDiagnostic, setOwnershipDiagnostic] = useState<string | null>(null);
   const mermaidInitialized = useRef(false);
   const docsContainerRef = useRef<HTMLDivElement>(null);
-  const [workflowViews, setWorkflowViews] = useState<Record<string, WorkflowViewMode>>({});
+  const session = useViewerSession();
+  const workflowViews = session.views;
   const [expandedWorkflows, setExpandedWorkflows] = useState<Set<string>>(new Set());
 
   const getWorkflowView = useCallback(
@@ -91,9 +91,8 @@ export const DocsView: React.FC<DocsViewProps> = () => {
   );
 
   const setWorkflowView = useCallback(
-    (workflowId: string, view: WorkflowViewMode) =>
-      setWorkflowViews((prev) => ({ ...prev, [workflowId]: view })),
-    [],
+    (workflowId: string, view: WorkflowViewMode) => session.setView(workflowId, view),
+    [session],
   );
 
   const handleToggle = useCallback(
@@ -194,20 +193,13 @@ export const DocsView: React.FC<DocsViewProps> = () => {
     return generateDocumentation(document, {
       includeMetadata: true,
       includeDiagrams: false,
+      includeStatus: false,
       documentURL,
       model,
     });
   }, [document, documentURL, model]);
 
   // Pre-generate all diagrams (memoized)
-  const sequenceDiagrams = useMemo(() => {
-    if (!document) return new Map<string, string>();
-    const diagrams = new Map<string, string>();
-    document.workflows.forEach((workflow) => {
-      diagrams.set(workflow.workflowId, generateMermaidSequence(workflow, document, model));
-    });
-    return diagrams;
-  }, [document, model]);
 
   const flowchartDiagrams = useMemo(() => {
     if (!document) return new Map<string, string>();
@@ -247,7 +239,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
 
   const viewModes: WorkflowViewMode[] = ['docs', 'sequence', 'flowchart'];
   const viewLabels: Record<WorkflowViewMode, string> = {
-    docs: 'Docs',
+    docs: 'Documentation',
     sequence: 'Sequence',
     flowchart: 'Flowchart',
   };
@@ -964,62 +956,79 @@ export const DocsView: React.FC<DocsViewProps> = () => {
             </button>
           </div>
 
-          {documentation.workflows.map((workflow) => {
-            const stepCount = workflow.steps.length;
-            const currentView = getWorkflowView(workflow.workflowId);
-            const workflowMd = documentation.workflowMarkdowns.get(workflow.workflowId) || '';
+          {activeWorkflowId === null && <WorkflowOverview />}
+          {documentation.workflows
+            .filter((workflow) => workflow.workflowId === activeWorkflowId)
+            .map((workflow) => {
+              const stepCount = workflow.steps.length;
+              const currentView = getWorkflowView(workflow.workflowId);
+              const workflowMd = documentation.workflowMarkdowns.get(workflow.workflowId) || '';
 
-            const sequenceSource = sequenceDiagrams.get(workflow.workflowId) || null;
-            const flowchartSource = flowchartDiagrams.get(workflow.workflowId) || null;
+              const flowchartSource = flowchartDiagrams.get(workflow.workflowId) || null;
 
-            return (
-              <details
-                key={workflow.workflowId}
-                className="workflow-details"
-                data-workflow-id={workflow.workflowId}
-                onToggle={(e) => handleToggle(workflow.workflowId, e)}
-              >
-                <summary className="workflow-summary-bar">
-                  <span className="step-count-badge">
-                    {stepCount} {stepCount === 1 ? 'Step' : 'Steps'}
-                  </span>
-                  <span className="workflow-summary-title">{workflow.workflowId}</span>
-                  {workflow.summary && (
-                    <span className="workflow-summary-text">{workflow.summary}</span>
-                  )}
-                </summary>
-                <div className="workflow-details-content">
-                  <div className="workflow-view-toggle">
-                    {viewModes.map((mode) => (
-                      <button
-                        key={mode}
-                        className={`workflow-view-btn ${currentView === mode ? 'workflow-view-btn-active' : ''}`}
-                        onClick={() => setWorkflowView(workflow.workflowId, mode)}
-                      >
-                        {viewLabels[mode]}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div style={{ display: currentView === 'docs' ? 'block' : 'none' }}>
-                    <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
-                      {workflowMd}
-                    </ReactMarkdown>
-                  </div>
-                  {sequenceSource && expandedWorkflows.has(workflow.workflowId) && (
-                    <div style={{ display: currentView === 'sequence' ? 'block' : 'none' }}>
-                      <MermaidDiagram source={sequenceSource} />
+              return (
+                <details
+                  key={workflow.workflowId}
+                  className="workflow-details"
+                  data-workflow-id={workflow.workflowId}
+                  onToggle={(e) => handleToggle(workflow.workflowId, e)}
+                  open
+                >
+                  <summary className="workflow-summary-bar">
+                    <span className="step-count-badge">
+                      {stepCount} {stepCount === 1 ? 'Step' : 'Steps'}
+                    </span>
+                    <span className="workflow-summary-title">{workflow.workflowId}</span>
+                    {workflow.summary && (
+                      <span className="workflow-summary-text">{workflow.summary}</span>
+                    )}
+                  </summary>
+                  <div className="workflow-details-content">
+                    <div className="workflow-view-toggle">
+                      {viewModes.map((mode) => (
+                        <button
+                          key={mode}
+                          className={`workflow-view-btn ${currentView === mode ? 'workflow-view-btn-active' : ''}`}
+                          onClick={() => setWorkflowView(workflow.workflowId, mode)}
+                        >
+                          {viewLabels[mode]}
+                        </button>
+                      ))}
                     </div>
-                  )}
-                  {flowchartSource && expandedWorkflows.has(workflow.workflowId) && (
-                    <div style={{ display: currentView === 'flowchart' ? 'block' : 'none' }}>
-                      <MermaidDiagram source={flowchartSource} />
+
+                    <div style={{ display: currentView === 'docs' ? 'block' : 'none' }}>
+                      <div aria-label="Step detail controls">
+                        {workflow.steps.map((step) => (
+                          <button
+                            key={step.stepId}
+                            onClick={(event) =>
+                              session.inspectStep(
+                                workflow.workflowId,
+                                step.stepId,
+                                event.currentTarget,
+                              )
+                            }
+                          >
+                            Inspect {workflow.workflowId}.{step.stepId}
+                          </button>
+                        ))}
+                      </div>
+                      <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
+                        {workflowMd}
+                      </ReactMarkdown>
                     </div>
-                  )}
-                </div>
-              </details>
-            );
-          })}
+                    {currentView === 'sequence' && (
+                      <SequenceView workflowId={workflow.workflowId} />
+                    )}
+                    {flowchartSource && expandedWorkflows.has(workflow.workflowId) && (
+                      <div style={{ display: currentView === 'flowchart' ? 'block' : 'none' }}>
+                        <MermaidDiagram source={flowchartSource} />
+                      </div>
+                    )}
+                  </div>
+                </details>
+              );
+            })}
         </article>
       </div>
     </div>
