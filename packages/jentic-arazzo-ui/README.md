@@ -17,9 +17,11 @@ Load any Arazzo Document by appending a `?document=` query parameter:
 https://arazzo-ui.jentic.com?document=https://arazzo-ui.jentic.com/petstore-order-workflow.arazzo.yaml
 ```
 
-**Supported Arazzo versions:**
+**Viewer inspection profiles:**
+
 - [Arazzo 1.0.0](https://spec.openapis.org/arazzo/v1.0.0)
 - [Arazzo 1.0.1](https://spec.openapis.org/arazzo/v1.0.1)
+- Arazzo 1.1.x: selected composition and asynchronous fields, with visible inspection limits (see below). This does not imply full 1.1 parser, validator, or runner support.
 
 ## Installation
 
@@ -167,6 +169,85 @@ The `view` prop (or `initialView` for standalone) controls the display:
 
 In split view, clicking a step node in the diagram expands the workflow and scrolls to that step in the docs pane. Switching workflow tabs in the diagram scrolls to the corresponding workflow in docs.
 
+## Chained workflow inspection
+
+The **All workflows** tab shows prerequisites, workflow calls, and understood
+success/failure transitions, including parallel relationships and loops. Select a
+workflow card to open its steps; prerequisite links navigate to local workflow or
+step destinations. External and missing targets remain visible with their status
+and do not navigate to a guessed local target. Source-description documents are
+not fetched for inspection, so OpenAPI/AsyncAPI source content and versions remain
+unverified.
+
+An omitted `activeWorkflowId` starts with the first workflow and lets the viewer
+manage navigation. Explicit `null` selects the overview. In controlled mode,
+`onWorkflowSelect` reports a workflow ID, or **`''` for All workflows**; map the
+empty string back to `null` when updating the prop. Prop updates do not emit an
+additional selection callback. Setting `selectedNodeId` to `null` clears a
+controlled node selection; `clearSelection()` clears an uncontrolled selection.
+
+```tsx
+import { useState } from 'react';
+import { ArazzoUI, type ArazzoDocument } from '@jentic/arazzo-ui';
+import '@jentic/arazzo-ui/styles.css';
+
+function Overview({ document }: { document: ArazzoDocument }) {
+  const [workflowId, setWorkflowId] = useState<string | null>(null);
+  const [nodeId, setNodeId] = useState<string | null>(null);
+
+  return (
+    <>
+      <button onClick={() => setNodeId(null)}>Clear selection</button>
+      <ArazzoUI
+        document={document}
+        view="split"
+        activeWorkflowId={workflowId}
+        selectedNodeId={nodeId}
+        onWorkflowSelect={(id) => {
+          setWorkflowId(id === '' ? null : id);
+          setNodeId(null);
+        }}
+        onNodeSelect={(id) => setNodeId(id)}
+        onEdgeSelect={(_id, edge) => {
+          if (edge.data?.type === 'relationship') {
+            console.log(edge.data.kind, edge.data.label, edge.data.warning);
+          }
+        }}
+      />
+    </>
+  );
+}
+```
+
+`onEdgeSelect` includes the additive `relationship` variant in `ArazzoEdgeType`
+and `ArazzoEdgeData`, also exported as `RelationshipEdgeData` from both package
+entry points. Its public fields are `type`, `kind` (`prerequisite`, `call`, or
+`action`), `label`, and optional `warning`, `channel`, and `actionType`. Consumers
+with exhaustive edge-data switches need to handle this variant. The callback
+signature is unchanged; private inspection models and routing data are excluded
+from relationship callback data.
+
+The 1.1 inspection profile includes step prerequisites, action parameters and
+reusable value overrides, querystring values, and authored asynchronous
+`send`/`receive`, `channelPath`, `timeout`, and `correlationId` metadata. Expressions
+and criteria are displayed without evaluation. Parseable unknown major/minor
+versions use raw inspection, without guessed relationship or Mermaid semantics;
+unrepresentable documents show a parsing error. Inspection does not certify schema
+validation or execution.
+
+Actions are labeled **viewer inspection order**: step actions in authored order,
+then unmatched workflow defaults in authored order. Matching uses name and type
+within the same success/failure channel. This is a display policy. The current
+runner replaces a workflow action list with the step list when one is declared;
+the viewer neither changes that behavior nor predicts which actions will run.
+
+Reference expansion uses the installed resolver where supported. Missing reusable
+components retain their authored content with warnings. When base URI metadata is
+unavailable, or authored `$self`/custom schema dialect semantics are unsupported,
+the entire expansion phase is bypassed with a limitation diagnostic and authored
+references are preserved. `getDocument()` returns the restored document without
+viewer-generated tracking IDs; it is not a validation result.
+
 ## Props
 
 ### ArazzoUIProps
@@ -175,13 +256,13 @@ In split view, clicking a step node in the diagram expands the workflow and scro
 |------|------|---------|-------------|
 | `document` | `ArazzoDocument \| string` | *required* | Arazzo document, URL, or inline content |
 | `view` | `'diagram' \| 'docs' \| 'split'` | `'docs'` | Active view mode |
-| `activeWorkflowId` | `string \| null` | first workflow | Currently active workflow |
-| `selectedNodeId` | `string \| null` | `null` | Currently selected diagram node |
+| `activeWorkflowId` | `string \| null` | first workflow | Omit for uncontrolled first-workflow selection; `null` selects All workflows |
+| `selectedNodeId` | `string \| null` | `null` | Controlled diagram node selection; `null` clears it |
 | `className` | `string` | — | CSS class for the root element |
 | `style` | `CSSProperties` | — | Inline styles for the root element |
 | `onNodeSelect` | `(nodeId, node) => void` | — | Called when a diagram node is clicked |
-| `onEdgeSelect` | `(edgeId, edge) => void` | — | Called when a diagram edge is clicked |
-| `onWorkflowSelect` | `(workflowId) => void` | — | Called when a workflow tab is selected |
+| `onEdgeSelect` | `(edgeId, edge) => void` | — | Called with a public edge, including relationship data |
+| `onWorkflowSelect` | `(workflowId) => void` | — | Called on workflow navigation; `''` represents All workflows |
 | `onViewChange` | `(view) => void` | — | Called when the view mode changes |
 
 ### ArazzoUIStandaloneProps

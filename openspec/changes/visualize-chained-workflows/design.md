@@ -57,6 +57,8 @@ Keep UI tracking IDs in a private sidecar and the decorated render projection, n
 
 **Alternative:** Renderer-specific helpers require repeated resolution and allow views to disagree. A global step-ID map fails the duplicate-step requirement.
 
+Relationship selection events use a small public `RelationshipEdgeData` projection (`type`, `kind`, `label`, optional `warning`, `channel`, and `actionType`) included in both public edge unions and re-exported from both entry points. Private rendering extensions retain routing geometry and full relationships for the selected-edge panel. Before `onEdgeSelect`, project relationship data explicitly so `WorkflowRelationship`, `EffectiveAction`, prerequisite facts, and routing fields do not cross the callback. Existing callback argument lists are unchanged; exhaustive consumers must handle the additive relationship variant. Verify the runtime callback and downstream narrowing against both rolled declarations.
+
 ### 3. Loading adapter: isolate, dereference, restore
 
 Keep the recovery algorithm in a testable private loading adapter; ArazzoUI.tsx manages asynchronous load state and cancellation.

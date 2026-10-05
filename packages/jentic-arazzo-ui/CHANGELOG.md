@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## Unreleased
+
+### Features
+
+- **ui:** add All workflows navigation and chained relationship inspection, shared documentation/Mermaid semantics, and selected Arazzo 1.1 inspection with explicit support limits.
+- **ui:** export `RelationshipEdgeData` through both entry points and include `relationship` in edge unions. Exhaustive edge-data consumers must handle the additive variant; callback signatures remain unchanged.
+
+### Bug Fixes
+
+- **ui:** preserve references under unsupported schema dialects regardless of component or subschema names, while keeping literal and extension payloads opaque.
+- **ui:** project relationship selection events onto the public contract without leaking private model or routing data.
+
 # [1.0.0-alpha.32](https://github.com/jentic/jentic-arazzo-tools/compare/v1.0.0-alpha.31...v1.0.0-alpha.32) (2026-07-21)
 
 **Note:** Version bump only for package @jentic/arazzo-ui
