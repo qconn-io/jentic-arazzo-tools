@@ -1,10 +1,12 @@
 import React from 'react';
 import { EdgeProps } from 'reactflow';
+import type { WorkflowRelationship } from '../utils/model/viewerModel';
 
 export interface RelationshipEdgeData {
   type: 'relationship';
   kind: 'prerequisite' | 'call' | 'action';
   label: string;
+  compactLabel?: string;
   lane: number;
   selfLoop: boolean;
   sideRoute?: boolean;
@@ -12,7 +14,7 @@ export interface RelationshipEdgeData {
   channel?: 'success' | 'failure';
   actionType?: string;
   provenance?: unknown;
-  relationship?: unknown;
+  relationship?: WorkflowRelationship;
 }
 
 // explicit orthogonal lanes preserve parallel occurrences and loops.
@@ -31,7 +33,7 @@ export function relationshipPath(
     return {
       path: `M ${sourceX} ${sourceY} L ${outsideX} ${sourceY} L ${outsideX} ${targetY} L ${targetX} ${targetY}`,
       labelX: outsideX,
-      labelY: (sourceY + targetY) / 2,
+      labelY: (sourceY + targetY) / 2 + lane * 22,
     };
   }
   if (selfLoop) {
@@ -39,7 +41,7 @@ export function relationshipPath(
     return {
       path: `M ${sourceX} ${sourceY} L ${sourceX} ${sourceY + offset} L ${outsideX} ${sourceY + offset} L ${outsideX} ${targetY - offset} L ${targetX} ${targetY - offset} L ${targetX} ${targetY}`,
       labelX: outsideX,
-      labelY: (sourceY + targetY) / 2,
+      labelY: (sourceY + targetY) / 2 + lane * 22,
     };
   }
   if (targetY <= sourceY) {
@@ -47,7 +49,7 @@ export function relationshipPath(
     return {
       path: `M ${sourceX} ${sourceY} L ${sourceX} ${sourceY + offset} L ${outsideX} ${sourceY + offset} L ${outsideX} ${targetY - offset} L ${targetX} ${targetY - offset} L ${targetX} ${targetY}`,
       labelX: outsideX,
-      labelY: (sourceY + targetY) / 2,
+      labelY: (sourceY + targetY) / 2 + lane * 22,
     };
   }
   const middleY = (sourceY + targetY) / 2 + lane * 18;
@@ -125,7 +127,7 @@ export const RelationshipEdge: React.FC<EdgeProps<RelationshipEdgeData>> = ({
           strokeLinejoin: 'round',
         }}
       >
-        {label}
+        {data?.compactLabel || label}
       </text>
     </g>
   );

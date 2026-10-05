@@ -17,6 +17,13 @@ describe('relationship edge routing', () => {
     expect(loop.path).toContain('L 330');
     expect(loop.labelX).toBeGreaterThan(280);
   });
+  it('separates label anchors on reciprocal and parallel self-loop lanes', () => {
+    for (const selfLoop of [false, true]) {
+      const first = relationshipPath(140, 480, 520, 280, 0, selfLoop);
+      const second = relationshipPath(140, 480, 520, 280, 1, selfLoop);
+      expect(Math.abs(first.labelY - second.labelY)).toBeGreaterThanOrEqual(18);
+    }
+  });
   it('renders the actual path, marker and a textual cycle warning', () => {
     const { container } = render(
       <svg>
@@ -83,4 +90,34 @@ describe('bounded overview cards', () => {
     expect(container.querySelector('[data-handleid="relationship-in"]')).toBeTruthy();
     expect(container.querySelector('[data-handleid="relationship-out"]')).toBeTruthy();
   });
+});
+
+it('keeps overview labels compact while preserving full accessible relationship text', () => {
+  const full =
+    'recover · failure/retry · step failed · 2 parameters · criteria: $statusCode == 503';
+  const { container } = render(
+    <svg>
+      <RelationshipEdge
+        id="compact"
+        source="a"
+        target="b"
+        sourceX={140}
+        sourceY={180}
+        targetX={520}
+        targetY={280}
+        sourcePosition={Position.Bottom}
+        targetPosition={Position.Top}
+        data={{
+          type: 'relationship',
+          kind: 'action',
+          label: full,
+          compactLabel: 'R1 · retry',
+          lane: 0,
+          selfLoop: false,
+        }}
+      />
+    </svg>,
+  );
+  expect(container.querySelector('text')!.textContent).toBe('R1 · retry');
+  expect(container.querySelector('title')!.textContent).toContain(full);
 });

@@ -129,7 +129,7 @@ export function convertDocumentToFlow(
     });
   }
   const lanes = new Map<string, number>();
-  for (const edge of projected) {
+  for (const [index, edge] of projected.entries()) {
     // unordered endpoint grouping also separates reciprocal relationships.
     const key = JSON.stringify([edge.source, edge.target].sort());
     const lane = lanes.get(key) || 0;
@@ -144,6 +144,7 @@ export function convertDocumentToFlow(
       type: 'relationship',
       kind: relationship.kind,
       label: relationshipLabel(relationship),
+      compactLabel: `R${index + 1} · ${relationship.actionType || relationship.kind}${warning ? ' · warning' : ''}`,
       lane,
       selfLoop: edge.source === edge.target,
       warning,
@@ -167,6 +168,7 @@ export function convertDocumentToFlow(
       id: edge.id,
       source: edge.source,
       target: edge.target,
+      ariaLabel: `${data.compactLabel}: ${data.label}${warning ? ` · ${warning}` : ''}`,
       type: 'relationship',
       sourceHandle: 'relationship-out',
       targetHandle: 'relationship-in',
