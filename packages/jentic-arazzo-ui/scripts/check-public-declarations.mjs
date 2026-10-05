@@ -30,6 +30,15 @@ import type { CallerFrame } from ${JSON.stringify(declaration)};
 import type { OccurrenceDetails } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private session presentation must not become public exports.
 import type { Session } from ${JSON.stringify(declaration)};
+import type { WorkflowLocation, WorkflowLocationStatus, WorkflowActionAddress } from ${JSON.stringify(declaration)};
+import { createLocationAdapter, encodeLocation, decodeLocation } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))};
+const address: WorkflowActionAddress = { document: 'host:doc', pointer: '/workflows/0/onFailure/0', usePointer: '/workflows/0/onFailure/0', channel: 'onFailure', index: 0 };
+const location: WorkflowLocation = { version: 1, document: 'host:doc', root: 'root', view: 'docs', subview: 'sequence', selection: { kind: 'action', workflowId: 'child', stepId: 'capture', occurrence: [{ workflowId: 'root', stepId: 'second-item' }], action: address } };
+const props: ArazzoUIProps = { document: '{}', location, defaultLocation: location, documentIdentity: 'host:doc', onLocationChange: value => value.selection?.occurrence, onLocationStatus: (status: WorkflowLocationStatus) => status.state };
+const adapter = createLocationAdapter('example.guide', (value: unknown): value is { stage: number } => typeof value === 'object' && value !== null && 'stage' in value && typeof value.stage === 'number', value => value.stage.toFixed());
+decodeLocation(encodeLocation(location));
+// @ts-expect-error Generated sequence row indices are not public addresses.
+location.rowIndex = 7;
 const variant: ArazzoEdgeType = 'relationship';
 const legacy: WorkflowRefNodeData = { type: 'workflowRef', step: { stepId: 'call', workflowId: 'child' }, targetWorkflowId: 'child', isValid: true };
 export const onEdgeSelect: NonNullable<ArazzoUIProps['onEdgeSelect']> = (id, edge) => {

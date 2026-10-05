@@ -16,6 +16,13 @@ export interface ArazzoUIConfig {
   onEdgeSelect?: ArazzoUIProps['onEdgeSelect'];
   onWorkflowSelect?: ArazzoUIProps['onWorkflowSelect'];
   onViewChange?: ArazzoUIProps['onViewChange'];
+  location?: ArazzoUIProps['location'];
+  defaultLocation?: ArazzoUIProps['defaultLocation'];
+  onLocationChange?: ArazzoUIProps['onLocationChange'];
+  onLocationStatus?: ArazzoUIProps['onLocationStatus'];
+  documentIdentity?: ArazzoUIProps['documentIdentity'];
+  documentRevision?: ArazzoUIProps['documentRevision'];
+  locationAdapters?: ArazzoUIProps['locationAdapters'];
 }
 
 export interface ArazzoUIInstance {

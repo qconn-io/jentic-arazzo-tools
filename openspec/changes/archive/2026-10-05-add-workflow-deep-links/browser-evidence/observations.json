@@ -1,0 +1,727 @@
+{
+  "generatedAt": "2026-10-05T19:50:52.679Z",
+  "sourceDigest": "891a91fb243de88897ca67af8c189eda1b96c72525d47b886d340083e045572e",
+  "hashes": {
+    "arazzo-ui-standalone.ffef736b.js": "2ff2c16ffa4397520a051365da33cc52a6329d4d6d372a487715068f4e8a1302",
+    "arazzo-ui.26db9dd7.css": "0756be3fc48644936206578012ba49c98f0efa05bdb3d7b6badc6fdd3965cf4b"
+  },
+  "observations": [
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "copied occurrence opens in fresh session",
+      "width": 1440,
+      "outcome": "passed",
+      "digest": "sha256:259b952d99aa770cb3d21e12a08e8496302c987a4dc4276ad3025a0d40206f26"
+    },
+    {
+      "task": "second-item caller mappings retained",
+      "width": 1440,
+      "outcome": "passed",
+      "mappings": [
+        "digital-upgrade",
+        2499,
+        "{$inputs.purchaseId}-B",
+        "authorization-demo-upgrade"
+      ]
+    },
+    {
+      "task": "Back/Forward restores once and retains caller return",
+      "width": 1440,
+      "outcome": "passed",
+      "historyDelta": 1
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh docs/docs destination",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh docs/sequence destination",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh docs/flowchart destination",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh diagram/sequence destination",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 1440,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh split/sequence destination",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "toolbar geometry and page containment",
+      "width": 1440,
+      "outcome": "passed",
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 355.125,
+          "y": 15.5,
+          "width": 435.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 799.046875,
+          "y": 16.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 883.125,
+          "y": 14,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "Copy link",
+          "x": 1150.25,
+          "y": 16.5,
+          "width": 76.828125,
+          "height": 27
+        },
+        {
+          "label": "diagram",
+          "x": 1240.078125,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 1315.453125,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 1373.046875,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ],
+      "scrollWidth": 1440
+    },
+    {
+      "task": "overview address restores",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "revision mismatch retains root without selecting another occurrence",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "missing occurrence explains exact segment",
+      "width": 1440,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "copied occurrence opens in fresh session",
+      "width": 480,
+      "outcome": "passed",
+      "digest": "sha256:259b952d99aa770cb3d21e12a08e8496302c987a4dc4276ad3025a0d40206f26"
+    },
+    {
+      "task": "second-item caller mappings retained",
+      "width": 480,
+      "outcome": "passed",
+      "mappings": [
+        "digital-upgrade",
+        2499,
+        "{$inputs.purchaseId}-B",
+        "authorization-demo-upgrade"
+      ]
+    },
+    {
+      "task": "Back/Forward restores once and retains caller return",
+      "width": 480,
+      "outcome": "passed",
+      "historyDelta": 1
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh docs/docs destination",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh docs/sequence destination",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh docs/flowchart destination",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh diagram/sequence destination",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "exact second-item capture and focused details",
+      "width": 480,
+      "outcome": "passed",
+      "selection": {
+        "kind": "step",
+        "occurrence": [
+          {
+            "stepId": "second-item",
+            "workflowId": "batch-fulfilment"
+          },
+          {
+            "stepId": "prepare",
+            "workflowId": "fulfil-item"
+          },
+          {
+            "stepId": "commerce",
+            "workflowId": "prepare-commerce"
+          },
+          {
+            "stepId": "capture",
+            "workflowId": "reserve-and-capture"
+          }
+        ],
+        "stepId": "capture-payment",
+        "workflowId": "capture-authorized-payment"
+      },
+      "mappings": [
+        "{$inputs.purchaseId}-payment",
+        "$inputs.amountMinor"
+      ],
+      "focusedControl": "Close details"
+    },
+    {
+      "task": "fresh split/sequence destination",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "toolbar geometry and page containment",
+      "width": 480,
+      "outcome": "passed",
+      "controls": [
+        {
+          "label": "Supported by Jentic",
+          "x": 16,
+          "y": 10,
+          "width": 108,
+          "height": 40
+        },
+        {
+          "label": "Arazzo document URL",
+          "x": 16,
+          "y": 63.5,
+          "width": 323.921875,
+          "height": 29
+        },
+        {
+          "label": "Explore",
+          "x": 347.921875,
+          "y": 64.5,
+          "width": 76.078125,
+          "height": 27
+        },
+        {
+          "label": "Upload Arazzo document",
+          "x": 432,
+          "y": 62,
+          "width": 32,
+          "height": 32
+        },
+        {
+          "label": "Copy link",
+          "x": 190.265625,
+          "y": 16.5,
+          "width": 76.828125,
+          "height": 27
+        },
+        {
+          "label": "diagram",
+          "x": 280.09375,
+          "y": 18.5,
+          "width": 75.375,
+          "height": 23
+        },
+        {
+          "label": "docs",
+          "x": 355.46875,
+          "y": 18.5,
+          "width": 57.59375,
+          "height": 23
+        },
+        {
+          "label": "split",
+          "x": 413.0625,
+          "y": 18.5,
+          "width": 49.9375,
+          "height": 23
+        }
+      ],
+      "scrollWidth": 480
+    },
+    {
+      "task": "overview address restores",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "revision mismatch retains root without selecting another occurrence",
+      "width": 480,
+      "outcome": "passed"
+    },
+    {
+      "task": "missing occurrence explains exact segment",
+      "width": 480,
+      "outcome": "passed"
+    }
+  ],
+  "errors": []
+}

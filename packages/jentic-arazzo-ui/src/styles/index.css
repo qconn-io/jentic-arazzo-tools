@@ -446,3 +446,40 @@
     max-width: 100%;
   }
 }
+
+.arazzo-toolbar-mode {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.arazzo-copy-link {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-inline: 4px;
+  overflow-wrap: anywhere;
+}
+.arazzo-copy-link button {
+  padding: 5px 10px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  background: #2a2a2a;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.arazzo-toolbar-mode .arazzo-copy-link [role='status'] {
+  max-width: 220px;
+  color: #fff;
+  font-size: 12px;
+}
+.arazzo-location-status {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background: #fff7ed;
+  border-bottom: 1px solid #fed7aa;
+  overflow-wrap: anywhere;
+}

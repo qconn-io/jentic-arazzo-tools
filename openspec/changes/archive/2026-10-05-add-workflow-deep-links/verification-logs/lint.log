@@ -1,0 +1,61 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 lint
+> eslint ./
+
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/actionUtils.ts
+  12:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/inputSchemaUtils.ts
+   37:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   38:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   61:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:57  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  176:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/inspection/facts.ts
+   24:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   24:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   25:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   27:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   27:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  126:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  127:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  172:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  320:13  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/inspection/inventory.ts
+  14:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/inspection/types.ts
+  6:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/model/viewerModel.ts
+   61:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/src/utils/nodeLayout.ts
+   10:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   44:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   47:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   72:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   82:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/inspection.test.ts
+  107:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  165:8   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  209:8   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/model.test.ts
+  112:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 36 problems (0 errors, 36 warnings)
+

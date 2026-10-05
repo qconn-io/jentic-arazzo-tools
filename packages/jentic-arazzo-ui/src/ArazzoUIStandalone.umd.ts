@@ -2,7 +2,7 @@ import React, { createRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
 import { ArazzoUIStandalone as ArazzoUIStandaloneComponent } from './ArazzoUIStandalone';
-import type { ArazzoUIRef, ViewerMode } from './types/index';
+import type { ArazzoUIRef, ArazzoUIProps, ViewerMode } from './types/index';
 import type { ArazzoDocument } from './types/arazzo';
 
 export interface ArazzoUIStandaloneConfig {
@@ -16,6 +16,13 @@ export interface ArazzoUIStandaloneConfig {
   onEdgeSelect?: (edgeId: string, edge: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   onWorkflowSelect?: (workflowId: string) => void;
   onViewChange?: (view: ViewerMode) => void;
+  location?: ArazzoUIProps['location'];
+  defaultLocation?: ArazzoUIProps['defaultLocation'];
+  onLocationChange?: ArazzoUIProps['onLocationChange'];
+  onLocationStatus?: ArazzoUIProps['onLocationStatus'];
+  documentIdentity?: ArazzoUIProps['documentIdentity'];
+  documentRevision?: ArazzoUIProps['documentRevision'];
+  locationAdapters?: ArazzoUIProps['locationAdapters'];
 }
 
 export interface ArazzoUIStandaloneInstance {
