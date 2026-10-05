@@ -13,6 +13,7 @@ import { traverse, type Path } from '@speclynx/apidom-traverse';
 import type { ArazzoDocument } from '../../types/arazzo';
 import { parseReusableReference, selectProfile } from '../inspection';
 import type { DocumentSnapshot, InspectionDiagnostic } from '../inspection/types';
+import { reusableOccurrenceFields } from '../inspection/reusable';
 
 interface LoadOptions {
   baseURI?: string;
@@ -175,8 +176,8 @@ export async function loadDocument(
           original = (original as Record<string, unknown>)[key];
         }
         if (!original || typeof original !== 'object') return;
-        for (const [key, value] of Object.entries(original)) {
-          if (key !== 'reference') path.node.set(key, structuredClone(value));
+        for (const [key, value] of Object.entries(reusableOccurrenceFields(original))) {
+          path.node.set(key, value);
         }
       },
     });

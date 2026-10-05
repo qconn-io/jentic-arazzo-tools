@@ -1,6 +1,6 @@
 import type { Workflow } from '../../types/arazzo';
 import { createSnapshot, inspect } from '../inspection';
-import { buildViewerModel } from '../model/viewerModel';
+import { buildViewerModel, transferSemantics } from '../model/viewerModel';
 import type { ArazzoViewerModel } from '../model/viewerModel';
 import type { ClassifiedTarget } from '../inspection';
 
@@ -83,13 +83,17 @@ export function generateMermaidFlowchart(
     lines.push(
       `    ${id}["${mermaidLabel(`${index + 1}. ${step.stepId}: ${locators || step.stepId}${metadata ? `; ${metadata}` : ''}`)}"]`,
     );
+    step.parameters.forEach((parameter, parameterIndex) => {
+      const details = `${parameter.status} parameter: ${JSON.stringify(parameter.value)}${parameter.status !== 'resolved' ? `; authored ${JSON.stringify(parameter.authored)}` : ''}`;
+      const parameterId = `Parameter${index}_${parameterIndex}`;
+      lines.push(`    ${parameterId}["${mermaidLabel(details)}"]`);
+      lines.push(`    ${id} -.- ${parameterId}`);
+    });
     // array order is the inspection spine, independently of prerequisite/action overlays.
     lines.push(`    ${id} --> ${next}`);
-    if (
-      step.callTarget &&
-      (step.callTarget.navigable || step.callTarget.kind.startsWith('external-'))
-    ) {
-      const call = targetNode(step.callTarget, `Call${index}`);
+    const callTransfer = transferSemantics(step);
+    if (callTransfer) {
+      const call = targetNode(callTransfer.target, `Call${index}`);
       lines.push(`    ${id} -->|call| ${call}`);
       lines.push(`    ${call} -->|call return| ${next}`);
     }
@@ -114,14 +118,11 @@ export function generateMermaidFlowchart(
           lines.push(`    ${id} -->|"${mermaidLabel(details)}"| End`);
           return;
         }
-        if (
-          !action.target ||
-          (!action.target.navigable && !action.target.kind.startsWith('external-'))
-        )
-          return;
-        const target = targetNode(action.target, `Action${index}_${channelIndex}_${actionIndex}`);
+        const transfer = transferSemantics(step, action);
+        if (!transfer) return;
+        const target = targetNode(transfer.target, `Action${index}_${channelIndex}_${actionIndex}`);
         lines.push(`    ${id} -->|"${mermaidLabel(details)}"| ${target}`);
-        if (value.type === 'retry' && target !== id)
+        if (transfer.returnTo === 'source-step')
           lines.push(`    ${target} -->|retry source step| ${id}`);
       });
     });
