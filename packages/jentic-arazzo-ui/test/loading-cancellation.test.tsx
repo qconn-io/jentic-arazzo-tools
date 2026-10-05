@@ -43,3 +43,49 @@ test('an older asynchronous load cannot overwrite a replacement resolved first',
   });
   expect(screen.getByTestId('title').textContent).toBe('replacement');
 });
+test('obsolete document and location requests never emit after the replacement has restored', async () => {
+  const { webcrypto } = await import('node:crypto');
+  Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true });
+  control.loads = [];
+  const old = doc('old location');
+  const replacement = doc('new location');
+  const changed = vi.fn();
+  const address = (document: string) => ({
+    version: 1 as const,
+    document,
+    root: null,
+    view: 'docs' as const,
+    subview: 'docs' as const,
+  });
+  const { rerender } = render(
+    <ArazzoUI
+      document={old}
+      documentIdentity="host:old"
+      location={address('host:old')}
+      onLocationChange={changed}
+    />,
+  );
+  rerender(
+    <ArazzoUI
+      document={replacement}
+      documentIdentity="host:new"
+      location={address('host:new')}
+      onLocationChange={changed}
+    />,
+  );
+  await act(async () => {
+    control.loads[1]({
+      document: replacement,
+      snapshot: createSnapshot(replacement),
+      diagnostics: [],
+    });
+  });
+  const { waitFor } = await import('@testing-library/react');
+  await waitFor(() => expect(changed).toHaveBeenCalledTimes(1));
+  expect(changed.mock.calls[0][0].document).toBe('host:new');
+  await act(async () => {
+    control.loads[0]({ document: old, snapshot: createSnapshot(old), diagnostics: [] });
+  });
+  expect(changed).toHaveBeenCalledTimes(1);
+  expect(screen.getByTestId('title').textContent).toBe('new location');
+});

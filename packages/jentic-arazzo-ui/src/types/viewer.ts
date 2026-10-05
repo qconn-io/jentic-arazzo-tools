@@ -1,3 +1,4 @@
+import type { WorkflowLocation, WorkflowLocationStatus, WorkflowLocationAdapter } from './location';
 /**
  * Viewer-specific types for \@jentic/arazzo-ui
  */
@@ -40,6 +41,14 @@ export interface ArazzoUIProps {
   view?: ViewerMode;
   activeWorkflowId?: string | null;
   selectedNodeId?: string | null;
+  /** explicit host identity for supplied/inline content */
+  documentIdentity?: string;
+  documentRevision?: string;
+  location?: WorkflowLocation;
+  defaultLocation?: WorkflowLocation;
+  onLocationChange?: (location: WorkflowLocation) => void;
+  onLocationStatus?: (status: WorkflowLocationStatus) => void;
+  locationAdapters?: readonly WorkflowLocationAdapter[];
   diagramType?: DiagramType | 'none';
   className?: string;
   style?: React.CSSProperties;

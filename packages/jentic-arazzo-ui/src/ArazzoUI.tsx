@@ -1,3 +1,21 @@
+export type {
+  WorkflowLocation,
+  WorkflowLocationSelection,
+  WorkflowCallSite,
+  WorkflowActionAddress,
+  WorkflowLocationJSON,
+  WorkflowLocationStatus,
+  WorkflowLocationAdapter,
+  WorkflowLocationDecodeResult,
+} from './types/location';
+export {
+  encodeLocation,
+  decodeLocation,
+  readLocationURL,
+  writeLocationURL,
+  authoredDigest,
+  createLocationAdapter,
+} from './utils/location/codec';
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -17,6 +35,7 @@ import { DocsView } from './components/DocsView';
 import { WorkflowNavigation } from './components/WorkflowNavigation';
 import { CallerNavigation } from './components/CallerNavigation';
 import { SelectionDetails } from './components/SelectionDetails';
+import { WorkflowLocationBridge } from './components/WorkflowLocationBridge';
 import { InspectionStatus } from './components/InspectionStatus';
 import type { ArazzoDocument, ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 
@@ -99,7 +118,7 @@ function detectUrl(value: ArazzoDocument | string): string | null {
 export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI(props, ref) {
   const {
     document: rawDocument,
-    view = 'docs',
+    view = props.location?.view ?? props.defaultLocation?.view ?? 'docs',
     activeWorkflowId: controlledWorkflowId,
     selectedNodeId: controlledSelectedNodeId,
     className,
@@ -111,20 +130,25 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
   } = props;
 
   const documentURL = detectUrl(rawDocument);
+  const loadedInput = useRef<ArazzoDocument | string>();
   const [parsedDocument, setParsedDocument] = useState<ArazzoDocument | null>(null);
   const [snapshot, setSnapshot] = useState<DocumentSnapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const workflowRequestId = useRef(0);
+  const [workflowRequest, setWorkflowRequest] = useState<{ id: number; root: string | null }>();
 
   useEffect(() => {
     let cancelled = false;
 
     setLoading(true);
+    setWorkflowRequest(undefined);
     setError(null);
 
     loadDocument(rawDocument, { baseURI: globalThis.document?.baseURI })
       .then((loaded) => {
         if (!cancelled) {
+          loadedInput.current = rawDocument;
           setParsedDocument(loaded.document);
           setSnapshot(loaded.snapshot);
           setLoading(false);
@@ -147,13 +171,42 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     () => ({
       onNodeSelect,
       onEdgeSelect,
-      onWorkflowSelect,
+      onWorkflowSelect: (id: string) => {
+        onWorkflowSelect?.(id);
+        if (
+          controlledWorkflowId !== undefined &&
+          id !== (controlledWorkflowId ?? '') &&
+          props.onLocationChange
+        )
+          setWorkflowRequest({ id: ++workflowRequestId.current, root: id || null });
+      },
       onViewChange,
     }),
-    [onNodeSelect, onEdgeSelect, onWorkflowSelect, onViewChange],
+    [
+      onNodeSelect,
+      onEdgeSelect,
+      onWorkflowSelect,
+      onViewChange,
+      controlledWorkflowId,
+      props.onLocationChange,
+    ],
   );
 
   const inspection = useMemo(() => (snapshot ? inspect(snapshot) : null), [snapshot]);
+
+  const unsupportedRequest = useRef<string>();
+  useEffect(() => {
+    const requested = props.location ?? props.defaultLocation;
+    if (!snapshot || !requested || inspection?.support.semanticInspection !== 'unsupported') return;
+    const key = JSON.stringify([snapshot.id, requested]);
+    if (unsupportedRequest.current === key) return;
+    unsupportedRequest.current = key;
+    props.onLocationStatus?.({
+      state: 'stale',
+      location: requested,
+      message: 'This inspection profile cannot restore workflow locations.',
+    });
+  }, [snapshot, inspection, props.location, props.defaultLocation, props.onLocationStatus]);
 
   if (loading && !parsedDocument) {
     return (
@@ -220,7 +273,13 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
   return (
     <div
       className={`arazzo-ui ${className ?? ''}`}
-      style={{ width: '100%', height: '100%', display: 'flex', ...style }}
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        visibility: loadedInput.current === rawDocument ? undefined : 'hidden',
+        ...style,
+      }}
     >
       <ArazzoViewerProvider
         document={parsedDocument}
@@ -232,7 +291,12 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
         events={events}
       >
         <ReactFlowProvider>
-          <ArazzoUIInner ref={ref} view={view} />
+          <ArazzoUIInner
+            ref={ref}
+            view={view}
+            locationProps={loadedInput.current === rawDocument ? props : undefined}
+            workflowRequest={workflowRequest}
+          />
         </ReactFlowProvider>
       </ArazzoViewerProvider>
     </div>
@@ -240,11 +304,13 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
 });
 
 interface ArazzoUIInnerProps {
+  locationProps?: ArazzoUIProps;
+  workflowRequest?: { id: number; root: string | null };
   view: ViewerMode;
 }
 
 const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function ArazzoUIInner(
-  { view },
+  { view, locationProps, workflowRequest },
   ref,
 ) {
   const diagramRef = useRef<DiagramViewRef>(null);
@@ -286,6 +352,13 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
     <div className="arazzo-viewer-shell">
       <WorkflowNavigation />
       <InspectionStatus />
+      {locationProps && (
+        <WorkflowLocationBridge
+          props={locationProps}
+          view={view}
+          workflowRequest={workflowRequest}
+        />
+      )}
       <CallerNavigation />
       <div className="arazzo-viewer-panes">
         {showDiagram && (

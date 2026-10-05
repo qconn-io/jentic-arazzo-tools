@@ -364,3 +364,86 @@ ref.current.getDocument();
 ref.current.getActiveWorkflowId();
 ref.current.getSelectedStepId();
 ```
+
+### Workflow locations and shareable links
+
+Standalone **Copy link** preserves the document, overview or root workflow, global view,
+Docs/Sequence/Flowchart subview, and exact scoped step or action occurrence. It also appears
+inside the details panel on narrow screens. A second call to the same workflow keeps its
+own ordered caller path; links never choose the first matching step as a substitute.
+A standalone location's view takes precedence over `initialView`. Initial hydration replaces the current history entry. Committed document, workflow, view,
+and inspection changes push entries; Back/Forward restore them without pushing again.
+Search typing and hover do not change history. Caller return addresses are kept as public
+authored locations in session history; links omit private caller frames and expansion maps.
+
+URL-loaded documents are addressable. Pasted/uploaded documents need a persistent URL or a
+host-supplied `documentIdentity` that the host can resolve on the next visit. Copy link
+explains this when no source is available. Existing `?document=` and `#document=` inputs
+still load; generated share URLs omit inline content and preserve unrelated query/hash
+fields. Uploaded contents may remain in local browser history for Back/Forward, but are
+never serialized into location links. Unaddressable content uses a session-only local identity and location in history state, allowing Back/Forward without claiming cross-session shareability.
+
+Both ESM entry points export `WorkflowLocation`, its selection/call/action types,
+`WorkflowLocationStatus`, and the `encodeLocation`, `decodeLocation`, `readLocationURL`,
+`writeLocationURL`, `authoredDigest`, and `createLocationAdapter` helpers. The imperative
+UMD configuration accepts the same optional location props.
+
+```tsx
+import { ArazzoUI, type WorkflowLocation } from '@jentic/arazzo-ui';
+
+const destination: WorkflowLocation = {
+  version: 1,
+  document: 'https://example.com/workflows.arazzo.yaml',
+  root: 'batch-fulfilment',
+  view: 'docs',
+  subview: 'sequence',
+  selection: {
+    kind: 'step',
+    workflowId: 'fulfil-item',
+    stepId: 'prepare',
+    occurrence: [{ workflowId: 'batch-fulfilment', stepId: 'second-item' }],
+  },
+};
+
+<ArazzoUI document={destination.document} defaultLocation={destination} />;
+```
+
+Use `defaultLocation` for initial navigation, or `location` with `onLocationChange` to
+control navigation. An authored-step selection omits `occurrence`; an empty array selects
+the root occurrence. Action selections include `kind: 'action'` and an `action` address
+with declaration `document`/JSON `pointer`, authored `usePointer`, channel, declaration
+index, and optional name. A reusable component declaration has index zero; its use pointer
+distinguishes references to the same declaration at different authored sites. These are
+not effective merged action indices or generated sequence row IDs.
+
+Explicit `activeWorkflowId`, `selectedNodeId`, and `view` props take precedence when they
+conflict with a location. `onLocationStatus` reports the conflict without overriding the
+host. A controlled location emits a navigation request once and remains authoritative
+until the host accepts it. Headless viewers do not write browser history. A location for
+another document reports `state: 'document-request'` with the requested location; the host
+must supply its document and matching identity, retaining the requested location. The
+viewer does not automatically fetch cross-document location targets.
+
+The canonical retrieval URI identifies URL sources. `documentIdentity` supplies a stable
+host identity for inline objects; `documentRevision` can identify an immutable host
+revision. Standalone links include a SHA-256 digest of canonically serialized **authored**
+content (sorted object keys, ordered arrays, preserved scalar types). Formatting and key
+ordering changes do not change the digest. A digest detects changed content; it does not
+pin old remote bytes, authenticate a source, or reconstruct historical content. Missing or
+changed revisions retain a valid root and explain the mismatch before selecting content.
+Digest generation requires browser Web Crypto in a secure context.
+
+The codec strictly validates version-one fields and limits decoded JSON to 16 KiB,
+occurrence paths to 32 call sites, and optional JSON state nesting to 32 levels. Restoration
+still obeys eight nested call levels, recursion markers, and the 200-row scene budget.
+Beyond those limits the boundary remains visible and authored details remain accessible;
+complete documentation or opening a callee as a new root uses the existing controls.
+Malformed locations, missing steps/call sites, and unsupported profiles explain the
+unavailable destination instead of silently selecting another occurrence.
+
+Optional `extensions` use names such as `example.guide` and contain JSON data only. Supply
+`locationAdapters={[createLocationAdapter(namespace, typeGuard, restore)]}` to register
+typed optional state. Unavailable/invalid adapters are ignored with a notice while their
+JSON is retained for sharing. Adapters restore presentation state; hosts should keep
+credentials and evaluated values out of extensions and never evaluate extension strings.
+Extensions cannot replace document, root, or occurrence identity.

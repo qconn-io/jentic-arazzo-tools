@@ -2,6 +2,9 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { useArazzoViewer } from './ArazzoViewerContext';
 import type { SequenceRow } from '../utils/sequence/sequenceModel';
 
+import type { WorkflowLocationStatus } from '../types/location';
+import type { ResolvedLocation } from '../utils/location/resolve';
+
 type WorkflowView = 'docs' | 'sequence' | 'flowchart';
 interface CallerFrame {
   documentId: string;
@@ -12,11 +15,15 @@ interface CallerFrame {
   callee: string;
 }
 interface DetailSelection {
+  authoredOnly?: boolean;
   workflowId: string;
   stepId?: string;
   row?: SequenceRow;
 }
 interface Session {
+  locationStatus?: WorkflowLocationStatus;
+  setLocationStatus: (status: WorkflowLocationStatus) => void;
+  cancelLocationRestoration: () => void;
   expansions: Record<string, Record<string, boolean>>;
   views: Record<string, WorkflowView>;
   setView: (root: string, view: WorkflowView) => void;
@@ -34,6 +41,11 @@ interface Session {
   focusRowId?: string;
   consumeFocus: () => void;
   clearTrail: () => void;
+  restoreLocation: (
+    result: ResolvedLocation,
+    view: WorkflowView,
+    callers?: ResolvedLocation[],
+  ) => void;
 }
 const ViewerSessionContext = createContext<Session | null>(null);
 export const useViewerSession = () => {
@@ -45,6 +57,7 @@ export const useViewerSession = () => {
 export function ViewerSessionProvider({ children }: { children: React.ReactNode }) {
   const viewer = useArazzoViewer();
   const { model, activeWorkflowId, selectedNodeId } = viewer;
+  const [locationStatus, setLocationStatus] = useState<WorkflowLocationStatus>();
   const [expansions, setExpansions] = useState<Session['expansions']>({});
   const [views, setViews] = useState<Session['views']>({});
   const [selectedRow, setSelectedRow] = useState<SequenceRow>();
@@ -65,11 +78,69 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     back: boolean;
     selectionRequestVersion: number;
   }>();
+  const restoration = useRef<{
+    result: ResolvedLocation;
+    view: WorkflowView;
+    callers?: ResolvedLocation[];
+  }>();
+  const applyLocation = (
+    result: ResolvedLocation,
+    view: WorkflowView,
+    callers: ResolvedLocation[] = [],
+  ) => {
+    const root = result.root;
+    setTrail(
+      callers.flatMap((caller) =>
+        caller.root && caller.row?.kind === 'call'
+          ? [
+              {
+                documentId: model.documentId,
+                root: caller.root,
+                row: caller.row,
+                expansion: caller.expansions,
+                view: caller.status.location?.subview ?? 'sequence',
+                callee: caller.row.target?.workflowId ?? '',
+              },
+            ]
+          : [],
+      ),
+    );
+    pending.current = undefined;
+    authoredRequest.current = undefined;
+    if (root !== null) {
+      setViews((current) => ({ ...current, [root]: view }));
+      setExpansions((current) => ({ ...current, [root]: result.expansions }));
+    }
+    const row = result.row;
+    setSelectedRow(result.authoredOnly ? undefined : row);
+    setDetails(
+      row
+        ? {
+            workflowId: row.workflowId,
+            stepId: row.step?.stepId,
+            row: result.authoredOnly && !row.action ? undefined : row,
+            authoredOnly: result.authoredOnly,
+          }
+        : null,
+    );
+    origin.current = undefined;
+    setFocusRowId(result.focusRowId);
+    const publicStep = row && (row.workflowId === root ? row.step?.stepId : row.path[0]?.[1]);
+    const nodeId = root && publicStep ? model.nodeIds.get(root)?.get(publicStep) : undefined;
+    requestedSelection.current = nodeId;
+    if (viewer.selectedNodeId !== (nodeId ?? null)) viewer.setSelectedNode(nodeId ?? null);
+  };
   const previous = useRef({ active: activeWorkflowId, selection: selectedNodeId });
 
   useEffect(() => {
     const prior = previous.current;
     previous.current = { active: activeWorkflowId, selection: selectedNodeId };
+    if (restoration.current && activeWorkflowId === restoration.current.result.root) {
+      const request = restoration.current;
+      restoration.current = undefined;
+      applyLocation(request.result, request.view, request.callers);
+      return;
+    }
     const authored = authoredRequest.current;
     if (authored) {
       if (
@@ -162,6 +233,7 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     control?: HTMLElement,
     row?: SequenceRow,
   ) => {
+    restoration.current = undefined;
     pending.current = undefined;
     authoredRequest.current = undefined;
     origin.current = control;
@@ -179,8 +251,22 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     }
   };
   const value: Session = {
+    locationStatus,
+    setLocationStatus,
+    cancelLocationRestoration: () => {
+      restoration.current = undefined;
+    },
     expansions,
     views,
+    restoreLocation: (result, view, callers) => {
+      pending.current = undefined;
+      authoredRequest.current = undefined;
+      if (activeWorkflowId === result.root) applyLocation(result, view, callers);
+      else {
+        restoration.current = { result, view, callers };
+        viewer.setActiveWorkflow(result.root);
+      }
+    },
     selectedRow,
     details,
     trail,

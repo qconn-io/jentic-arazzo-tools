@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
+import { CopyLocationControl } from '../context/CopyLinkContext';
 import { ReadingDetails } from './ReadingDetails';
 import { projectOccurrenceDetails } from '../utils/sequence/occurrenceDetails';
 
@@ -133,7 +134,15 @@ export function SelectionDetails() {
       <button ref={closeControl} onClick={session.closeDetails}>
         Close details
       </button>
+      <CopyLocationControl />
       <h2>{details.title}</h2>
+      {session.locationStatus &&
+        (session.locationStatus.state !== 'restored' ||
+          !!session.locationStatus.notices?.length) && (
+          <p role="status">
+            {session.locationStatus.message} {session.locationStatus.notices?.join(' ')}
+          </p>
+        )}
       <section aria-label="Owning context">
         <h3>Context</h3>
         <dl className="arazzo-value-rows">
