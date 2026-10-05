@@ -58,3 +58,14 @@
 - [x] 8.2 Run npm run typescript:check-types -w @jentic/arazzo-ui, npm run lint -w @jentic/arazzo-ui, and npm run build -w @jentic/arazzo-ui; verify both ESM/UMD entry points, public declarations, CSS, and standalone app artifacts build successfully and recovery/model internals do not leak into public exports.
 - [x] 8.3 Smoke-test the built standalone viewer with dense cyclic, duplicate-step, asynchronous, and unsupported-version fixtures; verify overview grid/hierarchy, edge routes, content bounds, owner scrolling, destination centering, inspection-order/support labels, and raw fallback, and record browser observations or screenshots alongside the implementation's verification report.
 - [x] 8.4 Reconcile implementation with proposal/design/specs, run openspec validate visualize-chained-workflows --strict, and verify evidence for completed tasks and all six design-acceptance criteria, input/provenance/unknown-content preservation, no temporary recovery exports, and unchanged runner/schema behavior in other packages.
+
+## 9. Verification Review Follow-up
+
+- [x] 9.1 Enforce action-step target ownership without blocking cross-workflow prerequisites; retain unsupported authored locators with diagnostics and no navigable transition.
+- [x] 9.2 Consume restored native reusable occurrences as effective values, preserve declaration/use provenance, and share lossless occurrence-field handling with generic expansion; verify native export, facts, documentation, and unchanged input.
+- [x] 9.3 Share understood transfer/return semantics across interactive and Mermaid diagrams; cover local/external workflow recovery, local/self retry, one-way goto, and external call returns with real handles.
+- [x] 9.4 Render complete step parameter facts in Mermaid flowcharts, including querystring locations/values, structured/falsy values, and unresolved authored content; verify syntax and retained data.
+- [x] 9.5 Restore safe CommonMark document descriptions, preserving links, emphasis, paragraphs, autolinks and inline/fenced code while treating authored HTML as literal data.
+- [x] 9.6 Improve dense overview readability with compact labels, separated lane label anchors and keyboard-accessible selected relationship details; verify component and built-browser behavior.
+- [x] 9.7 Record a logical upstream contribution split and the required feature-discussion step without rewriting existing history or claiming maintainer approval.
+- [x] 9.8 Run targeted and monorepo tests, UI type/lint/build checks, built-browser smoke tests, strict OpenSpec validation, and independent review; reconcile the review findings with fresh evidence.
