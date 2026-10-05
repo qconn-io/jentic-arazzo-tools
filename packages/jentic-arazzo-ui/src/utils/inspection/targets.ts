@@ -18,6 +18,8 @@ export function targetClassifier(document: PlainObject) {
       reason,
     });
     const local = (workflowId: string, stepId?: string): ClassifiedTarget => {
+      if (context.role === 'action' && stepId !== undefined && workflowId !== context.workflowId)
+        return malformed('action step targets must belong to the current workflow');
       const workflow = workflows.find((w) => w.workflowId === workflowId);
       if (!workflow)
         return {
@@ -50,6 +52,8 @@ export function targetClassifier(document: PlainObject) {
     if (typeof reference !== 'string' || !reference)
       return malformed('target must be a nonempty string');
     if (reference.startsWith('$sourceDescriptions.')) {
+      if (context.role === 'action' && wantsStep)
+        return malformed('action step targets must belong to the current workflow');
       const rest = reference.slice('$sourceDescriptions.'.length);
       const candidates = sources.filter(
         (source) => typeof source.name === 'string' && rest.startsWith(`${source.name}.`),

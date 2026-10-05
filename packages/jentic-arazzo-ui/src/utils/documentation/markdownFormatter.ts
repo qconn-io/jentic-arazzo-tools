@@ -1,3 +1,6 @@
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+
 import type {
   DocumentationMetadata,
   DocumentationPrerequisite,
@@ -22,6 +25,29 @@ export function escapeHTML(value: unknown): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+const descriptionParser = unified().use(remarkParse);
+interface MarkdownNode {
+  type: string;
+  children?: MarkdownNode[];
+  position?: { start: { offset?: number }; end: { offset?: number } };
+}
+function safeDescriptionMarkdown(value: string): string {
+  const htmlSpans: { start: number; end: number }[] = [];
+  const visit = (node: MarkdownNode) => {
+    if (node.type === 'html') {
+      const start = node.position?.start.offset;
+      const end = node.position?.end.offset;
+      if (start !== undefined && end !== undefined) htmlSpans.push({ start, end });
+    }
+    node.children?.forEach(visit);
+  };
+  visit(descriptionParser.parse(value));
+  // Escape only parsed HTML, preserving CommonMark autolinks, code and authored formatting.
+  for (const { start, end } of htmlSpans.sort((a, b) => b.start - a.start))
+    value = value.slice(0, start) + escapeHTML(value.slice(start, end)) + value.slice(end);
+  return value;
 }
 function valueText(value: unknown): string {
   return typeof value === 'string' ? value : (JSON.stringify(value, null, 2) ?? '');
@@ -100,7 +126,8 @@ export function formatHeaderAsMarkdown(
       `<a href="${safeURL(metadata.documentURL)}">${escapeHTML(metadata.documentURL)}</a>`,
     );
   if (metadata.summary) sections.push(`<p>${escapeHTML(metadata.summary)}</p>`);
-  if (metadata.description) sections.push(`<p>${escapeHTML(metadata.description)}</p>`);
+  // Keep CommonMark outside generated HTML blocks; authored HTML remains literal data.
+  if (metadata.description) sections.push(`\n${safeDescriptionMarkdown(metadata.description)}\n`);
   if (metadata.support)
     sections.push(
       `<div class="inspection-support">Semantic inspection: ${metadata.support.semanticInspection ? `profile ${escapeHTML(metadata.support.profile ?? 'selected')}` : 'unsupported version; raw content only'}. Schema validation and execution support are not established. Source documents and versions are unverified.</div>`,

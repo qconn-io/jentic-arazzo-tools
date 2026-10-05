@@ -9,7 +9,7 @@ import type {
   WorkflowRefNodeData,
 } from '../../types/viewer';
 import type { ViewerStep, EffectiveAction, ArazzoViewerModel } from '../model/viewerModel';
-import { buildViewerModel } from '../model/viewerModel';
+import { buildViewerModel, transferSemantics } from '../model/viewerModel';
 import { inspect, createSnapshot, type ClassifiedTarget } from '../inspection';
 import type { RelationshipEdgeData } from '../../edges/RelationshipEdge';
 
@@ -146,6 +146,7 @@ export function convertWorkflowToFlow(
     return referenceNode(target, owner, occurrence);
   };
   viewed.steps.forEach((step, index) => {
+    const callTransfer = transferSemantics(step);
     if (step.callTarget) {
       const target = referenceNode(step.callTarget, step, 'call');
       edges.push({
@@ -158,7 +159,7 @@ export function convertWorkflowToFlow(
         data: { type: 'sequential' },
         markerEnd: { type: MarkerType.ArrowClosed },
       });
-      if (step.callTarget.kind === 'local-workflow')
+      if (callTransfer?.returnTo === 'next-step')
         edges.push({
           id: JSON.stringify([step.nodeId, 'call-return']),
           source: target,
@@ -211,11 +212,11 @@ export function convertWorkflowToFlow(
           label: action.value.name,
           data,
         } as ArazzoEdge);
-        if (type === 'retry' && action.target.kind === 'local-workflow')
+        if (transferSemantics(step, action)?.returnTo === 'source-step')
           edges.push({
             id: JSON.stringify([step.nodeId, channel, action.effectiveIndex, 'retry-return']),
             source: target,
-            sourceHandle: 'return',
+            sourceHandle: action.target.kind === 'local-step' ? 'sequential' : 'return',
             target: step.nodeId,
             type: 'sequential',
             label: 'Retry return',

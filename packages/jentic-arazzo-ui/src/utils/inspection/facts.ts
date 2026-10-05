@@ -19,6 +19,7 @@ import type {
 import { clone } from './snapshot';
 import { parseReusableReference } from './inventory';
 import { targetClassifier } from './targets';
+import { reusableOccurrenceFields } from './reusable';
 
 const array = (value: any): any[] => (Array.isArray(value) ? value : []);
 const object = (value: any): PlainObject =>
@@ -118,8 +119,7 @@ export function extractFacts(
       expectedBucket,
       new Set([...seen, reference]),
     );
-    const resolved = { ...clone(nested.value) };
-    if (Object.hasOwn(value, 'value')) resolved.value = clone(value.value);
+    const resolved = { ...clone(nested.value), ...reusableOccurrenceFields(value) };
     return { ...nested, value: resolved, declarationPath };
   };
   const parameters = (
@@ -132,12 +132,11 @@ export function extractFacts(
     array(values).map((value, index) => {
       const original = object(array(originals)[index] ?? value);
       const occurrencePath = [...path, index];
-      const resolved = reusable(
-        original.reference ? original : object(value),
-        occurrencePath,
-        owner,
-        'parameters',
-      );
+      // Resolved native occurrences are authoritative; only remaining references expand here.
+      const resolved = reusable(object(value), occurrencePath, owner, 'parameters');
+      const reference = parseReusableReference(original.reference);
+      if (!resolved.declarationPath && reference?.bucket === 'parameters')
+        resolved.declarationPath = ['components', reference.bucket, reference.key];
       const parameterDeclaration = declarationPath
         ? [...declarationPath, index]
         : resolved.declarationPath;
@@ -180,12 +179,10 @@ export function extractFacts(
       const original = object(array(originals)[index] ?? value);
       const occurrencePath = [...path, index];
       const bucket = channel === 'onSuccess' ? 'successActions' : 'failureActions';
-      const resolved = reusable(
-        original.reference ? original : object(value),
-        occurrencePath,
-        owner,
-        bucket,
-      );
+      const resolved = reusable(object(value), occurrencePath, owner, bucket);
+      const reference = parseReusableReference(original.reference);
+      if (!resolved.declarationPath && reference?.bucket === bucket)
+        resolved.declarationPath = ['components', reference.bucket, reference.key];
       const action = resolved.value;
       const provenance = {
         ...owner,

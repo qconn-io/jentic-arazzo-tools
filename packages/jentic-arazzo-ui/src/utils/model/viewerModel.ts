@@ -23,6 +23,26 @@ export interface ViewerStep extends StepFact {
   nodeId: string;
   effectiveActions: Record<ActionChannel, EffectiveAction[]>;
 }
+export interface TransferSemantics {
+  target: ClassifiedTarget;
+  returnTo?: 'source-step' | 'next-step';
+}
+
+// Understood transfers are inspection overlays, not predictions of criteria or execution.
+export function transferSemantics(
+  step: StepFact,
+  action?: ActionFact,
+): TransferSemantics | undefined {
+  if (action && (action.status !== 'resolved' || action.value.type === 'end')) return undefined;
+  const target = action ? action.target : step.callTarget;
+  if (!target || (!target.navigable && !target.kind.startsWith('external-'))) return undefined;
+  if (!action) return { target, returnTo: 'next-step' };
+  const self =
+    target.kind === 'local-step' &&
+    target.workflowId === step.workflowId &&
+    target.stepId === step.stepId;
+  return { target, returnTo: action.value.type === 'retry' && !self ? 'source-step' : undefined };
+}
 export interface ViewerWorkflow extends WorkflowFact {
   internalId: string;
   nodeId: string;
