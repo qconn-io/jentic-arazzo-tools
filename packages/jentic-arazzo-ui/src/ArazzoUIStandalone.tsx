@@ -1,3 +1,22 @@
+export { ArazzoWorkflowReview } from './ArazzoWorkflowReview';
+export { compareWorkflowRevisions, exportWorkflowReview } from './utils/review';
+export type {
+  WorkflowReviewSnapshot,
+  WorkflowReviewAddress,
+  WorkflowReviewMatch,
+  WorkflowReviewOptions,
+  WorkflowReviewValue,
+  WorkflowReviewCategory,
+  WorkflowReviewEvidence,
+  WorkflowReviewRelationship,
+  WorkflowReviewImpactPath,
+  WorkflowReviewImpact,
+  WorkflowReviewEffect,
+  WorkflowReviewFinding,
+  WorkflowReviewIdentity,
+  WorkflowReviewResult,
+  ArazzoWorkflowReviewProps,
+} from './types/review';
 import { StandaloneCatalog } from './components/StandaloneCatalog';
 export { ArazzoCatalog } from './ArazzoCatalog';
 export type {

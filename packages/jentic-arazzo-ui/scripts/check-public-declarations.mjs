@@ -16,6 +16,18 @@ try {
 import type { ArazzoEdge, ArazzoEdgeType, ArazzoUIProps, RelationshipEdgeData, WorkflowRefNodeData } from ${JSON.stringify(declaration)};
 import type { WorkflowCatalogManifest, WorkflowCatalogSelection, WorkflowCatalogCoverage, ArazzoCatalogProps } from ${JSON.stringify(declaration)};
 import { ArazzoCatalog, normalizeCatalogManifest } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))};
+import type { WorkflowReviewSnapshot, WorkflowReviewMatch, WorkflowReviewResult, ArazzoWorkflowReviewProps } from ${JSON.stringify(declaration)};
+import { ArazzoWorkflowReview, compareWorkflowRevisions, exportWorkflowReview } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))};
+const snapshot: WorkflowReviewSnapshot = { version: 1, id: 'shop', revision: '1', documents: [] };
+const match: WorkflowReviewMatch = { before: { documentId: 'flow', workflowId: 'buy' }, after: { documentId: 'flow', workflowId: 'purchase' } };
+const reviewProps: ArazzoWorkflowReviewProps = { baseline: snapshot, candidate: { ...snapshot, revision: '2' }, options: { matches: [match] } };
+const consumeReview = (result: WorkflowReviewResult) => [result.findings[0]?.baselineImpact.direct[0]?.kind, result.runtimeEffect];
+void reviewProps; void consumeReview;
+const reviewComponent: typeof ArazzoWorkflowReview = ArazzoWorkflowReview;
+const compareResult: Promise<WorkflowReviewResult> = compareWorkflowRevisions(snapshot, { ...snapshot, revision: '2' });
+void reviewComponent; void compareResult; void exportWorkflowReview;
+// @ts-expect-error Private catalog indices are not review export types.
+import type { ReviewProjection } from ${JSON.stringify(declaration)};
 const catalog: WorkflowCatalogManifest = { version: 1, id: 'shop', revision: '1', documents: [{ id: 'payments', revision: 'r1', uri: 'https://example.test/payments', workflows: [{ workflowId: 'buy', role: 'entry' }] }] };
 const validatedCatalog = normalizeCatalogManifest(catalog);
 const catalogSelection: WorkflowCatalogSelection = { documentId: 'payments', revision: 'r1', workflowId: 'buy' };

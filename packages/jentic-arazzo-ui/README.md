@@ -676,3 +676,59 @@ and unknown organizational ownership. Open `?catalog=./examples/catalog.json` in
 standalone app. Regenerate its digests from the package directory with
 `node scripts/generate-sample-catalog.mjs` after intentionally changing example documents.
 The deliberately missing diagnostic source keeps sample coverage partial.
+
+### Immutable workflow revision review
+
+`ArazzoWorkflowReview` is an optional ESM React export, independent of normal viewer
+selection/history. Import `@jentic/arazzo-ui/styles.css` alongside the component.
+Hosts supply two `WorkflowReviewSnapshot` objects with version `1`, the same logical
+catalog `id`, distinct catalog revisions, and documents with scoped logical IDs,
+revision identities, absolute URIs and immutable authored contents. Pin contracts with supplied
+`content`, optionally verified using `expectedDigest` from `authoredDigest`. Supply exact
+source-name revision bindings through each workflow document's `sources` map.
+A URI by itself never substitutes current bytes for a missing historical revision.
+Missing contracts and unsupported inspection profiles retain coverage warnings; available
+raw authored declarations remain readable. Invalid or colliding identities prevent results.
+
+```tsx
+import { ArazzoWorkflowReview, compareWorkflowRevisions, exportWorkflowReview } from '@jentic/arazzo-ui';
+import '@jentic/arazzo-ui/styles.css';
+
+// baseline and candidate are immutable supplied WorkflowReviewSnapshot values.
+<ArazzoWorkflowReview baseline={baseline} candidate={candidate}
+  onLocationRequest={(side, location) => inspectRevision(side, location)} />;
+const review = await compareWorkflowRevisions(baseline, candidate);
+const json = exportWorkflowReview(review, 'json');
+const markdown = exportWorkflowReview(review, 'markdown');
+```
+
+Workflow and step matching uses scoped IDs. Renames produce removal/addition unless
+`options.matches` supplies a validated one-to-one before/after address map. Workflow
+matches also scope step matches; implicit ID matches cannot collide with explicit matches.
+Object key order and serialization whitespace do not create findings. Array order,
+exact expressions and falsy values remain significant. Shared inherited action declarations
+count once, with revision-owned effective uses attached as provenance.
+
+Impact uses each snapshot's catalog separately. Direct uses and potential entry paths retain
+`call`, `prerequisite`, `goto`, `retry`, `descriptive` and API labels. Schema and other authored
+contract references are followed only through supplied contents; inherited parameter,
+server and security declarations respect operation overrides. Step-specific transfers remain
+scoped during traversal. Defaults/caps are 10,000 visited catalog relationships, 100 displayed
+paths and depth 32 per finding/side; positive lower bounds can be supplied in `options`.
+Cycles and truncation are visible. Contract-reference provenance inspection is also finite
+(10,000 declaration visits/depth 32 per operation), with incomplete traversal disclosed.
+Absent or unsupported sources mean partial knowledge, not absence of consumers.
+
+Before/after values use the shared readable value renderer, and each location opens its own
+revision's existing viewer and pinned source inspector. Removed baseline content stays
+inspectable. JSON and Markdown exports contain identities/digests, authored differences,
+locations, relationship classes and coverage/limit records. Markdown also includes complete
+machine-readable review data. Exports contain supplied authored values, which hosts should
+review before sharing; private provider/session configuration is not included.
+Viewing/exporting creates no approval or test status. Runtime effect stays **undetermined**;
+reviewers retain responsibility for compatibility and business judgment.
+
+Synthetic purchase/event, partial and formatting-only pairs live in
+`public/examples/revision-review`. Production browser acceptance bundles the built ESM export:
+run `node scripts/build-review-browser.mjs` after `npm run build`, serve `build` at port 3000,
+then run `npx playwright test test/e2e/review.spec.ts`.
