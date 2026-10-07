@@ -1,3 +1,4 @@
+import { ScenarioFocusDetails } from './ScenarioPanel';
 import { SystemsDetails } from './SystemsDetails';
 import React, { useEffect, useRef, useState } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
@@ -60,9 +61,10 @@ export function SelectionDetails() {
       element.closest('.arazzo-ui-standalone') ??
       element.closest('.arazzo-ui') ??
       element.parentElement;
-    const fallback = element
-      .closest('.arazzo-viewer-shell')
-      ?.querySelector<HTMLElement>('.arazzo-workflow-navigation select');
+    const shell = element.closest('.arazzo-viewer-shell');
+    const fallback =
+      shell?.querySelector<HTMLElement>('.arazzo-scenario-controls button:not(:disabled)') ??
+      shell?.querySelector<HTMLElement>('.arazzo-workflow-navigation select');
     const background: { element: HTMLElement; inert: boolean; hidden: string | null }[] = [];
     if (covering) {
       let child: HTMLElement = element;
@@ -177,6 +179,7 @@ export function SelectionDetails() {
           )}
         </dl>
       </section>
+      <ScenarioFocusDetails />
       <ReadingDetails sections={details.reading.sections} />
       {selection?.stepId && (
         <ContractPanel workflowId={selection.workflowId} stepId={selection.stepId} />

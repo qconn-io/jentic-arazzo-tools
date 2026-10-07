@@ -180,3 +180,18 @@ runtime outcomes. See [verification.json](verification.json) for the recorded ch
 
 The event semantics follow [Arazzo 1.1.0](https://spec.openapis.org/arazzo/v1.1.0.html) and
 [AsyncAPI 3.0.0](https://www.asyncapi.com/docs/reference/specification/v3.0.0).
+
+## Authored reading guides
+
+Explicitly load `scenarios.json` in the viewer's **Scenario manifest URL** control (or provide
+its URL as `?scenarios=` alongside the document URL). All 27 original IDs and expected/evidence
+texts are preserved. Ordered waypoints address authored criteria, exact call mappings, recovery
+actions, payloads and intentional display/diagnostic boundaries. Next/Previous changes only the
+reading address; the inspector and Close details return to the guide. Leaving guide mode retains
+ordinary workflow navigation.
+
+The UNKNOWN capture guide reads reconciliation and the original retry separately from definite
+DECLINED abort. Compensation retains its absence/revocation guard. Completion timeout reads the
+12-second receive timeout, two receive retries and one-way polling fallback without republishing
+a command. FAILED activation and a RECORDED receipt remain distinct. These are authored expectations,
+not executed results. See the package README for manifest versioning, bounds and sharing requirements.

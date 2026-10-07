@@ -1,3 +1,17 @@
+import { useStandaloneScenarios } from './utils/scenario/useStandaloneScenarios';
+import {
+  SCENARIO_NAMESPACE,
+  normalizeScenarioManifest,
+  scenarioWaypoint,
+} from './utils/scenario/manifest';
+export type {
+  ScenarioFocus,
+  ScenarioWaypoint,
+  AuthoredScenario,
+  ScenarioManifest,
+  ScenarioSelection,
+  ScenarioControls,
+} from './types/scenario';
 export type {
   WorkflowProfileProvenance,
   WorkflowSystemParticipant,
@@ -131,6 +145,7 @@ export type ArazzoUIStandaloneProps = Omit<ArazzoUIProps, 'view'> & {
 export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
   function ArazzoUIStandalone(props, ref) {
     const { initialView = 'docs', onViewChange, ...rest } = props;
+    const guides = useStandaloneScenarios(props);
     const browserProvider = React.useMemo(() => new BrowserFetchProvider(), []);
     const [externalSource, setExternalSource] = useState<{
       uri: string;
@@ -139,6 +154,18 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
     }>();
     const [navigationError, setNavigationError] = useState('');
     const navigationController = useRef<AbortController>();
+    const hostScenarioLocation = useRef<WorkflowLocation>();
+    useEffect(() => {
+      sourceGeneration.current += 1;
+      navigationController.current?.abort();
+      navigationRegistry.cancelAll();
+    }, [guides.manifest]);
+    useEffect(() => {
+      if (guides.selection !== null) return;
+      sourceGeneration.current += 1;
+      navigationController.current?.abort();
+      navigationRegistry.cancelAll();
+    }, [guides.selection]);
     const initialURL = useRef(readLocationURL(new URL(globalThis.location.href)));
     const [view, setView] = useState<ViewerMode>(
       props.location?.view ??
@@ -215,6 +242,12 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
       !!suppliedIdentity || /^https?:\/\//i.test(value.document);
     const copy = async () => {
       const current = currentLocation.current;
+      if (guides.selection && (!guides.uri || !/^https?:\/\//i.test(guides.uri))) {
+        setShareMessage(
+          'Publish the scenario manifest at an addressable URI before sharing this guide.',
+        );
+        return;
+      }
       if (!current || !addressable(current)) {
         setShareMessage(
           'This content must be supplied again or published at an addressable source before a shareable link can reproduce it.',
@@ -235,6 +268,14 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
       const url = addressable(value)
         ? writeLocationURL(globalThis.location.href, value)
         : new URL(globalThis.location.href);
+      const guideState = value.extensions?.[SCENARIO_NAMESPACE];
+      if (
+        guideState &&
+        typeof guideState === 'object' &&
+        !Array.isArray(guideState) &&
+        typeof guideState.manifestURI === 'string'
+      )
+        url.searchParams.set('scenarios', guideState.manifestURI);
       const previousLocation = globalThis.history.state?.arazzoLocation;
       const state = {
         ...globalThis.history.state,
@@ -260,6 +301,7 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
         navigationRegistry.cancelAll();
         setNavigationError('');
         const url = new URL(globalThis.location.href);
+        guides.restore(url);
         let decoded = readLocationURL(url);
         if (!decoded.location && !decoded.error && event.state?.arazzoLocation) {
           try {
@@ -313,7 +355,18 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
     useEffect(() => {
       if (hostDocumentRef.current === props.document) return;
       hostDocumentRef.current = props.document;
-      commitSource(props.document);
+      const pending = hostScenarioLocation.current;
+      const supplied =
+        props.documentIdentity ??
+        (typeof props.document === 'string' && /^https?:\/\//i.test(props.document)
+          ? props.document
+          : undefined);
+      commitSource(
+        props.document,
+        undefined,
+        guides.selection && pending?.document === supplied ? pending : undefined,
+      );
+      hostScenarioLocation.current = undefined;
       setUrlInput(
         typeof props.document === 'string' && /^https?:\/\//i.test(props.document)
           ? props.document
@@ -324,11 +377,13 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
     const commitSource = (
       source: ArazzoDocument | string,
       provenance?: { uri: string; revision?: string; root?: string },
+      guideLocation?: WorkflowLocation,
     ) => {
       sourceGeneration.current += 1;
       navigationController.current?.abort();
       navigationRegistry.cancelAll();
       setNavigationError('');
+      if (!guideLocation) guides.setSelection(null);
       setExternalSource(provenance);
       currentLocation.current = undefined;
       replaceNext.current = true;
@@ -338,7 +393,7 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
       setDocumentSource(source);
       setHydration((current) => ({
         epoch: current.epoch + 1,
-        location: undefined,
+        location: guideLocation,
         error: undefined,
         callers: undefined,
       }));
@@ -459,6 +514,64 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
       },
       [loadFile],
     );
+
+    const navigateScenarioLocation: NonNullable<
+      ArazzoUIProps['onScenarioLocationRequest']
+    > = async (location, focus) => {
+      if (props.onScenarioLocationRequest) {
+        hostScenarioLocation.current = location;
+        props.onScenarioLocationRequest(location, focus);
+        return;
+      }
+      const normalized = normalizeScenarioManifest(guides.manifest, guides.uri).manifest;
+      const accepted = scenarioWaypoint(normalized, guides.selection, view);
+      if (!accepted || encodeLocation(accepted.location) !== encodeLocation(location)) return;
+      setView(location.view);
+      const currentIdentity =
+        documentIdentity ??
+        (typeof documentSource === 'string' && /^https?:\/\//i.test(documentSource)
+          ? documentSource
+          : undefined);
+      navigationController.current?.abort();
+      navigationRegistry.cancelAll();
+      const generation = ++sourceGeneration.current;
+      if (location.document === currentIdentity) return;
+      const controller = new AbortController();
+      navigationController.current = controller;
+      setNavigationError('');
+      try {
+        const acquired = await navigationRegistry.acquire(location.document, location.revision);
+        if (controller.signal.aborted || generation !== sourceGeneration.current) return;
+        if (location.revision !== undefined && acquired.revision !== location.revision)
+          throw new Error('Scenario document revision mismatch.');
+        commitSource(
+          typeof acquired.content === 'string'
+            ? acquired.content
+            : JSON.stringify(acquired.content),
+          { uri: acquired.retrievalURI, revision: acquired.revision },
+          location,
+        );
+        setUrlInput(acquired.retrievalURI);
+      } catch (error) {
+        if (!controller.signal.aborted && generation === sourceGeneration.current)
+          setNavigationError(
+            `Guide document unavailable: ${error instanceof Error ? error.message : String(error)}`,
+          );
+      }
+    };
+    const guideSelectionKey = JSON.stringify(guides.selection);
+    useEffect(() => {
+      if (props.onScenarioLocationRequest || !guides.selection) return;
+      const normalized = normalizeScenarioManifest(guides.manifest, guides.uri).manifest;
+      const identity = normalized?.id ?? guides.uri;
+      if (
+        (identity && guides.selection.manifest !== identity) ||
+        guides.selection.revision !== normalized?.revision
+      )
+        return;
+      const point = scenarioWaypoint(normalized, guides.selection, view);
+      if (point) navigateScenarioLocation(point.location, point.focus);
+    }, [guideSelectionKey, guides.manifest, guides.uri, props.sourceProvider]);
 
     return (
       <LocationHistoryContext.Provider
@@ -590,6 +703,28 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
             </div>
             {hydration.error && <p role="status">{hydration.error}</p>}
             {navigationError && <p role="status">{navigationError}</p>}
+            <form
+              className="arazzo-scenario-loader"
+              onSubmit={(event) => {
+                event.preventDefault();
+                guides.load();
+              }}
+            >
+              <label>
+                Scenario manifest URL{' '}
+                <input
+                  type="url"
+                  aria-label="Scenario manifest URL"
+                  value={guides.input}
+                  onChange={(event) => guides.setInput(event.target.value)}
+                  placeholder="Explicit scenario manifest URL"
+                />
+              </label>
+              <button type="submit" disabled={!guides.input.trim()}>
+                Load scenario manifest
+              </button>
+              {guides.message && <p role="status">{guides.message}</p>}
+            </form>
             <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
               <ArazzoUI
                 key={hydration.epoch}
@@ -640,6 +775,11 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
                       setNavigationError(error instanceof Error ? error.message : String(error));
                   }
                 }}
+                scenarioManifest={guides.manifest}
+                scenarioManifestURI={guides.uri}
+                scenarioSelection={guides.selection}
+                onScenarioSelectionChange={guides.setSelection}
+                onScenarioLocationRequest={navigateScenarioLocation}
                 document={documentSource}
                 view={view}
                 onViewChange={handleViewChange}

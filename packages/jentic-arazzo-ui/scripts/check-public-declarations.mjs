@@ -45,6 +45,16 @@ const widenedMode: ViewerMode = 'systems';
 const widenedDiagram: DiagramType = 'systems';
 // @ts-expect-error Native system scenes remain private.
 import type { SystemScene } from ${JSON.stringify(declaration)};
+import type { ScenarioManifest, ScenarioWaypoint, ScenarioSelection, ScenarioControls, ScenarioFocus, AuthoredScenario } from ${JSON.stringify(declaration)};
+const focus: ScenarioFocus = { kind: 'criterion', pointer: '/workflows/0/steps/0/successCriteria/0' };
+const waypoint: ScenarioWaypoint = { id: 'evidence', narrative: 'Inspect authored evidence.', location: {version: 1, document: 'host:doc', root: 'root', view: 'docs', subview: 'docs'}, focus };
+const authoredScenario: AuthoredScenario = { id: 'unknown', document: 'host:doc', workflow: 'root', expected: 'UNKNOWN requires reconciliation.', evidence: 'Authored inspection only.', waypoints: [waypoint] };
+const manifest: ScenarioManifest = { version: 1, id: 'host:guide', scenarios: [authoredScenario] };
+const selection: ScenarioSelection = { manifest: 'host:guide', scenarioId: 'unknown', waypointId: 'evidence' };
+const scenarioControls: ScenarioControls = { scenarioManifest: manifest, scenarioSelection: selection, onScenarioSelectionChange: s => s?.scenarioId, onScenarioLocationRequest: (l, f) => [l.selection, f?.pointer] };
+const scenarioProps: ArazzoUIProps = {document: '{}', ...scenarioControls};
+// @ts-expect-error Guides never accept execution commands.
+const executionFocus: ScenarioFocus = { kind: 'execute', pointer: '/workflows/0' };
 const address: WorkflowActionAddress = { document: 'host:doc', pointer: '/workflows/0/onFailure/0', usePointer: '/workflows/0/onFailure/0', channel: 'onFailure', index: 0 };
 const location: WorkflowLocation = { version: 1, document: 'host:doc', root: 'root', view: 'docs', subview: 'sequence', selection: { kind: 'action', workflowId: 'child', stepId: 'capture', occurrence: [{ workflowId: 'root', stepId: 'second-item' }], action: address } };
 const props: ArazzoUIProps = { document: '{}', location, defaultLocation: location, documentIdentity: 'host:doc', onLocationChange: value => value.selection?.occurrence, onLocationStatus: (status: WorkflowLocationStatus) => status.state };

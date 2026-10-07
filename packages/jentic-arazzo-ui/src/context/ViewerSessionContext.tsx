@@ -45,6 +45,7 @@ interface Session {
     result: ResolvedLocation,
     view: WorkflowView,
     callers?: ResolvedLocation[],
+    origin?: HTMLElement,
   ) => void;
 }
 const ViewerSessionContext = createContext<Session | null>(null);
@@ -123,7 +124,6 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
           }
         : null,
     );
-    origin.current = undefined;
     setFocusRowId(result.focusRowId);
     const publicStep = row && (row.workflowId === root ? row.step?.stepId : row.path[0]?.[1]);
     const nodeId = root && publicStep ? model.nodeIds.get(root)?.get(publicStep) : undefined;
@@ -258,7 +258,8 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     },
     expansions,
     views,
-    restoreLocation: (result, view, callers) => {
+    restoreLocation: (result, view, callers, control) => {
+      origin.current = control;
       pending.current = undefined;
       authoredRequest.current = undefined;
       if (activeWorkflowId === result.root) applyLocation(result, view, callers);

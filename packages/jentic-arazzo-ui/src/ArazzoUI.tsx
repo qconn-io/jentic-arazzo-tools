@@ -1,3 +1,13 @@
+import { ScenarioProvider } from './context/ScenarioContext';
+import { ScenarioPanel } from './components/ScenarioPanel';
+export type {
+  ScenarioFocus,
+  ScenarioWaypoint,
+  AuthoredScenario,
+  ScenarioManifest,
+  ScenarioSelection,
+  ScenarioControls,
+} from './types/scenario';
 export type {
   WorkflowProfileProvenance,
   WorkflowSystemParticipant,
@@ -320,14 +330,16 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
         onExternalNavigation={props.onExternalNavigation}
       >
         <SystemsProvider props={props}>
-          <ReactFlowProvider>
-            <ArazzoUIInner
-              ref={ref}
-              view={view}
-              locationProps={loadedInput.current === rawDocument ? props : undefined}
-              workflowRequest={workflowRequest}
-            />
-          </ReactFlowProvider>
+          <ScenarioProvider props={props}>
+            <ReactFlowProvider>
+              <ArazzoUIInner
+                ref={ref}
+                view={view}
+                locationProps={loadedInput.current === rawDocument ? props : undefined}
+                workflowRequest={workflowRequest}
+              />
+            </ReactFlowProvider>
+          </ScenarioProvider>
         </SystemsProvider>
       </ArazzoViewerProvider>
     </div>
@@ -404,6 +416,7 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
         </div>
       )}
       <InspectionStatus />
+      {locationProps && <ScenarioPanel props={locationProps} />}
       {locationProps && (
         <WorkflowLocationBridge
           props={locationProps}

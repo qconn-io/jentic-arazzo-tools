@@ -502,3 +502,89 @@ Selected mappings and explicit prerequisites are inspectable without expression 
 Response alternatives and declared event relationship details are opt-in inspector layers. Event links require an explicit association and loaded, matching resolved channel/message identities, including any pinned revision. Similar names or identical payloads do not establish a link. Neither send/receive arrows nor association links assert delivery, subscription, correlation success, execution order, or an observed response. Explicit source loading is still required. The inspector and Systems share current loaded projections; provider/document replacement and dependency reload invalidate obsolete facts.
 
 The `jentic.systems` workflow-location extension preserves the system root, semantic interaction address, association path and expanded/collapsed controls. Exact workflow navigation uses the existing standard occurrence address; returning restores the separate system context. Hosts must supply the same profile to restore its descriptive associations. System state does not widen legacy location view/subview unions or mutate authored documents.
+
+### Authored scenario guides
+
+Supply `scenarioManifest` to the headless viewer, or load an explicit manifest URL with the
+standalone **Scenario manifest URL** control or `?scenarios=<manifest URL>`. The viewer never
+searches sibling files for guides. Guide text is labeled as **authored expectations**: opening
+or visiting a waypoint does not execute an operation, evaluate an expression, or measure a
+scenario result.
+
+Legacy arrays of `{ id, document, workflow, expected, evidence }` remain supported. Their text
+is preserved; entries without waypoints open only the declared workflow and disclose that no
+precise reading path was authored. A versioned manifest can add titles, assumptions, tags and
+explicit ordered waypoints:
+
+```json
+{
+  "version": 1,
+  "id": "payment-guides",
+  "revision": "1",
+  "scenarios": [
+    {
+      "id": "unknown-capture",
+      "document": "arazzo.yaml",
+      "workflow": "capture-authorized-payment",
+      "expected": "Reconcile UNKNOWN before retrying the original capture; require CAPTURED evidence.",
+      "evidence": "Authored inspection only; no live execution trace.",
+      "assumptions": "Assume an uncertain response for the original purchase key.",
+      "tags": ["payment", "uncertain"],
+      "waypoints": [
+        {
+          "id": "capture-evidence",
+          "narrative": "Inspect the authored CAPTURED criterion and identity checks.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "capture-authorized-payment",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "capture-authorized-payment",
+              "stepId": "capture-payment"
+            }
+          },
+          "focus": { "kind": "criterion", "pointer": "/workflows/7/steps/0/successCriteria" }
+        }
+      ]
+    }
+  ]
+}
+```
+
+This pointer matches the supplied stress fixture; update it when the authored document changes.
+Relative scenario, waypoint and action document references resolve against `scenarioManifestURI`
+(the manifest retrieval URI), never an inferred sibling directory. Supplied manifests with relative
+references therefore require that prop. A headless host can instead use stable absolute identities
+such as `host:payment` and map requested identities to its own documents.
+
+A waypoint uses the existing `WorkflowLocation` contract: authored workflow/step identity, an
+optional exact call occurrence, and declaration/use-site addresses for an action. Optional focus
+kinds are `parameter`, `payload`, `output`, `criterion` and `action`; their JSON Pointers address
+actual authored content in the selected step, its call ancestry, applicable action declaration,
+or workflow outputs. The inspector presents that content without choosing a branch. Keep waypoint
+IDs stable when revising a manifest. Do not use generated row IDs or screen positions as addresses.
+
+`scenarioSelection`, `onScenarioSelectionChange`, and `onScenarioLocationRequest(location, focus)`
+provide optional embedding controls. `undefined` selection uses viewer-owned state; a supplied
+selection (including `null`) is controlled by the host. The callback is a reading/navigation
+request. For another document the headless host must supply `document` and `documentIdentity`
+(and `documentRevision` when applicable); the viewer reports a localized document-request
+status while waiting. Standalone acquires only explicitly addressed documents through its source
+provider and cancels obsolete requests on replacement or leaving the guide.
+
+Standalone links use the `arazzo.scenario` location extension with manifest identity, retrieval
+URI/revision, scenario ID and optional waypoint ID. A reproducible guide link needs an addressable
+HTTP(S) manifest and addressable documents. Inline-only manifests remain usable but cannot be
+reconstructed in a fresh session. Manifest revision and document revision/digest checks are
+independent. Unavailable manifests, stale IDs, removed actions/focus pointers and display-limit
+locations retain their narratives and show diagnostics; they never become failed test results or
+fall back to a namesake step. Invalid entries are localized. At most 500 scenarios and 100
+waypoints per scenario are displayed, with visible explanations for truncation.
+
+The [stress manifest](./public/examples/digital-product-stress/scenarios.json) contains 27 guides,
+and the [small-pack manifest](./public/examples/digital-product/scenarios.json) contains its seven
+documented failure cases. Their walkthrough records are browser inspection evidence, not observed
+business outcomes or execution coverage.

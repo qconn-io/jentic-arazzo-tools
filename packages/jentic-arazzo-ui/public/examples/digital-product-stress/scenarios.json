@@ -4,188 +4,2041 @@
     "document": "arazzo.yaml",
     "workflow": "full-stress-journey",
     "expected": "Each fulfil-item call retains its own purchase/product/amount and output mapping; two READY results.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "batch-fulfilment.first-item.parameter",
+        "narrative": "First call binds product, amount and purchase identity independently. These are authored input mappings, not measured results.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "batch-fulfilment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "batch-fulfilment",
+            "stepId": "first-item"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/2/steps/0/parameters"
+        }
+      },
+      {
+        "id": "batch-fulfilment.second-item.parameter",
+        "narrative": "Second call retains 2499, digital-upgrade and the -B purchase identity rather than the first item mappings.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "batch-fulfilment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "batch-fulfilment",
+            "stepId": "second-item"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/2/steps/1/parameters"
+        }
+      },
+      {
+        "id": "fulfil-item.issue-license.output",
+        "narrative": "Inspect issuance in the second call occurrence and its own output mapping; READY remains an authored requirement.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "batch-fulfilment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "fulfil-item",
+            "stepId": "issue-license",
+            "occurrence": [
+              {
+                "workflowId": "batch-fulfilment",
+                "stepId": "second-item"
+              }
+            ]
+          }
+        },
+        "focus": {
+          "kind": "output",
+          "pointer": "/workflows/3/steps/1/outputs"
+        }
+      }
+    ]
   },
   {
     "id": "price-drift",
     "document": "arazzo.yaml",
     "workflow": "reserve-inventory",
     "expected": "Reservation amount or currency differs from authorization; stop before capture.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "reserve-inventory.reserve-product.criterion",
+        "narrative": "Amount and currency must match the authorization before capture can be authorized.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reserve-inventory",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "reserve-inventory",
+            "stepId": "reserve-product"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/6/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "reserve-inventory.reserve-product.onFailure-1",
+        "narrative": "The end action stops this failing path; no successful capture is inferred.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reserve-inventory",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "reserve-inventory",
+            "stepId": "reserve-product",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/stop-and-reconcile",
+              "usePointer": "/workflows/6/steps/0/onFailure/1",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "stop-and-reconcile"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/stop-and-reconcile"
+        }
+      }
+    ]
   },
   {
     "id": "reservation-transient-503",
     "document": "arazzo.yaml",
     "workflow": "reserve-inventory",
     "expected": "Same-key reserve retry, 1-second delay, at most two retries; then stop.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "reserve-inventory.reserve-product.parameter",
+        "narrative": "The original reservation key remains attached to the source operation.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reserve-inventory",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "reserve-inventory",
+            "stepId": "reserve-product"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/6/steps/0/parameters"
+        }
+      },
+      {
+        "id": "reserve-inventory.reserve-product.onFailure-0",
+        "narrative": "503 has a one-second delay and at most two retries of this source step.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reserve-inventory",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "reserve-inventory",
+            "stepId": "reserve-product",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/retry-transient",
+              "usePointer": "/workflows/6/steps/0/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "retry-transient"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/retry-transient"
+        }
+      },
+      {
+        "id": "reserve-inventory.reserve-product.onFailure-1",
+        "narrative": "Exhaustion retains the explicit stop-and-reconcile boundary.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reserve-inventory",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "reserve-inventory",
+            "stepId": "reserve-product",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/stop-and-reconcile",
+              "usePointer": "/workflows/6/steps/0/onFailure/1",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "stop-and-reconcile"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/stop-and-reconcile"
+        }
+      }
+    ]
   },
   {
     "id": "capture-uncertain-then-confirmed",
     "document": "arazzo.yaml",
     "workflow": "capture-authorized-payment",
     "expected": "UNKNOWN/503 -> reconcile original key -> retry same source step; confirm CAPTURED evidence.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "capture-authorized-payment.capture-payment.onFailure-0",
+        "narrative": "UNKNOWN or 503 authorizes the authored reconciliation-before-retry path; neither is a definite decline.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/7/steps/0/onFailure/0",
+              "usePointer": "/workflows/7/steps/0/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "reconcile-before-capture-retry"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/7/steps/0/onFailure/0"
+        }
+      },
+      {
+        "id": "reconcile-payment.observe-payment.parameter",
+        "narrative": "Read evidence for the original purchase key. This observation is not proof of a captured payment.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reconcile-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "reconcile-payment",
+            "stepId": "observe-payment"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/8/steps/0/parameters"
+        }
+      },
+      {
+        "id": "capture-authorized-payment.capture-payment.parameter",
+        "narrative": "Retry returns to the original capture step with its original key, not a new capture operation.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/7/steps/0/parameters"
+        }
+      },
+      {
+        "id": "capture-authorized-payment.capture-payment.criterion",
+        "narrative": "Proceeding requires CAPTURED plus matching reservation, amount and currency evidence.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/7/steps/0/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "capture-retries-exhausted",
     "document": "arazzo.yaml",
     "workflow": "capture-authorized-payment",
     "expected": "At most three capture retries, each preceded by reconciliation; fallback end after exhaustion.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "capture-authorized-payment.capture-payment.onFailure-0",
+        "narrative": "At most three retries; each declared retry invokes reconciliation before returning to this same source step.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/7/steps/0/onFailure/0",
+              "usePointer": "/workflows/7/steps/0/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "reconcile-before-capture-retry"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/7/steps/0/onFailure/0"
+        }
+      },
+      {
+        "id": "reconcile-payment.observe-payment.parameter",
+        "narrative": "Reconciliation reads the original purchase, not a replacement attempt.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reconcile-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "reconcile-payment",
+            "stepId": "observe-payment"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/8/steps/0/parameters"
+        }
+      },
+      {
+        "id": "capture-authorized-payment.capture-payment.onFailure-2",
+        "narrative": "After retry exhaustion the fallback end action is a stopping boundary, not successful capture.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/stop-and-reconcile",
+              "usePointer": "/workflows/7/steps/0/onFailure/2",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "stop-and-reconcile"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/stop-and-reconcile"
+        }
+      }
+    ]
   },
   {
     "id": "definite-payment-decline",
     "document": "arazzo.yaml",
     "workflow": "capture-authorized-payment",
     "expected": "DECLINED -> one-way abort-purchase -> release and record failure; no refund.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "capture-authorized-payment.capture-payment.onFailure-1",
+        "narrative": "A definite DECLINED response selects an authored one-way abort alternative rather than the UNKNOWN retry alternative.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/7/steps/0/onFailure/1",
+              "usePointer": "/workflows/7/steps/0/onFailure/1",
+              "channel": "onFailure",
+              "index": 1,
+              "name": "release-after-definite-decline"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/7/steps/0/onFailure/1"
+        }
+      },
+      {
+        "id": "abort-purchase.release.parameter",
+        "narrative": "Abort releases the reservation. This workflow has no refund step.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "abort-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "abort-purchase",
+            "stepId": "release"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/12/steps/0/parameters"
+        }
+      },
+      {
+        "id": "abort-purchase.record-failure.parameter",
+        "narrative": "Record the failure with authored identifiers; visiting this guide does not perform cleanup.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "abort-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "abort-purchase",
+            "stepId": "record-failure"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/12/steps/1/parameters"
+        }
+      }
+    ]
   },
   {
     "id": "capture-evidence-mismatch",
     "document": "arazzo.yaml",
     "workflow": "capture-authorized-payment",
     "expected": "Wrong reservation, amount or currency -> stop; no issuance.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "capture-authorized-payment.capture-payment.criterion",
+        "narrative": "Matching reservation, amount and currency are mandatory even when the response says CAPTURED.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "capture-authorized-payment",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "capture-authorized-payment",
+            "stepId": "capture-payment"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/7/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "fulfil-item.prepare.criterion",
+        "narrative": "The caller requires CAPTURED evidence before license issuance.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "fulfil-item",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "fulfil-item",
+            "stepId": "prepare"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/3/steps/0/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "issuance-uncertain",
     "document": "arazzo.yaml",
     "workflow": "fulfil-item",
     "expected": "503 -> reconcile-license -> same-key issuance retry; at most two retries.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "fulfil-item.issue-license.onFailure-0",
+        "narrative": "503 triggers reconciliation before at most two retries of the original issuance step.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "fulfil-item",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "fulfil-item",
+            "stepId": "issue-license",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/3/steps/1/onFailure/0",
+              "usePointer": "/workflows/3/steps/1/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "reconcile-issuance-before-retry"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/3/steps/1/onFailure/0"
+        }
+      },
+      {
+        "id": "reconcile-license.observe-license.criterion",
+        "narrative": "Observe the original purchase key and require matching purchase identity.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "reconcile-license",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "reconcile-license",
+            "stepId": "observe-license"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/9/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "fulfil-item.issue-license.parameter",
+        "narrative": "The original issuance idempotency key stays attached to this request.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "fulfil-item",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "fulfil-item",
+            "stepId": "issue-license"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/3/steps/1/parameters"
+        }
+      }
+    ]
   },
   {
     "id": "issuance-rejected-compensation",
     "document": "arazzo.yaml",
     "workflow": "compensate-purchase",
     "expected": "Observe original license first; revoke READY license, refund captured payment, release reservation and record failure.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "fulfil-item.issue-license.onFailure-1",
+        "narrative": "A definite 409 issuance rejection has an explicitly authored compensation transfer.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "fulfil-item",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "fulfil-item",
+            "stepId": "issue-license",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/3/steps/1/onFailure/1",
+              "usePointer": "/workflows/3/steps/1/onFailure/1",
+              "channel": "onFailure",
+              "index": 1,
+              "name": "compensate-definite-issuance-rejection"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/3/steps/1/onFailure/1"
+        }
+      },
+      {
+        "id": "compensate-purchase.inspect-issued-license.criterion",
+        "narrative": "Inspect the original license before deciding whether revoke is relevant.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "inspect-issued-license"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/10/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "compensate-purchase.revoke-license.criterion",
+        "narrative": "The active-license path requires REVOKED evidence; absence has a separate skip-revoke guard.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "revoke-license"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/10/steps/1/successCriteria"
+        }
+      },
+      {
+        "id": "compensate-purchase.refund-payment.criterion",
+        "narrative": "Refund the identified captured payment and require REFUNDED evidence.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "refund-payment"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/10/steps/2/successCriteria"
+        }
+      },
+      {
+        "id": "compensate-purchase.release-reservation.parameter",
+        "narrative": "Only after the authored refund path can reservation release be read here.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "release-reservation"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/10/steps/3/parameters"
+        }
+      },
+      {
+        "id": "compensate-purchase.record-failure.parameter",
+        "narrative": "The final authored cleanup step records failure; no cleanup execution is claimed.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "record-failure"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/10/steps/4/parameters"
+        }
+      }
+    ]
   },
   {
     "id": "license-absent-during-compensation",
     "document": "arazzo.yaml",
     "workflow": "compensate-purchase",
     "expected": "ABSENT or REVOKED -> one-way goto refund-payment; skip revoke.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "compensate-purchase.inspect-issued-license.onSuccess-0",
+        "narrative": "ABSENT or REVOKED guards a one-way goto refund-payment, skipping revoke. Other states retain the revoke path.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "compensate-purchase",
+            "stepId": "inspect-issued-license",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/10/steps/0/onSuccess/0",
+              "usePointer": "/workflows/10/steps/0/onSuccess/0",
+              "channel": "onSuccess",
+              "index": 0,
+              "name": "skip-revoke-when-no-active-license"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/10/steps/0/onSuccess/0"
+        }
+      },
+      {
+        "id": "compensate-purchase.refund-payment.criterion",
+        "narrative": "The goto destination refunds the captured payment; no return to revoke is declared.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "refund-payment"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/10/steps/2/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "refund-transient-error",
     "document": "arazzo.yaml",
     "workflow": "compensate-purchase",
     "expected": "Retry original refund key at most twice; never infer later cleanup if refund still fails.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "compensate-purchase.refund-payment.parameter",
+        "narrative": "Keep the original refund key for every retry.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "compensate-purchase",
+            "stepId": "refund-payment"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/10/steps/2/parameters"
+        }
+      },
+      {
+        "id": "compensate-purchase.refund-payment.onFailure-0",
+        "narrative": "Transient 503 allows at most two retries.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "compensate-purchase",
+            "stepId": "refund-payment",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/retry-transient",
+              "usePointer": "/workflows/10/steps/2/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "retry-transient"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/retry-transient"
+        }
+      },
+      {
+        "id": "compensate-purchase.refund-payment.onFailure-1",
+        "narrative": "If refund still fails, the fallback stops; later release and recording are not inferred.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "compensate-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "compensate-purchase",
+            "stepId": "refund-payment",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/stop-and-reconcile",
+              "usePointer": "/workflows/10/steps/2/onFailure/1",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "stop-and-reconcile"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/stop-and-reconcile"
+        }
+      }
+    ]
   },
   {
     "id": "resume-existing-license",
     "document": "arazzo.yaml",
     "workflow": "resume-existing-purchase",
     "expected": "READY -> one-way transfer to record-ready with observed license identity; no return arrow.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "resume-existing-purchase.read-license.onSuccess-0",
+        "narrative": "A READY license authorizes the authored one-way transfer with its observed license identity.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "resume-existing-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "resume-existing-purchase",
+            "stepId": "read-license",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/16/steps/0/onSuccess/0",
+              "usePointer": "/workflows/16/steps/0/onSuccess/0",
+              "channel": "onSuccess",
+              "index": 0,
+              "name": "persist-existing-ready-license"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/16/steps/0/onSuccess/0"
+        }
+      },
+      {
+        "id": "record-ready.persist-ready.criterion",
+        "narrative": "The destination checks the same purchase and license before recording READY.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "record-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "record-ready",
+            "stepId": "persist-ready"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/13/steps/0/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "pending-status-read",
     "document": "arazzo.yaml",
     "workflow": "poll-purchase-until-ready",
     "expected": "Retry current read at most three times; READY passes and FAILED stops.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "poll-purchase-until-ready.poll.onFailure-0",
+        "narrative": "PENDING permits at most three retries of the current read, with a one-second delay.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "poll-purchase-until-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "poll-purchase-until-ready",
+            "stepId": "poll",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/15/steps/0/onFailure/0",
+              "usePointer": "/workflows/15/steps/0/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "wait-for-ready"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/15/steps/0/onFailure/0"
+        }
+      },
+      {
+        "id": "poll-purchase-until-ready.poll.criterion",
+        "narrative": "READY is required for success; FAILED does not satisfy these authored criteria.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "poll-purchase-until-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "poll-purchase-until-ready",
+            "stepId": "poll"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/15/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "poll-purchase-until-ready.poll.onFailure-1",
+        "narrative": "Failure retains an end boundary, not authorization to activate.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "poll-purchase-until-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "poll-purchase-until-ready",
+            "stepId": "poll",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/components/failureActions/stop-and-reconcile",
+              "usePointer": "/workflows/15/steps/0/onFailure/1",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "stop-and-reconcile"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/components/failureActions/stop-and-reconcile"
+        }
+      }
+    ]
   },
   {
     "id": "local-step-recovery",
     "document": "arazzo.yaml",
     "workflow": "step-recovery-probe",
     "expected": "PENDING -> refresh-state recovery step -> retry require-ready; successful goto skips recovery in the normal path.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "step-recovery-probe.require-ready.onFailure-0",
+        "narrative": "PENDING declares refresh-state as recovery before retrying require-ready.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "step-recovery-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "step-recovery-probe",
+            "stepId": "require-ready",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/17/steps/0/onFailure/0",
+              "usePointer": "/workflows/17/steps/0/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "refresh-before-retrying-source-step"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/17/steps/0/onFailure/0"
+        }
+      },
+      {
+        "id": "step-recovery-probe.refresh-state.criterion",
+        "narrative": "Inspect the recovery read, not a successful business operation.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "step-recovery-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "step-recovery-probe",
+            "stepId": "refresh-state"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/17/steps/1/successCriteria"
+        }
+      },
+      {
+        "id": "step-recovery-probe.require-ready.onSuccess-0",
+        "narrative": "Normal success uses goto finish and skips recovery.",
+        "location": {
+          "version": 1,
+          "document": "arazzo.yaml",
+          "root": "step-recovery-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "step-recovery-probe",
+            "stepId": "require-ready",
+            "action": {
+              "document": "arazzo.yaml",
+              "pointer": "/workflows/17/steps/0/onSuccess/0",
+              "usePointer": "/workflows/17/steps/0/onSuccess/0",
+              "channel": "onSuccess",
+              "index": 0,
+              "name": "skip-recovery-on-normal-success"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/17/steps/0/onSuccess/0"
+        }
+      }
+    ]
   },
   {
     "id": "command-and-completion",
     "document": "event-based.arazzo.yaml",
     "workflow": "event-driven-purchase",
     "expected": "Send command; receive correlated READY event; report actual activation; wait for audit receipt and read authoritative state.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "event-driven-purchase.publish-command.payload",
+        "narrative": "The authored command payload carries the original purchase and correlation values.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "publish-command"
+          }
+        },
+        "focus": {
+          "kind": "payload",
+          "pointer": "/workflows/0/steps/0/requestBody"
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-ready.criterion",
+        "narrative": "A correlated READY completion is required before activation reporting.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/1/successCriteria"
+        }
+      },
+      {
+        "id": "event-driven-purchase.publish-activation.payload",
+        "narrative": "Report the actual device outcome supplied as input; READY purchase is not successful device activation.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "publish-activation"
+          }
+        },
+        "focus": {
+          "kind": "payload",
+          "pointer": "/workflows/0/steps/2/requestBody"
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-audit.criterion",
+        "narrative": "RECORDED is an audit receipt for the original activation event.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-audit"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/3/successCriteria"
+        }
+      },
+      {
+        "id": "event-driven-purchase.read-authoritative-state.criterion",
+        "narrative": "Both receive steps precede this final authoritative read.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "read-authoritative-state"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/4/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "unrelated-event",
     "document": "event-based.arazzo.yaml",
     "workflow": "event-driven-purchase",
     "expected": "Different correlationId does not satisfy receive; continue waiting until a matching event or timeout.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "event-driven-purchase.await-ready",
+        "narrative": "The receive declaration names the correlationId; a different event is not assumed to satisfy it.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready"
+          }
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-ready.criterion",
+        "narrative": "READY and the same purchase identity are separately required.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/1/successCriteria"
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-ready.onFailure-0",
+        "narrative": "The bounded receive retry addresses this receive step without republishing the command.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready",
+            "action": {
+              "document": "event-based.arazzo.yaml",
+              "pointer": "/workflows/0/steps/1/onFailure/0",
+              "usePointer": "/workflows/0/steps/1/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "receive-again-without-republishing"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/0/steps/1/onFailure/0"
+        }
+      }
+    ]
   },
   {
     "id": "completion-timeout",
     "document": "event-based.arazzo.yaml",
     "workflow": "event-driven-purchase",
     "expected": "12-second receive timeout; two bounded receive retries without republishing command; then one-way HTTP polling fallback.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "event-driven-purchase.await-ready",
+        "narrative": "The authored receive timeout is 12 seconds. Inspect timeout and correlation declarations; no elapsed execution is observed.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready"
+          }
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-ready.onFailure-0",
+        "narrative": "At most two receive retries return to await-ready; publish-command is not republished.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready",
+            "action": {
+              "document": "event-based.arazzo.yaml",
+              "pointer": "/workflows/0/steps/1/onFailure/0",
+              "usePointer": "/workflows/0/steps/1/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "receive-again-without-republishing"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/0/steps/1/onFailure/0"
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-ready.onFailure-1",
+        "narrative": "After retries the authored goto is a one-way polling fallback.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready",
+            "action": {
+              "document": "event-based.arazzo.yaml",
+              "pointer": "/workflows/0/steps/1/onFailure/1",
+              "usePointer": "/workflows/0/steps/1/onFailure/1",
+              "channel": "onFailure",
+              "index": 1,
+              "name": "fallback-to-authoritative-state"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/0/steps/1/onFailure/1"
+        }
+      },
+      {
+        "id": "poll-purchase-until-ready.poll.criterion",
+        "narrative": "Polling still requires authoritative READY evidence before proceeding.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "poll-purchase-until-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "poll-purchase-until-ready",
+            "stepId": "poll"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/3/steps/0/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "completion-failed",
     "document": "event-based.arazzo.yaml",
     "workflow": "event-driven-purchase",
     "expected": "FAILED event fails receive criteria; bounded receive retries and polling fallback cannot authorize activation from FAILED state.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "event-driven-purchase.await-ready.criterion",
+        "narrative": "A FAILED event does not meet the authored READY receive criterion.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/1/successCriteria"
+        }
+      },
+      {
+        "id": "event-driven-purchase.await-ready.onFailure-0",
+        "narrative": "Bounded receive retries do not convert FAILED into READY.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "action",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-ready",
+            "action": {
+              "document": "event-based.arazzo.yaml",
+              "pointer": "/workflows/0/steps/1/onFailure/0",
+              "usePointer": "/workflows/0/steps/1/onFailure/0",
+              "channel": "onFailure",
+              "index": 0,
+              "name": "receive-again-without-republishing"
+            }
+          }
+        },
+        "focus": {
+          "kind": "action",
+          "pointer": "/workflows/0/steps/1/onFailure/0"
+        }
+      },
+      {
+        "id": "poll-purchase-until-ready.poll.criterion",
+        "narrative": "Polling requires READY; FAILED cannot authorize activation.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "poll-purchase-until-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "poll-purchase-until-ready",
+            "stepId": "poll"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/3/steps/0/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "failed-device-activation",
     "document": "event-based.arazzo.yaml",
     "workflow": "activation-audit-worker",
     "expected": "Record FAILED outcome and publish RECORDED receipt; receipt does not assert successful activation.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "activation-audit-worker.receive-activation.criterion",
+        "narrative": "Match the original activation event and purchase identity.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "activation-audit-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "activation-audit-worker",
+            "stepId": "receive-activation"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/2/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "activation-audit-worker.record-event.payload",
+        "narrative": "Record the actual FAILED device outcome from the received event, not an inferred success.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "activation-audit-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "activation-audit-worker",
+            "stepId": "record-event"
+          }
+        },
+        "focus": {
+          "kind": "payload",
+          "pointer": "/workflows/2/steps/1/requestBody"
+        }
+      },
+      {
+        "id": "activation-audit-worker.publish-receipt.payload",
+        "narrative": "Publish RECORDED as an audit acknowledgment. This payload does not assert successful activation.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "activation-audit-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "activation-audit-worker",
+            "stepId": "publish-receipt"
+          }
+        },
+        "focus": {
+          "kind": "payload",
+          "pointer": "/workflows/2/steps/2/requestBody"
+        }
+      }
+    ]
   },
   {
     "id": "audit-join",
     "document": "event-based.arazzo.yaml",
     "workflow": "event-driven-purchase",
     "expected": "Final read requires both await-ready and await-audit; receipt eventId must match the original activation event.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "event-driven-purchase.await-audit.criterion",
+        "narrative": "RECORDED receipt eventId must match the original activationEventId.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "await-audit"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/3/successCriteria"
+        }
+      },
+      {
+        "id": "event-driven-purchase.read-authoritative-state.criterion",
+        "narrative": "The authored dependsOn list joins await-ready and await-audit. Inspect both dependencies and required READY/license evidence.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "event-driven-purchase",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "event-driven-purchase",
+            "stepId": "read-authoritative-state"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/4/successCriteria"
+        }
+      }
+    ]
   },
   {
     "id": "worker-perspective",
     "document": "event-based.arazzo.yaml",
     "workflow": "purchase-event-worker",
     "expected": "Receive command -> external supplied HTTP fulfil-item -> read confirmed state -> publish completion.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "purchase-event-worker.receive-command.criterion",
+        "narrative": "Read the incoming command and its purchase criterion.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "purchase-event-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "purchase-event-worker",
+            "stepId": "receive-command"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/1/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "purchase-event-worker.fulfil-command.parameter",
+        "narrative": "The explicitly supplied external HTTP fulfil-item workflow receives these input mappings.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "purchase-event-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "purchase-event-worker",
+            "stepId": "fulfil-command"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/1/steps/1/parameters"
+        }
+      },
+      {
+        "id": "purchase-event-worker.verify-ready.criterion",
+        "narrative": "Read confirmed authoritative state before publishing completion.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "purchase-event-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "purchase-event-worker",
+            "stepId": "verify-ready"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/1/steps/2/successCriteria"
+        }
+      },
+      {
+        "id": "purchase-event-worker.publish-ready.payload",
+        "narrative": "The outgoing completion payload preserves verified identity and correlation. Delivery is not observed here.",
+        "location": {
+          "version": 1,
+          "document": "event-based.arazzo.yaml",
+          "root": "purchase-event-worker",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "purchase-event-worker",
+            "stepId": "publish-ready"
+          }
+        },
+        "focus": {
+          "kind": "payload",
+          "pointer": "/workflows/1/steps/3/requestBody"
+        }
+      }
+    ]
   },
   {
     "id": "large-structured-details",
     "document": "boundaries/metadata-heavy.arazzo.yaml",
     "workflow": "metadata-heavy-entry",
     "expected": "Long labels remain identifiable and 0/false/null/empty/nested values remain in authored details.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "metadata-heavy-entry.persist-verified-purchase-with-structured-policy-and-long-authored-name.parameter",
+        "narrative": "Inspect the full authored name and advanced metadata: false, zero, null, empty text and nested values remain available.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/metadata-heavy.arazzo.yaml",
+          "root": "metadata-heavy-entry",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "metadata-heavy-entry",
+            "stepId": "persist-verified-purchase-with-structured-policy-and-long-authored-name"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/0/steps/0/parameters"
+        }
+      },
+      {
+        "id": "record-ready.persist-ready.payload",
+        "narrative": "Follow the authored call mappings without treating metadata as execution evidence.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/metadata-heavy.arazzo.yaml",
+          "root": "record-ready",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "record-ready",
+            "stepId": "persist-ready"
+          }
+        },
+        "focus": {
+          "kind": "payload",
+          "pointer": "/workflows/1/steps/0/requestBody"
+        }
+      }
+    ]
   },
   {
     "id": "recursive-call",
     "document": "boundaries/recursion.arazzo.yaml",
     "workflow": "recursive-A",
     "expected": "Active-path recursion marker; finite scene; inspection-only nonterminating execution graph.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "recursive-A.enter-B",
+        "narrative": "The call enters recursive-B; no completion is inferred.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/recursion.arazzo.yaml",
+          "root": "recursive-A",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "recursive-A",
+            "stepId": "enter-B"
+          }
+        }
+      },
+      {
+        "id": "recursive-A.observe-A",
+        "narrative": "This explicit repeating occurrence reaches the active-path recursion boundary. Authored details remain inspectable.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/recursion.arazzo.yaml",
+          "root": "recursive-A",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "recursive-A",
+            "stepId": "observe-A",
+            "occurrence": [
+              {
+                "workflowId": "recursive-A",
+                "stepId": "enter-B"
+              },
+              {
+                "workflowId": "recursive-B",
+                "stepId": "return-A"
+              }
+            ]
+          }
+        }
+      }
+    ]
   },
   {
     "id": "depth-budget",
     "document": "boundaries/depth-limit.arazzo.yaml",
     "workflow": "layer-0",
     "expected": "Expand until an eight-level boundary marker; open the target as a new root for deeper content.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "layer-9.next-beyond-boundary",
+        "narrative": "This explicit deeper occurrence is beyond the eight-level display boundary. Authored details remain available; open layer-8 as a new root to continue reading.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/depth-limit.arazzo.yaml",
+          "root": "layer-0",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "layer-9",
+            "stepId": "next",
+            "occurrence": [
+              {
+                "workflowId": "layer-0",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-1",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-2",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-3",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-4",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-5",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-6",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-7",
+                "stepId": "next"
+              },
+              {
+                "workflowId": "layer-8",
+                "stepId": "next"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "layer-8.next-as-root",
+        "narrative": "As a new root, layer-8 exposes its authored continuation without asserting execution.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/depth-limit.arazzo.yaml",
+          "root": "layer-8",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "layer-8",
+            "stepId": "next"
+          }
+        }
+      }
+    ]
   },
   {
     "id": "row-budget",
     "document": "boundaries/row-limit.arazzo.yaml",
     "workflow": "row-limit",
     "expected": "250 authored read operations; 200-row scene with omitted-content marker and full documentation access.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "row-limit.observation-001",
+        "narrative": "The authored workflow contains 250 reads; the sequence has a bounded display.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/row-limit.arazzo.yaml",
+          "root": "row-limit",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "row-limit",
+            "stepId": "observation-001"
+          }
+        }
+      },
+      {
+        "id": "row-limit.observation-250",
+        "narrative": "The omitted step remains available in authored details and full documentation.",
+        "location": {
+          "version": 1,
+          "document": "boundaries/row-limit.arazzo.yaml",
+          "root": "row-limit",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "row-limit",
+            "stepId": "observation-250",
+            "occurrence": []
+          }
+        }
+      }
+    ]
   },
   {
     "id": "unavailable-targets",
     "document": "diagnostics/unavailable-targets.arazzo.yaml",
     "workflow": "diagnostic-probe",
     "expected": "Healthy, supplied external, unfetched external, missing local and ambiguous operation coexist; deliberately incomplete/invalid.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "diagnostic-probe.healthy.criterion",
+        "narrative": "Healthy operation coexists with deliberately unavailable targets.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/unavailable-targets.arazzo.yaml",
+          "root": "diagnostic-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "diagnostic-probe",
+            "stepId": "healthy"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "diagnostic-probe.supplied-external.parameter",
+        "narrative": "This external workflow is explicitly supplied in the example; no automatic fetch is claimed.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/unavailable-targets.arazzo.yaml",
+          "root": "diagnostic-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "diagnostic-probe",
+            "stepId": "supplied-external"
+          }
+        },
+        "focus": {
+          "kind": "parameter",
+          "pointer": "/workflows/0/steps/1/parameters"
+        }
+      },
+      {
+        "id": "diagnostic-probe.unavailable-external",
+        "narrative": "An unfetched source remains unavailable. The guide does not invent a callee.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/unavailable-targets.arazzo.yaml",
+          "root": "diagnostic-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "diagnostic-probe",
+            "stepId": "unavailable-external"
+          }
+        }
+      },
+      {
+        "id": "diagnostic-probe.missing-local",
+        "narrative": "The deliberately missing local target is an inspection diagnostic.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/unavailable-targets.arazzo.yaml",
+          "root": "diagnostic-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "diagnostic-probe",
+            "stepId": "missing-local"
+          }
+        }
+      },
+      {
+        "id": "diagnostic-probe.ambiguous-operation",
+        "narrative": "The unqualified operation remains ambiguous rather than resolved by a guess.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/unavailable-targets.arazzo.yaml",
+          "root": "diagnostic-probe",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "diagnostic-probe",
+            "stepId": "ambiguous-operation"
+          }
+        }
+      }
+    ]
   },
   {
     "id": "prerequisite-cycle",
     "document": "diagnostics/prerequisite-cycle.arazzo.yaml",
     "workflow": "cycle-A",
     "expected": "Prerequisite-only cycle warning; intentionally semantically invalid.",
-    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace.",
+    "waypoints": [
+      {
+        "id": "cycle-A.observe.criterion",
+        "narrative": "cycle-A declares a prerequisite on cycle-B. This is deliberately semantically invalid.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/prerequisite-cycle.arazzo.yaml",
+          "root": "cycle-A",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "cycle-A",
+            "stepId": "observe"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/0/steps/0/successCriteria"
+        }
+      },
+      {
+        "id": "cycle-B.observe.criterion",
+        "narrative": "cycle-B closes the prerequisite-only cycle; this is not a workflow invocation.",
+        "location": {
+          "version": 1,
+          "document": "diagnostics/prerequisite-cycle.arazzo.yaml",
+          "root": "cycle-B",
+          "view": "docs",
+          "subview": "sequence",
+          "selection": {
+            "kind": "step",
+            "workflowId": "cycle-B",
+            "stepId": "observe"
+          }
+        },
+        "focus": {
+          "kind": "criterion",
+          "pointer": "/workflows/1/steps/0/successCriteria"
+        }
+      }
+    ]
   }
 ]

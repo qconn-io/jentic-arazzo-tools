@@ -184,3 +184,12 @@ Published schema references:
 
 Schema validation checks document shape; the operation, mapping and example checks supply
 additional evidence. The server contracts and reference sequence remain fictional.
+
+## Authored failure guides
+
+`scenarios.json` is an explicit version-one manifest for the seven failure examples above.
+Load it with the viewer's **Scenario manifest URL** control or `?scenarios=<manifest URL>`.
+Its waypoints point to actual authored criteria, input mappings, payloads and end actions;
+no execution behavior has been added to the Arazzo document. In particular, DECLINED and UNKNOWN
+fail the required CAPTURED evidence, and a 204 acknowledgment of FAILED device reporting does not
+assert successful activation. Reconciliation and cleanup remain outside this small example.
