@@ -1,3 +1,4 @@
+import type { ScenarioControls } from './scenario';
 import type {
   WorkflowViewProfile,
   WorkflowViewProfileAdapter,
@@ -42,7 +43,7 @@ export interface ViewerEvents {
 // ============================================================================
 
 /** @public */
-export interface ArazzoUIProps {
+export interface ArazzoUIProps extends ScenarioControls {
   document: ArazzoDocument | string;
   viewProfile?: WorkflowViewProfile;
   viewProfileAdapter?: WorkflowViewProfileAdapter;

@@ -1,3 +1,5 @@
+import { useScenario } from '../context/ScenarioContext';
+import { SCENARIO_NAMESPACE, resolveScenarioWaypoint } from '../utils/scenario/manifest';
 import { useSystems, SYSTEMS_NAMESPACE } from '../context/SystemsContext';
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import type { ArazzoUIProps, ViewerMode, WorkflowLocation, WorkflowLocationStatus } from '../types';
@@ -35,6 +37,14 @@ export function WorkflowLocationBridge({
   view: ViewerMode;
   workflowRequest?: { id: number; root: string | null };
 }) {
+  const guide = useScenario();
+  const guideKey = JSON.stringify(guide?.selection);
+  const guideExtensions = (original: WorkflowLocation['extensions']) => {
+    const value = { ...original };
+    delete value[SCENARIO_NAMESPACE];
+    if (guide?.selection) value[SCENARIO_NAMESPACE] = { ...guide.selection };
+    return value;
+  };
   const history = useContext(LocationHistoryContext);
   const systems = useSystems();
   const systemsExtensionKey = JSON.stringify(systems?.extension);
@@ -43,7 +53,8 @@ export function WorkflowLocationBridge({
   const latest = useRef({ props, viewer, session });
   latest.current = { props, viewer, session };
   const initial = useRef(props.defaultLocation);
-  const request = props.location ?? initial.current;
+  if (guide?.request) initial.current = undefined;
+  const request = props.location ?? guide?.request?.location ?? initial.current;
   const source =
     props.documentIdentity ??
     viewer.snapshot.retrievalURI ??
@@ -62,7 +73,7 @@ export function WorkflowLocationBridge({
     latest.current.session.setLocationStatus(value);
     latest.current.props.onLocationStatus?.(value);
   };
-  const enabled = !!(request || props.onLocationChange || history);
+  const enabled = !!(request || props.onLocationChange || history || guide);
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
@@ -94,6 +105,7 @@ export function WorkflowLocationBridge({
     if (!readyDigest) return;
     const key = JSON.stringify([
       requestKey,
+      guide?.request?.id,
       invalid,
       source,
       readyDigest,
@@ -116,11 +128,20 @@ export function WorkflowLocationBridge({
       return;
     }
     if (!request) return;
-    const result = resolveLocation(viewer.model, request, {
-      document: source,
-      revision: props.documentRevision,
-      digest: readyDigest,
-    });
+    const point = guide?.manifest.manifest?.scenarios
+      .find((s) => s.id === guide.selection?.scenarioId)
+      ?.waypoints?.find((w) => w.id === guide.selection?.waypointId);
+    const sourceState = { document: source, revision: props.documentRevision, digest: readyDigest };
+    const result =
+      point && guide?.request?.location === request
+        ? resolveScenarioWaypoint(
+            viewer.model,
+            viewer.snapshot.authoredDocument,
+            { ...point, location: request },
+            sourceState,
+          )
+        : resolveLocation(viewer.model, request, sourceState);
+    if (result.status.state === 'stale' && point?.focus) result.row = undefined;
     if (result.status.state === 'document-request') {
       suspended.current = true;
       emitStatus(result.status);
@@ -173,7 +194,13 @@ export function WorkflowLocationBridge({
     for (const [namespace, value] of Object.entries(request.extensions ?? {})) {
       const adapter = latest.current.props.locationAdapters?.find((a) => a.namespace === namespace);
       try {
-        if (!(namespace === SYSTEMS_NAMESPACE ? systems?.restore(value) : adapter?.restore(value)))
+        if (
+          !(namespace === SCENARIO_NAMESPACE
+            ? guide?.restore(value)
+            : namespace === SYSTEMS_NAMESPACE
+              ? systems?.restore(value)
+              : adapter?.restore(value))
+        )
           notices.push(`Unavailable location extension: ${namespace}`);
       } catch {
         notices.push(`Unavailable location extension: ${namespace}`);
@@ -199,10 +226,12 @@ export function WorkflowLocationBridge({
       result,
       request.subview,
       callers.filter((caller) => caller.status.state === 'restored'),
+      guide?.requestOrigin,
     );
     emitStatus({ ...result.status, notices });
   }, [
     requestKey,
+    guide?.request?.id,
     invalid,
     source,
     readyDigest,
@@ -240,10 +269,10 @@ export function WorkflowLocationBridge({
       root: workflowRequest.root,
       view,
       subview: session.views[workflowRequest.root ?? ''] ?? 'docs',
-      ...(extensions.current || systems?.extension
+      ...(extensions.current || systems?.extension || guide
         ? {
             extensions: {
-              ...extensions.current,
+              ...guideExtensions(extensions.current),
               ...(systems?.extension ? { [SYSTEMS_NAMESPACE]: systems.extension } : {}),
             },
           }
@@ -300,10 +329,10 @@ export function WorkflowLocationBridge({
       root: viewer.activeWorkflowId,
       view,
       subview: session.views[viewer.activeWorkflowId ?? ''] ?? 'docs',
-      ...(extensions.current || systems?.extension
+      ...(extensions.current || systems?.extension || guide
         ? {
             extensions: {
-              ...extensions.current,
+              ...guideExtensions(extensions.current),
               ...(systems?.extension ? { [SYSTEMS_NAMESPACE]: systems.extension } : {}),
             },
           }
@@ -406,6 +435,7 @@ export function WorkflowLocationBridge({
     session.views,
     session.trail,
     systemsExtensionKey,
+    guideKey,
   ]);
   if (session.details || !status || (status.state === 'restored' && !status.notices?.length))
     return null;

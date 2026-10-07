@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "id": "digital-product-failure-guides",
+  "scenarios": [
+    {
+      "id": "inventory-evidence-mismatch",
+      "document": "arazzo.yaml",
+      "workflow": "reserve-and-capture",
+      "assumptions": "Inventory returns a different product, amount or currency",
+      "expected": "Stop before payment",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "reserve-and-capture.reserve-product.criterion",
+          "narrative": "Product, amount and currency must match before payment.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "reserve-and-capture",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "reserve-and-capture",
+              "stepId": "reserve-product"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/2/steps/0/successCriteria"
+          }
+        },
+        {
+          "id": "reserve-and-capture.reserve-product.onFailure-0",
+          "narrative": "The workflow end action stops this failing path.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "reserve-and-capture",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "action",
+              "workflowId": "reserve-and-capture",
+              "stepId": "reserve-product",
+              "action": {
+                "document": "arazzo.yaml",
+                "pointer": "/workflows/2/failureActions/0",
+                "usePointer": "/workflows/2/failureActions/0",
+                "channel": "onFailure",
+                "index": 0,
+                "name": "stop-before-issuance"
+              }
+            }
+          },
+          "focus": {
+            "kind": "action",
+            "pointer": "/workflows/2/failureActions/0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "capture-declined-or-unknown",
+      "document": "arazzo.yaml",
+      "workflow": "reserve-and-capture",
+      "assumptions": "Capture returns DECLINED or UNKNOWN, even with HTTP 200",
+      "expected": "Stop before license issuance",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "reserve-and-capture.capture-payment.criterion",
+          "narrative": "CAPTURED is explicitly required. HTTP 200 with DECLINED or UNKNOWN does not suffice.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "reserve-and-capture",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "reserve-and-capture",
+              "stepId": "capture-payment"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/2/steps/1/successCriteria"
+          }
+        },
+        {
+          "id": "fulfil-purchase.reserve-and-pay.criterion",
+          "narrative": "The caller also requires CAPTURED evidence before issuance.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "fulfil-purchase",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "fulfil-purchase",
+              "stepId": "reserve-and-pay"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/1/steps/0/successCriteria"
+          }
+        }
+      ]
+    },
+    {
+      "id": "capture-evidence-mismatch",
+      "document": "arazzo.yaml",
+      "workflow": "reserve-and-capture",
+      "assumptions": "Capture evidence belongs to a different reservation or amount/currency",
+      "expected": "Stop before license issuance",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "reserve-and-capture.capture-payment.criterion",
+          "narrative": "Match reservation identity, amount and currency independently of the CAPTURED label.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "reserve-and-capture",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "reserve-and-capture",
+              "stepId": "capture-payment"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/2/steps/1/successCriteria"
+          }
+        }
+      ]
+    },
+    {
+      "id": "issuance-purchase-mismatch",
+      "document": "arazzo.yaml",
+      "workflow": "fulfil-purchase",
+      "assumptions": "Issuance response names another purchase",
+      "expected": "Reject the result; do not confirm the client",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "fulfil-purchase.issue-license.criterion",
+          "narrative": "The issuance response purchaseId must match the original purchase.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "fulfil-purchase",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "fulfil-purchase",
+              "stepId": "issue-license"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/1/steps/1/successCriteria"
+          }
+        },
+        {
+          "id": "fulfil-purchase.issue-license.onFailure-0",
+          "narrative": "The stop-and-reconcile end action provides no client confirmation.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "fulfil-purchase",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "action",
+              "workflowId": "fulfil-purchase",
+              "stepId": "issue-license",
+              "action": {
+                "document": "arazzo.yaml",
+                "pointer": "/workflows/1/failureActions/0",
+                "usePointer": "/workflows/1/failureActions/0",
+                "channel": "onFailure",
+                "index": 0,
+                "name": "stop-fulfilment-and-reconcile"
+              }
+            }
+          },
+          "focus": {
+            "kind": "action",
+            "pointer": "/workflows/1/failureActions/0"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bundle-evidence-mismatch",
+      "document": "arazzo.yaml",
+      "workflow": "client-journey",
+      "assumptions": "Bundle names another purchase, license or device",
+      "expected": "Stop before reporting activation",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "client-journey.retrieve-bundle.criterion",
+          "narrative": "Purchase, license and device criteria guard reporting.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "client-journey",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "client-journey",
+              "stepId": "retrieve-bundle"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/0/steps/1/successCriteria"
+          }
+        }
+      ]
+    },
+    {
+      "id": "failed-device-activation",
+      "document": "arazzo.yaml",
+      "workflow": "client-journey",
+      "assumptions": "Actual device outcome is FAILED",
+      "expected": "Record FAILED and acknowledge receipt; failure follow-up is separate",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "client-journey.report-activation.payload",
+          "narrative": "The payload reports the actual supplied device outcome, including FAILED.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "client-journey",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "client-journey",
+              "stepId": "report-activation"
+            }
+          },
+          "focus": {
+            "kind": "payload",
+            "pointer": "/workflows/0/steps/2/requestBody"
+          }
+        },
+        {
+          "id": "client-journey.report-activation.criterion",
+          "narrative": "204 acknowledges recording; it is not successful activation evidence.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "client-journey",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "client-journey",
+              "stepId": "report-activation"
+            }
+          },
+          "focus": {
+            "kind": "criterion",
+            "pointer": "/workflows/0/steps/2/successCriteria"
+          }
+        }
+      ]
+    },
+    {
+      "id": "lost-response-or-503",
+      "document": "arazzo.yaml",
+      "workflow": "reserve-and-capture",
+      "assumptions": "Response is lost or a service returns 503",
+      "expected": "Stop and reconcile the original attempt; no automatic blind replay",
+      "evidence": "Authored failure example and viewer inspection; not a live execution trace.",
+      "waypoints": [
+        {
+          "id": "reserve-and-capture.capture-payment.parameter",
+          "narrative": "The original operation-specific key remains available for separate reconciliation.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "reserve-and-capture",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "step",
+              "workflowId": "reserve-and-capture",
+              "stepId": "capture-payment"
+            }
+          },
+          "focus": {
+            "kind": "parameter",
+            "pointer": "/workflows/2/steps/1/parameters"
+          }
+        },
+        {
+          "id": "reserve-and-capture.capture-payment.onFailure-0",
+          "narrative": "The small pack ends on failure and has no automatic retry/replay declaration. Reconciliation is outside this example.",
+          "location": {
+            "version": 1,
+            "document": "arazzo.yaml",
+            "root": "reserve-and-capture",
+            "view": "docs",
+            "subview": "sequence",
+            "selection": {
+              "kind": "action",
+              "workflowId": "reserve-and-capture",
+              "stepId": "capture-payment",
+              "action": {
+                "document": "arazzo.yaml",
+                "pointer": "/workflows/2/failureActions/0",
+                "usePointer": "/workflows/2/failureActions/0",
+                "channel": "onFailure",
+                "index": 0,
+                "name": "stop-before-issuance"
+              }
+            }
+          },
+          "focus": {
+            "kind": "action",
+            "pointer": "/workflows/2/failureActions/0"
+          }
+        }
+      ]
+    }
+  ]
+}
