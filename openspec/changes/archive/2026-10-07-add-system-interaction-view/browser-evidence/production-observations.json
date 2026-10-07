@@ -1,0 +1,39 @@
+{
+  "assets": {
+    "script": "./arazzo-ui-standalone.ea163edb.js",
+    "stylesheet": "./arazzo-ui.4464c625.css",
+    "scriptSHA256": "52a4280dfe822547254797d73c9b2e985da9b5fa75ed2ebf21f72d65324db40e",
+    "stylesheetSHA256": "ed9ebcb728c0221a43bdbddef8e85369d3baa118e4054303d3af9ab96e16d60b"
+  },
+  "observations": [
+    {
+      "width": 1440,
+      "check": "built UMD five participants, payment occurrence return, keyboard and containment",
+      "pass": true,
+      "geometry": {
+        "client": 1414,
+        "scroll": 1414,
+        "page": 1440,
+        "viewport": 1440
+      }
+    },
+    {
+      "width": 480,
+      "check": "built UMD five participants, payment occurrence return, keyboard and containment",
+      "pass": true,
+      "geometry": {
+        "client": 454,
+        "scroll": 1050,
+        "page": 480,
+        "viewport": 480
+      }
+    },
+    {
+      "width": 480,
+      "check": "built UMD explicit event identity validation and source loading",
+      "pass": true,
+      "contractRequests": 1
+    }
+  ],
+  "errors": []
+}

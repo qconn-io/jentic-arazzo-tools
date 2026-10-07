@@ -1,4 +1,17 @@
 export type {
+  WorkflowProfileProvenance,
+  WorkflowSystemParticipant,
+  WorkflowActorBinding,
+  WorkflowSourceOwnerBinding,
+  WorkflowImplementationAssociation,
+  WorkflowContractIdentity,
+  WorkflowEventAssociation,
+  WorkflowViewProfile,
+  WorkflowPerspective,
+  WorkflowViewProfileAdapter,
+} from './types/profile';
+export { digitalProductProfile } from './utils/systems/digitalProductProfile';
+export type {
   WorkflowLocation,
   WorkflowLocationSelection,
   WorkflowCallSite,
@@ -102,6 +115,8 @@ export type {
   JSONSchema,
 } from './types/arazzo';
 
+import { SystemsProvider, useSystems } from './context/SystemsContext';
+import { SystemsView } from './components/SystemsView';
 import './styles/index.css';
 
 function detectUrl(value: ArazzoDocument | string): string | null {
@@ -152,9 +167,10 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     setWorkflowRequest(undefined);
     setError(null);
 
-    const baseURI = typeof rawDocument === 'string' && /^https?:\/\//i.test(rawDocument)
-      ? rawDocument
-      : globalThis.document?.baseURI || globalThis.location?.href;
+    const baseURI =
+      typeof rawDocument === 'string' && /^https?:\/\//i.test(rawDocument)
+        ? rawDocument
+        : props.baseURI;
 
     loadDocument(rawDocument, { baseURI })
       .then((loaded) => {
@@ -176,7 +192,7 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     return () => {
       cancelled = true;
     };
-  }, [rawDocument]);
+  }, [rawDocument, props.baseURI]);
 
   const events = useMemo(
     () => ({
@@ -300,15 +316,19 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
         initialActiveWorkflowId={controlledWorkflowId}
         initialSelectedNodeId={controlledSelectedNodeId}
         events={events}
+        sourceProvider={props.sourceProvider}
+        onExternalNavigation={props.onExternalNavigation}
       >
-        <ReactFlowProvider>
-          <ArazzoUIInner
-            ref={ref}
-            view={view}
-            locationProps={loadedInput.current === rawDocument ? props : undefined}
-            workflowRequest={workflowRequest}
-          />
-        </ReactFlowProvider>
+        <SystemsProvider props={props}>
+          <ReactFlowProvider>
+            <ArazzoUIInner
+              ref={ref}
+              view={view}
+              locationProps={loadedInput.current === rawDocument ? props : undefined}
+              workflowRequest={workflowRequest}
+            />
+          </ReactFlowProvider>
+        </SystemsProvider>
       </ArazzoViewerProvider>
     </div>
   );
@@ -326,6 +346,7 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
 ) {
   const diagramRef = useRef<DiagramViewRef>(null);
   const ctx = useArazzoViewer();
+  const systems = useSystems();
 
   useImperativeHandle(
     ref,
@@ -362,6 +383,26 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
   return (
     <div className="arazzo-viewer-shell">
       <WorkflowNavigation />
+      {systems?.enabled && (
+        <div className="arazzo-systems-setting">
+          <label>
+            Perspective{' '}
+            <select
+              aria-label="Perspective"
+              value={systems.perspective}
+              onChange={(event) =>
+                systems.setPerspective(event.target.value as 'workflow' | 'systems')
+              }
+            >
+              <option value="workflow">Workflow</option>
+              <option value="systems">Systems</option>
+            </select>
+          </label>
+          {systems.perspective === 'workflow' && systems.selected && (
+            <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
+          )}
+        </div>
+      )}
       <InspectionStatus />
       {locationProps && (
         <WorkflowLocationBridge
@@ -372,15 +413,21 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
       )}
       <CallerNavigation />
       <div className="arazzo-viewer-panes">
-        {showDiagram && (
-          <div style={{ flex: 1, minWidth: 0, height: '100%' }}>
-            <DiagramView ref={diagramRef} showWorkflowTabs={false} />
-          </div>
-        )}
-        {showDocs && (
-          <div style={{ flex: 1, minWidth: 0, height: '100%', overflow: 'auto' }}>
-            <DocsView />
-          </div>
+        {systems?.perspective === 'systems' ? (
+          <SystemsView />
+        ) : (
+          <>
+            {showDiagram && (
+              <div style={{ flex: 1, minWidth: 0, height: '100%' }}>
+                <DiagramView ref={diagramRef} showWorkflowTabs={false} />
+              </div>
+            )}
+            {showDocs && (
+              <div style={{ flex: 1, minWidth: 0, height: '100%', overflow: 'auto' }}>
+                <DocsView />
+              </div>
+            )}
+          </>
         )}
       </div>
       <SelectionDetails />

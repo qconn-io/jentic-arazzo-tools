@@ -26,8 +26,8 @@ import type {
 import { buildViewerModel, type ArazzoViewerModel } from '../utils/model/viewerModel';
 import { useSourceRegistry } from '../utils/source/useSourceRegistry';
 import type { SourceRegistry } from '../utils/source/SourceRegistry';
-import type { SourceDocumentProvider } from '../types/source';
-import { BrowserFetchProvider } from '../utils/source/BrowserFetchProvider';
+import type { SourceDocumentProvider, ExternalNavigationRequest } from '../types/source';
+import { ContractFactsProvider } from './ContractFactsContext';
 import { ViewerSessionProvider } from './ViewerSessionContext';
 
 interface InternalContext extends ArazzoViewerContextValue {
@@ -39,6 +39,8 @@ interface InternalContext extends ArazzoViewerContextValue {
   selectionRequestVersion: number;
   getNodeOwner: (node: ArazzoNode) => string | undefined;
   sourceRegistry: SourceRegistry;
+  sourceProvider?: SourceDocumentProvider;
+  onExternalNavigation?: (request: ExternalNavigationRequest) => void;
 }
 const ArazzoViewerContext = createContext<InternalContext | null>(null);
 export const useArazzoViewer = () => {
@@ -55,6 +57,7 @@ interface StandaloneProviderProps {
   initialSelectedNodeId?: string | null;
   events?: ViewerEvents;
   sourceProvider?: SourceDocumentProvider;
+  onExternalNavigation?: (request: ExternalNavigationRequest) => void;
   children: React.ReactNode;
 }
 type ProviderProps =
@@ -87,7 +90,7 @@ function InjectedProvider({
   value: ArazzoViewerContextValue;
   children: React.ReactNode;
 }) {
-  const sourceRegistry = useSourceRegistry(new BrowserFetchProvider());
+  const sourceRegistry = useSourceRegistry(undefined, undefined, value.document);
   const snapshot = useMemo(
     () => createSnapshot(value.document, { trustedInternalIds: true }),
     [value.document],
@@ -173,7 +176,9 @@ function InjectedProvider({
         sourceRegistry,
       }}
     >
-      <ViewerSessionProvider key={model.documentId}>{children}</ViewerSessionProvider>
+      <ContractFactsProvider key={model.documentId}>
+        <ViewerSessionProvider>{children}</ViewerSessionProvider>
+      </ContractFactsProvider>
     </ArazzoViewerContext.Provider>
   );
 }
@@ -189,9 +194,14 @@ function StandaloneProvider({
   initialSelectedNodeId,
   events,
   sourceProvider,
+  onExternalNavigation,
   children,
 }: StandaloneProviderProps) {
-  const sourceRegistry = useSourceRegistry(sourceProvider || new BrowserFetchProvider());
+  const sourceRegistry = useSourceRegistry(
+    sourceProvider,
+    undefined,
+    suppliedSnapshot ?? rawDocument,
+  );
   const snapshot = useMemo(
     () => suppliedSnapshot ?? createSnapshot(rawDocument),
     [suppliedSnapshot, rawDocument],
@@ -399,10 +409,14 @@ function StandaloneProvider({
     selectionRequestVersion,
     getNodeOwner: (node) => ownerLookup(node, model, rawDocument),
     sourceRegistry,
+    sourceProvider,
+    onExternalNavigation,
   };
   return (
     <ArazzoViewerContext.Provider value={value}>
-      <ViewerSessionProvider key={model.documentId}>{children}</ViewerSessionProvider>
+      <ContractFactsProvider key={model.documentId}>
+        <ViewerSessionProvider>{children}</ViewerSessionProvider>
+      </ContractFactsProvider>
     </ArazzoViewerContext.Provider>
   );
 }

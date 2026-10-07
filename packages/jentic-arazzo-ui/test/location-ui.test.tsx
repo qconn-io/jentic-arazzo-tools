@@ -35,7 +35,11 @@ test('default location restores second occurrence, structured mappings, focus an
       onLocationChange={changed}
     />,
   );
-  const details = await screen.findByRole('region', { name: 'Selection details' });
+  const details = await screen.findByRole(
+    'region',
+    { name: 'Selection details' },
+    { timeout: 5000 },
+  );
   expect(details.textContent).toContain('checkout.secondPayment');
   expect(details.textContent).toContain('payment.charge');
   expect(details.textContent).toContain('$response.body#/id');

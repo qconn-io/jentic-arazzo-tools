@@ -1,140 +1,198 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React from 'react';
+import { useContractFacts } from '../context/ContractFactsContext';
+
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
-import { resolveOperationStatus, OperationLookupStatus, OperationLookupResult } from '../utils/contract/OperationStatusResolver';
-import type { ContractDocumentFacts } from '../utils/contract/types';
-import { projectOpenAPI } from '../utils/contract/OpenAPIAdapter';
-import { projectAsyncAPI } from '../utils/contract/AsyncAPIAdapter';
-import { projectArazzo } from '../utils/contract/ArazzoAdapter';
+import { resolveScopedOperation } from '../utils/contract/OperationStatusResolver';
 
-export function ContractPanel({ workflowId, stepId }: { workflowId: string, stepId?: string }) {
-  const { model, sourceRegistry } = useArazzoViewer();
-  const step = stepId ? model.stepsByWorkflow.get(workflowId)?.get(stepId) : undefined;
-  const sourceBinding = step?.sourceBinding;
-  const sourceURL = model.document.sourceDescriptions?.find(s => s.name === sourceBinding?.sourceName)?.url;
-
-  const [docState, setDocState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [facts, setFacts] = useState<ContractDocumentFacts | undefined>();
-  const [error, setError] = useState<Error | undefined>();
-  const [customUri, setCustomUri] = useState<string>('');
-
-  const targetUrl = customUri || sourceURL;
-
-  useEffect(() => {
-    if (!targetUrl) {
-      setDocState('idle');
-      return;
-    }
-
-    let isMounted = true;
-    setDocState('loading');
-    setError(undefined);
-
-    sourceRegistry.acquire(targetUrl, undefined, model.inspection.snapshot.baseURI)
-      .then(async (content) => {
-        if (!isMounted) return;
-        try {
-          let projected: ContractDocumentFacts;
-          const type = sourceBinding?.sourceType || 'openapi';
-          if (type.startsWith('asyncapi')) {
-            projected = await projectAsyncAPI(content.content as any, content.retrievalURI, sourceRegistry);
-          } else if (type.startsWith('arazzo')) {
-            const modelResult = await projectArazzo(content.content as any, content.retrievalURI, sourceRegistry);
-            projected = {
-              version: '1.0.0',
-              dialect: 'unsupported',
-              uri: content.retrievalURI,
-              operations: new Map(),
-              rawContent: content.content,
-              unsupportedDiagnostics: ['Arazzo sources should be navigated as external workflows']
-            };
-          } else {
-            projected = await projectOpenAPI(content.content as any, content.retrievalURI, sourceRegistry);
-          }
-          if (!isMounted) return;
-          setFacts(projected);
-          setDocState('success');
-        } catch (e) {
-          if (isMounted) {
-            setError(e instanceof Error ? e : new Error(String(e)));
-            setDocState('error');
-          }
-        }
-      })
-      .catch((e) => {
-        if (!isMounted) return;
-        setError(e instanceof Error ? e : new Error(String(e)));
-        setDocState('error');
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [targetUrl, sourceBinding?.sourceType, sourceRegistry, sourceRegistry.getProviderGeneration()]);
-
-  let targetId = sourceBinding?.locators?.operationId || sourceBinding?.locators?.operationPath || sourceBinding?.locators?.channelPath;
-  if (typeof targetId === 'string' && targetId.startsWith('$sourceDescriptions.')) {
-    targetId = targetId.split('.').pop() || targetId;
-  }
-  const statusResult = useMemo(() => {
-    if (!targetId) return null;
-    return resolveOperationStatus(targetId, docState, facts, error);
-  }, [targetId, docState, facts, error]);
-
-  const handleLoad = (e: React.FormEvent) => {
-    e.preventDefault();
-    const fd = new FormData(e.target as HTMLFormElement);
-    const uri = fd.get('uri') as string;
-    if (uri) setCustomUri(uri);
-  };
-
-  if (!sourceURL && !customUri) {
-    return (
-      <section className="arazzo-contract-panel">
-        <h3>Load Contract Source</h3>
-        <form onSubmit={handleLoad} style={{ display: 'flex', gap: '8px' }}>
-          <input name="uri" type="url" placeholder="Enter source URL" required />
-          <button type="submit">Load</button>
-        </form>
-      </section>
-    );
-  }
-
+function Declaration({ title, value }: { title: string; value: unknown }) {
+  if (value === undefined) return null;
   return (
-    <section className="arazzo-contract-panel">
-      <h3>Contract & Source</h3>
-      <div style={{ marginBottom: '8px' }}>
-        <form onSubmit={handleLoad} style={{ display: 'flex', gap: '8px' }}>
-          <input name="uri" type="url" placeholder="Override source URL" defaultValue={targetUrl} />
-          <button type="submit">Load</button>
-          <button type="button" onClick={() => sourceRegistry.reload(targetUrl!)}>Reload</button>
-        </form>
-      </div>
-
-      <p>Source URL: <code>{targetUrl}</code></p>
-      <p>Base URI: <code>{model.inspection.snapshot.baseURI}</code></p>
-      <p>Status: <strong>{statusResult?.status || docState}</strong></p>
-      
-      {statusResult?.diagnostics && statusResult.diagnostics.length > 0 && (
-        <div className="arazzo-diagnostics">
-          <h4>Diagnostics</h4>
-          <ul>
-            {statusResult.diagnostics.map((d, i) => <li key={i}>{d}</li>)}
-          </ul>
-        </div>
+    <details>
+      <summary>{title}</summary>
+      <pre>{JSON.stringify(value, null, 2)}</pre>
+    </details>
+  );
+}
+export function ContractPanel({ workflowId, stepId }: { workflowId: string; stepId?: string }) {
+  const { model, sourceRegistry, sourceProvider, onExternalNavigation } = useArazzoViewer();
+  const binding = stepId
+    ? model.stepsByWorkflow.get(workflowId)?.get(stepId)?.sourceBinding
+    : undefined;
+  const { loaded: currentLoaded, load } = useContractFacts();
+  if (!binding || !Object.keys(binding.locators).length) return null;
+  const sources = (model.document.sourceDescriptions ?? []).filter((source) =>
+    binding.candidates.includes(source.name),
+  );
+  const locators = { ...binding.locators };
+  if (binding.sourceName) {
+    for (const key of Object.keys(locators)) {
+      const locator = locators[key];
+      if (typeof locator !== 'string') continue;
+      const prefix = `$sourceDescriptions.${binding.sourceName}.`;
+      const urlPrefix = `{$sourceDescriptions.${binding.sourceName}.url}`;
+      locators[key] = locator.startsWith(prefix)
+        ? locator.slice(prefix.length)
+        : locator.startsWith(urlPrefix)
+          ? locator.slice(urlPrefix.length)
+          : locator;
+    }
+  }
+  const result = resolveScopedOperation(
+    locators,
+    sources.map((source) => currentLoaded[source.name] ?? { state: 'idle' }),
+  );
+  const operation = result.operation;
+  return (
+    <section className="arazzo-contract-panel" aria-label="Contract and source">
+      <h3>Contract &amp; Source</h3>
+      <p>
+        Authored locator: <code>{Object.values(binding.locators).join(' · ')}</code>
+      </p>
+      {!Object.hasOwn(binding.locators, 'workflowId') && (
+        <p role="status">
+          Status: <strong>{result.status}</strong>
+        </p>
       )}
-
-      {statusResult?.operation && (
-        <details>
-          <summary>Operation Details</summary>
-          <pre>{JSON.stringify(statusResult.operation, null, 2)}</pre>
-        </details>
-      )}
-
-      {facts && (
-        <details>
-          <summary>Raw Source Document</summary>
-          <pre>{typeof facts.rawContent === 'string' ? facts.rawContent : JSON.stringify(facts.rawContent, null, 2)}</pre>
-        </details>
+      {result.diagnostics?.map((message) => (
+        <p key={message}>{message}</p>
+      ))}
+      {!sourceProvider && <p>Source not checked. Supply a source provider to enable inspection.</p>}
+      {sources.map((source) => {
+        const value = currentLoaded[source.name];
+        const target = typeof locators.workflowId === 'string' ? locators.workflowId : undefined;
+        const workflow = target ? value?.workflowModel?.workflowsById.get(target) : undefined;
+        return (
+          <section key={source.name} aria-label={`Source ${source.name}`}>
+            <h4>{source.name}</h4>
+            <p>
+              Source URL: <code>{source.url}</code>
+            </p>
+            <p>Source state: {value?.state ?? 'not-loaded'}</p>
+            {sourceProvider && (
+              <button
+                type="button"
+                disabled={value?.state === 'loading'}
+                onClick={() => void load(source, !!value)}
+              >
+                {' '}
+                {value ? 'Reload' : 'Load'} source {source.name}
+              </button>
+            )}
+            {value?.error && <p role="status">{value.error.message}</p>}
+            {value?.facts && (
+              <p>
+                Contract profile: {value.facts.dialect} {value.facts.version}
+              </p>
+            )}
+            {value?.facts?.unsupportedDiagnostics.map((message) => (
+              <p key={message}>{message}</p>
+            ))}
+            {value?.content && (
+              <>
+                <p>
+                  Retrieval URI: <code>{value.content.retrievalURI}</code>
+                </p>
+                <p>
+                  Revision: <code>{value.content.revision ?? 'unpinned'}</code>
+                </p>
+                <p>Provider generation: {sourceRegistry.getProviderGeneration()}</p>
+                <details>
+                  <summary>Raw Source Document</summary>
+                  <pre>
+                    {typeof value.content.content === 'string'
+                      ? value.content.content
+                      : JSON.stringify(value.content.content, null, 2)}
+                  </pre>
+                </details>
+              </>
+            )}
+            {value?.workflowModel && (
+              <>
+                <p>Status: {workflow ? 'located' : 'missing'}</p>
+                {workflow && onExternalNavigation && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onExternalNavigation({
+                        documentUri: value.content!.retrievalURI,
+                        revision: value.content!.revision,
+                        workflowId: target,
+                      })
+                    }
+                  >
+                    Open workflow {target}
+                  </button>
+                )}
+              </>
+            )}
+          </section>
+        );
+      })}
+      {operation && (
+        <section aria-label="Operation declaration">
+          <h4>Operation Details</h4>
+          <p>
+            {operation.operationId} {operation.method} {operation.path}
+          </p>
+          <p>
+            Located means found in this source; it does not establish full contract validity or
+            execution.
+          </p>
+          {!!operation.schemaReferences?.length && (
+            <section aria-label="Referenced schema declarations">
+              <h4>Referenced schema declarations</h4>
+              <p>
+                Authored references and sibling constraints remain in their schema declarations.
+                Targets are shown separately without combining constraints.
+              </p>
+              {operation.schemaReferences.map((reference, index) => (
+                <details key={`${reference.declaringURI}:${reference.occurrence}:${index}`}>
+                  <summary>
+                    {reference.authoredReference} — {reference.status}
+                  </summary>
+                  <p>
+                    Occurrence:{' '}
+                    <code>
+                      {reference.declaringURI}
+                      {reference.occurrence}
+                    </code>
+                  </p>
+                  {reference.targetURI && (
+                    <p>
+                      Target:{' '}
+                      <code>
+                        {reference.targetURI}
+                        {reference.targetPointer}
+                      </code>
+                    </p>
+                  )}
+                  <p>
+                    Revision: <code>{reference.revision ?? 'unpinned'}</code>
+                  </p>
+                  {reference.diagnostic && <p>{reference.diagnostic}</p>}
+                  {reference.declaration !== undefined && (
+                    <pre>{JSON.stringify(reference.declaration, null, 2)}</pre>
+                  )}
+                </details>
+              ))}
+            </section>
+          )}
+          <Declaration title="Declared parameters" value={operation.parameters} />
+          <Declaration title="Request media types and schemas" value={operation.requestBody} />
+          <Declaration
+            title="Response alternatives (declared, not observed)"
+            value={operation.responses}
+          />
+          <Declaration title="Declared servers" value={operation.servers} />
+          <Declaration title="Applicable security requirements" value={operation.security} />
+          {operation.action && <p>Declared direction: {operation.action}</p>}
+          {operation.channel && <p>Channel: {operation.channel}</p>}
+          <Declaration title="Channel address" value={operation.address} />
+          <Declaration
+            title="Message alternatives, headers, payload and correlation declarations"
+            value={operation.messages}
+          />
+        </section>
       )}
     </section>
   );

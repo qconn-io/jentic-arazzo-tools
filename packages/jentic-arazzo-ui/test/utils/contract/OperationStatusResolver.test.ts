@@ -38,9 +38,7 @@ describe('OperationStatusResolver', () => {
       version: '3.0.0',
       dialect: 'openapi',
       uri: 'test',
-      operations: new Map([
-        ['op2', { operationId: 'op2', parameters: [] }]
-      ]),
+      operations: new Map([['op2', { operationId: 'op2', parameters: [] }]]),
       rawContent: '',
       unsupportedDiagnostics: [],
     };
@@ -54,9 +52,7 @@ describe('OperationStatusResolver', () => {
       version: '3.0.0',
       dialect: 'openapi',
       uri: 'test',
-      operations: new Map([
-        ['op1', op]
-      ]),
+      operations: new Map([['op1', op]]),
       rawContent: '',
       unsupportedDiagnostics: [],
     };
@@ -72,7 +68,7 @@ describe('OperationStatusResolver', () => {
       uri: 'test',
       operations: new Map([
         ['op1-1', { operationId: 'op1', parameters: [] }],
-        ['op1-2', { operationId: 'op1', parameters: [] }]
+        ['op1-2', { operationId: 'op1', parameters: [] }],
       ]),
       rawContent: '',
       unsupportedDiagnostics: [],

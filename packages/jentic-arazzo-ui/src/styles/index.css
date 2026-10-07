@@ -483,3 +483,63 @@
   border-bottom: 1px solid #fed7aa;
   overflow-wrap: anywhere;
 }
+
+.arazzo-systems {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow: auto;
+  padding: 12px;
+  color: #334155;
+}
+.arazzo-systems p {
+  margin: 8px 0;
+}
+.arazzo-systems-canvas {
+  max-width: 100%;
+  max-height: 65vh;
+  overflow: auto;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+}
+.arazzo-systems-participants {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: #f1f5f9;
+  z-index: 1;
+}
+.arazzo-systems-participants > div {
+  flex-shrink: 0;
+  padding: 12px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.arazzo-systems-participants small {
+  display: block;
+}
+.arazzo-systems-controls {
+  list-style: none;
+  padding: 0;
+}
+.arazzo-systems-controls li {
+  margin: 6px 0;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.arazzo-systems button,
+.arazzo-systems-setting button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding: 6px 10px;
+}
+.arazzo-systems-setting {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+}
+.arazzo-systems-setting select {
+  margin-left: 8px;
+}

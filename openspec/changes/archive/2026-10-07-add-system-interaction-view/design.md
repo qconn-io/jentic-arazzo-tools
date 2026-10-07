@@ -16,6 +16,12 @@ Add a versioned `WorkflowViewProfile` containing participants, workflow-actor bi
 
 Event associations explicitly identify producer and consumer workflow locations plus contract channel/message identities. Contract facts verify that the referenced declarations match; shared names alone produce no relationship. This is stronger than visually connecting every send/receive pair and safer than asking users to interpret an unexplained inferred event graph.
 
+### Shared contract facts and declaration identity
+
+Extend the existing bounded reference projector to retain channel/message declaration identities: retrieved document, final resolved pointer, revision when available, authored reference/use occurrence and resolution status. Equal message names or declaration values do not establish equal identities. Preserve aliases, chained/external references and localized unresolved diagnostics without flattening schemas.
+
+Move explicitly loaded source projections from ContractPanel component state into a viewer-local projection store shared with Systems. Reuse acquisition validity tokens, generation/scope invalidation and dependency-closure reload. Reading this store never triggers acquisition; hosts still supply providers and users explicitly load sources. A document/provider replacement or dependency reload immediately excludes obsolete facts.
+
 ### Separate scene with shared locations
 
 Build a private system scene from inspected workflows, loaded contract facts, and the view profile. Business participant identity comes from the profile. Workflow calls become control groups/annotations, not additional systems. Associated implementations appear inside a descriptive exchange group, labeled with provenance; standard calls retain their existing call semantics. Conflicting/missing actor bindings use explicit unknown participants without dropping steps.

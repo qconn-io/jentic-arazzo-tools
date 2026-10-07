@@ -13,11 +13,8 @@ describe('OpenAPIAdapter', () => {
       maxSizeBytes: 1000,
     });
     vi.spyOn(registry, 'acquire').mockResolvedValue({
-      uri: 'http://test/api.yaml',
+      retrievalURI: 'http://test/api.yaml',
       content: 'mock',
-      format: 'text',
-      sizeBytes: 4,
-      version: undefined,
     });
   });
 
@@ -100,10 +97,15 @@ paths:
 
     try {
       await projectOpenAPI(content, 'http://test/api.yaml', registry);
-    } catch (e: any) {
+    } catch {
       // It should throw because we mocked acquire to reject.
     }
-    
-    expect(registry.acquire).toHaveBeenCalledWith('http://example.com/external.yaml', undefined, 'http://test/api.yaml');
+
+    expect(registry.acquire).toHaveBeenCalledWith(
+      'http://example.com/external.yaml',
+      undefined,
+      'http://test/api.yaml',
+      1,
+    );
   });
 });

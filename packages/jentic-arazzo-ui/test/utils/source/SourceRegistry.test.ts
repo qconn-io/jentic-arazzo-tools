@@ -132,11 +132,13 @@ describe('SourceRegistry', () => {
       return new Promise(() => {}); // never resolves
     });
 
-    registry.acquire('http://example.com/api.yaml');
+    const pending = registry.acquire('http://example.com/api.yaml');
+    const rejection = expect(pending).rejects.toThrow('Aborted');
     await Promise.resolve(); // Let semaphore resolve
     registry.reload('http://example.com/api.yaml');
 
     expect(abortSignal!.aborted).toBe(true);
+    await rejection;
   });
 
   describe('limits', () => {
@@ -155,7 +157,7 @@ describe('SourceRegistry', () => {
     it('enforces max reference depth', async () => {
       registry.budget.maxReferenceDepth = 2;
       await expect(
-        registry.acquire('http://example.com/1', undefined, undefined, 2),
+        registry.acquire('http://example.com/1', undefined, undefined, 3),
       ).rejects.toThrow('Maximum reference depth exceeded (2)');
 
       expect(registry.getEntry('http://example.com/1')?.state).toBe('limit-exceeded');
@@ -204,4 +206,201 @@ describe('SourceRegistry', () => {
       expect(mockProvider.load).toHaveBeenCalledTimes(2);
     });
   });
+});
+
+const result = (content = 'ok'): SourceDocumentContent => ({
+  content,
+  retrievalURI: 'https://example.com/api',
+});
+const deferred = () => {
+  let resolve!: (value: SourceDocumentContent) => void;
+  const promise = new Promise<SourceDocumentContent>((done) => {
+    resolve = done;
+  });
+  return { promise, resolve };
+};
+
+describe('registry invalidation and provenance', () => {
+  it('rejects pinned content without revision provenance', async () => {
+    const registry = new SourceRegistry();
+    registry.setProvider({ load: async () => result() });
+    await expect(registry.acquire('https://example.com/api', 'pinned')).rejects.toThrow(
+      'Revision mismatch',
+    );
+  });
+
+  it.each(['reload', 'cancelAll'] as const)(
+    '%s ignores late completion and preserves a replacement',
+    async (action) => {
+      const registry = new SourceRegistry();
+      const first = deferred();
+      const second = deferred();
+      let calls = 0;
+      registry.setProvider({ load: () => (++calls === 1 ? first.promise : second.promise) });
+      const old = registry.acquire('https://example.com/api');
+      const rejected = expect(old).rejects.toThrow(/Abort/);
+      await Promise.resolve();
+      if (action === 'reload') registry.reload('https://example.com/api');
+      else registry.cancelAll();
+      const replacement = registry.acquire('https://example.com/api');
+      await Promise.resolve();
+      second.resolve(result('new'));
+      await replacement;
+      first.resolve(result('old'));
+      await rejected;
+      expect(registry.getEntry('https://example.com/api')).toMatchObject({
+        state: 'located',
+        content: { content: 'new' },
+      });
+    },
+  );
+
+  it('keeps physical concurrency bounded when a cancelled provider ignores abort', async () => {
+    const registry = new SourceRegistry({
+      maxConcurrent: 1,
+      maxDocuments: 3,
+      maxReferenceDepth: 8,
+      maxSizeBytes: 100,
+    });
+    const first = deferred();
+    let calls = 0;
+    registry.setProvider({
+      load: () => {
+        calls++;
+        return first.promise;
+      },
+    });
+    const old = registry.acquire('https://example.com/old');
+    const rejection = old.catch(() => undefined);
+    await Promise.resolve();
+    registry.cancelAll();
+    registry.setProvider({
+      load: async () => {
+        calls++;
+        return result();
+      },
+    });
+    const current = registry.acquire('https://example.com/new');
+    await Promise.resolve();
+    expect(calls).toBe(1);
+    first.resolve(result());
+    await rejection;
+    await current;
+    expect(calls).toBe(2);
+  });
+
+  it('counts acquisitions rather than failed and limit markers', async () => {
+    const registry = new SourceRegistry({
+      maxConcurrent: 1,
+      maxDocuments: 1,
+      maxReferenceDepth: 1,
+      maxSizeBytes: 100,
+    });
+    registry.setProvider({
+      load: async ({ uri }) => {
+        if (uri.endsWith('bad')) throw new Error('bad');
+        return result();
+      },
+    });
+    await expect(registry.acquire('relative')).rejects.toThrow();
+    await expect(
+      registry.acquire('https://example.com/deep', undefined, undefined, 2),
+    ).rejects.toThrow();
+    await expect(registry.acquire('https://example.com/bad')).rejects.toThrow('bad');
+    await expect(registry.acquire('https://example.com/good')).resolves.toEqual(result());
+  });
+
+  it('deduplicates canonical document URIs independently of fragments', async () => {
+    const registry = new SourceRegistry();
+    let calls = 0;
+    registry.setProvider({
+      load: async () => {
+        calls++;
+        return result();
+      },
+    });
+    await registry.acquire('https://example.com/api#/one');
+    await registry.acquire('https://example.com/api#/two');
+    expect(calls).toBe(1);
+    expect(registry.getEntry('https://example.com/api#/two')?.state).toBe('located');
+  });
+
+  it.each([0, -1, NaN, Infinity, 1.5])('rejects invalid concurrency budget %s', (maxConcurrent) => {
+    expect(
+      () =>
+        new SourceRegistry({
+          maxConcurrent,
+          maxDocuments: 1,
+          maxReferenceDepth: 1,
+          maxSizeBytes: 100,
+        }),
+    ).toThrow(/budget/i);
+  });
+});
+
+it('cancels queued acquisitions without starting their provider loads', async () => {
+  const registry = new SourceRegistry({
+    maxConcurrent: 1,
+    maxDocuments: 3,
+    maxReferenceDepth: 8,
+    maxSizeBytes: 100,
+  });
+  const first = deferred();
+  const visited: string[] = [];
+  registry.setProvider({
+    load: ({ uri }) => {
+      visited.push(uri);
+      return first.promise;
+    },
+  });
+  const active = registry.acquire('https://example.com/active');
+  const queued = registry.acquire('https://example.com/queued');
+  const rejected = Promise.all([
+    expect(active).rejects.toThrow('Aborted'),
+    expect(queued).rejects.toThrow('Aborted'),
+  ]);
+  await Promise.resolve();
+  const generation = registry.getProviderGeneration();
+  registry.cancelAll();
+  await rejected;
+  expect(registry.getProviderGeneration()).toBeGreaterThan(generation);
+  first.resolve(result());
+  await Promise.resolve();
+  expect(visited).toEqual(['https://example.com/active']);
+  expect(registry.getEntry('https://example.com/active')).toBeUndefined();
+  expect(registry.getEntry('https://example.com/queued')).toBeUndefined();
+});
+
+it.each(['maxDocuments', 'maxReferenceDepth', 'maxSizeBytes'] as const)(
+  'rejects nonfinite %s budgets',
+  (field) => {
+    expect(
+      () =>
+        new SourceRegistry({
+          maxConcurrent: 1,
+          maxDocuments: 3,
+          maxReferenceDepth: 8,
+          maxSizeBytes: 100,
+          [field]: Infinity,
+        }),
+    ).toThrow(/budget/i);
+  },
+);
+
+it('rejects source objects whose size cannot be measured', async () => {
+  const registry = new SourceRegistry({
+    maxConcurrent: 1,
+    maxDocuments: 1,
+    maxReferenceDepth: 8,
+    maxSizeBytes: 10,
+  });
+  const content: { value: string; self?: object } = { value: 'oversized source content' };
+  content.self = content;
+  registry.setProvider({
+    load: async () => ({ content, retrievalURI: 'https://example.com/api' }),
+  });
+  await expect(registry.acquire('https://example.com/api')).rejects.toThrow(
+    'Unable to measure source size',
+  );
+  expect(registry.getEntry('https://example.com/api')?.state).toBe('failed');
 });

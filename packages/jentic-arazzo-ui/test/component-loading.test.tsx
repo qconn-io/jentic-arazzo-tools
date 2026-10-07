@@ -40,7 +40,7 @@ const input = {
 test('real component loading shows missing-reference warnings and getDocument retains authored content without decoration', async () => {
   const ref = createRef<ArazzoUIRef>();
   const original = structuredClone(input);
-  render(<ArazzoUI document={input} ref={ref} />);
+  render(<ArazzoUI document={input} baseURI="https://example.test/workflow.yaml" ref={ref} />);
   await waitFor(() => expect(screen.getByTestId('docs').textContent).toContain('Missing reusable'));
   expect(ref.current?.getDocument()).toEqual(original);
   expect(input).toEqual(original);

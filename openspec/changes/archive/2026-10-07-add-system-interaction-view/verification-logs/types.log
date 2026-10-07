@@ -1,0 +1,3 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit

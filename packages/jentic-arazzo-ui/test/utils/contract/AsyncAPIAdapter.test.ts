@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { projectAsyncAPI } from '../../../src/utils/contract/AsyncAPIAdapter';
 import { SourceRegistry } from '../../../src/utils/source/SourceRegistry';
 
@@ -39,7 +39,7 @@ operations:
     expect(facts.dialect).toBe('asyncapi');
     expect(facts.version).toBe('3.0.0');
     expect(facts.operations.get('onUserSignup')).toBeDefined();
-    
+
     const op = facts.operations.get('onUserSignup');
     expect(op?.action).toBe('receive');
     expect(op?.channel).toBe('userSignup');
@@ -75,5 +75,4 @@ operations:
     expect(op).toBeDefined();
     expect(op?.channel).toBe('missing');
   });
-
 });

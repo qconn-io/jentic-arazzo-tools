@@ -1,4 +1,19 @@
 export type {
+  WorkflowProfileProvenance,
+  WorkflowSystemParticipant,
+  WorkflowActorBinding,
+  WorkflowSourceOwnerBinding,
+  WorkflowImplementationAssociation,
+  WorkflowContractIdentity,
+  WorkflowEventAssociation,
+  WorkflowViewProfile,
+  WorkflowPerspective,
+  WorkflowViewProfileAdapter,
+} from './types/profile';
+export { digitalProductProfile } from './utils/systems/digitalProductProfile';
+import { BrowserFetchProvider } from './utils/source/BrowserFetchProvider';
+import { useSourceRegistry } from './utils/source/useSourceRegistry';
+export type {
   WorkflowLocation,
   WorkflowLocationSelection,
   WorkflowCallSite,
@@ -116,6 +131,14 @@ export type ArazzoUIStandaloneProps = Omit<ArazzoUIProps, 'view'> & {
 export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
   function ArazzoUIStandalone(props, ref) {
     const { initialView = 'docs', onViewChange, ...rest } = props;
+    const browserProvider = React.useMemo(() => new BrowserFetchProvider(), []);
+    const [externalSource, setExternalSource] = useState<{
+      uri: string;
+      revision?: string;
+      root?: string;
+    }>();
+    const [navigationError, setNavigationError] = useState('');
+    const navigationController = useRef<AbortController>();
     const initialURL = useRef(readLocationURL(new URL(globalThis.location.href)));
     const [view, setView] = useState<ViewerMode>(
       props.location?.view ??
@@ -142,6 +165,11 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
         : '',
     );
     const [documentSource, setDocumentSource] = useState<ArazzoDocument | string>(initialDocument);
+    const navigationRegistry = useSourceRegistry(
+      props.sourceProvider ?? browserProvider,
+      undefined,
+      documentSource,
+    );
     const [localIdentity, setLocalIdentity] = useState(
       () =>
         `urn:arazzo-ui:local:${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`,
@@ -151,8 +179,10 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
       /[\r\n]|^\s*[{[]|^\s*(?:arazzo|info|sourceDescriptions):/.test(documentSource);
     const hostSource = documentSource === props.document;
     const suppliedIdentity = hostSource ? props.documentIdentity : undefined;
-    const documentIdentity = suppliedIdentity ?? (inlineSource ? localIdentity : undefined);
-    const documentRevision = hostSource ? props.documentRevision : undefined;
+    const documentIdentity =
+      externalSource?.uri ?? suppliedIdentity ?? (inlineSource ? localIdentity : undefined);
+    const documentRevision =
+      externalSource?.revision ?? (hostSource ? props.documentRevision : undefined);
     const [dragging, setDragging] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const dragCounter = useRef(0);
@@ -168,8 +198,19 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
     const replaceNext = useRef(true);
     const [shareMessage, setShareMessage] = useState('');
     const sourceGeneration = useRef(0);
+    const hostDocumentRef = useRef(props.document);
     const sourceRef = useRef(documentSource);
     sourceRef.current = documentSource;
+    useEffect(() => {
+      sourceGeneration.current += 1;
+      navigationController.current?.abort();
+      navigationRegistry.cancelAll();
+      return () => {
+        sourceGeneration.current += 1;
+        navigationController.current?.abort();
+        navigationRegistry.cancelAll();
+      };
+    }, [props.sourceProvider, props.document]);
     const addressable = (value: WorkflowLocation) =>
       !!suppliedIdentity || /^https?:\/\//i.test(value.document);
     const copy = async () => {
@@ -200,6 +241,7 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
         arazzoDocument: sourceRef.current,
         arazzoCallers: callerLocations.current,
         arazzoIdentity: documentIdentity,
+        arazzoExternalSource: externalSource,
         arazzoLocation: value,
       };
       if (replaceNext.current) {
@@ -214,6 +256,9 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
     useEffect(() => {
       const restore = (event: PopStateEvent) => {
         sourceGeneration.current += 1;
+        navigationController.current?.abort();
+        navigationRegistry.cancelAll();
+        setNavigationError('');
         const url = new URL(globalThis.location.href);
         let decoded = readLocationURL(url);
         if (!decoded.location && !decoded.error && event.state?.arazzoLocation) {
@@ -235,7 +280,10 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
         setShareMessage('');
         if (typeof event.state?.arazzoIdentity === 'string')
           setLocalIdentity(event.state.arazzoIdentity);
-        setDocumentSource(document);
+        setExternalSource(event.state?.arazzoExternalSource);
+        setDocumentSource(
+          event.state?.arazzoExternalSource ? event.state.arazzoDocument : document,
+        );
         setUrlInput(typeof document === 'string' && /^https?:\/\//i.test(document) ? document : '');
         setView(decoded.location?.view ?? initialView);
         const callers: WorkflowLocation[] = [];
@@ -262,8 +310,26 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
         globalThis.removeEventListener('popstate', restore);
       };
     }, [props.document, props.documentIdentity, initialView]);
-    const commitSource = (source: ArazzoDocument | string) => {
+    useEffect(() => {
+      if (hostDocumentRef.current === props.document) return;
+      hostDocumentRef.current = props.document;
+      commitSource(props.document);
+      setUrlInput(
+        typeof props.document === 'string' && /^https?:\/\//i.test(props.document)
+          ? props.document
+          : '',
+      );
+    }, [props.document]);
+
+    const commitSource = (
+      source: ArazzoDocument | string,
+      provenance?: { uri: string; revision?: string; root?: string },
+    ) => {
       sourceGeneration.current += 1;
+      navigationController.current?.abort();
+      navigationRegistry.cancelAll();
+      setNavigationError('');
+      setExternalSource(provenance);
       currentLocation.current = undefined;
       replaceNext.current = true;
       setShareMessage('');
@@ -291,7 +357,8 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
         {
           ...globalThis.history.state,
           arazzoDocument: source,
-          arazzoIdentity: identity,
+          arazzoIdentity: provenance?.uri ?? identity,
+          arazzoExternalSource: provenance,
           arazzoLocation: undefined,
           arazzoCallers: [],
         },
@@ -522,6 +589,7 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
               </div>
             </div>
             {hydration.error && <p role="status">{hydration.error}</p>}
+            {navigationError && <p role="status">{navigationError}</p>}
             <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
               <ArazzoUI
                 key={hydration.epoch}
@@ -531,6 +599,47 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
                 documentRevision={documentRevision}
                 defaultLocation={hydration.location}
                 onLocationChange={props.onLocationChange}
+                sourceProvider={props.sourceProvider ?? browserProvider}
+                baseURI={externalSource?.uri ?? props.baseURI}
+                activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
+                onExternalNavigation={async (request) => {
+                  if (props.onExternalNavigation) {
+                    props.onExternalNavigation(request);
+                    return;
+                  }
+                  navigationController.current?.abort();
+                  navigationRegistry.cancelAll();
+                  const controller = new AbortController();
+                  navigationController.current = controller;
+                  const generation = ++sourceGeneration.current;
+                  setNavigationError('');
+                  try {
+                    const acquired = await navigationRegistry.acquire(
+                      request.documentUri,
+                      request.revision,
+                    );
+                    if (controller.signal.aborted || generation !== sourceGeneration.current)
+                      return;
+                    if (request.revision !== undefined && acquired.revision !== request.revision)
+                      throw new Error(
+                        `Revision mismatch: requested ${request.revision}, got ${acquired.revision ?? 'no revision'}`,
+                      );
+                    commitSource(
+                      typeof acquired.content === 'string'
+                        ? acquired.content
+                        : JSON.stringify(acquired.content),
+                      {
+                        uri: acquired.retrievalURI,
+                        revision: acquired.revision,
+                        root: request.workflowId,
+                      },
+                    );
+                    setUrlInput(acquired.retrievalURI);
+                  } catch (error) {
+                    if (!controller.signal.aborted && generation === sourceGeneration.current)
+                      setNavigationError(error instanceof Error ? error.message : String(error));
+                  }
+                }}
                 document={documentSource}
                 view={view}
                 onViewChange={handleViewChange}

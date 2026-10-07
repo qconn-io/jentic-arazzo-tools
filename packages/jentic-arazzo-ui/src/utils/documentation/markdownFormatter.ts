@@ -159,7 +159,7 @@ export function formatHeaderAsMarkdown(
       '<div class="sources-section"><h2>Source Descriptions</h2>',
       ...metadata.sourceDescriptions.map(
         (source) =>
-          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>${escapeHTML(source.type ?? 'unknown')} — unverified</span> <a href="${sourceURL(source.url, metadata.documentURL)}">${escapeHTML(source.url)}</a></div>`,
+          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>${escapeHTML(source.type ?? 'unknown')} — unverified authored declaration (loaded status in inspector)</span> <a href="${sourceURL(source.url, metadata.documentURL)}">${escapeHTML(source.url)}</a></div>`,
       ),
       '</div>',
     );
