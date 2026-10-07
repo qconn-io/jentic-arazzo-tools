@@ -1,3 +1,16 @@
+export { ArazzoCatalog } from './ArazzoCatalog';
+export type {
+  WorkflowCatalogLabel,
+  WorkflowCatalogIdentity,
+  WorkflowCatalogMetadata,
+  WorkflowCatalogDocument,
+  WorkflowCatalogAssociation,
+  WorkflowCatalogManifest,
+  WorkflowCatalogCoverage,
+  WorkflowCatalogSelection,
+  ArazzoCatalogProps,
+} from './types/catalog';
+export { normalizeCatalogManifest } from './utils/catalog/manifest';
 import { ScenarioProvider } from './context/ScenarioContext';
 import { ScenarioPanel } from './components/ScenarioPanel';
 export type {

@@ -34,7 +34,11 @@
       "import": "./dist/arazzo-ui-standalone.mjs",
       "require": "./dist/arazzo-ui-standalone.js"
     },
-    "./styles.css": "./dist/arazzo-ui.css"
+    "./styles.css": "./dist/arazzo-ui.css",
+    "./catalog": {
+      "types": "./types/arazzo-ui.d.ts",
+      "import": "./dist/arazzo-ui.mjs"
+    }
   },
   "types": "./types/arazzo-ui.d.ts",
   "bin": {

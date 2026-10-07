@@ -3,6 +3,7 @@ import { createRoot, Root } from 'react-dom/client';
 
 import { ArazzoUIStandalone as ArazzoUIStandaloneComponent } from './ArazzoUIStandalone';
 import type { ArazzoUIRef, ArazzoUIProps, ViewerMode } from './types/index';
+import type { ArazzoUIStandaloneProps } from './ArazzoUIStandalone';
 import type { ArazzoDocument } from './types/arazzo';
 
 export interface ArazzoUIStandaloneConfig {
@@ -14,6 +15,11 @@ export interface ArazzoUIStandaloneConfig {
   perspective?: ArazzoUIProps['perspective'];
   onPerspectiveChange?: ArazzoUIProps['onPerspectiveChange'];
   initialView?: ViewerMode;
+  catalog?: ArazzoUIStandaloneProps['catalog'];
+  catalogURI?: ArazzoUIStandaloneProps['catalogURI'];
+  catalogSelection?: ArazzoUIStandaloneProps['catalogSelection'];
+  onCatalogSelectionChange?: ArazzoUIStandaloneProps['onCatalogSelectionChange'];
+  sourceProvider?: ArazzoUIProps['sourceProvider'];
   activeWorkflowId?: string | null;
   selectedNodeId?: string | null;
   onNodeSelect?: (nodeId: string, node: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any

@@ -1,3 +1,17 @@
+import { StandaloneCatalog } from './components/StandaloneCatalog';
+export { ArazzoCatalog } from './ArazzoCatalog';
+export type {
+  WorkflowCatalogLabel,
+  WorkflowCatalogIdentity,
+  WorkflowCatalogMetadata,
+  WorkflowCatalogDocument,
+  WorkflowCatalogAssociation,
+  WorkflowCatalogManifest,
+  WorkflowCatalogCoverage,
+  WorkflowCatalogSelection,
+  ArazzoCatalogProps,
+} from './types/catalog';
+export { normalizeCatalogManifest } from './utils/catalog/manifest';
 import { useStandaloneScenarios } from './utils/scenario/useStandaloneScenarios';
 import {
   SCENARIO_NAMESPACE,
@@ -131,6 +145,12 @@ export type {
 /** @public */
 export type ArazzoUIStandaloneProps = Omit<ArazzoUIProps, 'view'> & {
   initialView?: ViewerMode;
+  catalog?: import('./types/catalog').WorkflowCatalogManifest | string;
+  catalogURI?: string;
+  catalogSelection?: import('./types/catalog').WorkflowCatalogSelection | null;
+  onCatalogSelectionChange?: (
+    selection: import('./types/catalog').WorkflowCatalogSelection | null,
+  ) => void;
 };
 
 /**
@@ -142,7 +162,7 @@ export type ArazzoUIStandaloneProps = Omit<ArazzoUIProps, 'view'> & {
  *
  * @public
  */
-export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
+const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
   function ArazzoUIStandalone(props, ref) {
     const { initialView = 'docs', onViewChange, ...rest } = props;
     const guides = useStandaloneScenarios(props);
@@ -819,6 +839,28 @@ export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProp
           </div>
         </CopyLinkContext.Provider>
       </LocationHistoryContext.Provider>
+    );
+  },
+);
+
+/** Self-contained document viewer or opt-in supplied catalog. @public */
+export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
+  function ArazzoUIStandalone(props, ref) {
+    const [href, setHref] = useState(globalThis.location.href);
+    useEffect(() => {
+      const pop = () => setHref(globalThis.location.href);
+      globalThis.addEventListener('popstate', pop);
+      return () => globalThis.removeEventListener('popstate', pop);
+    }, []);
+    const input = props.catalog ?? new URL(href).searchParams.get('catalog');
+    return input ? (
+      <StandaloneCatalog
+        key={typeof input === 'string' ? input : undefined}
+        props={props}
+        input={input}
+      />
+    ) : (
+      <DocumentStandalone {...props} ref={ref} />
     );
   },
 );

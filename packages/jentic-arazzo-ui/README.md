@@ -588,3 +588,91 @@ The [stress manifest](./public/examples/digital-product-stress/scenarios.json) c
 and the [small-pack manifest](./public/examples/digital-product/scenarios.json) contains its seven
 documented failure cases. Their walkthrough records are browser inspection evidence, not observed
 business outcomes or execution coverage.
+
+## Supplied workflow capability catalogs
+
+The optional `ArazzoCatalog` export (also available from the ESM-only `@jentic/arazzo-ui/catalog` subpath) discovers
+workflows across explicitly supplied document revisions. It accepts a version-one
+`WorkflowCatalogManifest`, an optional `manifestURI` for relative sources, a
+`SourceDocumentProvider`, and controlled `selection`/`onSelectionChange` callbacks.
+It does not write browser history. `onLocationChange` reports authored viewer addresses;
+`onCoverageChange` reports the acquired scope. The ordinary `ArazzoUI` viewer requires no catalog.
+
+```tsx
+import { ArazzoCatalog, type WorkflowCatalogManifest } from '@jentic/arazzo-ui/catalog';
+
+const manifest: WorkflowCatalogManifest = {
+  version: 1,
+  id: 'shop',
+  revision: 'portfolio-2026-10',
+  capabilities: [{ id: 'purchase', name: 'Purchase' }],
+  owners: [{ id: 'payments-team', name: 'Payments team' }],
+  documents: [{
+    id: 'commerce',
+    revision: 'commerce-v3',
+    uri: 'https://example.test/commerce.arazzo.yaml',
+    // expectedDigest: 'sha256:<64 lowercase hexadecimal characters>',
+    workflows: [{ workflowId: 'purchase', role: 'entry',
+      capabilities: ['purchase'], owner: 'payments-team' }],
+  }],
+};
+// provider must return revision 'commerce-v3' when no expectedDigest is supplied.
+<ArazzoCatalog manifest={manifest} sourceProvider={provider} />;
+```
+
+The manifest author supplies product, capability, team owner, lifecycle, tags, API labels,
+system associations, and `entry`/`helper`/`diagnostic` roles. Missing roles, ownership and
+lifecycle stay unknown. A system participant never becomes a responsible team. Optional
+`viewProfile` and `scenarioManifest` objects reuse the existing presentation contracts.
+`associations` are explicit descriptive links; they do not become standard workflow calls.
+Unknown label references, duplicate document/revision identities, and duplicate workflow
+metadata within a revision are rejected. Metadata referring to an absent authored workflow
+fails that revision's indexing.
+
+Each document identifies a logical `id`, immutable `revision`, and `uri`, with optional
+inline `content`, `kind` (`arazzo`, `openapi`, `asyncapi`) and `expectedDigest`. An inline
+revision is an explicit host assertion. URI acquisition needs either provider-returned
+matching revision evidence or an expected digest; URI alone is not a pin. Digests use
+`authoredDigest` on the **parsed JSON object with sorted object keys**, not file bytes.
+A digest mismatch excludes that revision from the index and shows failed coverage.
+Catalog revision IDs also need immutable host publication practices; the browser cannot
+prove that an author never reused an ID.
+
+Relative document URIs resolve against the manifest URI; source descriptions resolve against
+the acquired workflow URI. Multiple supplied revisions at the same source URI require an
+explicit `sources` binding, such as `{ payment: { documentId: 'payment-api', revision: 'v2' } }`.
+Referenced sources are retrieved through the same provider/registry. Unlisted source contract
+snapshots get digest identities. External workflow navigation uses supplied scoped identities.
+No business API requests are made; catalog browsing only acquires specification content.
+
+Direct API uses are counted once per authored step. Located operation identities include the
+source contract URI, revision and operation pointer; unresolved/ambiguous locators remain
+candidates. Calls, prerequisites, goto, retry and descriptive associations retain their
+classes. Entry-point paths are bounded authored reachability, and may include conditional
+transfers or prerequisite relationships; they establish no execution, compatibility, or
+business outcome. Repeated call sites retain separate paths while reachable entry identities
+are deduplicated. Cycles stop at repeated identities. Path inspection is limited to 100 paths,
+32 relationships per path and 10,000 visits.
+
+A catalog generation allows at most 100 acquired document revisions (including source
+contracts), four concurrent physical acquisitions, 64 MiB aggregate acquired content,
+10 MiB per source, eight reference hops, and 10,000 authored workflow steps. Bounds and
+acquisition/projection failures remain visible as incomplete coverage. Manifest/provider
+replacement cancels the old generation; entry selection retains the portfolio index.
+Coverage only describes the supplied scope, never an organization or ecosystem. Empty
+results with partial coverage cannot establish that no consumers exist.
+
+Standalone accepts `catalog={manifestOrURI}` or `?catalog=<manifest URI>`. Shared entry links
+retain the catalog URI and use the `jentic.catalog` location extension for catalog revision
+and logical document identity, together with the existing workflow revision/address.
+Fresh sessions either restore the exact revision/workflow or show an explicit unavailable
+revision message. Standalone owns its browser history; controlled `catalogSelection` and
+`onCatalogSelectionChange` let hosts own selection without history writes. Existing
+single-document links remain compatible.
+
+The supplied example is `public/examples/catalog.json`: nine audited Arazzo documents,
+nine pinned contracts, declared capabilities and roles, intentional diagnostic labels,
+and unknown organizational ownership. Open `?catalog=./examples/catalog.json` in the
+standalone app. Regenerate its digests from the package directory with
+`node scripts/generate-sample-catalog.mjs` after intentionally changing example documents.
+The deliberately missing diagnostic source keeps sample coverage partial.
