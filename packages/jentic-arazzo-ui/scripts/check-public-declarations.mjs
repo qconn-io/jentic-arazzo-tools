@@ -14,6 +14,15 @@ try {
       file,
       `
 import type { ArazzoEdge, ArazzoEdgeType, ArazzoUIProps, RelationshipEdgeData, WorkflowRefNodeData } from ${JSON.stringify(declaration)};
+import type { WorkflowCatalogManifest, WorkflowCatalogSelection, WorkflowCatalogCoverage, ArazzoCatalogProps } from ${JSON.stringify(declaration)};
+import { ArazzoCatalog, normalizeCatalogManifest } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))};
+const catalog: WorkflowCatalogManifest = { version: 1, id: 'shop', revision: '1', documents: [{ id: 'payments', revision: 'r1', uri: 'https://example.test/payments', workflows: [{ workflowId: 'buy', role: 'entry' }] }] };
+const validatedCatalog = normalizeCatalogManifest(catalog);
+const catalogSelection: WorkflowCatalogSelection = { documentId: 'payments', revision: 'r1', workflowId: 'buy' };
+const catalogProps: ArazzoCatalogProps = { manifest: validatedCatalog, selection: catalogSelection, onCoverageChange(coverage: readonly WorkflowCatalogCoverage[]) { void coverage; } };
+const catalogComponent: typeof ArazzoCatalog = ArazzoCatalog;
+const renderedCatalog = catalogComponent(catalogProps); void renderedCatalog;
+void catalogProps; void catalogComponent;
 // @ts-expect-error Private inspection models must not become public exports.
 import type { WorkflowRelationship } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private effective actions must not become public exports.

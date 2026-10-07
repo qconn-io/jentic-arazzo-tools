@@ -1,0 +1,15 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+
+ Test Files  69 passed (69)
+      Tests  447 passed (447)
+   Start at  10:59:06
+   Duration  8.80s (tests 38%, import 26%, environment 18%, transform 11%, setup 6%)
+
+    Isolate  69 workers spawned · ~598ms startup each (spawn + environment, per file)
+             at least ~1.20s faster with isolate: false — reuses workers across files instead of one per file

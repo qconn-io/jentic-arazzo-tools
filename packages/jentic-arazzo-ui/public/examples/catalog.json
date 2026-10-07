@@ -1,0 +1,912 @@
+{
+  "version": 1,
+  "id": "digital-product-reference",
+  "revision": "sample-2026-10-07",
+  "products": [
+    {
+      "id": "digital-product",
+      "name": "Digital product reference examples"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "purchase",
+      "name": "Purchase"
+    },
+    {
+      "id": "event-purchase",
+      "name": "Event purchase"
+    },
+    {
+      "id": "inspection-diagnostics",
+      "name": "Inspection diagnostics and boundaries"
+    }
+  ],
+  "owners": [],
+  "documents": [
+    {
+      "id": "purchase",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product/arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:7071e9708b289c831691f49ad4229ac2c0358afd2e4e96343f0dd4f14f2b852a",
+      "workflows": [
+        {
+          "workflowId": "client-journey",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "fulfil-purchase",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "reserve-and-capture",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "http-commerce",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:259b952d99aa770cb3d21e12a08e8496302c987a4dc4276ad3025a0d40206f26",
+      "workflows": [
+        {
+          "workflowId": "full-stress-journey",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "initialize-session",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "batch-fulfilment",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "fulfil-item",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "prepare-commerce",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "reserve-and-capture",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "reserve-inventory",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "capture-authorized-payment",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "reconcile-payment",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "reconcile-license",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "compensate-purchase",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "release-reservation",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "abort-purchase",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "record-ready",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "record-failure",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "poll-purchase-until-ready",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "resume-existing-purchase",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "step-recovery-probe",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event-commerce",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/event-based.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:6540230fbbce0a1ecdc7c244006b56ed215be03ae910304514bbf64ed95d416a",
+      "workflows": [
+        {
+          "workflowId": "event-driven-purchase",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "event-purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "purchase-event-worker",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "event-purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "activation-audit-worker",
+          "role": "entry",
+          "product": "digital-product",
+          "capabilities": [
+            "event-purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        },
+        {
+          "workflowId": "poll-purchase-until-ready",
+          "role": "helper",
+          "product": "digital-product",
+          "capabilities": [
+            "event-purchase"
+          ],
+          "lifecycle": "reference-example",
+          "tags": [
+            "reference-example",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "depth-limit",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:f3ae52fd2cb90798e739ebed0219fd5e14b6e962b82061797395c8cb4f9db203",
+      "workflows": [
+        {
+          "workflowId": "layer-0",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-1",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-2",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-3",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-4",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-5",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-6",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-7",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-8",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-9",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-10",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "layer-11",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        }
+      ]
+    },
+    {
+      "id": "metadata-heavy",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:c8272186c7f9bd79dc5ca054a662cc498b5152a150f667c6c8c72ff8d17d1b86",
+      "workflows": [
+        {
+          "workflowId": "metadata-heavy-entry",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "record-ready",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        }
+      ]
+    },
+    {
+      "id": "recursion",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:f4baca1de28284173a0e2a24bbdda07ed6c082d07e3fd6483cc49e39b5f1084a",
+      "workflows": [
+        {
+          "workflowId": "recursive-A",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "recursive-B",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        }
+      ]
+    },
+    {
+      "id": "row-limit",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:f0f3f0c91d207660684a9e4af6549ca035ab8d976ca3eb7192b204679174d48a",
+      "workflows": [
+        {
+          "workflowId": "row-limit",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        }
+      ]
+    },
+    {
+      "id": "prerequisite-cycle",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:c7d4818b66529935b814be8e5c8b9d8360e208e9a683c0b87dbbebda90cd6855",
+      "workflows": [
+        {
+          "workflowId": "cycle-A",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        },
+        {
+          "workflowId": "cycle-B",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        }
+      ]
+    },
+    {
+      "id": "unavailable-targets",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "kind": "arazzo",
+      "expectedDigest": "sha256:89c290194f44f6eb868f90f8f0941ed6445778b4ce35916662486195e60f63ea",
+      "workflows": [
+        {
+          "workflowId": "diagnostic-probe",
+          "role": "diagnostic",
+          "product": "digital-product",
+          "capabilities": [
+            "inspection-diagnostics"
+          ],
+          "lifecycle": "intentional-diagnostic",
+          "tags": [
+            "intentional-diagnostic",
+            "inspection-only"
+          ],
+          "systems": [
+            "Coordinator"
+          ],
+          "description": "Intentional inspection/boundary example; authored warnings and limits are part of its purpose."
+        }
+      ]
+    },
+    {
+      "id": "contract:digital-product/coordinator.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product/coordinator.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:0815d2f9f9e805d7e929df299dda6fb964700871471b5e1c19393617686f48b0"
+    },
+    {
+      "id": "contract:digital-product/inventory.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product/inventory.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:7f0ab0462a41f28641ab02b87c8805873ecb492dbd66d8c395e8552f63a3b5b0"
+    },
+    {
+      "id": "contract:digital-product/payment.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product/payment.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:6ae85e088440a0a0d0b503a00a2d932e7f865a7fa5279b515f7d9aa19c797d70"
+    },
+    {
+      "id": "contract:digital-product/license.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product/license.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:62cf7cb4485a8e7365c96b12048eeb69cd387959ab272e3c82bef31356e98f6b"
+    },
+    {
+      "id": "contract:digital-product-stress/coordinator.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/coordinator.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:073d416ac89494d77e1341e3c2d0fae99c01fbb55e668093e307190408daed9b"
+    },
+    {
+      "id": "contract:digital-product-stress/inventory.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/inventory.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:140a53d1998af38513d5c6826bf2cc5af3e5118ab031029fb6e31b144952a6bf"
+    },
+    {
+      "id": "contract:digital-product-stress/payment.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/payment.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:f2a7199452d1d76691c2d2abbc729cbdf93c8591fe580d12caf4ca7e8dd04174"
+    },
+    {
+      "id": "contract:digital-product-stress/license.openapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/license.openapi.yaml",
+      "kind": "openapi",
+      "expectedDigest": "sha256:9b99f16738f914c8a54edf40ae9e7cd2315b6e67a83a62b73fed9c1a8555fab8"
+    },
+    {
+      "id": "contract:digital-product-stress/events.asyncapi.yaml",
+      "revision": "sample-2026-10-07",
+      "uri": "./digital-product-stress/events.asyncapi.yaml",
+      "kind": "asyncapi",
+      "expectedDigest": "sha256:054c172bc2fa2f509d229552f9841ed7ac3dfc55369d4738c99bb0ca374bab7c"
+    }
+  ]
+}

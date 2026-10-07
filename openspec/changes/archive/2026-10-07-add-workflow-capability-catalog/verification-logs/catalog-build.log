@@ -1,0 +1,106 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build
+> npm run clean && run-p --max-parallel ${CPU_CORES:-2} typescript:declaration build:umd:ui build:umd:standalone build:esm:ui build:esm:standalone && npm run build:app
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 clean
+> rimraf ./dist ./types ./build
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:umd:ui
+> cross-env BUILD_ENTRY=ArazzoUI vite build --config config/vite/vite.config.ts
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 typescript:declaration
+> tsc -p tsconfig.declaration.json && api-extractor run -l -c ./config/api-extractor/api-extractor.ArazzoUI.json && api-extractor run -l -c ./config/api-extractor/api-extractor.ArazzoUIStandalone.json
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 4305 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css     19.17 kB │ gzip:     4.20 kB
+dist/arazzo-ui.js   8,014.35 kB │ gzip: 1,888.62 kB
+
+✓ built in 980ms
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:umd:standalone
+> cross-env BUILD_ENTRY=ArazzoUIStandalone vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 4312 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css               19.17 kB │ gzip:     4.20 kB
+dist/arazzo-ui-standalone.js  8,070.67 kB │ gzip: 1,903.43 kB
+
+✓ built in 898ms
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:esm:ui
+> cross-env BUILD_FORMAT=esm BUILD_ENTRY=ArazzoUI vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 87 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css            16.00 kB │ gzip:  3.56 kB
+dist/references-DZgm4nmI.js   13.57 kB │ gzip:  3.95 kB
+dist/inspection-Mk2QIb4g.js   27.11 kB │ gzip:  6.80 kB
+dist/arazzo-ui.mjs           384.03 kB │ gzip: 85.62 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/utils/contract/ArazzoAdapter.ts is dynamically imported by src/context/ContractFactsContext.tsx but also statically imported by src/utils/catalog/load.ts, dynamic import will not move module into another chunk.
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/utils/contract/OpenAPIAdapter.ts is dynamically imported by src/context/ContractFactsContext.tsx but also statically imported by src/utils/catalog/load.ts, dynamic import will not move module into another chunk.
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/utils/contract/AsyncAPIAdapter.ts is dynamically imported by src/context/ContractFactsContext.tsx but also statically imported by src/utils/catalog/load.ts, dynamic import will not move module into another chunk.
+
+✓ built in 49ms
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:esm:standalone
+> cross-env BUILD_FORMAT=esm BUILD_ENTRY=ArazzoUIStandalone vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 94 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css              16.00 kB │ gzip:  3.57 kB
+dist/references-DZgm4nmI.js     13.57 kB │ gzip:  3.95 kB
+dist/inspection-BdRvODHd.js     27.11 kB │ gzip:  6.79 kB
+dist/arazzo-ui-standalone.mjs  420.44 kB │ gzip: 94.96 kB
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/utils/contract/ArazzoAdapter.ts is dynamically imported by src/context/ContractFactsContext.tsx but also statically imported by src/utils/catalog/load.ts, dynamic import will not move module into another chunk.
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/utils/contract/OpenAPIAdapter.ts is dynamically imported by src/context/ContractFactsContext.tsx but also statically imported by src/utils/catalog/load.ts, dynamic import will not move module into another chunk.
+
+[33m[INEFFECTIVE_DYNAMIC_IMPORT] [0msrc/utils/contract/AsyncAPIAdapter.ts is dynamically imported by src/context/ContractFactsContext.tsx but also statically imported by src/utils/catalog/load.ts, dynamic import will not move module into another chunk.
+
+✓ built in 56ms
+
+[1mapi-extractor 7.58.12 [36m - https://api-extractor.com/[39m
+[22m
+Analysis will use the bundled TypeScript version 5.9.3
+
+API Extractor completed successfully
+
+[1mapi-extractor 7.58.12 [36m - https://api-extractor.com/[39m
+[22m
+Analysis will use the bundled TypeScript version 5.9.3
+
+API Extractor completed successfully
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:app
+> npm run build:umd:standalone && rimraf ./build && mkdir -p ./build && cp ./dist/arazzo-ui-standalone.js ./dist/arazzo-ui.css ./build/ && node ./scripts/copy-public-assets.mjs && rm -f ./build/main.tsx ./build/index.html && mv ./build/app.html ./build/index.html && node ./scripts/hash-build-assets.mjs
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:umd:standalone
+> cross-env BUILD_ENTRY=ArazzoUIStandalone vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 4312 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css               19.17 kB │ gzip:     4.20 kB
+dist/arazzo-ui-standalone.js  8,070.67 kB │ gzip: 1,903.43 kB
+
+✓ built in 892ms
+arazzo-ui-standalone.js -> arazzo-ui-standalone.2ff30bf1.js
+arazzo-ui.css -> arazzo-ui.3cd378d2.css

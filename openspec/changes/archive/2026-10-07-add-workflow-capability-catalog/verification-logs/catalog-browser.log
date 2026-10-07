@@ -1,0 +1,10 @@
+
+Running 3 tests using 1 worker
+
+(node:158306) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [chromium] › test/e2e/catalog.spec.ts:38:3 › catalog discovery and classified reverse usage at 1440 (5.0s)
+  ✓  2 [chromium] › test/e2e/catalog.spec.ts:38:3 › catalog discovery and classified reverse usage at 480 (4.8s)
+  ✓  3 [chromium] › test/e2e/catalog.spec.ts:140:1 › rejects unavailable shared catalog revision and preserves plain document viewing (1.3s)
+
+  3 passed (11.8s)

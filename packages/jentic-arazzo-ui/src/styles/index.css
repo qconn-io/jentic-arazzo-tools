@@ -630,3 +630,126 @@
     width: min(480px, 45%);
   }
 }
+
+/* optional supplied catalog; keep scrolling and focus within the available width. */
+.arazzo-catalog {
+  padding: 1.25rem;
+  color: #172033;
+  background: #f8fafc;
+  min-height: 100%;
+  overflow-wrap: anywhere;
+}
+.arazzo-catalog h1,
+.arazzo-catalog h2,
+.arazzo-catalog h3 {
+  margin: 0.75rem 0;
+}
+.arazzo-catalog p {
+  margin: 0.45rem 0;
+}
+.arazzo-catalog button,
+.arazzo-catalog input,
+.arazzo-catalog select {
+  font: inherit;
+  border: 1px solid #94a3b8;
+  border-radius: 0.3rem;
+  padding: 0.45rem 0.6rem;
+  background: white;
+  max-width: 100%;
+  color: #172033;
+}
+.arazzo-catalog button {
+  cursor: pointer;
+  text-align: left;
+}
+.arazzo-catalog button:focus-visible,
+.arazzo-catalog input:focus-visible,
+.arazzo-catalog select:focus-visible,
+.arazzo-catalog summary:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+.arazzo-catalog button[aria-current='true'] {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+.catalog-filters label {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+.catalog-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  gap: 1.5rem;
+}
+.catalog-layout > section {
+  min-width: 0;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.catalog-entries {
+  list-style: none;
+  padding: 0;
+}
+.catalog-entries > li {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.75rem 0;
+}
+.arazzo-catalog ul,
+.arazzo-catalog ol {
+  padding-left: 1.25rem;
+}
+.arazzo-catalog li {
+  margin: 0.5rem 0;
+}
+.arazzo-catalog pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 25rem;
+  overflow: auto;
+}
+.catalog-viewer {
+  margin-top: 1.5rem;
+  height: 75vh;
+  min-height: 32rem;
+  border: 1px solid #cbd5e1;
+  background: white;
+}
+@media (max-width: 700px) {
+  .arazzo-catalog {
+    padding: 0.75rem;
+  }
+  .catalog-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .catalog-filters label {
+    flex: 1 1 10rem;
+  }
+}
+
+.arazzo-catalog,
+.catalog-copy-link {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+.catalog-filters input,
+.catalog-filters select {
+  width: 100%;
+  min-width: 0;
+}
+.catalog-copy-link {
+  margin: 0.75rem 1.25rem 0;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #94a3b8;
+  border-radius: 0.3rem;
+  background: white;
+  cursor: pointer;
+}

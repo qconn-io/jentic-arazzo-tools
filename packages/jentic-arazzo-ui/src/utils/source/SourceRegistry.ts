@@ -85,6 +85,10 @@ export class SourceRegistry {
     }
   }
 
+  public forEachEntry(visitor: (key: string, entry: RegistryEntryState) => void): void {
+    this.entries.forEach((entry, key) => visitor(key, entry));
+  }
+
   public getProviderGeneration(): number {
     return this.providerGeneration;
   }

@@ -195,3 +195,9 @@ DECLINED abort. Compensation retains its absence/revocation guard. Completion ti
 12-second receive timeout, two receive retries and one-way polling fallback without republishing
 a command. FAILED activation and a RECORDED receipt remain distinct. These are authored expectations,
 not executed results. See the package README for manifest versioning, bounds and sharing requirements.
+
+The optional supplied [capability catalog](../catalog.json) includes all nine audited
+Arazzo documents and pinned contract revisions. It supplies example/diagnostic roles and
+capabilities while leaving organizational ownership unknown. Open the standalone app with
+`?catalog=./examples/catalog.json`; the intentionally unavailable source remains visible as
+partial coverage. Browsing this catalog inspects authored specifications and does not run APIs.

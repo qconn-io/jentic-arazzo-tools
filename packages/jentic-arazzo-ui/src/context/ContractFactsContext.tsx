@@ -1,3 +1,4 @@
+import { SourceRevisionContext } from './SourceRevisionContext';
 import React, {
   createContext,
   useContext,
@@ -34,6 +35,7 @@ export function useContractFacts() {
 }
 export function ContractFactsProvider({ children }: { children: React.ReactNode }) {
   const { model, sourceRegistry, sourceProvider } = useArazzoViewer();
+  const revisions = useContext(SourceRevisionContext);
   useSyncExternalStore(
     sourceRegistry.subscribe,
     sourceRegistry.getSnapshot,
@@ -61,10 +63,11 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
   );
   const load = async (source: { name: string; type?: string; url: string }, reload: boolean) => {
     const token = {};
+    const revision = revisions[source.name];
     requests.current.set(source.name, token);
-    if (reload) sourceRegistry.reload(source.url, undefined, scope.baseURI);
+    if (reload) sourceRegistry.reload(source.url, revision, scope.baseURI);
     const resolvedURI = sourceRegistry.resolveUri(source.url, scope.baseURI).resolvedUri;
-    const validity = sourceRegistry.captureValidity(resolvedURI);
+    const validity = sourceRegistry.captureValidity(resolvedURI, revision);
     const isCurrent = () =>
       current.current.scope === scope &&
       current.current.sourceProvider === sourceProvider &&
@@ -76,7 +79,7 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
     }));
     let acquired: SourceDocumentContent | undefined;
     try {
-      acquired = await sourceRegistry.acquire(source.url, undefined, scope.baseURI);
+      acquired = await sourceRegistry.acquire(source.url, revision, scope.baseURI);
       if (!isCurrent()) return;
       let value: LoadedSource;
       if (source.type === 'arazzo') {
