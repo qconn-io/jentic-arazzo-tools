@@ -1,56 +1,36 @@
-import { dereferenceOpenAPI } from '@jentic/arazzo-resolver';
-import { Resolver, File, ResolverError } from '@speclynx/apidom-reference/configuration/empty';
-import { isObjectElement, isStringElement, isArrayElement, Element, ObjectElement } from '@speclynx/apidom-datamodel';
+import { parseOpenAPI, defaultParseOpenAPIOptions } from '@jentic/arazzo-parser';
 
-import { SourceRegistry } from '../source/SourceRegistry';
-import { ContractDocumentFacts } from './types';
-
-function createSourceRegistryResolver(registry: SourceRegistry, baseUri: string, rawContent: string | object) {
-  const resolver = new (Resolver as any)({ name: 'source-registry' });
-  
-  resolver.canRead = (file: File): boolean => {
-    return true; // We intercept everything
-  };
-
-  resolver.read = async (file: File): Promise<Buffer> => {
-    console.log(`[SourceRegistryResolver] read called for ${file.uri}`);
-    try {
-      if (file.uri === baseUri) {
-        console.log(`[SourceRegistryResolver] returning raw content for ${file.uri}`);
-        const text = typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent);
-        return new TextEncoder().encode(text) as unknown as Buffer;
-      }
-      const content = await registry.acquire(file.uri, undefined, baseUri);
-      const text = typeof content.content === 'string' ? content.content : JSON.stringify(content.content);
-      return new TextEncoder().encode(text) as unknown as Buffer;
-    } catch (e) {
-      throw new ResolverError(`Failed to load ${file.uri}`, { cause: e });
-    }
-  };
-
-  return resolver;
-}
+import { decodePointer, encodePointer } from './pointer';
+import type { SourceRegistry, SourceValidityToken } from '../source/SourceRegistry';
+import type {
+  ContractDocumentFacts,
+  ContractOperation,
+  ContractOperationParameter,
+  ContractValue,
+} from './types';
+import {
+  createReferenceProjector,
+  indexOperations,
+  object,
+  parseContract,
+  string,
+} from './references';
 
 export async function projectOpenAPI(
   content: string | object,
   uri: string,
   registry: SourceRegistry,
   revision?: string,
+  acquisitionValidity?: SourceValidityToken,
 ): Promise<ContractDocumentFacts> {
-  const resolver = createSourceRegistryResolver(registry, uri, content);
-
-  const derefOptions = {
-    baseURI: uri,
-    resolve: { resolvers: [resolver] },
+  const validity = acquisitionValidity ?? registry.captureValidity(uri, revision);
+  const ensureCurrent = () => {
+    if (!registry.isCurrent(validity)) throw new Error('Obsolete contract projection');
   };
-
-  console.log('[projectOpenAPI] calling dereferenceOpenAPI');
-  const dereferenced = await dereferenceOpenAPI(uri, derefOptions);
-  console.log('[projectOpenAPI] dereferenceOpenAPI completed');
-
-  // 3. Extract facts
+  let api = await parseContract(content);
+  const version = string(api.openapi) ?? string(api.swagger) ?? '';
   const facts: ContractDocumentFacts = {
-    version: '',
+    version,
     dialect: 'openapi',
     uri,
     revision,
@@ -58,88 +38,114 @@ export async function projectOpenAPI(
     rawContent: content,
     unsupportedDiagnostics: [],
   };
-
-  const api = dereferenced.api;
-  if (!api || !isObjectElement(api)) {
+  if (!/^3\.[01]\.\d+$/.test(version)) {
     facts.dialect = 'unsupported';
-    facts.unsupportedDiagnostics.push('No API object found');
+    facts.unsupportedDiagnostics.push(
+      api.swagger === '2.0'
+        ? 'OpenAPI 2.0 (Swagger) is not fully supported'
+        : `Unsupported OpenAPI version: ${version || 'missing'}`,
+    );
     return facts;
   }
-
-  // Version
-  const openapiElem = api.get('openapi');
-  if (isStringElement(openapiElem)) {
-    facts.version = String(openapiElem.toValue());
-  } else {
-    const swaggerElem = api.get('swagger');
-    if (isStringElement(swaggerElem)) {
-      facts.version = String(swaggerElem.toValue());
-      facts.dialect = 'unsupported';
-      facts.unsupportedDiagnostics.push('OpenAPI 2.0 (Swagger) is not fully supported');
-    } else {
-      facts.dialect = 'unsupported';
-      facts.unsupportedDiagnostics.push('Unknown or missing OpenAPI version');
+  // The object path cannot be interpreted as a URI; only the parser's memory resolver is enabled.
+  const parsed = await parseOpenAPI(api, {
+    resolve: {
+      resolvers: defaultParseOpenAPIOptions.resolve?.resolvers?.filter(
+        (resolver) => resolver.name === 'memory',
+      ),
+    },
+    parse: { parserOpts: { strict: false } },
+  });
+  api = object(parsed.api?.toValue());
+  if (
+    typeof api.jsonSchemaDialect === 'string' &&
+    api.jsonSchemaDialect !== 'https://spec.openapis.org/oas/3.1/dialect/base'
+  ) {
+    facts.unsupportedDiagnostics.push(
+      `Unsupported document schema dialect: ${api.jsonSchemaDialect}; schema declarations are retained without compatibility claims`,
+    );
+  }
+  const makeProjector = () =>
+    createReferenceProjector(
+      api,
+      uri,
+      registry,
+      facts.unsupportedDiagnostics,
+      typeof api.jsonSchemaDialect === 'string' &&
+        api.jsonSchemaDialect !== 'https://spec.openapis.org/oas/3.1/dialect/base',
+      undefined,
+      { revision, openapi31: version.startsWith('3.1.'), ensureCurrent, validity },
+    );
+  ensureCurrent();
+  const operations: ContractOperation[] = [];
+  const parameters = (value: ContractValue | undefined): ContractOperationParameter[] => {
+    if (!Array.isArray(value)) return [];
+    return value
+      .map(object)
+      .filter(
+        (p) =>
+          typeof p.name === 'string' &&
+          ['query', 'header', 'path', 'cookie'].includes(String(p.in)),
+      )
+      .map((p) => ({
+        name: String(p.name),
+        in: p.in as ContractOperationParameter['in'],
+        required: p.required === true,
+        ...(p.schema !== undefined ? { schema: p.schema } : {}),
+        ...(p.content !== undefined ? { content: p.content } : {}),
+        ...(typeof p.description === 'string' ? { description: p.description } : {}),
+      }));
+  };
+  for (const [path, authoredPath] of Object.entries(object(api.paths))) {
+    if (!path.startsWith('/')) continue;
+    const followed = await makeProjector().follow(authoredPath);
+    const pathItem = object(followed.value);
+    const pathLocation = followed.pointer ? decodePointer(followed.pointer) : ['paths', path];
+    if (
+      object(authoredPath).$ref &&
+      Object.keys(object(authoredPath)).some((key) => key !== '$ref')
+    )
+      facts.unsupportedDiagnostics.push(
+        `Path Item reference siblings retained in raw source; their combined semantics are unsupported: ${path}`,
+      );
+    for (const method of ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']) {
+      if (!pathItem[method] || typeof pathItem[method] !== 'object') continue;
+      const { project, schemaReferences } = makeProjector();
+      const op = object(
+        await project(pathItem[method], followed.base, followed.depth, followed.links, 0, false, [
+          ...pathLocation,
+          method,
+        ]),
+      );
+      const pathParameters = await project(
+        pathItem.parameters,
+        followed.base,
+        followed.depth,
+        followed.links,
+        0,
+        false,
+        [...pathLocation, 'parameters'],
+      );
+      const merged = new Map<string, ContractOperationParameter>();
+      [...parameters(pathParameters), ...parameters(op.parameters)].forEach((p) =>
+        merged.set(`${p.in}:${p.name}`, p),
+      );
+      operations.push({
+        schemaReferences,
+        operationId: string(op.operationId),
+        pointer: encodePointer(['paths', path, method]),
+        path,
+        method: method.toUpperCase(),
+        summary: string(op.summary),
+        parameters: [...merged.values()],
+        security: op.security ?? api.security,
+        servers: op.servers ?? pathItem.servers ?? api.servers,
+        requestBody: op.requestBody,
+        responses: op.responses,
+      });
     }
   }
-
-  // Paths
-  const paths = api.get('paths');
-  if (isObjectElement(paths)) {
-    paths.forEach((pathItem: Element, pathKey: Element) => {
-      if (!isObjectElement(pathItem)) return;
-      const pathValue = String(pathKey.toValue());
-
-      // Path-level parameters
-      const pathParamsElem = pathItem.get('parameters');
-      const pathParams = extractParameters(pathParamsElem);
-
-      // Operations
-      const methods = ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'];
-      for (const method of methods) {
-        const op = pathItem.get(method);
-        if (isObjectElement(op)) {
-          const operationId = op.get('operationId')
-            ? String(op.get('operationId')?.toValue())
-            : undefined;
-
-          const opParams = extractParameters(op.get('parameters'));
-          // Merge parameters (operation overrides path)
-          const paramsMap = new Map();
-          for (const p of pathParams) paramsMap.set(`${p.in}:${p.name}`, p);
-          for (const p of opParams) paramsMap.set(`${p.in}:${p.name}`, p);
-
-          const parameters = Array.from(paramsMap.values());
-
-          const opKey = operationId || `${method.toUpperCase()} ${pathValue}`;
-
-          facts.operations.set(opKey, {
-            operationId,
-            path: pathValue,
-            method: method.toUpperCase(),
-            parameters,
-            // add security, requestBody, responses...
-          });
-        }
-      }
-    });
-  }
-
+  ensureCurrent();
+  facts.operations = indexOperations(operations);
   return facts;
-}
-
-function extractParameters(paramsElem: Element | undefined) {
-  const result: any[] = [];
-  if (isArrayElement(paramsElem)) {
-    paramsElem.forEach((p: Element) => {
-      if (isObjectElement(p)) {
-        result.push({
-          name: String(p.get('name')?.toValue()),
-          in: String(p.get('in')?.toValue()),
-          required: Boolean(p.get('required')?.toValue() ?? false),
-          schema: p.get('schema')?.toValue(),
-        });
-      }
-    });
-  }
-  return result;
 }

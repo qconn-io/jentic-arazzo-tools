@@ -46,3 +46,14 @@ System interactions SHALL link to their exact workflow location and contract det
 #### Scenario: System to workflow and back
 - **WHEN** the reader selects the payment exchange, opens its workflow occurrence, and returns
 - **THEN** the original system context and scoped selection can be restored without changing the underlying authored document
+
+### Requirement: Shared contract identity facts
+The inspector and Systems SHALL share viewer-local explicitly loaded contract projections with resolved channel/message declaration identity and authored-use provenance. Document/provider replacement and dependency reload SHALL exclude obsolete facts. Reading projections SHALL NOT acquire sources implicitly.
+
+#### Scenario: Different messages with identical content
+- **WHEN** an operation reference changes to a distinct message declaration with identical name and content
+- **THEN** contract facts distinguish the resolved identities and an association pinned to the original declaration remains diagnostic
+
+#### Scenario: Reload and replacement
+- **WHEN** a source dependency is reloaded or the document/provider is replaced
+- **THEN** both perspectives exclude obsolete projections and explicit loading is required to restore current facts

@@ -1,3 +1,8 @@
+import type {
+  WorkflowViewProfile,
+  WorkflowViewProfileAdapter,
+  WorkflowPerspective,
+} from './profile';
 import type { WorkflowLocation, WorkflowLocationStatus, WorkflowLocationAdapter } from './location';
 /**
  * Viewer-specific types for \@jentic/arazzo-ui
@@ -39,6 +44,10 @@ export interface ViewerEvents {
 /** @public */
 export interface ArazzoUIProps {
   document: ArazzoDocument | string;
+  viewProfile?: WorkflowViewProfile;
+  viewProfileAdapter?: WorkflowViewProfileAdapter;
+  perspective?: WorkflowPerspective;
+  onPerspectiveChange?: (perspective: WorkflowPerspective) => void;
   view?: ViewerMode;
   activeWorkflowId?: string | null;
   selectedNodeId?: string | null;
@@ -57,6 +66,8 @@ export interface ArazzoUIProps {
   onEdgeSelect?: (edgeId: string, edge: ArazzoEdge) => void;
   onWorkflowSelect?: (workflowId: string) => void;
   onViewChange?: (view: ViewerMode) => void;
+  /** Base URI for relative sources in inline/uploaded documents. */
+  baseURI?: string;
   sourceProvider?: SourceDocumentProvider;
   onExternalNavigation?: (request: ExternalNavigationRequest) => void;
 }

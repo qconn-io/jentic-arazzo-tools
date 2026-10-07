@@ -9,6 +9,10 @@ export interface ArazzoUIConfig {
   dom_id?: string;
   domNode?: HTMLElement;
   document: ArazzoDocument | string;
+  viewProfile?: ArazzoUIProps['viewProfile'];
+  viewProfileAdapter?: ArazzoUIProps['viewProfileAdapter'];
+  perspective?: ArazzoUIProps['perspective'];
+  onPerspectiveChange?: ArazzoUIProps['onPerspectiveChange'];
   view?: ViewerMode;
   activeWorkflowId?: string | null;
   selectedNodeId?: string | null;

@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "document": "./event-based.arazzo.yaml",
+  "participants": [
+    {
+      "id": "client",
+      "name": "Client application",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "coordinator",
+      "name": "Purchase Coordinator",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "purchase-worker",
+      "name": "Purchase event worker",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "audit-worker",
+      "name": "Activation audit worker",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "inventory",
+      "name": "Inventory Service",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "payment",
+      "name": "Payment Service",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "license",
+      "name": "License Service",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "events",
+      "name": "Event channel endpoint",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    }
+  ],
+  "actors": [
+    {
+      "workflowId": "event-driven-purchase",
+      "participant": "client",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "workflowId": "purchase-event-worker",
+      "participant": "purchase-worker",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "workflowId": "activation-audit-worker",
+      "participant": "audit-worker",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "workflowId": "poll-purchase-until-ready",
+      "participant": "coordinator",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    }
+  ],
+  "sourceOwners": [
+    {
+      "sourceName": "coordinator",
+      "participant": "coordinator",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "sourceName": "inventory",
+      "participant": "inventory",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "sourceName": "payment",
+      "participant": "payment",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "sourceName": "license",
+      "participant": "license",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "sourceName": "events",
+      "participant": "events",
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    }
+  ],
+  "implementations": [],
+  "events": [
+    {
+      "id": "purchase-command",
+      "producer": {
+        "workflowId": "event-driven-purchase",
+        "stepId": "publish-command"
+      },
+      "consumer": {
+        "workflowId": "purchase-event-worker",
+        "stepId": "receive-command"
+      },
+      "channel": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/purchaseRequested"
+      },
+      "message": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/purchaseRequested/messages/PurchaseRequested"
+      },
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "purchase-completion",
+      "producer": {
+        "workflowId": "purchase-event-worker",
+        "stepId": "publish-ready"
+      },
+      "consumer": {
+        "workflowId": "event-driven-purchase",
+        "stepId": "await-ready"
+      },
+      "channel": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/purchaseCompleted"
+      },
+      "message": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/purchaseCompleted/messages/PurchaseCompleted"
+      },
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "activation-report",
+      "producer": {
+        "workflowId": "event-driven-purchase",
+        "stepId": "publish-activation"
+      },
+      "consumer": {
+        "workflowId": "activation-audit-worker",
+        "stepId": "receive-activation"
+      },
+      "channel": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/activationReported"
+      },
+      "message": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/activationReported/messages/ActivationReported"
+      },
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    },
+    {
+      "id": "audit-completion",
+      "producer": {
+        "workflowId": "activation-audit-worker",
+        "stepId": "publish-receipt"
+      },
+      "consumer": {
+        "workflowId": "event-driven-purchase",
+        "stepId": "await-audit"
+      },
+      "channel": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/auditRecorded"
+      },
+      "message": {
+        "uri": "./events.asyncapi.yaml",
+        "pointer": "#/channels/auditRecorded/messages/AuditRecorded"
+      },
+      "provenance": {
+        "kind": "host",
+        "description": "Explicit digital-product event example profile; declared relationships only"
+      }
+    }
+  ]
+}

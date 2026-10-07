@@ -450,21 +450,55 @@ Extensions cannot replace document, root, or occurrence identity.
 
 ## API Contract Inspection
 
-The Arazzo UI viewer integrates standalone contract panels for source operations. It supports OpenAPI 3.1.0 and AsyncAPI 2.x/3.x profiles, projecting `$sourceDescriptions` into operations. The viewer is capable of dynamically retrieving URL-based Arazzo workflow sources, resolving operations, and displaying exact constraints without fabricating responses or simulating the underlying servers.
+Select a step to inspect its authored source binding in **Contract & Source**. Selecting a step does not fetch a contract: use **Load source <name>** to request a declared source and **Reload source <name>** to refresh it. Standalone viewing supplies a browser fetch provider; embedded viewing uses the optional `sourceProvider` supplied by the host. Browser fetches omit credentials and remain subject to browser CORS rules.
 
-### Source Document Providers and Limits
+Supported inspection profiles are OpenAPI 3.0/3.1 and AsyncAPI 3. OpenAPI details retain parameters, request bodies, response alternatives, examples and effective security. AsyncAPI details retain send/receive direction, channel, messages, payloads, headers, correlation information and bindings. AsyncAPI 2 and Swagger 2 are reported as unsupported. Inspection displays authored contract facts; it does not execute requests, validate runtime values, select a successful response, or infer message delivery guarantees.
 
-The default standalone view includes a **Browser Fetch Adapter** which is limited by standard browser CORS rules, caching heuristics, and cannot relay host credentials implicit for internal endpoints. Hosts supplying `sourceProvider={customAdapter}` can integrate specialized retrieval logic. To prevent run-away fetch chains or deeply circular document loops, source provision relies on explicit limits (the viewer caps operation and nested-target discovery traversal limits).
+A source can be not loaded, loading, located, missing, ambiguous, unsupported, failed, or limited by an acquisition budget. **Located** means the locator identifies a unique operation in the retrieved document; it is not a validation result. Retrieval URI, revision when supplied, and provider generation identify the acquired source. Relative source URLs and references require a document base URI. Inline content without a base reports that limitation instead of resolving against the viewer page.
 
-### Provenance and Located Status
+Schemas retain their authored references and sibling constraints. **Referenced schema declarations** shows targets separately, including their retrieval URI, revision when supplied, and reference limitations. Inspection does not flatten schemas or combine constraints. Recursive links remain finite; unsupported schema dialects, resource identifiers and anchors retain their authored content with an explanation.
 
-The viewer assigns a distinct state to each requested API contract:
+Reload refreshes the selected source and its reference dependencies, including failed dependencies. Other loaded sources that depend on invalidated entries return to not loaded and require an explicit Load source action; unrelated sources stay available. Cancelled or obsolete projections cannot publish their old facts.
 
-- **idle** / **loading**: The contract source request is enqueued or fetching.
-- **located**: The specific referenced operation is successfully verified inside the matched source document schema.
-- **ambiguous**: Multiple operations map to the same lookup query within the contract.
-- **missing**: The expected operation is not present in the retrieved contract.
-- **failed**: The operation's contract source failed to parse or was completely unavailable.
-- **unsupported**: The referenced document type dialect (such as OpenAPI 2.0 Swagger) is unsupported.
+The registry shares source acquisitions within a viewer and limits them to four concurrent requests, 32 documents, eight reference levels, and 10 MiB per document. Provider replacement and document replacement invalidate the source scope and abort pending acquisitions. These bounds protect inspection work; a host should also bound its own network response reading.
 
-A `baseURI` property maintains origin document provenance across loaded instances, enforcing accurate relative `$ref` evaluations without falling back incorrectly.
+Hosts can supply already available documents without adding network access:
+
+```tsx
+import { ArazzoUI, type SourceDocumentProvider } from '@jentic/arazzo-ui';
+
+const sourceProvider: SourceDocumentProvider = {
+  async load({ uri, signal }) {
+    signal?.throwIfAborted();
+    const content = contracts.get(uri);
+    if (!content) throw new Error(`Unavailable source: ${uri}`);
+    return { content, retrievalURI: uri, revision: 'catalog-v1' };
+  },
+};
+
+<ArazzoUI
+  document={workflowDocument}
+  sourceProvider={sourceProvider}
+  onExternalNavigation={({ documentUri, workflowId }) => {
+    openWorkflowInHost(documentUri, workflowId);
+  }}
+/>;
+```
+
+A loaded Arazzo source exposes the referenced external workflow. **Open workflow <id>** issues `onExternalNavigation` with the retrieved document URI, revision and workflow ID, allowing the host to choose how to open it. It does not silently switch the current document or treat external workflow steps as local operations.
+
+### Optional Systems perspective
+
+Hosts can supply `viewProfile` (version 1) and select `perspective="systems"`, or let readers use the optional Perspective setting. `onPerspectiveChange` supports a controlled host. Existing `ViewerMode` and `DiagramType` unions and default workflow views remain unchanged. With no profile, standard views do not interpret presentation extensions.
+
+Profiles bind explicit business participants, workflow/step actors, API source owners, descriptive operation implementations, and declared event endpoints to one document identity and optional revision. Every binding retains an authored field location or host provenance. Organizational ownership is separate optional catalog data. Invalid/stale/conflicting references remain diagnostic; missing identities become Unknown participants while authored interactions remain inspectable.
+
+Use `viewProfileAdapter="digital-product"` or the exported `digitalProductProfile(document, identity, revision)` **explicitly** for the example schema. It translates `x-example-participants`, step actor/target/implementation metadata, and the example convention that source names matching declared participant keys identify source owners. It does not infer actors from workflow names or prose. Descriptive implementation mappings remain authored metadata, not evaluated values or additional API requests. The event example's [explicit profile](public/examples/digital-product-stress/systems-profile.json) declares four producer/consumer associations; its relative URIs must be resolved against the example document by the host before supplying it. The development app accepts `?profile=digital-product` or `?systemsProfile=<profile-url>` as explicit configuration; these are not automatic extension discovery.
+
+The diagram distinguishes requests and declared send/receive direction, descriptive implementation groups, standard workflow control, and display-limit markers. Helper calls start collapsed. Depth eight and 200 rows include association expansion. Keyboard list controls expose every visible interaction, expand/collapse, and exact workflow navigation; contained canvas scrolling supports narrow screens. The existing inspector retains full authored content, correlation expressions, receive timeouts and contract details.
+
+Selected mappings and explicit prerequisites are inspectable without expression evaluation. Exact supported `$steps.<id>.outputs.<name>` references offer producer navigation within the owning workflow and standard call path. Other expressions stay exact authored text. Repeated call mappings retain their caller context; numeric values displayed in caller mappings are authored literals, not computed transaction amounts.
+
+Response alternatives and declared event relationship details are opt-in inspector layers. Event links require an explicit association and loaded, matching resolved channel/message identities, including any pinned revision. Similar names or identical payloads do not establish a link. Neither send/receive arrows nor association links assert delivery, subscription, correlation success, execution order, or an observed response. Explicit source loading is still required. The inspector and Systems share current loaded projections; provider/document replacement and dependency reload invalidate obsolete facts.
+
+The `jentic.systems` workflow-location extension preserves the system root, semantic interaction address, association path and expanded/collapsed controls. Exact workflow navigation uses the existing standard occurrence address; returning restores the separate system context. Hosts must supply the same profile to restore its descriptive associations. System state does not widen legacy location view/subview unions or mutate authored documents.

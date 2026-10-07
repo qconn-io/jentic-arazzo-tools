@@ -7,3 +7,6 @@ isolate-*.log
 .log*
 .claude/
 .agents/
+# Browser acceptance test output
+**/test-results/
+**/playwright-report/

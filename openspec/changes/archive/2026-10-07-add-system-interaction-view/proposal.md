@@ -7,6 +7,7 @@ The small purchase example has five business participants, yet its client operat
 - Add an optional Systems perspective alongside the existing workflow sequence.
 - Accept explicit participant, source-owner, workflow-actor, and operation-implementation associations through a typed view profile; provide an opt-in adapter for the digital-product examples.
 - Show an associated implementation inside its HTTP exchange as a descriptive association, distinct from a standard workflow call.
+- Share explicitly loaded contract projections between the inspector and Systems, retaining resolved channel/message declaration identity and reload provenance.
 - Represent AsyncAPI send/receive relationships using resolved contract identity and explicit associations; do not infer delivery from similar names.
 - Add selected mapping/dependency overlays and contract response alternatives with clear provenance, without evaluating expressions or claiming outcomes.
 

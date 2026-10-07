@@ -1,3 +1,4 @@
+import { SystemsDetails } from './SystemsDetails';
 import React, { useEffect, useRef, useState } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
@@ -137,6 +138,7 @@ export function SelectionDetails() {
       </button>
       <CopyLocationControl />
       <h2>{details.title}</h2>
+      <SystemsDetails />
       {session.locationStatus &&
         (session.locationStatus.state !== 'restored' ||
           !!session.locationStatus.notices?.length) && (
@@ -176,7 +178,9 @@ export function SelectionDetails() {
         </dl>
       </section>
       <ReadingDetails sections={details.reading.sections} />
-      {selection?.stepId && <ContractPanel workflowId={selection.workflowId} stepId={selection.stepId} />}
+      {selection?.stepId && (
+        <ContractPanel workflowId={selection.workflowId} stepId={selection.stepId} />
+      )}
       <details data-advanced>
         <summary>Advanced authored content and provenance</summary>
         {details.sections.map((section) => (
