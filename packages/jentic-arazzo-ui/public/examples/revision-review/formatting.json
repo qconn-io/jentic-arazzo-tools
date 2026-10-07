@@ -1,0 +1,173 @@
+{
+  "baseline": {
+    "version": 1,
+    "id": "purchase-review",
+    "revision": "baseline-r1",
+    "documents": [
+      {
+        "id": "flow",
+        "revision": "baseline-r1",
+        "uri": "https://review.example/purchase.json",
+        "content": {
+          "arazzo": "1.0.1",
+          "info": {
+            "title": "Synthetic purchase review",
+            "version": "1"
+          },
+          "sourceDescriptions": [
+            {
+              "name": "pay",
+              "type": "openapi",
+              "url": "https://review.example/pay.json"
+            }
+          ],
+          "workflows": [
+            {
+              "workflowId": "purchase-entry",
+              "steps": [
+                {
+                  "stepId": "purchase",
+                  "workflowId": "capture-payment"
+                }
+              ]
+            },
+            {
+              "workflowId": "capture-payment",
+              "steps": [
+                {
+                  "stepId": "capture",
+                  "operationId": "capture",
+                  "parameters": [
+                    {
+                      "name": "amount",
+                      "in": "query",
+                      "value": 0
+                    }
+                  ],
+                  "successCriteria": [
+                    {
+                      "condition": "$response.body.state == 'CAPTURED'"
+                    }
+                  ],
+                  "onFailure": [
+                    {
+                      "name": "recover",
+                      "type": "retry",
+                      "retryLimit": 2,
+                      "workflowId": "reconcile-payment"
+                    }
+                  ]
+                },
+                {
+                  "stepId": "revoke-license",
+                  "operationId": "capture",
+                  "description": "Compensation declaration retained only in baseline"
+                }
+              ]
+            },
+            {
+              "workflowId": "reconcile-payment",
+              "dependsOn": [
+                "$workflows.capture-payment"
+              ],
+              "steps": []
+            }
+          ]
+        },
+        "workflows": [
+          {
+            "workflowId": "purchase-entry",
+            "role": "entry"
+          }
+        ],
+        "sources": {
+          "pay": {
+            "documentId": "contract",
+            "revision": "baseline-r1"
+          }
+        }
+      },
+      {
+        "id": "contract",
+        "revision": "baseline-r1",
+        "uri": "https://review.example/pay.json",
+        "kind": "openapi",
+        "content": {
+          "openapi": "3.1.0",
+          "info": {
+            "title": "Payment declarations",
+            "version": "1"
+          },
+          "paths": {
+            "/capture": {
+              "post": {
+                "operationId": "capture",
+                "summary": "Capture payment",
+                "responses": {
+                  "200": {
+                    "description": "Capture evidence",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/Evidence"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "Evidence": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "CAPTURED",
+                      "UNKNOWN"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "candidate": {
+    "version": 1,
+    "id": "purchase-review",
+    "revision": "formatting-r2",
+    "documents": [
+      {
+        "id": "flow",
+        "revision": "formatting-r2",
+        "uri": "https://review.example/purchase.json",
+        "content": "{\n    \"arazzo\": \"1.0.1\",\n    \"info\": {\n        \"title\": \"Synthetic purchase review\",\n        \"version\": \"1\"\n    },\n    \"sourceDescriptions\": [\n        {\n            \"name\": \"pay\",\n            \"type\": \"openapi\",\n            \"url\": \"https://review.example/pay.json\"\n        }\n    ],\n    \"workflows\": [\n        {\n            \"steps\": [\n                {\n                    \"stepId\": \"purchase\",\n                    \"workflowId\": \"capture-payment\"\n                }\n            ],\n            \"workflowId\": \"purchase-entry\"\n        },\n        {\n            \"steps\": [\n                {\n                    \"onFailure\": [\n                        {\n                            \"name\": \"recover\",\n                            \"retryLimit\": 2,\n                            \"type\": \"retry\",\n                            \"workflowId\": \"reconcile-payment\"\n                        }\n                    ],\n                    \"operationId\": \"capture\",\n                    \"parameters\": [\n                        {\n                            \"in\": \"query\",\n                            \"name\": \"amount\",\n                            \"value\": 0\n                        }\n                    ],\n                    \"stepId\": \"capture\",\n                    \"successCriteria\": [\n                        {\n                            \"condition\": \"$response.body.state == 'CAPTURED'\"\n                        }\n                    ]\n                },\n                {\n                    \"description\": \"Compensation declaration retained only in baseline\",\n                    \"operationId\": \"capture\",\n                    \"stepId\": \"revoke-license\"\n                }\n            ],\n            \"workflowId\": \"capture-payment\"\n        },\n        {\n            \"dependsOn\": [\n                \"$workflows.capture-payment\"\n            ],\n            \"steps\": [],\n            \"workflowId\": \"reconcile-payment\"\n        }\n    ]\n}",
+        "workflows": [
+          {
+            "workflowId": "purchase-entry",
+            "role": "entry"
+          }
+        ],
+        "sources": {
+          "pay": {
+            "documentId": "contract",
+            "revision": "formatting-r2"
+          }
+        }
+      },
+      {
+        "id": "contract",
+        "revision": "formatting-r2",
+        "uri": "https://review.example/pay.json",
+        "kind": "openapi",
+        "content": "{\n    \"components\": {\n        \"schemas\": {\n            \"Evidence\": {\n                \"properties\": {\n                    \"state\": {\n                        \"enum\": [\n                            \"CAPTURED\",\n                            \"UNKNOWN\"\n                        ],\n                        \"type\": \"string\"\n                    }\n                },\n                \"type\": \"object\"\n            }\n        }\n    },\n    \"info\": {\n        \"title\": \"Payment declarations\",\n        \"version\": \"1\"\n    },\n    \"openapi\": \"3.1.0\",\n    \"paths\": {\n        \"/capture\": {\n            \"post\": {\n                \"operationId\": \"capture\",\n                \"responses\": {\n                    \"200\": {\n                        \"content\": {\n                            \"application/json\": {\n                                \"schema\": {\n                                    \"$ref\": \"#/components/schemas/Evidence\"\n                                }\n                            }\n                        },\n                        \"description\": \"Capture evidence\"\n                    }\n                },\n                \"summary\": \"Capture payment\"\n            }\n        }\n    }\n}"
+      }
+    ]
+  }
+}

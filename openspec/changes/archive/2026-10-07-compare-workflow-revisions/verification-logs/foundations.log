@@ -1,0 +1,12 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts test/catalog-index.test.ts test/catalog-contract-revisions.test.tsx test/location-resolver.test.ts
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+   Start at  12:03:16
+   Duration  3.33s (import 31%, transform 25%, tests 24%, environment 15%, setup 4%)

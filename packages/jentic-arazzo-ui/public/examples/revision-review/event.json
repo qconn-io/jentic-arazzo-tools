@@ -1,0 +1,214 @@
+{
+  "baseline": {
+    "version": 1,
+    "id": "event-review",
+    "revision": "baseline-e1",
+    "documents": [
+      {
+        "id": "flow",
+        "revision": "baseline-e1",
+        "uri": "https://review.example/event.json",
+        "content": {
+          "arazzo": "1.0.1",
+          "info": {
+            "title": "Synthetic event review",
+            "version": "1"
+          },
+          "sourceDescriptions": [
+            {
+              "name": "events",
+              "type": "asyncapi",
+              "url": "https://review.example/events.json"
+            }
+          ],
+          "workflows": [
+            {
+              "workflowId": "event-entry",
+              "steps": [
+                {
+                  "stepId": "await",
+                  "workflowId": "receive-evidence"
+                }
+              ]
+            },
+            {
+              "workflowId": "receive-evidence",
+              "steps": [
+                {
+                  "stepId": "capture-evidence",
+                  "operationId": "receiveCapture",
+                  "successCriteria": [
+                    {
+                      "condition": "$response.body.state == 'CAPTURED'"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "workflows": [
+          {
+            "workflowId": "event-entry",
+            "role": "entry"
+          }
+        ],
+        "sources": {
+          "events": {
+            "documentId": "contract",
+            "revision": "baseline-e1"
+          }
+        }
+      },
+      {
+        "id": "contract",
+        "revision": "baseline-e1",
+        "uri": "https://review.example/events.json",
+        "kind": "asyncapi",
+        "content": {
+          "asyncapi": "3.0.0",
+          "info": {
+            "title": "Payment events",
+            "version": "1"
+          },
+          "channels": {
+            "captured": {
+              "address": "payment.captured",
+              "messages": {
+                "captured": {
+                  "payload": {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "operations": {
+            "receiveCapture": {
+              "action": "receive",
+              "channel": {
+                "$ref": "#/channels/captured"
+              },
+              "messages": [
+                {
+                  "$ref": "#/channels/captured/messages/captured"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  },
+  "candidate": {
+    "version": 1,
+    "id": "event-review",
+    "revision": "candidate-e2",
+    "documents": [
+      {
+        "id": "flow",
+        "revision": "candidate-e2",
+        "uri": "https://review.example/event.json",
+        "content": {
+          "arazzo": "1.0.1",
+          "info": {
+            "title": "Synthetic event review",
+            "version": "1"
+          },
+          "sourceDescriptions": [
+            {
+              "name": "events",
+              "type": "asyncapi",
+              "url": "https://review.example/events.json"
+            }
+          ],
+          "workflows": [
+            {
+              "workflowId": "event-entry",
+              "steps": [
+                {
+                  "stepId": "await",
+                  "workflowId": "receive-evidence"
+                }
+              ]
+            },
+            {
+              "workflowId": "receive-evidence",
+              "steps": [
+                {
+                  "stepId": "capture-evidence",
+                  "operationId": "receiveCapture",
+                  "successCriteria": [
+                    {
+                      "condition": "$response.body.state == 'SETTLED'"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "workflows": [
+          {
+            "workflowId": "event-entry",
+            "role": "entry"
+          }
+        ],
+        "sources": {
+          "events": {
+            "documentId": "contract",
+            "revision": "candidate-e2"
+          }
+        }
+      },
+      {
+        "id": "contract",
+        "revision": "candidate-e2",
+        "uri": "https://review.example/events.json",
+        "kind": "asyncapi",
+        "content": {
+          "asyncapi": "3.0.0",
+          "info": {
+            "title": "Payment events",
+            "version": "1"
+          },
+          "channels": {
+            "captured": {
+              "address": "payment.captured",
+              "messages": {
+                "captured": {
+                  "payload": {
+                    "type": "object",
+                    "properties": {
+                      "state": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "operations": {
+            "receiveCapture": {
+              "action": "receive",
+              "channel": {
+                "$ref": "#/channels/captured"
+              },
+              "messages": [
+                {
+                  "$ref": "#/channels/captured/messages/captured"
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -753,3 +753,12 @@
   background: white;
   cursor: pointer;
 }
+
+.arazzo-review { padding: 20px; min-width: 0; overflow-wrap: anywhere; }
+.arazzo-review button, .arazzo-review select { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.arazzo-review-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.arazzo-review-sides { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.arazzo-review-sides > section { min-width: 0; padding: 16px; border: 1px solid #ccd0d5; border-radius: 8px; }
+.arazzo-review .arazzo-value-tree, .arazzo-review .arazzo-exact-value { overflow-wrap: anywhere; white-space: pre-wrap; }
+.arazzo-review-inspector { height: 640px; min-width: 0; }
+@media (max-width: 800px) { .arazzo-review-sides { grid-template-columns: minmax(0, 1fr); } .arazzo-review { padding: 12px; } }

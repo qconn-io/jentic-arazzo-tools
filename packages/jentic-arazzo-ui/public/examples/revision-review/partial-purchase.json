@@ -1,0 +1,231 @@
+{
+  "baseline": {
+    "version": 1,
+    "id": "purchase-review",
+    "revision": "baseline-r1",
+    "documents": [
+      {
+        "id": "flow",
+        "revision": "baseline-r1",
+        "uri": "https://review.example/purchase.json",
+        "content": {
+          "arazzo": "1.0.1",
+          "info": {
+            "title": "Synthetic purchase review",
+            "version": "1"
+          },
+          "sourceDescriptions": [
+            {
+              "name": "pay",
+              "type": "openapi",
+              "url": "https://review.example/pay.json"
+            }
+          ],
+          "workflows": [
+            {
+              "workflowId": "purchase-entry",
+              "steps": [
+                {
+                  "stepId": "purchase",
+                  "workflowId": "capture-payment"
+                }
+              ]
+            },
+            {
+              "workflowId": "capture-payment",
+              "steps": [
+                {
+                  "stepId": "capture",
+                  "operationId": "capture",
+                  "parameters": [
+                    {
+                      "name": "amount",
+                      "in": "query",
+                      "value": 0
+                    }
+                  ],
+                  "successCriteria": [
+                    {
+                      "condition": "$response.body.state == 'CAPTURED'"
+                    }
+                  ],
+                  "onFailure": [
+                    {
+                      "name": "recover",
+                      "type": "retry",
+                      "retryLimit": 2,
+                      "workflowId": "reconcile-payment"
+                    }
+                  ]
+                },
+                {
+                  "stepId": "revoke-license",
+                  "operationId": "capture",
+                  "description": "Compensation declaration retained only in baseline"
+                }
+              ]
+            },
+            {
+              "workflowId": "reconcile-payment",
+              "dependsOn": [
+                "$workflows.capture-payment"
+              ],
+              "steps": []
+            }
+          ]
+        },
+        "workflows": [
+          {
+            "workflowId": "purchase-entry",
+            "role": "entry"
+          }
+        ],
+        "sources": {
+          "pay": {
+            "documentId": "contract",
+            "revision": "baseline-r1"
+          }
+        }
+      },
+      {
+        "id": "contract",
+        "revision": "baseline-r1",
+        "uri": "https://review.example/pay.json",
+        "kind": "openapi"
+      }
+    ]
+  },
+  "candidate": {
+    "version": 1,
+    "id": "purchase-review",
+    "revision": "candidate-r2",
+    "documents": [
+      {
+        "id": "flow",
+        "revision": "candidate-r2",
+        "uri": "https://review.example/purchase.json",
+        "content": {
+          "arazzo": "1.0.1",
+          "info": {
+            "title": "Synthetic purchase review",
+            "version": "1"
+          },
+          "sourceDescriptions": [
+            {
+              "name": "pay",
+              "type": "openapi",
+              "url": "https://review.example/pay.json"
+            }
+          ],
+          "workflows": [
+            {
+              "workflowId": "purchase-entry",
+              "steps": [
+                {
+                  "stepId": "purchase",
+                  "workflowId": "capture-payment"
+                }
+              ]
+            },
+            {
+              "workflowId": "capture-payment",
+              "steps": [
+                {
+                  "stepId": "capture",
+                  "operationId": "capture",
+                  "parameters": [
+                    {
+                      "name": "amount",
+                      "in": "query",
+                      "value": 2499
+                    }
+                  ],
+                  "successCriteria": [
+                    {
+                      "condition": "$response.body.state == 'SETTLED'"
+                    }
+                  ],
+                  "onFailure": [
+                    {
+                      "name": "recover",
+                      "type": "goto",
+                      "workflowId": "purchase-entry"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "workflowId": "reconcile-payment",
+              "dependsOn": [
+                "$workflows.capture-payment"
+              ],
+              "steps": []
+            }
+          ]
+        },
+        "workflows": [
+          {
+            "workflowId": "purchase-entry",
+            "role": "entry"
+          }
+        ],
+        "sources": {
+          "pay": {
+            "documentId": "contract",
+            "revision": "candidate-r2"
+          }
+        }
+      },
+      {
+        "id": "contract",
+        "revision": "candidate-r2",
+        "uri": "https://review.example/pay.json",
+        "kind": "openapi",
+        "content": {
+          "openapi": "3.1.0",
+          "info": {
+            "title": "Payment declarations",
+            "version": "1"
+          },
+          "paths": {
+            "/capture": {
+              "post": {
+                "operationId": "capture",
+                "summary": "Capture payment",
+                "responses": {
+                  "200": {
+                    "description": "Capture evidence",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/Evidence"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "components": {
+            "schemas": {
+              "Evidence": {
+                "type": "object",
+                "properties": {
+                  "state": {
+                    "type": "string",
+                    "enum": [
+                      "SETTLED",
+                      "UNKNOWN"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}
