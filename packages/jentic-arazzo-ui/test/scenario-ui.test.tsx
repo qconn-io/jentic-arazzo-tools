@@ -72,7 +72,7 @@ test('searches authored guides, opens exact occurrences, returns focus and leave
       onLocationChange={location}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   expect(panel.textContent).toContain('Authored expectations');
   fireEvent.change(within(panel).getByRole('searchbox'), { target: { value: 'CAPTURED' } });
   fireEvent.click(within(panel).getByRole('button', { name: 'second-charge' }));
@@ -109,7 +109,7 @@ test('presents exact expected/evidence text for every legacy stress guide with n
       scenarioManifestURI="https://test/pack/scenarios.json"
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   for (const entry of entries) {
     fireEvent.click(within(panel).getByRole('button', { name: entry.id }));
     expect(panel.textContent).toContain(entry.expected);
@@ -132,7 +132,7 @@ test('controlled selection requests changes without accepting them and stale way
       onScenarioSelectionChange={changed}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   expect(panel.textContent).toContain('Unavailable waypoint: removed');
   fireEvent.click(within(panel).getByRole('button', { name: 'Leave guide' }));
   expect(changed).toHaveBeenCalledWith(null);
@@ -165,7 +165,7 @@ test('hands off missing documents to the host and restores after supply without 
       onScenarioLocationRequest={requested}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'second-charge' }));
   await waitFor(() => expect(requested).toHaveBeenCalledTimes(1));
   expect(screen.queryByRole('region', { name: 'Selection details' })).toBeNull();
@@ -226,7 +226,7 @@ test('leaving a guide consumes its initial location rather than restoring or ree
   );
   await screen.findByRole('region', { name: 'Selection details' });
   fireEvent.click(screen.getByRole('button', { name: 'Close details' }));
-  const panel = screen.getByRole('region', { name: 'Authored scenario guides' });
+  const panel = screen.getByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'second-charge' }));
   await screen.findByRole('region', { name: 'Selection details' });
   await waitFor(() =>
@@ -251,7 +251,7 @@ test('guide focus is absent when inspecting a different occurrence of the same a
   render(
     <ArazzoUI document={nestedCalls} documentIdentity="host:doc" scenarioManifest={manifest} />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'second-charge' }));
   await screen.findByRole('region', { name: 'Selection details' });
   fireEvent.click(screen.getByRole('button', { name: 'Close details' }));
@@ -282,7 +282,7 @@ test('narrow guide dismissal returns to an enabled guide control when terminal N
     ],
   };
   render(<ArazzoUI document={nestedCalls} documentIdentity="host:doc" scenarioManifest={local} />);
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   const origin = within(panel).getByRole('button', { name: 'second-charge' });
   fireEvent.click(origin);
   await screen.findByRole('dialog', { name: 'Selection details' });

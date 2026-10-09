@@ -97,3 +97,7 @@ Contract inspection SHALL explain whether the API description is unchecked, load
 #### Scenario: Loading unavailable in an embedded host
 - **WHEN** the host supplied no source-loading capability
 - **THEN** ordinary workflow details remain readable and explain that API-description loading is unavailable in this viewer, while developer configuration information is available separately
+
+#### Scenario: Focus during explicit loading
+- **WHEN** a focused API-description loading control becomes disabled during acquisition
+- **THEN** focus remains in a stable source context inside the inspector, Escape can dismiss it and return to a valid origin, and late results do not move focus elsewhere

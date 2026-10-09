@@ -78,7 +78,6 @@ export {
   authoredDigest,
   createLocationAdapter,
 } from './utils/location/codec';
-import { AdvancedProfileControls } from './components/AdvancedTools';
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -429,26 +428,45 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
     <div className="arazzo-viewer-shell">
       <WorkflowNavigation view={view} />
       {systems?.enabled && (
-        <AdvancedProfileControls>
-          <div className="arazzo-systems-setting">
-            <label>
-              Perspective{' '}
-              <select
-                aria-label="Perspective"
-                value={systems.perspective}
-                onChange={(event) =>
-                  systems.setPerspective(event.target.value as 'workflow' | 'systems')
-                }
-              >
-                <option value="workflow">Workflow</option>
-                <option value="systems">Systems</option>
-              </select>
-            </label>
-            {systems.perspective === 'workflow' && systems.selected && (
-              <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
-            )}
-          </div>
-        </AdvancedProfileControls>
+        <div className="arazzo-systems-setting">
+          <p>See the participants and their interactions using supplied system information.</p>
+          <label>
+            Perspective{' '}
+            <select
+              aria-label="Perspective"
+              value={systems.perspective}
+              onChange={(event) =>
+                systems.setPerspective(event.target.value as 'workflow' | 'systems')
+              }
+            >
+              <option value="workflow">Workflow view</option>
+              <option value="systems">Systems view</option>
+            </select>
+          </label>
+          {systems.perspective === 'workflow' && systems.selected && (
+            <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
+          )}
+        </div>
+      )}
+      {!systems?.enabled && (
+        <details className="arazzo-systems-availability">
+          <summary>Systems view</summary>
+          <p>This document has no supplied system participant information.</p>
+          <p>
+            Systems view shows participants and their interactions using explicitly supplied
+            associations. Workflow reading remains available.
+          </p>
+        </details>
+      )}
+      {systems?.enabled && systems.scene.diagnostics.length > 0 && (
+        <details className="arazzo-systems-diagnostics">
+          <summary>Supplied system information has limitations.</summary>
+          {systems.scene.diagnostics.map((message, index) => (
+            <p role="status" key={index}>
+              {message}
+            </p>
+          ))}
+        </details>
       )}
       <InspectionStatus />
       {locationProps && <ScenarioPanel props={locationProps} />}

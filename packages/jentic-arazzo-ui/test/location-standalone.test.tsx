@@ -221,3 +221,38 @@ test('controlled location mode requests preserve the host view and do not commit
   );
   expect(changed).toHaveBeenCalledTimes(2);
 });
+
+test('an unavailable restored guide preserves the exact base occurrence without opening URL setup', async () => {
+  const fetch = vi.fn(async () => ({ ok: false, status: 404 }));
+  vi.stubGlobal('fetch', fetch);
+  try {
+    history.replaceState(
+      {},
+      '',
+      writeLocationURL(new URL(window.location.href), {
+        ...location,
+        extensions: {
+          'arazzo.scenario': {
+            manifest: 'missing',
+            manifestURI: 'https://example.test/missing-guide.json',
+            scenarioId: 'read',
+            waypointId: 'removed',
+          },
+        },
+      }),
+    );
+    render(<ArazzoUIStandalone document={nestedCalls} documentIdentity={location.document} />);
+    const details = await screen.findByRole('region', { name: 'Selection details' });
+    expect(details.textContent).toContain('payment.charge');
+    await screen.findByText('Guide file unavailable (404).');
+    expect(screen.getByRole('button', { name: 'Retry guide loading' })).toBeTruthy();
+    expect(screen.getByText('Load guides from a URL').closest('details')!.open).toBe(false);
+    expect(
+      (screen.getByRole('combobox', { name: 'Select workflow' }) as HTMLSelectElement).value,
+    ).toBe('checkout');
+    expect(details.textContent).toContain('secondPayment');
+    expect(fetch).toHaveBeenCalledTimes(1);
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});

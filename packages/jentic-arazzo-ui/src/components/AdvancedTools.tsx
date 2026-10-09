@@ -1,45 +1,25 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import React from 'react';
 
-// keep profile state in its viewer provider while sharing the standalone setup disclosure.
-const AdvancedToolsTarget = createContext<HTMLElement | null | undefined>(undefined);
-
-export function AdvancedTools({
-  reveal,
+// URL setup is independent of supplied guides and Systems reading navigation.
+export function GuideSetup({
   status,
   setup,
   children,
 }: {
-  reveal: boolean;
-  status?: string;
+  status?: React.ReactNode;
   setup: React.ReactNode;
   children: React.ReactNode;
 }) {
-  const disclosure = useRef<HTMLDetailsElement>(null);
-  const [target, setTarget] = useState<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if ((reveal || status) && disclosure.current) disclosure.current.open = true;
-  }, [reveal, status]);
   return (
-    <AdvancedToolsTarget.Provider value={target}>
-      <details ref={disclosure} className="arazzo-advanced-tools">
-        <summary>Advanced tools</summary>
-        {setup}
-        <div ref={setTarget} />
-      </details>
+    <>
+      <div className="arazzo-guide-setup">
+        <details className="arazzo-advanced-tools">
+          <summary>Load guides from a URL</summary>
+          {setup}
+        </details>
+        {status}
+      </div>
       {children}
-    </AdvancedToolsTarget.Provider>
+    </>
   );
-}
-
-export function AdvancedProfileControls({ children }: { children: React.ReactNode }) {
-  const target = useContext(AdvancedToolsTarget);
-  if (target === undefined)
-    return (
-      <details open className="arazzo-advanced-tools">
-        <summary>Advanced tools</summary>
-        {children}
-      </details>
-    );
-  return target ? createPortal(children, target) : null;
 }

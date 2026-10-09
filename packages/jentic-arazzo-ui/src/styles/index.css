@@ -1020,6 +1020,7 @@
 }
 
 .arazzo-mermaid-diagram:focus-visible,
+.arazzo-contract-panel section:focus-visible,
 .arazzo-view-mode-control:focus-within {
   outline: 3px solid #2563eb;
   outline-offset: 2px;
@@ -1030,4 +1031,37 @@
   font-size: 13px;
   font-weight: 600;
   padding-right: 6px;
+}
+
+/* keep optional setup compact, with bounded help and independent view navigation. */
+.arazzo-guide-setup {
+  flex-shrink: 0;
+  min-width: 0;
+}
+.arazzo-guide-format {
+  flex-basis: 100%;
+  min-width: 0;
+}
+.arazzo-guide-format pre {
+  max-width: 100%;
+  overflow: auto;
+  font-size: 12px;
+}
+.arazzo-guide-status {
+  padding: 6px 16px;
+  overflow-wrap: anywhere;
+}
+.arazzo-systems-availability,
+.arazzo-systems-diagnostics {
+  padding: 6px 12px;
+  flex-shrink: 0;
+  max-height: 20vh;
+  overflow: auto;
+}
+.arazzo-systems-setting p {
+  margin: 0;
+}
+.arazzo-systems-setting {
+  align-items: center;
+  flex-shrink: 0;
 }

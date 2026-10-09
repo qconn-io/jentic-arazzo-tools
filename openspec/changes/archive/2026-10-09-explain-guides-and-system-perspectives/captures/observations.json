@@ -1,0 +1,107 @@
+{
+  "hashes": {
+    "arazzo-ui-standalone.6c004993.js": "42071654989a9347aba7d8a0ee4f124db964a99fcf23754cba963c731061f537",
+    "arazzo-ui.38aec924.css": "29fbedb8a5560d2b2a91816c0dd36aad6b0a51ecb7a5a16b4d5200aa44bae73c"
+  },
+  "errors": [],
+  "observations": [
+    {
+      "width": 1440,
+      "state": "plain-entry",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 1440,
+      "state": "unconfigured-systems",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 1440,
+      "state": "guide-help",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 1440,
+      "state": "supplied-guides",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 1440,
+      "state": "guide-inspection",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 1440,
+      "state": "configured-systems",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 1440,
+      "state": "failed-restoration",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "width": 480,
+      "state": "plain-entry",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "width": 480,
+      "state": "unconfigured-systems",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "width": 480,
+      "state": "guide-help",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "width": 480,
+      "state": "supplied-guides",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "width": 480,
+      "state": "guide-inspection",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "width": 480,
+      "state": "configured-systems",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "width": 480,
+      "state": "failed-restoration",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    }
+  ]
+}

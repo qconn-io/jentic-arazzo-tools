@@ -79,3 +79,76 @@ Representative captures:
 **F1-flowchart-readability — FAIL; owner: `gate-workflow-ux-regressions`.** Mermaid's existing fit-to-width display scales labels below the 12px reading size used by the current cards: Petstore approximately 9.51px at 1440 and 2.96px at 480; the long-label fixture approximately 9.60px at 480. Visual inspection confirms the small-text problem. SVG rendering itself succeeds; these are readability failures, not recovery failures. The capture JSON preserves each as `state: "FAIL"`. New labels, scoped controls and render recovery do not fix this scaling behavior, and this slice does not claim final flowchart UX acceptance or silently waive the final gate.
 
 The independent reviewer declined visual acceptance until these captures existed; this section supplies the current evidence. Source-binding semantics were verified as a prerequisite, broader navigation redesign is excluded by design, and final completion bookkeeping is handled here. The combined-series packaged/browser acceptance and human-comprehension work remain with the final gate; no human-comprehension sessions were conducted.
+
+## Approved F1 correction and current verification (2026-10-09)
+
+This change was reopened with user authorization to correct flowchart scaling
+before resuming the final gate. The earlier FAIL above remains historic evidence;
+its ownership is corrected to this reading-control repair.
+
+Permanent `production.spec.ts` tests first failed for Petstore's 9.506/2.964px
+labels, narrow long-label scaling and the non-tab-reachable region. The correction
+retains the generated SVG viewBox width inside a focusable contained scroll region.
+No samples, public modes, locators or Mermaid rendering generations were changed.
+
+Fresh normal `npm run test:browser -w @jentic/arazzo-ui` passed all 18 tests
+including default and long-label flowcharts at 1440 and 480, label-size checks,
+keyboard scrolling when content exceeds the pane and no page-wide overflow.
+It rebuilt both entries/declarations and passed installed package acceptance.
+The saved RED results remain under ignored
+`test-output/browser/gate-prerequisites/flowchart-red-results`. The old guide
+disclosure selector was corrected to its direct summary; its nested format
+summary previously caused an ambiguous locator, with a consequential request-count
+failure. Normal acquisition assertions pass after that selector correction.
+
+Current UI suite: 601 tests in 94 files passed. Focused rendering/focus: 11 tests
+passed. UI type check, declaration consumers and ESLint on the changed source and
+browser test passed after rebuilding. A transient type-check run overlapped a
+build cleaning declaration output; it was rerun sequentially after build and
+passed. Full commands/results are in `gate-prerequisites/flowchart-green.log`,
+`ui-suite.log` and `flowchart-current.log`. All use `.nvmrc` Node 26.3.1.
+
+Independent current-build measurements show minimum labels 15.9999px at both
+widths, scale 0.999994; no page errors. Current captures were inspected and confirm
+readable intrinsic-size content with horizontal navigation rather than a tiny
+whole-graph thumbnail. Build JS SHA-256:
+`d72ff288c8af96ac1142dd0d756db896bbb9f34854e2e03a13405147bfa96768`.
+Complete build digests, request logs and measurements are in
+`packages/jentic-arazzo-ui/test-output/browser/gate-prerequisites/flowchart-observations.json`.
+F1 is corrected on this candidate. Final full-matrix/human acceptance still belongs
+to `gate-workflow-ux-regressions`. No rearchive, main-spec sync or Git publication
+was performed.
+
+## Source-loading focus correction under integrated gate task 6.2
+
+The final gate reproduced focus loss at 1440 and 480: disabling the focused
+API-description button moves focus to body, Escape cannot close the inspector,
+and narrow background remains inert. `gate-prerequisites/source-focus.json`
+records this failure and two captures preserve it. The permanent component
+regression failed before correction (`source-focus-red.log`) and passed afterward,
+including a pending result completing after focus moved elsewhere.
+
+ContractPanel now focuses its stable named Source region before starting load
+only when the activating button owns focus. This preserves current context while
+the button is disabled and introduces no asynchronous focus reassignment. The
+region has a scoped visible focus cue. Existing authority, callbacks, statuses
+and acquisition logic remain unchanged. An independent read-only follow-up found
+no Important/Critical issue in this correction. Current root build, declarations,
+lint, 610 UI tests within passing monorepo tests, and all type checks passed.
+Actual browser lookup/reload/Escape verification remains in the currently running
+final integrated gate; this section does not claim its result before completion.
+
+### Final current focus and correction result
+
+Normal integrated production browser passed 162/162 at both widths, including
+all F1 and source-focus cases. The independent current probe records Source
+petstoreAPI focused after load, Escape closing the inspector and returning to
+the exact loginUser row, with narrow inert removed. Every named negative control
+and normal control passed their wrapper criteria. Current root engineering gates
+are green. Both corrective sections are complete, 17/17 tasks; final UX readiness
+remains pending real reader sessions in the final gate.
+
+The reopened delta headers were reconciled with the already-synced main baseline:
+existing requirements are MODIFIED and the new contained-flowchart requirement
+is ADDED. Strict validation now passes without the duplicate-ADDED archive
+advisory. Main specs were not changed by this reconciliation.

@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: Reader-facing layout and representation hierarchy
 The viewer SHALL distinguish document layout controls from the selected workflow's reading representations using understandable names and scoped selected-state semantics. Workflow diagram, Read workflow, and Side by side SHALL describe layout choices; Step descriptions, Sequence diagram, and Flowchart SHALL describe reading representations. A direct Sequence diagram action SHALL be available for a selected workflow without requiring prior knowledge of a Docs mode. Public mode/subview values, existing URLs, controlled callbacks, overview behavior and occurrence restoration SHALL remain compatible.
@@ -51,3 +51,21 @@ A failed flowchart render SHALL produce a visible localized explanation with Ret
 #### Scenario: Retry and document replacement
 - **WHEN** a render fails, retry starts, and the document changes before it finishes
 - **THEN** the late result cannot replace the new document's diagram or error state and keyboard focus remains in the valid current view
+
+## ADDED Requirements
+
+### Requirement: Readable contained flowcharts
+Flowcharts SHALL retain readable label size, at least 12 displayed pixels,
+at 1440 and 480 pixels without page-wide overflow. Large graphs SHALL expose
+their full content through a contained keyboard-accessible scroll region
+rather than shrinking labels to fit the reading pane. Other representations,
+render recovery, exact selection and current-generation rendering SHALL remain
+available.
+
+#### Scenario: Default Petstore at both widths
+- **WHEN** a reader selects Flowchart for unchanged Petstore at 1440 or 480 pixels
+- **THEN** its labels remain readable and the reader can scroll to off-screen content with the keyboard inside the flowchart without widening the page
+
+#### Scenario: Long-label graph and replacement
+- **WHEN** a long-label graph is displayed or replaced during rendering
+- **THEN** current content retains readable labels and contained navigation and obsolete content cannot alter the replacement

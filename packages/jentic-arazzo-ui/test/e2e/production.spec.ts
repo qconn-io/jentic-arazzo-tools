@@ -1,107 +1,15 @@
 import { test, expect, type Page } from '@playwright/test';
-import { readFileSync } from 'node:fs';
+import { staticPaths, installProductionChecks, inspector } from './productionSupport';
 
 type HostState = {
   providerRequests: string[];
   locations: { selection?: { occurrence?: { stepId: string }[] } }[];
 };
-const identity = JSON.parse(readFileSync('test-output/browser/identity.json', 'utf8'));
-
-const staticPaths = new Set(
-  Object.keys(identity.artifacts)
-    .filter((path) => /\.(?:m?js|css|svg|png|jpe?g|ico|woff2?|wasm)$/.test(path))
-    .map((path) =>
-      path.startsWith('build/')
-        ? `/${path.slice(6)}`
-        : `/consumer/${path.slice('test-output/package-consumer/app/'.length)}`,
-    ),
-);
-test.beforeEach(async ({ page, baseURL }) => {
-  const response = await page.request.get('/__identity');
-  expect(response.headers()['content-type']).toContain('charset=utf-8');
-  expect(await response.json()).toEqual(identity);
-  const errors: string[] = [],
-    forbidden: string[] = [],
-    dependencies: string[] = [];
-  const explicitSources = new Set<string>();
-
-  page.on('pageerror', (error) => errors.push(error.message));
-  page.on('request', (request) => {
-    const current = new URL(page.url());
-    const allowed = [current.searchParams.get('document'), current.searchParams.get('scenarios')];
-    const requested = new URL(request.url());
-    const dataRequest = !request.isNavigationRequest() && !staticPaths.has(requested.pathname);
-    const selected = allowed.includes(request.url());
-    const fixture = requested.pathname === '/fixtures/readiness.json';
-    if (dataRequest && !selected && !fixture) dependencies.push(request.url());
-    if (
-      request.method() !== 'GET' ||
-      requested.origin !== new URL(baseURL!).origin ||
-      (dataRequest && !selected && !fixture && !explicitSources.has(request.url()))
-    )
-      forbidden.push(`${request.method()} ${request.url()}`);
-  });
-  await page.route('**/*', (route) =>
-    new URL(route.request().url()).origin === new URL(baseURL!).origin
-      ? route.continue()
-      : route.abort(),
-  );
-  await page.addInitScript(() => {
-    const originalPush = history.pushState.bind(history),
-      originalReplace = history.replaceState.bind(history);
-    Object.assign(window, { acceptanceHistory: [] as string[] });
-    history.pushState = (...args) => {
-      (window as unknown as { acceptanceHistory: string[] }).acceptanceHistory.push('push');
-      originalPush(...args);
-    };
-    history.replaceState = (...args) => {
-      (window as unknown as { acceptanceHistory: string[] }).acceptanceHistory.push('replace');
-      originalReplace(...args);
-    };
-  });
-  Object.assign(page, {
-    acceptanceErrors: errors,
-    acceptanceForbidden: forbidden,
-    acceptanceDependencies: dependencies,
-    acceptanceExplicitSources: explicitSources,
-  });
-});
-
-test.afterEach(async ({ page }, info) => {
-  const state = page as Page & {
-    acceptanceErrors: string[];
-    acceptanceForbidden: string[];
-    acceptanceDependencies: string[];
-  };
-  expect(state.acceptanceErrors).toEqual([]);
-  expect(state.acceptanceForbidden).toEqual([]);
-  if (info.title.startsWith('standalone viewing'))
-    expect(state.acceptanceDependencies).toHaveLength(1);
-  else expect(state.acceptanceDependencies).toEqual([]);
-  if (page.url().includes('/consumer/'))
-    expect(
-      await page.evaluate(
-        () => (window as unknown as { acceptanceHistory: string[] }).acceptanceHistory,
-      ),
-    ).toEqual([]);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
-    true,
-  );
-  await info.attach('current-production-artifacts', {
-    body: JSON.stringify(identity),
-    contentType: 'application/json',
-  });
-  if (info.status === 'passed')
-    await info.attach('production-view', {
-      body: await page.screenshot(),
-      contentType: 'image/png',
-    });
-});
+installProductionChecks();
 
 async function hostState(page: Page): Promise<HostState> {
   return page.evaluate(() => (window as unknown as { acceptanceState: HostState }).acceptanceState);
 }
-const inspector = (page: Page) => page.getByLabel('Selection details', { exact: true });
 
 test('identified installed ESM plain viewing and provider denial', async ({ page }) => {
   await page.goto('/consumer/');
@@ -131,9 +39,9 @@ test('standalone viewing discloses setup and acquires only explicitly loaded con
   await expect(page.locator('.arazzo-ui')).toContainText('client-journey');
   const advanced = page.locator('details.arazzo-advanced-tools');
   await expect(advanced).not.toHaveAttribute('open', '');
-  await advanced.locator('summary').focus();
+  await advanced.locator(':scope > summary').focus();
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('textbox', { name: 'Scenario manifest URL' })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: 'Guide file URL' })).toBeVisible();
   expect(contractRequests).toEqual([]);
   await page.getByRole('button', { name: 'Workflow diagram', exact: true }).click();
   await page
@@ -228,8 +136,8 @@ test('scenario focus, dismissal and restored guide context', async ({
   await page.goto(
     `/?document=${baseURL}/examples/digital-product-stress/event-based.arazzo.yaml&scenarios=${baseURL}/examples/digital-product-stress/scenarios.json`,
   );
-  await expect(page.locator('details.arazzo-advanced-tools')).toHaveAttribute('open', '');
-  const panel = page.getByRole('region', { name: 'Authored scenario guides' });
+  await expect(page.locator('details.arazzo-advanced-tools')).not.toHaveAttribute('open', '');
+  const panel = page.getByRole('region', { name: 'Guided walkthroughs' });
   const guide = panel.getByRole('button', { name: 'completion-timeout', exact: true });
   await guide.focus();
   await page.keyboard.press('Enter');
@@ -265,10 +173,10 @@ test('scenario focus, dismissal and restored guide context', async ({
       restoredForbidden.push(request.url());
   });
   await restored.goto(shared);
-  await expect(restored.locator('details.arazzo-advanced-tools')).toHaveAttribute('open', '');
+  await expect(restored.locator('details.arazzo-advanced-tools')).not.toHaveAttribute('open', '');
   await expect(inspector(restored)).toBeVisible();
   await restored.keyboard.press('Escape');
-  await expect(restored.getByRole('region', { name: 'Authored scenario guides' })).toContainText(
+  await expect(restored.getByRole('region', { name: 'Guided walkthroughs' })).toContainText(
     'completion-timeout',
   );
   expect(restoredErrors).toEqual([]);
@@ -295,3 +203,71 @@ test('pinned Jentic Asana, Xero and Stripe remain readable without acquisition',
     await page.keyboard.press('Escape');
   }
 });
+
+for (const fixture of ['petstore', 'long-label'] as const) {
+  test(`F1 flowchart labels stay readable with contained keyboard scrolling: ${fixture}`, async ({
+    page,
+    baseURL,
+  }, info) => {
+    if (fixture === 'long-label') {
+      const url = `${baseURL}/examples/acceptance-long.arazzo.yaml`;
+      await page.route(url, (route) =>
+        route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            arazzo: '1.0.1',
+            info: { title: 'Long-label flowchart', version: '1' },
+            sourceDescriptions: [{ name: 'petstoreAPI', type: 'openapi', url: './api.yaml' }],
+            workflows: [
+              {
+                workflowId: 'long-workflow',
+                summary: 'Inspect a long authored operation',
+                steps: [
+                  {
+                    stepId:
+                      'findAvailablePetsWithAnExtremelyLongAuthoredIdentifierThatMustStayReadable',
+                    operationId: '$sourceDescriptions.petstoreAPI.findPetsByStatus',
+                  },
+                ],
+              },
+            ],
+          }),
+        }),
+      );
+      await page.goto(`/?document=${encodeURIComponent(url)}`);
+    } else await page.goto('/');
+    await page.getByRole('button', { name: 'Flowchart', exact: true }).click();
+    const region = page.getByRole('region', { name: 'Flowchart', exact: true });
+    const svg = region.locator('svg');
+    await expect(svg).toBeVisible();
+    const sizes = await svg.evaluate((node) => {
+      if (!(node instanceof SVGSVGElement)) throw new Error('Expected a rendered SVG');
+      const scale = Math.abs(node.getScreenCTM()?.a ?? 1);
+      return [...node.querySelectorAll('text, .nodeLabel p, .edgeLabel p')].map(
+        (label) => parseFloat(getComputedStyle(label).fontSize) * scale,
+      );
+    });
+    expect(sizes.length, 'Flowchart must contain actual readable labels').toBeGreaterThan(0);
+    expect(
+      Math.min(...sizes),
+      'F1-flowchart-readability: displayed labels must be at least 12px',
+    ).toBeGreaterThanOrEqual(12);
+    await expect(region).toHaveAttribute('tabindex', '0');
+    await region.focus();
+    if (await region.evaluate((node) => node.scrollWidth > node.clientWidth)) {
+      await page.keyboard.press('ArrowRight');
+      await expect
+        .poll(() => region.evaluate((node) => node.scrollLeft), {
+          message: 'Flowchart content must be keyboard reachable in its contained scroll region',
+        })
+        .toBeGreaterThan(0);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      info.project.use.viewport!.width + 1,
+    );
+    await info.attach(`${fixture}-flowchart`, {
+      body: await region.screenshot(),
+      contentType: 'image/png',
+    });
+  });
+}

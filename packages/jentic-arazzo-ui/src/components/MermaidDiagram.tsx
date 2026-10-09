@@ -16,6 +16,7 @@ export function MermaidDiagram({
   const [result, setResult] = useState<{
     source: string;
     svg?: string;
+    width?: number;
     error?: string;
     loading: boolean;
   }>({ source, loading: true });
@@ -35,7 +36,21 @@ export function MermaidDiagram({
       .then(() => mermaid.render(id, source, sandbox))
       .then(
         ({ svg }) => {
-          if (generation.current === current) setResult({ source, svg, loading: false });
+          if (generation.current === current) {
+            const root = new DOMParser().parseFromString(svg, 'image/svg+xml').documentElement;
+            const width = Number(
+              root
+                .getAttribute('viewBox')
+                ?.trim()
+                .split(/[\s,]+/)[2],
+            );
+            setResult({
+              source,
+              svg,
+              width: Number.isFinite(width) && width > 0 ? width : undefined,
+              loading: false,
+            });
+          }
         },
         (error: unknown) => {
           if (generation.current === current)
@@ -58,7 +73,8 @@ export function MermaidDiagram({
       className="arazzo-mermaid-diagram"
       role="region"
       aria-label="Flowchart"
-      tabIndex={-1}
+      tabIndex={0}
+      style={{ overflowX: 'auto', maxWidth: '100%' }}
     >
       {active.loading && <p role="status">Drawing flowchart…</p>}
       {active.error && (
@@ -84,7 +100,11 @@ export function MermaidDiagram({
         </div>
       )}
       {active.svg && (
-        <div className="mermaid-rendered" dangerouslySetInnerHTML={{ __html: active.svg }} />
+        <div
+          className="mermaid-rendered"
+          style={{ width: active.width }}
+          dangerouslySetInnerHTML={{ __html: active.svg }}
+        />
       )}
     </div>
   );

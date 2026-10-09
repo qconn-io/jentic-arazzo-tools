@@ -42,6 +42,22 @@ Move MermaidDiagram into a private MermaidDiagram.tsx component if needed for fo
 
 ## Risks / Trade-offs
 
+### Approved corrective scope: readable flowcharts
+
+The final gate reproduced F1-flowchart-readability on 2026-10-09: unchanged
+Petstore's 16px Mermaid labels shrink to 9.51px at 1440 and 2.96px at 480.
+Preserve the generated SVG's intrinsic viewBox width inside a contained
+scrollable Flowchart region rather than fitting the whole graph to the pane.
+The region is keyboard focusable so arrow-key scrolling reaches off-screen
+content. Keep SVG label text, rendering recovery, exact selection, generation
+guards and other reading representations intact. Normal-size and long-label
+graphs must have labels at least 12 displayed pixels with no page-wide overflow.
+Permanent production-browser assertions measure screen-space label size,
+contained scrolling and keyboard access at both maintained viewport widths.
+This corrective work belongs to this repair; the final gate verifies it rather
+than waiving the failure. The user authorized the correction and resumption of
+the final gate on 2026-10-09.
+
 - Label changes break automation -> update semantic role/name selectors and keep public values/old-link compatibility tests.
 - Direct sequence action races with controlled selection -> accept layout updates through existing callback policy and test cancellation/replacement.
 - Summaries obscure IDs -> always retain scoped IDs and full labels, including duplicate/absent summaries.
@@ -49,5 +65,17 @@ Move MermaidDiagram into a private MermaidDiagram.tsx component if needed for fo
 - Diagram errors reset reading state -> generation-scoped retry and focus restoration tests.
 
 ## Migration Plan
+
+### Integrated gate correction: source-loading focus
+
+Gate task 6.2 routes regressions across the agreed reading surfaces to their
+owning repairs. Current Chromium evidence at both widths shows that explicit
+source loading disables the focused API-description button and moves focus to
+body; Escape then cannot close the inspector. Before initiating loading from a
+focused button, focus its stable named Source region. Do not transfer focus after
+the asynchronous result, steal focus from unrelated navigation or alter loading
+authority. Preserve focusable source context with a visible keyboard focus cue.
+Reverify actual keyboard dismissal and exact live origin after lookup/reload;
+fresh-session restored details use their existing valid navigation fallback.
 
 Apply after source binding. Existing location query/hash values and callbacks remain unchanged, so no serialized migration is required. Update README and screenshots to show the new terminology. Revert reader presentation as one slice if necessary without reverting semantic bindings. Focused component/keyboard/render-recovery checks precede the final packaged acceptance.

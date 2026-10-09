@@ -1,0 +1,4092 @@
+{
+  "version": 1,
+  "documents": [
+    {
+      "path": "public/petstore-order-workflow.arazzo.yaml",
+      "version": "1.0.1",
+      "sha256": "8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "authenticateAndOrderPet",
+          "steps": [
+            {
+              "stepId": "loginUser",
+              "kind": "operation",
+              "locator": "loginUser",
+              "source": "petstoreAPI",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "orderFailed",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "retryOnServiceUnavailable",
+                  "type": "retry",
+                  "target": "loginUser",
+                  "targetLane": "authenticateAndOrderPet",
+                  "returnToSource": false
+                }
+              ]
+            },
+            {
+              "stepId": "findAvailablePets",
+              "kind": "operation",
+              "locator": "findPetsByStatus",
+              "source": "petstoreAPI",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "noPetsAvailable",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "orderFailed",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "retryOnServiceUnavailable",
+                  "type": "retry",
+                  "target": "findAvailablePets",
+                  "targetLane": "authenticateAndOrderPet",
+                  "returnToSource": false
+                }
+              ]
+            },
+            {
+              "stepId": "placeOrder",
+              "kind": "operation",
+              "locator": "placeOrder",
+              "source": "petstoreAPI",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "orderFailed",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "retryOnServiceUnavailable",
+                  "type": "retry",
+                  "target": "placeOrder",
+                  "targetLane": "authenticateAndOrderPet",
+                  "returnToSource": false
+                }
+              ]
+            },
+            {
+              "stepId": "retrieveOrderedPetDetails",
+              "kind": "operation",
+              "locator": "getPetById",
+              "source": "petstoreAPI",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "orderFailed",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "retryOnServiceUnavailable",
+                  "type": "retry",
+                  "target": "retrieveOrderedPetDetails",
+                  "targetLane": "authenticateAndOrderPet",
+                  "returnToSource": false
+                }
+              ]
+            },
+            {
+              "stepId": "verifyOrderConfirmation",
+              "kind": "operation",
+              "locator": "getOrderById",
+              "source": "petstoreAPI",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "orderFailed",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "retryOnServiceUnavailable",
+                  "type": "retry",
+                  "target": "verifyOrderConfirmation",
+                  "targetLane": "authenticateAndOrderPet",
+                  "returnToSource": false
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "petstoreAPI"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product/arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "a07ef6f54bc2414340d7a54f0ed533ede6178131457a27dbc90e2ed68c73974e",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "client-journey",
+          "steps": [
+            {
+              "stepId": "purchase",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.purchaseProduct",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-client-journey",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "retrieve-bundle",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getLicenseBundle",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-client-journey",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "report-activation",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.recordActivation",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-client-journey",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "fulfil-purchase",
+          "steps": [
+            {
+              "stepId": "reserve-and-pay",
+              "kind": "call",
+              "locator": "reserve-and-capture",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-fulfilment-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "issue-license",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.license.issueLicense",
+              "source": "license",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-fulfilment-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "inventory",
+            "payment",
+            "license"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "reserve-and-capture",
+          "steps": [
+            {
+              "stepId": "reserve-product",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.inventory.reserveProduct",
+              "source": "inventory",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-before-issuance",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "capture-payment",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.payment.capturePayment",
+              "source": "payment",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-before-issuance",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "inventory",
+            "payment"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "58086e94bc72622b100c08d329ed3f06022d0b1f4a084f5d39b0c1c3b2e01fa0",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "full-stress-journey",
+          "steps": [
+            {
+              "stepId": "initialize",
+              "kind": "call",
+              "locator": "initialize-session",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "two-products",
+              "kind": "call",
+              "locator": "batch-fulfilment",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "initialize-session",
+          "steps": [
+            {
+              "stepId": "readiness",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "batch-fulfilment",
+          "steps": [
+            {
+              "stepId": "first-item",
+              "kind": "call",
+              "locator": "fulfil-item",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "second-item",
+              "kind": "call",
+              "locator": "fulfil-item",
+              "source": null,
+              "targetKind": "local-workflow",
+              "parameters": {
+                "amountMinor": 2499,
+                "productId": "digital-upgrade",
+                "purchaseId": "{$inputs.purchaseId}-B"
+              },
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "license"
+          ],
+          "relationships": [
+            "prerequisite",
+            "call",
+            "operation",
+            "continuation",
+            "transfer",
+            "marker"
+          ],
+          "prerequisites": [
+            "initialize-session"
+          ],
+          "limits": []
+        },
+        {
+          "workflowId": "fulfil-item",
+          "steps": [
+            {
+              "stepId": "prepare",
+              "kind": "call",
+              "locator": "prepare-commerce",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "issue-license",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.license.issueLicense",
+              "source": "license",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "reconcile-issuance-before-retry",
+                  "type": "retry",
+                  "target": "reconcile-license",
+                  "targetLane": "reconcile-license",
+                  "returnToSource": true
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "compensate-definite-issuance-rejection",
+                  "type": "goto",
+                  "target": "compensate-purchase",
+                  "targetLane": "compensate-purchase",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "record-ready",
+              "kind": "call",
+              "locator": "record-ready",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "license",
+            "coordinator"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation",
+            "transfer",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "prepare-commerce",
+          "steps": [
+            {
+              "stepId": "commerce",
+              "kind": "call",
+              "locator": "reserve-and-capture",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "reserve-and-capture",
+          "steps": [
+            {
+              "stepId": "reserve",
+              "kind": "call",
+              "locator": "reserve-inventory",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "capture",
+              "kind": "call",
+              "locator": "capture-authorized-payment",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "inventory",
+            "payment"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "reserve-inventory",
+          "steps": [
+            {
+              "stepId": "reserve-product",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.inventory.reserveProduct",
+              "source": "inventory",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "retry-transient",
+                  "type": "retry",
+                  "target": "$workflows.reserve-inventory.steps.reserve-product",
+                  "targetLane": "reserve-inventory",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "inventory"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "capture-authorized-payment",
+          "steps": [
+            {
+              "stepId": "capture-payment",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.payment.capturePayment",
+              "source": "payment",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "reconcile-before-capture-retry",
+                  "type": "retry",
+                  "target": "reconcile-payment",
+                  "targetLane": "reconcile-payment",
+                  "returnToSource": true
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "release-after-definite-decline",
+                  "type": "goto",
+                  "target": "abort-purchase",
+                  "targetLane": "abort-purchase",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "payment"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "reconcile-payment",
+          "steps": [
+            {
+              "stepId": "observe-payment",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.payment.getCaptureByKey",
+              "source": "payment",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "retry-transient",
+                  "type": "retry",
+                  "target": "$workflows.reconcile-payment.steps.observe-payment",
+                  "targetLane": "reconcile-payment",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "payment"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "reconcile-license",
+          "steps": [
+            {
+              "stepId": "observe-license",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.license.getLicenseByKey",
+              "source": "license",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "license"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "compensate-purchase",
+          "steps": [
+            {
+              "stepId": "inspect-issued-license",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.license.getLicenseByKey",
+              "source": "license",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onSuccess",
+                  "name": "skip-revoke-when-no-active-license",
+                  "type": "goto",
+                  "target": "$workflows.compensate-purchase.steps.refund-payment",
+                  "targetLane": "compensate-purchase",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "revoke-license",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.license.revokeLicense",
+              "source": "license",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "refund-payment",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.payment.refundPayment",
+              "source": "payment",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "retry-transient",
+                  "type": "retry",
+                  "target": "$workflows.compensate-purchase.steps.refund-payment",
+                  "targetLane": "compensate-purchase",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "release-reservation",
+              "kind": "call",
+              "locator": "release-reservation",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "record-failure",
+              "kind": "call",
+              "locator": "record-failure",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "license",
+            "payment",
+            "inventory",
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "transfer",
+            "call",
+            "continuation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "release-reservation",
+          "steps": [
+            {
+              "stepId": "release",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.inventory.releaseReservation",
+              "source": "inventory",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "inventory"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "abort-purchase",
+          "steps": [
+            {
+              "stepId": "release",
+              "kind": "call",
+              "locator": "release-reservation",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "record-failure",
+              "kind": "call",
+              "locator": "record-failure",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "inventory",
+            "coordinator"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "record-ready",
+          "steps": [
+            {
+              "stepId": "persist-ready",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.updatePurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onSuccess",
+                  "name": "finish",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "record-failure",
+          "steps": [
+            {
+              "stepId": "persist-failed",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.updatePurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "poll-purchase-until-ready",
+          "steps": [
+            {
+              "stepId": "poll",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getPurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "wait-for-ready",
+                  "type": "retry",
+                  "target": "$workflows.poll-purchase-until-ready.steps.poll",
+                  "targetLane": "poll-purchase-until-ready",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "resume-existing-purchase",
+          "steps": [
+            {
+              "stepId": "read-license",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.license.getLicenseByKey",
+              "source": "license",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onSuccess",
+                  "name": "persist-existing-ready-license",
+                  "type": "goto",
+                  "target": "record-ready",
+                  "targetLane": "record-ready",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onSuccess",
+                  "name": "finish",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "license"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "step-recovery-probe",
+          "steps": [
+            {
+              "stepId": "require-ready",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getPurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onSuccess",
+                  "name": "skip-recovery-on-normal-success",
+                  "type": "goto",
+                  "target": "$workflows.step-recovery-probe.steps.finish",
+                  "targetLane": "step-recovery-probe",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "refresh-before-retrying-source-step",
+                  "type": "retry",
+                  "target": "$workflows.step-recovery-probe.steps.refresh-state",
+                  "targetLane": "step-recovery-probe",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "refresh-state",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getPurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "finish",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/event-based.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "8cf8380f3e9c296873ead824c011f52d0972968be70acf5ca45199b36311fad0",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "event-driven-purchase",
+          "steps": [
+            {
+              "stepId": "publish-command",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.sendPurchaseRequested",
+              "source": "events",
+              "action": "send",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-event-journey",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "await-ready",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.receivePurchaseCompleted",
+              "source": "events",
+              "action": "receive",
+              "prerequisites": [
+                "publish-command"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "receive-again-without-republishing",
+                  "type": "retry",
+                  "target": "$workflows.event-driven-purchase.steps.await-ready",
+                  "targetLane": "event-driven-purchase",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "fallback-to-authoritative-state",
+                  "type": "goto",
+                  "target": "poll-purchase-until-ready",
+                  "targetLane": "poll-purchase-until-ready",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-event-journey",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "publish-activation",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.sendActivationReported",
+              "source": "events",
+              "action": "send",
+              "prerequisites": [
+                "await-ready"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-event-journey",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "await-audit",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.receiveAuditRecorded",
+              "source": "events",
+              "action": "receive",
+              "prerequisites": [
+                "publish-activation"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-event-journey",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "read-authoritative-state",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getPurchaseState",
+              "source": "coordinator",
+              "prerequisites": [
+                "await-ready",
+                "await-audit"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-event-journey",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "events",
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "prerequisite",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "purchase-event-worker",
+          "steps": [
+            {
+              "stepId": "receive-command",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.receivePurchaseRequested",
+              "source": "events",
+              "action": "receive",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-worker-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "fulfil-command",
+              "kind": "call",
+              "locator": "$sourceDescriptions.commerce.fulfil-item",
+              "source": "commerce",
+              "targetKind": "external-workflow",
+              "prerequisites": [
+                "receive-command"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-worker-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "verify-ready",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getPurchaseState",
+              "source": "coordinator",
+              "prerequisites": [
+                "fulfil-command"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-worker-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "publish-ready",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.sendPurchaseCompleted",
+              "source": "events",
+              "action": "send",
+              "prerequisites": [
+                "verify-ready"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-worker-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "events",
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "prerequisite",
+            "call",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "activation-audit-worker",
+          "steps": [
+            {
+              "stepId": "receive-activation",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.receiveActivationReported",
+              "source": "events",
+              "action": "receive",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-audit-worker",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "record-event",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.recordActivation",
+              "source": "coordinator",
+              "prerequisites": [
+                "receive-activation"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-audit-worker",
+                  "type": "end"
+                }
+              ]
+            },
+            {
+              "stepId": "publish-receipt",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.events.sendAuditRecorded",
+              "source": "events",
+              "action": "send",
+              "prerequisites": [
+                "record-event"
+              ],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "stop-audit-worker",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "events",
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "prerequisite"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "poll-purchase-until-ready",
+          "steps": [
+            {
+              "stepId": "poll",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.getPurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onFailure",
+                  "name": "wait-for-ready",
+                  "type": "retry",
+                  "target": "$workflows.poll-purchase-until-ready.steps.poll",
+                  "targetLane": "poll-purchase-until-ready",
+                  "returnToSource": false
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "transfer"
+          ],
+          "prerequisites": [],
+          "limits": []
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "92b3888975b45d1f207c4f7843451f32dd40dc27ef9c0873970ec261448857a8",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "recursive-A",
+          "steps": [
+            {
+              "stepId": "observe-A",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "enter-B",
+              "kind": "call",
+              "locator": "recursive-B",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "recursion"
+          ]
+        },
+        {
+          "workflowId": "recursive-B",
+          "steps": [
+            {
+              "stepId": "observe-B",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "return-A",
+              "kind": "call",
+              "locator": "recursive-A",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "recursion"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "62456e3fd5ec0d4aaa4818e7888d3d367e34cffa412a9de9cc71653b98bd0e0b",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "layer-0",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-1",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-1",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-2",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-2",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-3",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-3",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-4",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-4",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-5",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-5",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-6",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-6",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-7",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-7",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-8",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-8",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-9",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-9",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-10",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [],
+          "relationships": [
+            "call",
+            "continuation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-10",
+          "steps": [
+            {
+              "stepId": "next",
+              "kind": "call",
+              "locator": "layer-11",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        },
+        {
+          "workflowId": "layer-11",
+          "steps": [
+            {
+              "stepId": "leaf",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "depth"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "8089a1b1e28eb6e7f8e0f4d4b71c6910414b1cb5c62aec58f2ffa80f6a768dbc",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "row-limit",
+          "steps": [
+            {
+              "stepId": "observation-001",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-002",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-003",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-004",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-005",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-006",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-007",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-008",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-009",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-010",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-011",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-012",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-013",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-014",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-015",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-016",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-017",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-018",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-019",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-020",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-021",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-022",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-023",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-024",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-025",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-026",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-027",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-028",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-029",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-030",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-031",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-032",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-033",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-034",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-035",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-036",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-037",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-038",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-039",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-040",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-041",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-042",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-043",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-044",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-045",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-046",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-047",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-048",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-049",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-050",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-051",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-052",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-053",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-054",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-055",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-056",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-057",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-058",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-059",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-060",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-061",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-062",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-063",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-064",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-065",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-066",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-067",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-068",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-069",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-070",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-071",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-072",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-073",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-074",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-075",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-076",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-077",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-078",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-079",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-080",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-081",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-082",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-083",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-084",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-085",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-086",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-087",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-088",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-089",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-090",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-091",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-092",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-093",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-094",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-095",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-096",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-097",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-098",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-099",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-100",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-101",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-102",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-103",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-104",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-105",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-106",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-107",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-108",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-109",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-110",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-111",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-112",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-113",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-114",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-115",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-116",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-117",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-118",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-119",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-120",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-121",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-122",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-123",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-124",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-125",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-126",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-127",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-128",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-129",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-130",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-131",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-132",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-133",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-134",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-135",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-136",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-137",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-138",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-139",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-140",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-141",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-142",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-143",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-144",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-145",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-146",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-147",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-148",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-149",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-150",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-151",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-152",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-153",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-154",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-155",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-156",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-157",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-158",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-159",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-160",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-161",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-162",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-163",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-164",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-165",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-166",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-167",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-168",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-169",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-170",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-171",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-172",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-173",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-174",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-175",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-176",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-177",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-178",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-179",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-180",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-181",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-182",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-183",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-184",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-185",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-186",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-187",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-188",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-189",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-190",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-191",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-192",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-193",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-194",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-195",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-196",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-197",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-198",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-199",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-200",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-201",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-202",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-203",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-204",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-205",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-206",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-207",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-208",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-209",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-210",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-211",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-212",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-213",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-214",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-215",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-216",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-217",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-218",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-219",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-220",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-221",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-222",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-223",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-224",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-225",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-226",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-227",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-228",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-229",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-230",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-231",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-232",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-233",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-234",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-235",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-236",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-237",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-238",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-239",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-240",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-241",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-242",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-243",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-244",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-245",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-246",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-247",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-248",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-249",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "observation-250",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": [
+            "rows"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "8fce882eb7ffee0dfb8f3a745b77cd1e01dbba53b05f0e28597c179e1bcafc54",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "metadata-heavy-entry",
+          "steps": [
+            {
+              "stepId": "persist-verified-purchase-with-structured-policy-and-long-authored-name",
+              "kind": "call",
+              "locator": "record-ready",
+              "source": null,
+              "targetKind": "local-workflow",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "call",
+            "operation",
+            "continuation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        },
+        {
+          "workflowId": "record-ready",
+          "steps": [
+            {
+              "stepId": "persist-ready",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.updatePurchaseState",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": [
+                {
+                  "channel": "onSuccess",
+                  "name": "finish",
+                  "type": "end"
+                },
+                {
+                  "channel": "onFailure",
+                  "name": "stop-and-reconcile",
+                  "type": "end"
+                }
+              ]
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation"
+          ],
+          "prerequisites": [],
+          "limits": []
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "40e57edaa566d0e645f643c4b60b4d9f8553a8bd2478880379bb019a46dee8b6",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "diagnostic-probe",
+          "steps": [
+            {
+              "stepId": "healthy",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "supplied-external",
+              "kind": "call",
+              "locator": "$sourceDescriptions.commerce.reconcile-license",
+              "source": "commerce",
+              "targetKind": "external-workflow",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "unavailable-external",
+              "kind": "call",
+              "locator": "$sourceDescriptions.not-supplied.remote-workflow",
+              "source": "not-supplied",
+              "targetKind": "external-workflow",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "missing-local",
+              "kind": "call",
+              "locator": "does-not-exist",
+              "source": null,
+              "targetKind": "missing",
+              "prerequisites": [],
+              "actions": []
+            },
+            {
+              "stepId": "ambiguous-operation",
+              "kind": "operation",
+              "locator": "getLicenseByKey",
+              "source": null,
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "operation",
+            "call",
+            "marker"
+          ],
+          "prerequisites": [],
+          "limits": []
+        }
+      ]
+    },
+    {
+      "path": "public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml",
+      "version": "1.1.0",
+      "sha256": "91e7b7fb1c2c7743e095fcfb035b375ad78b608ac74e1187fc651a64d6ffbb38",
+      "layouts": [
+        "diagram",
+        "docs",
+        "split"
+      ],
+      "representations": [
+        "docs",
+        "sequence",
+        "flowchart"
+      ],
+      "workflows": [
+        {
+          "workflowId": "cycle-A",
+          "steps": [
+            {
+              "stepId": "observe",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "prerequisite",
+            "operation"
+          ],
+          "prerequisites": [
+            "cycle-B"
+          ],
+          "limits": []
+        },
+        {
+          "workflowId": "cycle-B",
+          "steps": [
+            {
+              "stepId": "observe",
+              "kind": "operation",
+              "locator": "$sourceDescriptions.coordinator.checkReadiness",
+              "source": "coordinator",
+              "prerequisites": [],
+              "actions": []
+            }
+          ],
+          "sources": [
+            "coordinator"
+          ],
+          "relationships": [
+            "prerequisite",
+            "operation"
+          ],
+          "prerequisites": [
+            "cycle-A"
+          ],
+          "limits": []
+        }
+      ]
+    }
+  ]
+}

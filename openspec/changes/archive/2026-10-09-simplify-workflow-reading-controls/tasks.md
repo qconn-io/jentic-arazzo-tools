@@ -21,3 +21,14 @@
 
 - [x] 4.1 Update reader instructions in packages/jentic-arazzo-ui/README.md and affected maintained semantic test selectors; run focused component tests, UI type checks and built declaration consumers, verifying old mode/subview values and existing callbacks/links remain compatible.
 - [x] 4.2 Record requirement-to-test/capture results in this change's verification.md with current build identity; verify unresolved visual or navigation failures remain failures and are carried to the final gate rather than claimed fixed by changed labels alone.
+
+## 5. Correct F1 before final acceptance
+
+- [x] 5.1 Add permanent production-browser coverage reproducing unreadable default and long-label flowcharts at 1440 and 480; verify the current failure is label scaling rather than SVG rendering.
+- [x] 5.2 Preserve intrinsic flowchart sizing in a contained keyboard-accessible scroll region; verify at least 12px displayed labels, keyboard scrolling, no page-wide overflow and current render/recovery/focus behavior.
+- [x] 5.3 Run current UI tests/type/build/declaration/package and browser checks, inspect fresh captures, and record the corrected F1 evidence before resuming gate-workflow-ux-regressions.
+
+## 6. Correct source-loading focus found by the integrated gate
+
+- [x] 6.1 Reproduce disabled source-control focus loss, preserve focus in stable source context before loading, and add permanent component/browser coverage for explicit lookup/reload and Escape dismissal without late focus theft.
+- [x] 6.2 Run affected current tests and engineering/browser checks and record the corrected focus evidence, retaining failed discovery records.

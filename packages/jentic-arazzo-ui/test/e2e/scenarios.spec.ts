@@ -78,7 +78,7 @@ for (const { pack, scenarios } of fixtures)
         await expect(page.locator('script[src]')).toHaveAttribute('src', `./${script}`);
       }
       await expect(page.locator('details.arazzo-advanced-tools')).toHaveAttribute('open', '');
-      const panel = page.getByRole('region', { name: 'Authored scenario guides' });
+      const panel = page.getByRole('region', { name: 'Guided walkthroughs' });
       await expect(panel).toContainText('Authored expectations');
       await panel.getByRole('button', { name: scenario.id, exact: true }).click();
       await expect(panel).toContainText(scenario.expected);
@@ -140,7 +140,7 @@ test('480px keyboard inspector return and fresh-session shared polling waypoint'
   await page.goto(
     '/?document=http://localhost:3000/examples/digital-product-stress/event-based.arazzo.yaml&scenarios=http://localhost:3000/examples/digital-product-stress/scenarios.json',
   );
-  const panel = page.getByRole('region', { name: 'Authored scenario guides' });
+  const panel = page.getByRole('region', { name: 'Guided walkthroughs' });
   const guide = panel.getByRole('button', { name: 'completion-timeout', exact: true });
   await guide.focus();
   await page.keyboard.press('Enter');
@@ -173,7 +173,7 @@ test('480px keyboard inspector return and fresh-session shared polling waypoint'
     'poll-purchase-until-ready',
   );
   await fresh.keyboard.press('Escape');
-  await expect(fresh.getByRole('region', { name: 'Authored scenario guides' })).toContainText(
+  await expect(fresh.getByRole('region', { name: 'Guided walkthroughs' })).toContainText(
     'Polling still requires authoritative READY',
   );
   records.push({

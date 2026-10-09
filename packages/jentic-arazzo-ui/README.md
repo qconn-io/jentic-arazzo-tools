@@ -500,6 +500,8 @@ A loaded Arazzo source exposes the referenced external workflow. **Open workflow
 
 ### Optional Systems perspective
 
+Systems view lets readers see participants and their interactions using supplied system information. When configured, **Workflow view / Systems view** appears beside the workflow reading controls. Without metadata, the **Systems view** help explains that this document has no supplied system participant information; normal workflow reading remains available. No participant setup is required, and the viewer does not infer actors or API owners. Stale or invalid supplied information has separate diagnostics.
+
 Hosts can supply `viewProfile` (version 1) and select `perspective="systems"`, or let readers use the optional Perspective setting. `onPerspectiveChange` supports a controlled host. Existing `ViewerMode` and `DiagramType` unions and default workflow views remain unchanged. With no profile, standard views do not interpret presentation extensions.
 
 Profiles bind explicit business participants, workflow/step actors, API source owners, descriptive operation implementations, and declared event endpoints to one document identity and optional revision. Every binding retains an authored field location or host provenance. Organizational ownership is separate optional catalog data. Invalid/stale/conflicting references remain diagnostic; missing identities become Unknown participants while authored interactions remain inspectable.
@@ -516,8 +518,11 @@ The `jentic.systems` workflow-location extension preserves the system root, sema
 
 ### Authored scenario guides
 
-Supply `scenarioManifest` to the headless viewer, or load an explicit manifest URL with the
-standalone **Scenario manifest URL** control or `?scenarios=<manifest URL>`. The viewer never
+**Guided walkthroughs** are author-provided descriptions and links through a workflow. Select a supplied guide by its name (or its authored ID when no title is provided). Reading a guide does not run the workflow.
+
+A guide file is an optional, separate JSON document. In the standalone viewer, open **Load guides from a URL**, enter its **Guide file URL**, then choose **Load guides**. **Guide file format** explains the accepted formats. **Open guided example** explicitly switches to the digital-product document and its compatible guide file; opening help alone loads nothing. Loading errors offer **Retry guide loading** while ordinary reading and previously loaded valid guides remain available. Empty files, stale waypoints and guides for another document have local explanations and applicable return actions.
+
+Developers can supply `scenarioManifest` to either viewer, or use an explicit manifest URL with `scenarioManifestURI` or `?scenarios=<manifest URL>` alongside `?document=<document URL>`. The viewer never
 searches sibling files for guides. Guide text is labeled as **authored expectations**: opening
 or visiting a waypoint does not execute an operation, evaluate an expression, or measure a
 scenario result.
@@ -766,7 +771,7 @@ Then run `npm run test:browser -w @jentic/arazzo-ui`.
 The command sequentially builds standalone and a packed package installed into a real
 downstream ESM app, identifies current source/fixture/artifact bytes, and starts its own
 UTF-8 static server on a fresh port. Playwright rejects an existing server. No development
-server is required. The compact suite runs at 1440 and 480 pixels and covers explicit
+server is required. The suite runs at 1440 and 480 pixels and covers explicit
 loading/provider denial, repeated calls and unknown actors, operation entry paths,
 scenario keyboard dismissal/restoration, and scoped before/after potential impact.
 It checks browser errors, implicit dependencies, business requests, host history and width.
@@ -777,10 +782,36 @@ Evidence, traces, reports and current build identities live under ignored
 changes. CI runs package/export acceptance and production Chromium in separate bounded
 jobs while retaining the existing monorepo test timeout.
 
+The test-owned `test/fixtures/workflow-ux-acceptance.json` pins the unchanged
+default Petstore and all nine digital-product/stress documents: 46 workflows.
+Every workflow has independent source/call/mapping expectations. Each document
+root is exercised in Workflow diagram and all three reading representations in
+Read workflow and Side by side. Inventory drift, omitted tests, skipped cases
+and missing representation captures fail the command. Plain-entry discovery is
+tested separately from configured guide and Systems navigation. Only the
+authored explicit Petstore contract URL is intercepted with deterministic
+test-owned bytes; no business operation or live Swagger dependency is required.
+
 After a successful current browser run, `npm run test:browser:negative -w @jentic/arazzo-ui`
-must return a failing exit code. It deliberately serves a broken fixture title to the
-ordinary installed-consumer assertion; tracked files and generated build bytes stay intact.
-Rerunning `npm run test:browser -w @jentic/arazzo-ui` restores the positive gate.
+returns zero only when all five isolated faults fail their named assertion at
+both widths and every normal control passes. The faults exercise incorrect
+Petstore lanes, obsolete lookup evidence, silent rendering failure, missing
+first-use guide discovery and broken legacy locations. Unrelated crashes or
+server failures cannot count as detection. Tracked files and build bytes remain
+intact. Separate normal/fault reports, screenshots and traces are preserved under
+`test-output/browser/negative`; `negative.json` records detected reasons.
+`positive.json`, `coverage.json` and `identity.json` identify the positive run.
+Changed inputs or build artifacts require a fresh positive command before reuse.
+
+For complete engineering verification from the repository root, use `.nvmrc`
+and run `npm run build:es`, `npm run typescript:declaration`, `npm run lint`,
+`npm test`, and `npm run typescript:check-types`. Then run UI build,
+`test:declarations`, `test:package:built`, `test:browser` and
+`test:browser:negative` with `-w @jentic/arazzo-ui`. The browser command performs
+its own sequential build and installed-package check. Record command exit codes
+and fresh identities. Passing automation and reviewed captures are engineering
+evidence; final UX acceptance also requires consented, unassisted critical-task
+sessions with an unfamiliar API Owner and Developer.
 
 ### Maintained package acceptance
 

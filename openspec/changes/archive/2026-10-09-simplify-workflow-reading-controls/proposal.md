@@ -11,6 +11,8 @@ Workflow reading exposes plain inspect buttons, two overlapping view selectors, 
 - Remove generated participant IDs from headings; keep genuine uncertainty actionable through plain-language explanations and exact details.
 - Translate contract/source statuses into reader-oriented text and recovery actions; keep technical provenance in expandable details.
 - Replace blank Mermaid failures with a localized message, retry, and access to workflow descriptions.
+- Preserve readable flowchart label size in a contained, keyboard-accessible scroll region at desktop and narrow widths; repair the recorded F1-flowchart-readability failure before final acceptance.
+- Keep focus inside contract inspection when an explicit source-loading control becomes disabled, preserving Escape dismissal and the valid detail origin.
 
 ## Capabilities
 

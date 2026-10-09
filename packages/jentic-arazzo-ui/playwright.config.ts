@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './test/e2e',
-  testIgnore: 'production.spec.ts',
+  testIgnore: ['production.spec.ts', 'workflow-ux.spec.ts'],
   timeout: 30 * 1000,
   expect: { timeout: 5000 },
   fullyParallel: true,

@@ -158,6 +158,8 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Verify current standalone and installed ESM consumer in Chromium
         run: npm run test:browser -w @jentic/arazzo-ui
+      - name: Prove named UX regression detection with normal controls
+        run: npm run test:browser:negative -w @jentic/arazzo-ui
       - name: Upload production browser evidence
         if: always()
         uses: actions/upload-artifact@v7

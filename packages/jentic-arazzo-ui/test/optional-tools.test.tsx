@@ -5,7 +5,6 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ArazzoUIStandalone } from '../src/ArazzoUIStandalone';
 import { nestedCalls } from './fixtures/connected';
-import { writeLocationURL } from '../src/utils/location/codec';
 
 vi.mock('mermaid', () => ({
   default: { initialize: vi.fn(), render: vi.fn(async () => ({ svg: '<svg />' })) },
@@ -29,20 +28,20 @@ test('ordinary viewing keeps optional setup closed and disclosure itself acquire
   expect(screen.getByRole('textbox', { name: 'Arazzo document URL' })).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Upload Arazzo document' })).toBeTruthy();
   expect(screen.getByRole('searchbox', { name: 'Search workflows and steps' })).toBeTruthy();
-  const summary = screen.getByText('Advanced tools');
+  const summary = screen.getByText('Load guides from a URL');
   const disclosure = summary.closest('details')!;
   expect(disclosure.open).toBe(false);
-  expect(screen.getByRole('textbox', { name: 'Scenario manifest URL' }).closest('details')).toBe(
+  expect(screen.getByRole('textbox', { name: 'Guide file URL' }).closest('details')).toBe(
     disclosure,
   );
   fireEvent.click(summary);
   await waitFor(() => expect(disclosure.open).toBe(true));
-  expect(screen.getByRole('textbox', { name: 'Scenario manifest URL' })).toBeTruthy();
+  expect(screen.getByRole('textbox', { name: 'Guide file URL' })).toBeTruthy();
   expect(fetch).not.toHaveBeenCalled();
   expect(load).not.toHaveBeenCalled();
 });
 
-test('a restored guide reveals its loading and failed status without another setup action', async () => {
+test('a restored guide keeps status visible without repeatedly opening URL setup', async () => {
   setupURL();
   let reject: (error: Error) => void = () => {};
   vi.stubGlobal(
@@ -54,41 +53,18 @@ test('a restored guide reveals its loading and failed status without another set
         }),
     ),
   );
-  history.replaceState(
-    {},
-    '',
-    writeLocationURL(new URL(globalThis.location.href), {
-      version: 1,
-      document: 'https://test/doc',
-      root: 'checkout',
-      view: 'docs',
-      subview: 'docs',
-      extensions: {
-        'arazzo.scenario': {
-          manifest: 'guide',
-          manifestURI: 'https://test/guide.json',
-          scenarioId: 'read',
-        },
-      },
-    }),
-  );
+  history.replaceState({}, '', '/?scenarios=https%3A%2F%2Ftest%2Fguide.json');
   render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
-  const input = await screen.findByRole('textbox', { name: 'Scenario manifest URL' });
-  const disclosure = input.closest('details')!;
-  expect(disclosure.open).toBe(true);
-  expect(screen.getByText('Loading authored scenario manifest…')).toBeTruthy();
-  fireEvent.click(screen.getByText('Advanced tools'));
-  await waitFor(() => expect(disclosure.open).toBe(false));
+  await screen.findByText('Loading guided walkthroughs…');
+  const disclosure = screen.getByText('Load guides from a URL').closest('details')!;
+  expect(disclosure.open).toBe(false);
   reject(new Error('Shared guide unavailable'));
-  await waitFor(() => expect(disclosure.open).toBe(true));
-  expect(screen.getByText('Shared guide unavailable')).toBeTruthy();
-  fireEvent.click(screen.getByText('Advanced tools'));
-  await waitFor(() => expect(disclosure.open).toBe(false));
-  fireEvent(window, new PopStateEvent('popstate', { state: history.state }));
-  await waitFor(() => expect(disclosure.open).toBe(true));
+  await screen.findByText(/Guide file unavailable: Shared guide unavailable/);
+  expect(disclosure.open).toBe(false);
+  expect(screen.getByRole('button', { name: 'Retry guide loading' })).toBeTruthy();
 });
 
-test('a host-configured profile exposes its existing perspective switch inside Advanced tools', async () => {
+test('a host-configured profile exposes Systems beside reading controls', async () => {
   setupURL();
   render(
     <ArazzoUIStandalone
@@ -118,11 +94,13 @@ test('a host-configured profile exposes its existing perspective switch inside A
     />,
   );
   const perspective = await screen.findByRole('combobox', { name: 'Perspective' });
-  const disclosure = perspective.closest('details')!;
-  expect(disclosure).toBeTruthy();
-  expect(disclosure.open).toBe(true);
-  expect(disclosure.querySelector('summary')?.textContent).toBe('Advanced tools');
-  expect(screen.getAllByText('Advanced tools')).toHaveLength(1);
+  expect(perspective.closest('details')).toBeNull();
+  expect(screen.getByText('Load guides from a URL').closest('details')!.open).toBe(false);
+  expect(
+    screen.getByText(
+      'See the participants and their interactions using supplied system information.',
+    ),
+  ).toBeTruthy();
   fireEvent.change(perspective, { target: { value: 'systems' } });
   await screen.findByRole('region', { name: 'Systems checkout' });
 });
@@ -175,7 +153,7 @@ test('covering details excludes advanced setup from background interaction and r
   const dialog = await screen.findByRole('dialog', { name: 'Selection details' });
   const close = screen.getByRole('button', { name: 'Close details' });
   expect(document.activeElement).toBe(close);
-  const advanced = screen.getByText('Advanced tools').closest('details')!;
+  const advanced = screen.getByText('Load guides from a URL').closest('.arazzo-guide-setup')!;
   expect(advanced.hasAttribute('inert')).toBe(true);
   expect(advanced.getAttribute('aria-hidden')).toBe('true');
   const last = dialog.querySelector('details[data-advanced] > summary') as HTMLElement;

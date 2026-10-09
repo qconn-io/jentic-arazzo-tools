@@ -71,6 +71,38 @@ test('embedded inspection without provider retains authored locator without brow
   fetch.mockRestore();
 });
 
+test('explicit loading keeps focus on stable source context while its button is disabled', async () => {
+  let release!: (value: { content: object; retrievalURI: string }) => void;
+  const provider = {
+    load: () =>
+      new Promise<{ content: object; retrievalURI: string }>((resolve) => {
+        release = resolve;
+      }),
+  };
+  render(
+    <ArazzoViewerProvider
+      document={document}
+      snapshot={createSnapshot(document, { baseURI: 'https://example.test/workflow.yaml' })}
+      sourceProvider={provider}
+    >
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  const button = screen.getByRole('button', { name: 'Load API description api' });
+  button.focus();
+  fireEvent.click(button);
+  const source = screen.getByRole('region', { name: 'Source api' });
+  expect(globalThis.document.activeElement).toBe(source);
+  await waitFor(() => expect(release).toBeTypeOf('function'));
+  const elsewhere = globalThis.document.createElement('button');
+  globalThis.document.body.appendChild(elsewhere);
+  elsewhere.focus();
+  release({ content: contract, retrievalURI: 'https://example.test/api.yaml' });
+  await screen.findByText('located');
+  expect(globalThis.document.activeElement).toBe(elsewhere);
+  elsewhere.remove();
+});
+
 test('shared dependency reload hides affected facts and keeps unrelated panels loaded', async () => {
   const { within } = await import('@testing-library/react');
   const sources = ['a', 'b', 'c'];

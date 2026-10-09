@@ -73,7 +73,7 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
         const target = typeof locators.workflowId === 'string' ? locators.workflowId : undefined;
         const workflow = target ? value?.workflowModel?.workflowsById.get(target) : undefined;
         return (
-          <section key={source.name} aria-label={`Source ${source.name}`}>
+          <section key={source.name} aria-label={`Source ${source.name}`} tabIndex={-1}>
             <h4>{source.name}</h4>
             <details>
               <summary>Source acquisition details</summary>
@@ -96,7 +96,11 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
               <button
                 type="button"
                 disabled={value?.state === 'loading'}
-                onClick={() => void load(source, !!value)}
+                onClick={(event) => {
+                  if (document.activeElement === event.currentTarget)
+                    event.currentTarget.parentElement?.focus();
+                  void load(source, !!value);
+                }}
               >
                 {' '}
                 {value?.state === 'loading'

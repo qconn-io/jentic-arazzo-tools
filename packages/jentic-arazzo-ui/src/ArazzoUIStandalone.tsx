@@ -100,7 +100,7 @@ import { ArazzoUI } from './ArazzoUI';
 import { JenticLogo } from './components/JenticLogo';
 import { UploadIcon } from './components/UploadIcon';
 import { ViewModeControl } from './components/ViewModeControl';
-import { AdvancedTools } from './components/AdvancedTools';
+import { GuideSetup } from './components/AdvancedTools';
 import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 import type { ArazzoDocument } from './types/arazzo';
 
@@ -186,6 +186,7 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
   function ArazzoUIStandalone(props, ref) {
     const { initialView = 'docs', onViewChange, ...rest } = props;
     const guides = useStandaloneScenarios(props);
+    const guideHelpId = React.useId();
     const browserProvider = React.useMemo(() => new BrowserFetchProvider(), []);
     const [externalSource, setExternalSource] = useState<{
       uri: string;
@@ -742,17 +743,15 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
             </div>
             {hydration.error && <p role="status">{hydration.error}</p>}
             {navigationError && <p role="status">{navigationError}</p>}
-            <AdvancedTools
-              reveal={
-                !!(
-                  guides.manifest ||
-                  guides.selection ||
-                  guides.input ||
-                  props.viewProfile ||
-                  props.viewProfileAdapter
+            <GuideSetup
+              status={
+                guides.message && (
+                  <div className="arazzo-guide-status">
+                    <p role="status">{guides.message}</p>
+                    {guides.failed && <button onClick={guides.retry}>Retry guide loading</button>}
+                  </div>
                 )
               }
-              status={guides.message}
               setup={
                 <form
                   className="arazzo-scenario-loader"
@@ -762,19 +761,79 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
                   }}
                 >
                   <label>
-                    Scenario manifest URL{' '}
+                    Guide file URL{' '}
                     <input
                       type="url"
-                      aria-label="Scenario manifest URL"
+                      aria-label="Guide file URL"
+                      aria-describedby={guideHelpId}
                       value={guides.input}
                       onChange={(event) => guides.setInput(event.target.value)}
-                      placeholder="Explicit scenario manifest URL"
+                      placeholder="Guide file URL"
                     />
                   </label>
+                  <p id={guideHelpId}>
+                    A guide file is a separate JSON document containing walkthrough descriptions and
+                    links to workflow steps.
+                  </p>
+                  <p>Reading a guide does not run the workflow.</p>
+                  <details className="arazzo-guide-format">
+                    <summary>Guide file format</summary>
+                    <pre data-testid="guide-format-example">
+                      {JSON.stringify(
+                        {
+                          version: 1,
+                          id: 'reading-guide',
+                          scenarios: [
+                            {
+                              id: 'read-workflow',
+                              document: 'arazzo.yaml',
+                              workflow: 'client-journey',
+                              expected: 'Read the authored purchase exchange.',
+                              evidence: 'Author-provided description; inspection only.',
+                            },
+                          ],
+                        },
+                        null,
+                        2,
+                      )}
+                    </pre>
+                    <p>
+                      Legacy arrays of scenarios are also accepted, using the same scenario fields
+                      without the versioned envelope. Relative document links resolve against the
+                      guide file URL.
+                    </p>
+                    <a href="https://github.com/jentic/jentic-arazzo-tools/blob/main/packages/jentic-arazzo-ui/README.md#authored-scenario-guides">
+                      Developer guide schema
+                    </a>
+                    <p>
+                      The guided example opens the digital-product workflow and its separate guide
+                      file.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const documentURL = new URL(
+                          'examples/digital-product/arazzo.yaml',
+                          globalThis.location.href,
+                        ).href;
+                        const guideURL = new URL(
+                          'examples/digital-product/scenarios.json',
+                          globalThis.location.href,
+                        ).href;
+                        commitSource(documentURL);
+                        setUrlInput(documentURL);
+                        guides.loadExample(guideURL);
+                        const target = new URL(globalThis.location.href);
+                        target.searchParams.set('scenarios', guideURL);
+                        globalThis.history.replaceState(globalThis.history.state, '', target);
+                      }}
+                    >
+                      Open guided example
+                    </button>
+                  </details>
                   <button type="submit" disabled={!guides.input.trim()}>
-                    Load scenario manifest
+                    Load guides
                   </button>
-                  {guides.message && <p role="status">{guides.message}</p>}
                 </form>
               }
             >
@@ -840,7 +899,7 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
                   style={undefined}
                 />
               </div>
-            </AdvancedTools>
+            </GuideSetup>
             {dragging && (
               <div
                 style={{

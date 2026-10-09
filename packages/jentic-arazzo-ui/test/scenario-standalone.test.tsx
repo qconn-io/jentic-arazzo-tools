@@ -66,10 +66,11 @@ test('loads only an explicitly supplied manifest and restores a fresh namespaced
     ),
   );
   render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   await waitFor(() => expect(panel.textContent).toContain('Read authored charge evidence.'));
   await screen.findByRole('region', { name: 'Selection details' });
   expect(fetch).toHaveBeenCalledTimes(1);
+  expect(screen.getByText('Load guides from a URL').closest('details')!.open).toBe(false);
 });
 test('replacement cancels obsolete manifest loading and valid new guides remain usable', async () => {
   history.replaceState({}, '', `${globalThis.location.origin}/`);
@@ -86,13 +87,13 @@ test('replacement cancels obsolete manifest loading and valid new guides remain 
   });
   vi.stubGlobal('fetch', fetch);
   render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
-  fireEvent.click(screen.getByText('Advanced tools'));
-  const input = await screen.findByRole('textbox', { name: 'Scenario manifest URL' });
+  fireEvent.click(screen.getByText('Load guides from a URL'));
+  const input = await screen.findByRole('textbox', { name: 'Guide file URL' });
   fireEvent.change(input, { target: { value: 'https://test/old' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Load scenario manifest' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Load guides' }));
   await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
   fireEvent.change(input, { target: { value: 'https://test/new' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Load scenario manifest' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Load guides' }));
   await screen.findByRole('button', { name: 'charge-guide' });
   expect(firstSignal?.aborted).toBe(true);
   release({ ok: true, url: 'https://test/old', json: async () => ({ version: 1, scenarios: [] }) });
@@ -132,7 +133,7 @@ test('leaving a guide cancels a pending document handoff and ignores its late re
       sourceProvider={provider}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'remote' }));
   await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(1));
   fireEvent.click(within(panel).getByRole('button', { name: 'Leave guide' }));
@@ -162,7 +163,7 @@ test('controlled prose-only selection opens its declared workflow', async () => 
       ]}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'prose' }));
   await waitFor(() =>
     expect(
@@ -198,7 +199,7 @@ test('a rejected controlled selection cannot acquire or replace a document', asy
       sourceProvider={{ load }}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'remote' }));
   await waitFor(() => expect(changed).toHaveBeenCalledTimes(1));
   expect(load).not.toHaveBeenCalled();
@@ -228,7 +229,7 @@ test('a standalone host supplying the requested document preserves the guide and
       onScenarioLocationRequest={handoff}
     />,
   );
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   fireEvent.click(within(panel).getByRole('button', { name: 'remote' }));
   await waitFor(() => expect(handoff).toHaveBeenCalled());
   rerender(
@@ -241,7 +242,7 @@ test('a standalone host supplying the requested document preserves the guide and
   );
   const details = await screen.findByRole('region', { name: 'Selection details' });
   expect(details.textContent).toContain('payment.charge');
-  expect(screen.getByRole('region', { name: 'Authored scenario guides' }).textContent).toContain(
+  expect(screen.getByRole('region', { name: 'Guided walkthroughs' }).textContent).toContain(
     'Read authored charge evidence.',
   );
 });
@@ -270,7 +271,7 @@ test('guide reconstruction retains the shared document digest check', async () =
     }),
   );
   render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
-  const panel = await screen.findByRole('region', { name: 'Authored scenario guides' });
+  const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   await waitFor(() =>
     expect(
       screen

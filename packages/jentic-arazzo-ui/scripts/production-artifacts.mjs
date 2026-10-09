@@ -5,6 +5,17 @@ import { fileURLToPath } from 'node:url';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const output = resolve(root, 'test-output/browser');
+export const petstoreBaseline = '8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569';
+export async function verifyPetstoreBaseline(
+  path = resolve(root, 'public/petstore-order-workflow.arazzo.yaml'),
+) {
+  if (
+    createHash('sha256')
+      .update(await readFile(path))
+      .digest('hex') !== petstoreBaseline
+  )
+    throw new Error('Petstore baseline identity mismatch: preserve the unchanged authored sample');
+}
 export async function fixtureHash() {
   return createHash('sha256')
     .update(await readFile(resolve(output, 'readiness.json')))
@@ -24,9 +35,10 @@ export async function hashes(directory, authoredOnly = false) {
   return result;
 }
 export async function currentIdentity() {
+  await verifyPetstoreBaseline();
   const source = await hashes(resolve(root, 'src'));
-  const fixtures = await hashes(resolve(root, 'public/examples'));
-  const tests = await hashes(resolve(root, 'test/fixtures'));
+  const fixtures = await hashes(resolve(root, 'public'));
+  const tests = await hashes(resolve(root, 'test'));
   const app = await hashes(resolve(root, 'test/package'));
   const buildInputs = {};
   for (const path of [
@@ -34,7 +46,10 @@ export async function currentIdentity() {
     '../../package-lock.json',
     '../../babel.config.cjs',
     '../../tsconfig.json',
+    '../../.nvmrc',
+    '../../.github/workflows/build.yml',
     'package.json',
+    'README.md',
     'tsconfig.json',
     'tsconfig.declaration.json',
     'playwright.production.config.ts',

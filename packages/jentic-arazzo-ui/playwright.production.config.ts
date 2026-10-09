@@ -3,13 +3,26 @@ import { defineConfig, devices } from '@playwright/test';
 const port = Number(process.env.ARAZZO_BROWSER_PORT ?? 43187);
 export default defineConfig({
   testDir: './test/e2e',
-  testMatch: 'production.spec.ts',
-  outputDir: './test-output/browser/results',
+  testMatch: ['production.spec.ts', 'workflow-ux.spec.ts'],
+  outputDir: process.env.ARAZZO_BROWSER_RESULTS ?? './test-output/browser/results',
   timeout: 30_000,
   expect: { timeout: 5000 },
   retries: 0,
   workers: 1,
-  reporter: [['list'], ['html', { outputFolder: './test-output/browser/report', open: 'never' }]],
+  reporter: [
+    ['list'],
+    [
+      'json',
+      { outputFile: process.env.ARAZZO_BROWSER_REPORT ?? './test-output/browser/positive.json' },
+    ],
+    [
+      'html',
+      {
+        outputFolder: process.env.ARAZZO_BROWSER_HTML ?? './test-output/browser/report',
+        open: 'never',
+      },
+    ],
+  ],
   use: {
     baseURL: `http://127.0.0.1:${port}`,
     trace: 'retain-on-failure',

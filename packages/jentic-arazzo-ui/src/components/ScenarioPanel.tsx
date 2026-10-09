@@ -34,7 +34,13 @@ export function ScenarioPanel({ props }: { props: ArazzoUIProps }) {
         : undefined,
     [point, viewer.model, viewer.snapshot, source?.document, source?.revision, source?.digest],
   );
-  if (!guide) return null;
+  if (!guide)
+    return (
+      <section role="region" aria-label="Guided walkthroughs" className="arazzo-scenario-panel">
+        <h2>Guided walkthroughs</h2>
+        <p>Follow an author-provided guide through this workflow.</p>
+      </section>
+    );
   const open = (s: AuthoredScenario, w?: ScenarioWaypoint, origin?: HTMLElement) => {
     const waypoint = w ?? {
       id: '',
@@ -69,16 +75,20 @@ export function ScenarioPanel({ props }: { props: ArazzoUIProps }) {
           ? `Unavailable waypoint: ${selection.waypointId}`
           : undefined);
   return (
-    <section role="region" aria-label="Authored scenario guides" className="arazzo-scenario-panel">
-      <h2>Authored scenario guides</h2>
+    <section role="region" aria-label="Guided walkthroughs" className="arazzo-scenario-panel">
+      <h2>Guided walkthroughs</h2>
+      <p>Follow an author-provided guide through this workflow.</p>
       <p>
         <strong>Authored expectations · inspection only</strong>
       </p>
       <p>These guides do not execute operations, evaluate criteria, or report test results.</p>
       <label>
-        Search scenarios{' '}
+        Search guides{' '}
         <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} />
       </label>
+      {manifest?.scenarios.length === 0 && (
+        <p role="status">This guide file contains no walkthroughs.</p>
+      )}
       {guide.manifest.diagnostics.map((message, i) => (
         <p role="status" key={i}>
           {message}
@@ -102,7 +112,27 @@ export function ScenarioPanel({ props }: { props: ArazzoUIProps }) {
             </button>
           ))}
       </div>
-      {invalid && <p role="status">{invalid}</p>}
+      {invalid && (
+        <p role="status">{invalid} Choose another walkthrough or return to the workflow.</p>
+      )}
+      {scenario && scenario.document !== source?.document && (
+        <p role="status">
+          This walkthrough refers to another document: {scenario.document}. The current workflow
+          remains readable; choose a compatible guide or request its document.
+        </p>
+      )}
+      {(invalid ||
+        (scenario && scenario.document !== source?.document) ||
+        (resolved && !['restored', 'bounded'].includes(resolved.status.state))) && (
+        <button
+          onClick={() => {
+            guide.select(null);
+            session.closeDetails();
+          }}
+        >
+          Return to workflow
+        </button>
+      )}
       {scenario && (
         <div className="arazzo-scenario-current">
           <h3>{scenario.title ?? scenario.id}</h3>
