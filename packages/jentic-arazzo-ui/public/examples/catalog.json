@@ -29,7 +29,7 @@
       "revision": "sample-2026-10-07",
       "uri": "./digital-product/arazzo.yaml",
       "kind": "arazzo",
-      "expectedDigest": "sha256:7071e9708b289c831691f49ad4229ac2c0358afd2e4e96343f0dd4f14f2b852a",
+      "expectedDigest": "sha256:b01d4b86054366bffb42bab552fcb6050298cc520ac6be10fe1ad93f797a6c45",
       "workflows": [
         {
           "workflowId": "client-journey",

@@ -114,3 +114,53 @@ jobs:
       with:
         name: arazzo-ui-build
         path: ./packages/jentic-arazzo-ui/build
+
+  public-package-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.3.1
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      - run: npm ci --engine-strict=false
+      - name: Build workspace runtime dependencies
+        run: npm run build:es
+      - name: Install public package acceptance browser
+        run: npx playwright install --with-deps chromium
+      - name: Verify generated declarations and installed package exports
+        run: npm run test:package -w @jentic/arazzo-ui
+      - name: Upload package acceptance identity and measurements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: arazzo-ui-package-acceptance
+          path: |
+            packages/jentic-arazzo-ui/test-output/package-consumer/metadata.json
+            packages/jentic-arazzo-ui/test-output/package-consumer-unpinned*/evidence-*.json
+
+  production-browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26.3.1
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+      - run: npm ci --engine-strict=false
+      - name: Build workspace runtime dependencies
+        run: npm run build:es
+      - name: Install production acceptance browser
+        run: npx playwright install --with-deps chromium
+      - name: Verify current standalone and installed ESM consumer in Chromium
+        run: npm run test:browser -w @jentic/arazzo-ui
+      - name: Upload production browser evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: arazzo-ui-production-browser
+          path: packages/jentic-arazzo-ui/test-output/browser

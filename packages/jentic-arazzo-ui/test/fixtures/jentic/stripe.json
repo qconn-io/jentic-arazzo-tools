@@ -1,0 +1,1140 @@
+{
+  "arazzo": "1.0.1",
+  "info": {
+    "title": "Jentic Generated Arazzo Specification",
+    "version": "1.0.0",
+    "description": "Automatically generated Arazzo specification from OpenAPI"
+  },
+  "sourceDescriptions": [
+    {
+      "name": "openapi_source",
+      "url": "./apis/openapi/stripe.com/main/2025-03-31.basil/openapi.json",
+      "type": "openapi"
+    }
+  ],
+  "workflows": [
+    {
+      "workflowId": "process-and-manage-one-time-payments",
+      "summary": "This workflow covers the core process of creating a payment intent, confirming it, and then optionally capturing the funds if manual capture is desired. It also includes steps for refunding the payment.",
+      "description": "This workflow covers the core process of creating a payment intent, confirming it, and then optionally capturing the funds if manual capture is desired. It also includes steps for refunding the payment.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "payment_method": {
+            "type": "string"
+          },
+          "return_url": {
+            "type": "string"
+          },
+          "amount_to_capture": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-payment-intent",
+          "description": "Initiates a payment by creating a PaymentIntent object, specifying the amount, currency, and desired payment method types.",
+          "operationId": "PostPaymentIntents",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "amount": "$inputs.amount",
+              "currency": "$inputs.currency"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "payment_intent_id": "$response.body#/id",
+            "client_secret": "$response.body#/client_secret"
+          }
+        },
+        {
+          "stepId": "confirm-payment-intent",
+          "description": "Confirms the PaymentIntent with a payment method, attempting to process the payment. This step handles authentication if required.",
+          "operationId": "PostPaymentIntentsIntentConfirm",
+          "parameters": [
+            {
+              "name": "intent",
+              "in": "path",
+              "value": "$steps.create-payment-intent.outputs.payment_intent_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "intent": "$steps.create-payment-intent.outputs.payment_intent_id",
+              "payment_method": "$inputs.payment_method",
+              "return_url": "$inputs.return_url"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "payment_status": "$response.body#/payment_status",
+            "latest_charge_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "capture-payment-intent",
+          "description": "Captures the funds of an existing uncaptured PaymentIntent. This is used for two-step payment flows where authorization and capture are separate.",
+          "operationId": "PostPaymentIntentsIntentCapture",
+          "parameters": [
+            {
+              "name": "intent",
+              "in": "path",
+              "value": "$steps.create-payment-intent.outputs.payment_intent_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "intent": "$steps.create-payment-intent.outputs.payment_intent_id",
+              "amount_to_capture": "$inputs.amount_to_capture"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "payment_status": "$response.body#/payment_status"
+          }
+        },
+        {
+          "stepId": "refund-payment",
+          "description": "Refunds a previously captured payment, either fully or partially. Can be initiated from a Charge or PaymentIntent.",
+          "operationId": "PostRefunds",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "payment_intent": "$steps.create-payment-intent.outputs.payment_intent_id",
+              "amount": "$inputs.amount",
+              "reason": "$inputs.reason"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "refund_id": "$response.body#/id",
+            "refund_status": "$response.body#/refund_status"
+          }
+        }
+      ],
+      "outputs": {
+        "payment_intent_id": "$steps.create-payment-intent.outputs.payment_intent_id",
+        "client_secret": "$steps.create-payment-intent.outputs.client_secret",
+        "payment_status": "$steps.capture-payment-intent.outputs.payment_status",
+        "latest_charge_id": "$steps.confirm-payment-intent.outputs.latest_charge_id",
+        "refund_id": "$steps.refund-payment.outputs.refund_id",
+        "refund_status": "$steps.refund-payment.outputs.refund_status"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "in-person-payment-and-refund-with-terminal",
+      "summary": "This workflow demonstrates setting up a physical terminal location and reader, processing a payment using a PaymentIntent, and then initiating a refund directly through the reader.",
+      "description": "This workflow demonstrates setting up a physical terminal location and reader, processing a payment using a PaymentIntent, and then initiating a refund directly through the reader.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "registration_code": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "reader": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-terminal-location",
+          "description": "Creates a new physical location where terminal readers will operate.",
+          "operationId": "PostTerminalLocations",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "display_name": "$inputs.display_name"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "location_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-terminal-reader",
+          "description": "Registers a new physical payment reader to the created location, making it available for transactions.",
+          "operationId": "PostTerminalReaders",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "location": "$steps.create-terminal-location.outputs.location_id",
+              "registration_code": "$inputs.registration_code"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "reader_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-payment-intent-for-terminal",
+          "description": "Creates a PaymentIntent specifically for a card-present transaction on a terminal.",
+          "operationId": "PostPaymentIntents",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "amount": "$inputs.amount",
+              "currency": "$inputs.currency"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "payment_intent_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "process-payment-on-reader",
+          "description": "Initiates the payment process on the specified reader using the PaymentIntent. The customer will interact with the physical reader.",
+          "operationId": "PostTerminalReadersReaderProcessPaymentIntent",
+          "parameters": [
+            {
+              "name": "reader",
+              "in": "path",
+              "value": "$steps.create-terminal-reader.outputs.reader_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "reader": "$steps.create-terminal-reader.outputs.reader_id",
+              "payment_intent": "$steps.create-payment-intent-for-terminal.outputs.payment_intent_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "reader_action_status": "$response.body#/reader_action_status"
+          }
+        },
+        {
+          "stepId": "refund-payment-on-reader",
+          "description": "Initiates a refund for a payment directly through the terminal reader.",
+          "operationId": "PostTerminalReadersReaderRefundPayment",
+          "parameters": [
+            {
+              "name": "reader",
+              "in": "path",
+              "value": "$steps.create-terminal-reader.outputs.reader_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "reader": "$steps.create-terminal-reader.outputs.reader_id",
+              "payment_intent": "$steps.create-payment-intent-for-terminal.outputs.payment_intent_id",
+              "amount": "$inputs.amount"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "reader_action_status": "$response.body#/reader_action_status"
+          }
+        }
+      ],
+      "outputs": {
+        "location_id": "$steps.create-terminal-location.outputs.location_id",
+        "reader_id": "$steps.create-terminal-reader.outputs.reader_id",
+        "payment_intent_id": "$steps.create-payment-intent-for-terminal.outputs.payment_intent_id",
+        "reader_action_status": "$steps.refund-payment-on-reader.outputs.reader_action_status"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "onboard-custom-connected-account",
+      "summary": "This workflow enables a platform to create a new custom Stripe account for a user and then generate a link to guide them through the Connect onboarding process. Finally, it retrieves the account status to confirm onboarding progress.",
+      "description": "This workflow enables a platform to create a new custom Stripe account for a user and then generate a link to guide them through the Connect onboarding process. Finally, it retrieves the account status to confirm onboarding progress.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "account": {
+            "type": "string"
+          },
+          "expand": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-connected-account",
+          "description": "Creates a new custom Stripe account for a user. This is the first step in onboarding a connected account.",
+          "operationId": "PostAccounts",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "country": "$inputs.country",
+              "email": "$inputs.email",
+              "type": "$inputs.type"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "account_id": "$response.body#/id",
+            "details_submitted": "$response.body#/details_submitted"
+          }
+        },
+        {
+          "stepId": "create-account-onboarding-link",
+          "description": "Generates a single-use URL that the platform can redirect their user to, allowing them to complete the Connect Onboarding flow directly on Stripe.",
+          "operationId": "PostAccountLinks",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "account": "$steps.create-connected-account.outputs.account_id",
+              "type": "$inputs.type"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "onboarding_url": "$response.body#/onboarding_url",
+            "expires_at": "$response.body#/expires_at"
+          }
+        },
+        {
+          "stepId": "retrieve-account-status",
+          "description": "Retrieves the details of the newly created account to check if the onboarding process (details submission, capabilities enabled) has been completed.",
+          "operationId": "GetAccountsAccount",
+          "parameters": [
+            {
+              "name": "account",
+              "in": "path",
+              "value": "$steps.create-connected-account.outputs.account_id"
+            },
+            {
+              "name": "expand",
+              "in": "query",
+              "value": "$inputs.expand"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "account": "$steps.create-connected-account.outputs.account_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "details_submitted": "$response.body#/details_submitted",
+            "charges_enabled": "$response.body#/charges_enabled",
+            "payouts_enabled": "$response.body#/payouts_enabled"
+          }
+        }
+      ],
+      "outputs": {
+        "account_id": "$steps.create-connected-account.outputs.account_id",
+        "details_submitted": "$steps.retrieve-account-status.outputs.details_submitted",
+        "onboarding_url": "$steps.create-account-onboarding-link.outputs.onboarding_url",
+        "expires_at": "$steps.create-account-onboarding-link.outputs.expires_at",
+        "charges_enabled": "$steps.retrieve-account-status.outputs.charges_enabled",
+        "payouts_enabled": "$steps.retrieve-account-status.outputs.payouts_enabled"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "manage-customer-subscriptions",
+      "summary": "This workflow demonstrates how to create a customer, define a product and its pricing, and then subscribe the customer to a recurring plan. It also includes steps for updating and canceling the subscription.",
+      "description": "This workflow demonstrates how to create a customer, define a product and its pricing, and then subscribe the customer to a recurring plan. It also includes steps for updating and canceling the subscription.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "subscription_exposed_id": {
+            "type": "string"
+          },
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-customer",
+          "description": "Creates a new customer profile in Stripe to associate with subscriptions and payments.",
+          "operationId": "PostCustomers",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "email": "$inputs.email",
+              "name": "$inputs.name"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "customer_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-product",
+          "description": "Defines a new product that can be offered as part of a subscription.",
+          "operationId": "PostProducts",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "name": "$inputs.name"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "product_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-recurring-price",
+          "description": "Sets up a recurring price for the newly created product, defining its billing interval and amount.",
+          "operationId": "PostPrices",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "product": "$steps.create-product.outputs.product_id",
+              "currency": "$inputs.currency"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "price_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-subscription",
+          "description": "Subscribes a customer to the defined product and price, initiating recurring billing.",
+          "operationId": "PostSubscriptions",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "customer": "$steps.create-customer.outputs.customer_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "subscription_id": "$response.body#/id",
+            "subscription_status": "$response.body#/subscription_status"
+          }
+        },
+        {
+          "stepId": "update-subscription",
+          "description": "Modifies an existing subscription, for example, changing the quantity of items or the associated price.",
+          "operationId": "PostSubscriptionsSubscriptionExposedId",
+          "parameters": [
+            {
+              "name": "subscription_exposed_id",
+              "in": "path",
+              "value": "$steps.create-subscription.outputs.subscription_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "subscription_exposed_id": "$steps.create-subscription.outputs.subscription_id",
+              "items": "$inputs.items"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "subscription_status": "$response.body#/subscription_status"
+          }
+        },
+        {
+          "stepId": "cancel-subscription",
+          "description": "Cancels an active subscription, either immediately or at the end of the current billing period.",
+          "operationId": "DeleteSubscriptionsSubscriptionExposedId",
+          "parameters": [
+            {
+              "name": "subscription_exposed_id",
+              "in": "path",
+              "value": "$steps.create-subscription.outputs.subscription_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "subscription_exposed_id": "$steps.create-subscription.outputs.subscription_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "subscription_status": "$response.body#/subscription_status"
+          }
+        }
+      ],
+      "outputs": {
+        "customer_id": "$steps.create-customer.outputs.customer_id",
+        "product_id": "$steps.create-product.outputs.product_id",
+        "price_id": "$steps.create-recurring-price.outputs.price_id",
+        "subscription_id": "$steps.create-subscription.outputs.subscription_id",
+        "subscription_status": "$steps.cancel-subscription.outputs.subscription_status"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "create-and-manage-one-off-invoices",
+      "summary": "This workflow outlines the process of creating a draft invoice for a customer, adding line items to it, finalizing the invoice, and then marking it as paid.",
+      "description": "This workflow outlines the process of creating a draft invoice for a customer, adding line items to it, finalizing the invoice, and then marking it as paid.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "invoice": {
+            "type": "string"
+          },
+          "payment_method": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-customer-for-invoice",
+          "description": "Creates a new customer profile to whom the invoice will be issued.",
+          "operationId": "PostCustomers",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "email": "$inputs.email",
+              "name": "$inputs.name"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "customer_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-invoice-item",
+          "description": "Adds a specific item or service to be included in the customer's next invoice.",
+          "operationId": "PostInvoiceitems",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "customer": "$steps.create-customer-for-invoice.outputs.customer_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_item_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "create-draft-invoice",
+          "description": "Generates a new draft invoice for the customer, which will include any pending invoice items.",
+          "operationId": "PostInvoices",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "customer": "$steps.create-customer-for-invoice.outputs.customer_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_id": "$response.body#/id",
+            "invoice_status": "$response.body#/invoice_status"
+          }
+        },
+        {
+          "stepId": "finalize-invoice",
+          "description": "Transitions the draft invoice to a finalized state, making it ready for payment or sending.",
+          "operationId": "PostInvoicesInvoiceFinalize",
+          "parameters": [
+            {
+              "name": "invoice",
+              "in": "path",
+              "value": "$steps.create-draft-invoice.outputs.invoice_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "invoice": "$steps.create-draft-invoice.outputs.invoice_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_status": "$response.body#/invoice_status"
+          }
+        },
+        {
+          "stepId": "pay-invoice",
+          "description": "Attempts to collect payment for the finalized invoice using the customer's default payment method or a specified one.",
+          "operationId": "PostInvoicesInvoicePay",
+          "parameters": [
+            {
+              "name": "invoice",
+              "in": "path",
+              "value": "$steps.create-draft-invoice.outputs.invoice_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "invoice": "$steps.create-draft-invoice.outputs.invoice_id",
+              "payment_method": "$inputs.payment_method"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_status": "$response.body#/invoice_status"
+          }
+        },
+        {
+          "stepId": "create-credit-note",
+          "description": "Issues a credit note against a finalized invoice to adjust the amount owed or provide a refund.",
+          "operationId": "PostCreditNotes",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "invoice": "$steps.create-draft-invoice.outputs.invoice_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "credit_note_id": "$response.body#/id",
+            "credit_note_status": "$response.body#/credit_note_status"
+          }
+        }
+      ],
+      "outputs": {
+        "customer_id": "$steps.create-customer-for-invoice.outputs.customer_id",
+        "invoice_item_id": "$steps.create-invoice-item.outputs.invoice_item_id",
+        "invoice_id": "$steps.create-draft-invoice.outputs.invoice_id",
+        "invoice_status": "$steps.pay-invoice.outputs.invoice_status",
+        "credit_note_id": "$steps.create-credit-note.outputs.credit_note_id",
+        "credit_note_status": "$steps.create-credit-note.outputs.credit_note_status"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "verify-user-identity",
+      "summary": "This workflow allows for the creation of an identity verification session, monitoring its status, and retrieving the final verification report.",
+      "description": "This workflow allows for the creation of an identity verification session, monitoring its status, and retrieving the final verification report.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "client_reference_id": {
+            "type": "string"
+          },
+          "return_url": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "expand": {
+            "type": "string"
+          },
+          "session": {
+            "type": "string"
+          },
+          "report": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-verification-session",
+          "description": "Creates a new session for identity verification, specifying the type of check (e.g., document, ID number).",
+          "operationId": "PostIdentityVerificationSessions",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "client_reference_id": "$inputs.client_reference_id",
+              "return_url": "$inputs.return_url",
+              "type": "$inputs.type"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "session_id": "$response.body#/id",
+            "client_secret": "$response.body#/client_secret",
+            "session_url": "$response.body#/session_url"
+          }
+        },
+        {
+          "stepId": "retrieve-verification-session",
+          "description": "Retrieves the details of an existing verification session to check its current status.",
+          "operationId": "GetIdentityVerificationSessionsSession",
+          "parameters": [
+            {
+              "name": "expand",
+              "in": "query",
+              "value": "$inputs.expand"
+            },
+            {
+              "name": "session",
+              "in": "path",
+              "value": "$steps.create-verification-session.outputs.session_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "session": "$steps.create-verification-session.outputs.session_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "session_status": "$response.body#/session_status",
+            "last_verification_report_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "retrieve-verification-report",
+          "description": "Fetches the detailed verification report once the session is completed, providing results of the identity checks.",
+          "operationId": "GetIdentityVerificationReportsReport",
+          "parameters": [
+            {
+              "name": "expand",
+              "in": "query",
+              "value": "$inputs.expand"
+            },
+            {
+              "name": "report",
+              "in": "path",
+              "value": "$steps.retrieve-verification-session.outputs.last_verification_report_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "report": "$steps.retrieve-verification-session.outputs.last_verification_report_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "report_status": "$response.body#/report_status",
+            "document_status": "$response.body#/document_status",
+            "id_number_status": "$response.body#/id_number_status"
+          }
+        }
+      ],
+      "outputs": {
+        "session_id": "$steps.create-verification-session.outputs.session_id",
+        "client_secret": "$steps.create-verification-session.outputs.client_secret",
+        "session_url": "$steps.create-verification-session.outputs.session_url",
+        "session_status": "$steps.retrieve-verification-session.outputs.session_status",
+        "last_verification_report_id": "$steps.retrieve-verification-session.outputs.last_verification_report_id",
+        "report_status": "$steps.retrieve-verification-report.outputs.report_status",
+        "document_status": "$steps.retrieve-verification-report.outputs.document_status",
+        "id_number_status": "$steps.retrieve-verification-report.outputs.id_number_status"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "manage-financial-account-balances",
+      "summary": "This workflow allows for the creation of a financial account, retrieving its balance, and initiating an inbound transfer to fund it.",
+      "description": "This workflow allows for the creation of a financial account, retrieving its balance, and initiating an inbound transfer to fund it.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "supported_currencies": {
+            "type": "string"
+          },
+          "expand": {
+            "type": "string"
+          },
+          "financial_account": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "origin_payment_method": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-financial-account",
+          "description": "Creates a new financial account to hold funds within Stripe Treasury.",
+          "operationId": "PostTreasuryFinancialAccounts",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "supported_currencies": "$inputs.supported_currencies"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "financial_account_id": "$response.body#/id"
+          }
+        },
+        {
+          "stepId": "retrieve-financial-account-balance",
+          "description": "Retrieves the current balance of the financial account.",
+          "operationId": "GetTreasuryFinancialAccountsFinancialAccount",
+          "parameters": [
+            {
+              "name": "expand",
+              "in": "query",
+              "value": "$inputs.expand"
+            },
+            {
+              "name": "financial_account",
+              "in": "path",
+              "value": "$steps.create-financial-account.outputs.financial_account_id"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "financial_account": "$steps.create-financial-account.outputs.financial_account_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "cash_balance": "$response.body#/cash_balance",
+            "inbound_pending_balance": "$response.body#/inbound_pending_balance"
+          }
+        },
+        {
+          "stepId": "create-inbound-transfer",
+          "description": "Initiates a transfer of funds into the financial account from an external payment method.",
+          "operationId": "PostTreasuryInboundTransfers",
+          "requestBody": {
+            "contentType": "application/x-www-form-urlencoded",
+            "payload": {
+              "financial_account": "$steps.create-financial-account.outputs.financial_account_id",
+              "amount": "$inputs.amount",
+              "currency": "$inputs.currency",
+              "origin_payment_method": "$inputs.origin_payment_method"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "inbound_transfer_id": "$response.body#/id",
+            "inbound_transfer_status": "$response.body#/inbound_transfer_status"
+          }
+        }
+      ],
+      "outputs": {
+        "financial_account_id": "$steps.create-financial-account.outputs.financial_account_id",
+        "cash_balance": "$steps.retrieve-financial-account-balance.outputs.cash_balance",
+        "inbound_pending_balance": "$steps.retrieve-financial-account-balance.outputs.inbound_pending_balance",
+        "inbound_transfer_id": "$steps.create-inbound-transfer.outputs.inbound_transfer_id",
+        "inbound_transfer_status": "$steps.create-inbound-transfer.outputs.inbound_transfer_status"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    }
+  ],
+  "components": {
+    "successActions": {
+      "default_success": {
+        "name": "default_success",
+        "type": "end"
+      }
+    },
+    "failureActions": {
+      "auth_failure": {
+        "name": "auth_failure",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 401"
+          }
+        ]
+      },
+      "permission_denied": {
+        "name": "permission_denied",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 403"
+          }
+        ]
+      },
+      "not_found": {
+        "name": "not_found",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 404"
+          }
+        ]
+      },
+      "server_error": {
+        "name": "server_error",
+        "type": "retry",
+        "retryAfter": 2,
+        "retryLimit": 3,
+        "criteria": [
+          {
+            "condition": "$statusCode >= 500"
+          }
+        ]
+      },
+      "default_retry": {
+        "name": "default_retry",
+        "type": "retry",
+        "retryAfter": 1,
+        "retryLimit": 3
+      },
+      "default_failure": {
+        "name": "default_failure",
+        "type": "end"
+      }
+    }
+  }
+}

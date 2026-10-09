@@ -17,6 +17,8 @@ export interface SystemRow {
   step?: ViewerStep;
   from: string;
   to: string;
+  actor: string;
+  sourceOwner?: string;
   label: string;
   depth: number;
   parentId?: string;
@@ -113,7 +115,6 @@ export function buildSystemScene(
     active: string[],
     depth: number,
     parentId?: string,
-    inheritedActor?: string,
   ) => {
     for (const step of workflow.steps) {
       if (exhausted) return;
@@ -127,13 +128,13 @@ export function buildSystemScene(
         step.stepId,
       ]);
       const key = bindingKey(workflow.workflowId, step.stepId);
-      const from =
-        p.invalidActors.has(key) || p.invalidActors.has(bindingKey(workflow.workflowId))
-          ? unknown('actor', workflow.workflowId)
-          : (p.actors.get(key) ??
-            p.actors.get(bindingKey(workflow.workflowId)) ??
-            inheritedActor ??
-            unknown('actor', workflow.workflowId));
+      const from = p.invalidActors.has(key)
+        ? unknown('actor', workflow.workflowId)
+        : (p.actors.get(key) ??
+          (p.invalidActors.has(bindingKey(workflow.workflowId))
+            ? unknown('actor', workflow.workflowId)
+            : (p.actors.get(bindingKey(workflow.workflowId)) ??
+              unknown('actor', workflow.workflowId))));
       const base = {
         id,
         workflowId: workflow.workflowId,
@@ -141,6 +142,7 @@ export function buildSystemScene(
         step,
         from,
         to: from,
+        actor: from,
         depth,
         parentId,
         path,
@@ -180,7 +182,6 @@ export function buildSystemScene(
             workflowRoot,
             active,
             depth,
-            from,
           );
         continue;
       }
@@ -198,6 +199,7 @@ export function buildSystemScene(
         !append({
           ...base,
           kind: 'exchange',
+          sourceOwner: to,
           from: receive ? to : from,
           to: receive ? from : to,
           label: `${workflow.workflowId}.${step.stepId}`,
@@ -227,7 +229,6 @@ export function buildSystemScene(
             a.workflowId,
             active,
             depth,
-            to,
           );
       }
     }
@@ -241,7 +242,6 @@ export function buildSystemScene(
     workflowRoot: string,
     active: string[],
     depth: number,
-    actor: string,
   ) => {
     const recursionKey = JSON.stringify([
       options.document,
@@ -272,7 +272,6 @@ export function buildSystemScene(
         [...active, recursionKey],
         depth + 1,
         row.id,
-        actor,
       );
   };
   const workflow = model.workflowsById.get(root);

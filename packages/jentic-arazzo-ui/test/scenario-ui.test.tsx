@@ -6,7 +6,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { readFileSync } from 'node:fs';
 import { ArazzoUI } from '../src/ArazzoUI';
 import { nestedCalls } from './fixtures/connected';
-import type { ScenarioManifest } from '../src/types/scenario';
+import type { AuthoredScenario, ScenarioManifest } from '../src/types/scenario';
 vi.mock('mermaid', () => ({
   default: { initialize: vi.fn(), render: vi.fn(async () => ({ svg: '<svg />' })) },
 }));
@@ -97,9 +97,10 @@ test('searches authored guides, opens exact occurrences, returns focus and leave
   expect(screen.getByRole('combobox', { name: 'Select workflow' })).toBeTruthy();
 });
 test('presents exact expected/evidence text for every legacy stress guide with no invented path', async () => {
-  const entries = JSON.parse(readFileSync('test/fixtures/legacy-scenarios.json', 'utf8')).map(
-    (s: any) => ({ ...s, waypoints: undefined }),
+  const legacy: AuthoredScenario[] = JSON.parse(
+    readFileSync('test/fixtures/legacy-scenarios.json', 'utf8'),
   );
+  const entries = legacy.map((scenario) => ({ ...scenario, waypoints: undefined }));
   render(
     <ArazzoUI
       document={nestedCalls}

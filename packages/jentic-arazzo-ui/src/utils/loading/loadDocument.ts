@@ -1,5 +1,5 @@
 import { parseArazzo } from '@jentic/arazzo-parser';
-import { dereferenceArazzoElement } from '@jentic/arazzo-resolver';
+import { defaultDereferenceArazzoOptions } from '@jentic/arazzo-resolver';
 import { toValue } from '@speclynx/apidom-core';
 import {
   cloneDeep,
@@ -9,14 +9,27 @@ import {
   type ParseResultElement,
 } from '@speclynx/apidom-datamodel';
 import { traverse, type Path } from '@speclynx/apidom-traverse';
+import {
+  dereferenceApiDOM,
+  mergeOptions,
+  options as nativeOptions,
+  type ApiDOMReferenceOptions,
+} from '@speclynx/apidom-reference/configuration/empty';
 
 import type { ArazzoDocument } from '../../types/arazzo';
 import { parseReusableReference, selectProfile } from '../inspection';
 import type { DocumentSnapshot, InspectionDiagnostic } from '../inspection/types';
 import { reusableOccurrenceFields } from '../inspection/reusable';
+import { parseContract } from '../contract/references';
+import type { SourceRegistry, SourceValidityToken } from '../source/SourceRegistry';
+import { createNativeAuthority } from './nativeAuthority';
 
 interface LoadOptions {
   baseURI?: string;
+  contentOnly?: boolean;
+  secondaryRegistry?: SourceRegistry;
+  sourceRevision?: string;
+  sourceValidity?: SourceValidityToken;
 }
 interface LoadedDocument {
   document: ArazzoDocument;
@@ -127,9 +140,11 @@ export async function loadDocument(
   options: LoadOptions = {},
 ): Promise<LoadedDocument> {
   const parsed = await parseArazzo(
-    typeof input === 'string'
-      ? input
-      : (structuredClone(input) as unknown as Record<string, unknown>),
+    options.contentOnly
+      ? await parseContract(input)
+      : typeof input === 'string'
+        ? input
+        : (structuredClone(input) as unknown as Record<string, unknown>),
   );
   if (!parsed.api || !isObjectElement(parsed.api))
     throw new Error('Parsing: unusable Arazzo document root');
@@ -188,15 +203,76 @@ export async function loadDocument(
         path.skip();
       },
     });
-    restored = await dereferenceArazzoElement(restored, {
-      parse: { parserOpts: { sourceDescriptions: false } },
-      resolve: { baseURI },
+    // Native resolution can read the supplied root, but has no independent transport.
+    // Only the explicitly enabled secondary projection may acquire dependencies.
+    const rootURI = new URL(baseURI!).href;
+    const registry = options.secondaryRegistry;
+    const authority = createNativeAuthority(
+      restored,
+      rootURI,
+      registry,
+      options.sourceRevision,
+      options.sourceValidity,
+    );
+    const defaults = mergeOptions(nativeOptions, defaultDereferenceArazzoOptions);
+    const projectionOptions: ApiDOMReferenceOptions = {
+      ...defaults,
+      parse: {
+        ...defaults.parse,
+        parserOpts: { ...defaults.parse.parserOpts, sourceDescriptions: false },
+      },
+      resolve: {
+        ...defaults.resolve,
+        baseURI: rootURI,
+        resolvers: [authority.resolver],
+      },
       dereference: {
+        ...defaults.dereference,
+        refSet: authority.refSet,
         circular: 'error',
         immutable: false,
         strategyOpts: { sourceDescriptions: false },
+        continueOnError(error) {
+          authority.ensureCurrent();
+          const context = error as unknown as {
+            uri?: string;
+            refFieldValue?: string;
+            location?: string;
+            trace?: { uri: string; refFieldValue: string; location?: string }[];
+          };
+          const rootHop = context.trace?.find((hop) => hop.uri === rootURI);
+          const reference = rootHop?.refFieldValue ?? context.refFieldValue;
+          // Supported local schema errors retain the existing fatal-load contract.
+          if (!reference || new URL(reference, rootURI).href.split('#')[0] === rootURI) throw error;
+          const tokens = (rootHop?.location ?? context.location ?? '')
+            .replace(/^#?\//, '')
+            .split('/')
+            .filter(Boolean);
+          const causes: string[] = [];
+          let cause: unknown = error;
+          for (let depth = 0; cause instanceof Error && depth < 10; depth++) {
+            causes.push(cause.message);
+            cause = cause.cause;
+          }
+          diagnostics.push({
+            phase: 'resolution',
+            category: 'missing-reference',
+            severity: 'warning',
+            code: 'secondary-reference-unavailable',
+            path: tokens.map((token) => token.replace(/~1/g, '/').replace(/~0/g, '~')),
+            originalReference: reference,
+            workflowId:
+              tokens[0] === 'workflows'
+                ? authoredDocument.workflows[Number(tokens[1])]?.workflowId
+                : undefined,
+            message: [...new Set(causes)].join(': '),
+          });
+        },
       },
-    });
+    };
+    restored = await dereferenceApiDOM(restored, projectionOptions);
+    authority.ensureCurrent();
+    restored.meta.set('viewerSourceReferences', authority.references);
     restored = transformApi(restored, {
       enter(path: Path<Element>) {
         if (!path.node.hasMetaProperty('viewerRecoveryToken')) return;

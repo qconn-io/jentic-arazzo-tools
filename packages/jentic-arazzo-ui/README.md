@@ -729,6 +729,75 @@ Viewing/exporting creates no approval or test status. Runtime effect stays **und
 reviewers retain responsibility for compatibility and business judgment.
 
 Synthetic purchase/event, partial and formatting-only pairs live in
-`public/examples/revision-review`. Production browser acceptance bundles the built ESM export:
-run `node scripts/build-review-browser.mjs` after `npm run build`, serve `build` at port 3000,
-then run `npx playwright test test/e2e/review.spec.ts`.
+`public/examples/revision-review`. The longer archival walkthrough remains runnable with
+`node scripts/build-review-browser.mjs` after `npm run build`, a static `build` server at port
+3000, and `npx playwright test test/e2e/review.spec.ts`. Its generated evidence goes to ignored
+`test-output/browser/archival/review`.
+
+For maintained production acceptance, from a clean checkout run `nvm use`, `npm ci`,
+`npm run build:es`, and `npx playwright install chromium`.
+Then run `npm run test:browser -w @jentic/arazzo-ui`.
+The command sequentially builds standalone and a packed package installed into a real
+downstream ESM app, identifies current source/fixture/artifact bytes, and starts its own
+UTF-8 static server on a fresh port. Playwright rejects an existing server. No development
+server is required. The compact suite runs at 1440 and 480 pixels and covers explicit
+loading/provider denial, repeated calls and unknown actors, operation entry paths,
+scenario keyboard dismissal/restoration, and scoped before/after potential impact.
+It checks browser errors, implicit dependencies, business requests, host history and width.
+
+Evidence, traces, reports and current build identities live under ignored
+`test-output/browser`; the installed consumer metadata lives under ignored
+`test-output/package-consumer`. These runs do not write into active or archived OpenSpec
+changes. CI runs package/export acceptance and production Chromium in separate bounded
+jobs while retaining the existing monorepo test timeout.
+
+After a successful current browser run, `npm run test:browser:negative -w @jentic/arazzo-ui`
+must return a failing exit code. It deliberately serves a broken fixture title to the
+ordinary installed-consumer assertion; tracked files and generated build bytes stay intact.
+Rerunning `npm run test:browser -w @jentic/arazzo-ui` restores the positive gate.
+
+### Maintained package acceptance
+
+Use the repository's `.nvmrc` (`nvm use`) before npm commands. From a clean install,
+`npm run test:package -w @jentic/arazzo-ui` builds the parser/resolver ESM and
+declarations, builds the UI, checks the rolled declarations, and packs and installs
+all three packages into an independent downstream application. It checks the
+main and standalone ESM exports, both browser UMD globals, the stylesheet, and the
+typed ESM-only `@jentic/arazzo-ui/catalog` path. Public location/provider/scenario,
+profile, catalog, review and selection callbacks compile with strict checking;
+private inspection/model imports are expected to fail. No UI source alias is used.
+The generated declarations are checked with `skipLibCheck: false`.
+The measurement host pins the SpecLynx family to the repository lockfile's
+versions for comparable bundle measurements; those pins are recorded in
+`metadata.json`. The same acceptance command also creates two separate fresh
+installed hosts without SpecLynx overrides, exercising supplied-object and YAML
+catalog inputs against the advertised ranges. Aligning the generic YAML adapter
+range with the existing ApiDOM family ranges repairs the previously reproduced
+mixed-version browser parsing failure. Fresh coverage, exact resolved locks,
+tarball identities and caught exception chains are preserved under
+`test-output/package-consumer-unpinned*/evidence-*.json`. Failed projection fails
+the gate. Run `node packages/jentic-arazzo-ui/scripts/check-unpinned-consumer.mjs`
+after packing to repeat the object check independently, or add `--yaml-input`.
+
+`npm run test:package:built -w @jentic/arazzo-ui` runs the same acceptance against
+already generated artifacts without rebuilding them. Production browser
+acceptance uses this after its sequential builds. Installed artifacts and reports
+are ignored under `test-output/package-consumer/`: `app/` is the production ESM
+host, `umd/` contains packed browser entry consumers, and `metadata.json` records
+source HEAD, tarball SHA-256 identities, installed versions and consumer reports.
+The installed host is built from `test/package/acceptance-app.tsx`; its imports
+resolve through the unpacked package's export map.
+
+After package acceptance, `npm run test:bundle -w @jentic/arazzo-ui` compares the
+minimal embedded viewer with pinned upstream commit
+`49dd8ef814637b481c0a1998f586ce2785812f5d`. It uses a temporary detached upstream
+worktree and the same installed dependency graph, React, Vite settings and
+minification. The source branch/history is preserved and the temporary worktree
+is removed. `bundle-comparison.json` reports initial and deferred JS gzip sums,
+separate CSS, retained implementation symbols/module contributions, and whole
+ESM/UMD file sizes. These are different measurements: whole library bytes are
+not the initial download of a tree-shaken host. Minimal viewer, direct standalone
+and deferred standalone workloads are identical in both runs. Baseline has no
+catalog/review; the repaired catalog/review workload is measured additionally.
+The maintained minimal consumer fails if unused catalog/review implementation
+survives tree shaking. Shared inspection and rendering costs remain included.

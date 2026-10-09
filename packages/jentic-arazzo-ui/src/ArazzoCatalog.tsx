@@ -13,6 +13,7 @@ import {
   filterCatalogEntries,
   catalogReachability,
   catalogPathLocation,
+  catalogOperationPaths,
   type CatalogFilter,
   type CatalogEntry,
   type CatalogRelationship,
@@ -161,6 +162,7 @@ export function ArazzoCatalog(props: ArazzoCatalogProps) {
     ).values(),
   ];
   const operationUsages = index.apiUsages.filter((u) => u.operationKey === operationKey);
+  const operationPaths = catalogOperationPaths(index, operationKey);
   const relation = (r: CatalogRelationship, direction: 'incoming' | 'outgoing') => {
     const source = index.byKey.get(catalogKey(r.from));
     const target = r.to && index.byKey.get(catalogKey(r.to));
@@ -463,6 +465,63 @@ export function ArazzoCatalog(props: ArazzoCatalogProps) {
                   </li>
                 ))}
               </ul>
+              <h4>Known entry-point paths</h4>
+              <p>
+                Authored reachability only. Recovery, prerequisites and descriptive associations
+                retain their relationship classes.
+              </p>
+              {operationPaths.bounded && (
+                <p role="status">
+                  Path or visit limit reached; operation consumer coverage is incomplete.
+                </p>
+              )}
+              {!!operationPaths.cycles.length && (
+                <p>
+                  Cycles encountered: {operationPaths.cycles.length}; traversal stopped at repeated
+                  identities.
+                </p>
+              )}
+              <ul>
+                {operationPaths.paths.map((path) => (
+                  <li key={path.key}>
+                    <p>
+                      {path.entry.workflowId} / {path.entry.documentId} / {path.entry.revision} →{' '}
+                      {path.usage.from.workflowId}.{path.usage.stepId}
+                    </p>
+                    {path.location && (
+                      <button type="button" onClick={() => open(path.entry, path.location)}>
+                        Inspect {path.relationships.length ? 'call' : 'direct'} occurrence{' '}
+                        {path.relationships
+                          .map(
+                            (relation) =>
+                              `${relation.from.workflowId}.${relation.location.selection?.stepId}`,
+                          )
+                          .join(' → ') || `${path.usage.from.workflowId}.${path.usage.stepId}`}
+                      </button>
+                    )}
+                    <ol>
+                      {path.relationships.map((relationship) => (
+                        <li key={relationship.id}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const source = index.byKey.get(catalogKey(relationship.from));
+                              if (source) open(source, relationship.location);
+                            }}
+                          >
+                            {relationship.kind} · {relationship.from.workflowId} /{' '}
+                            {relationship.from.documentId} / {relationship.from.revision} ·{' '}
+                            {relationship.location.selection?.stepId ?? relationship.pointer}
+                          </button>
+                        </li>
+                      ))}
+                    </ol>
+                  </li>
+                ))}
+              </ul>
+              {!operationPaths.paths.length && (
+                <p>No known entry paths in the supplied scope. {index.coverageMessage}</p>
+              )}
               <details>
                 <summary>Exact operation declaration</summary>
                 <pre>{JSON.stringify(operationUsages[0]?.operation, null, 2)}</pre>

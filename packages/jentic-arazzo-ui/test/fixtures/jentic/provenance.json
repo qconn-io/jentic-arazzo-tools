@@ -1,0 +1,31 @@
+{
+  "repository": "https://github.com/jentic/jentic-public-apis",
+  "commit": "6af8aeee9f38dbf15959a946f82cb24ef9144b4d",
+  "license": "CC0-1.0",
+  "fixtures": [
+    {
+      "name": "asana",
+      "path": "asana.json",
+      "url": "https://raw.githubusercontent.com/jentic/jentic-public-apis/6af8aeee9f38dbf15959a946f82cb24ef9144b4d/workflows/asana.com/workflows.arazzo.json",
+      "sha256": "cbf1bb816299e8d2154b78df3e2ad07b2eba09ebc2e8d6d76bd5611bfa911158",
+      "workflows": 10,
+      "steps": 32
+    },
+    {
+      "name": "xero",
+      "path": "xero.json",
+      "url": "https://raw.githubusercontent.com/jentic/jentic-public-apis/6af8aeee9f38dbf15959a946f82cb24ef9144b4d/workflows/xero.com~xero_accounting/workflows.arazzo.json",
+      "sha256": "ad6dccb78c2b23ec2b0149848d70ae5aa3395a98fd3f32819f26504095040c9f",
+      "workflows": 6,
+      "steps": 29
+    },
+    {
+      "name": "stripe",
+      "path": "stripe.json",
+      "url": "https://raw.githubusercontent.com/jentic/jentic-public-apis/6af8aeee9f38dbf15959a946f82cb24ef9144b4d/workflows/stripe.com/workflows.arazzo.json",
+      "sha256": "15bce53e1cda03dde6505adcc5608d3d8f6c597cf02ed48160ca24eabee0764d",
+      "workflows": 7,
+      "steps": 30
+    }
+  ]
+}

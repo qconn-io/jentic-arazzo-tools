@@ -168,3 +168,50 @@ test('explicitly loaded facts survive inspector unmount and are shared with anot
   expect(screen.getByText('located')).toBeTruthy();
   expect(load).toHaveBeenCalledTimes(1);
 });
+
+test('advanced source provenance hides implementation generations while revision, methods and declared bodies stay contextual', async () => {
+  const load = vi.fn(async () => ({
+    content: {
+      ...contract,
+      paths: {
+        '/items': {
+          post: {
+            operationId: 'get.item',
+            requestBody: { content: { 'application/json': { schema: { type: 'object' } } } },
+            responses: { '200': { description: 'Authored response' } },
+          },
+        },
+      },
+    },
+    retrievalURI: 'https://example.test/api.yaml',
+    revision: 'r1',
+  }));
+  render(
+    <ArazzoViewerProvider
+      document={document}
+      snapshot={createSnapshot(document, { baseURI: 'https://example.test/workflow.yaml' })}
+      sourceProvider={{ load }}
+    >
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Load source api' }));
+  await screen.findByText('located');
+  const generation = screen.getByText(/Provider generation:/);
+  const advanced = generation.closest('details')!;
+  expect(advanced).toBeTruthy();
+  expect(advanced.open).toBe(false);
+  expect(advanced.querySelector('summary')?.textContent).toBe('Advanced source provenance');
+  expect(screen.getByText('r1').closest('details')).toBeNull();
+  expect(screen.getByText('get.item POST /items')).toBeTruthy();
+  expect(
+    screen
+      .getByText('Request media types and schemas')
+      .closest('details')
+      ?.parentElement?.closest('[data-advanced]'),
+  ).toBeNull();
+  expect(screen.getByText('Response alternatives (declared, not observed)')).toBeTruthy();
+  fireEvent.click(advanced.querySelector('summary')!);
+  expect(advanced.open).toBe(true);
+  expect(load).toHaveBeenCalledTimes(1);
+});

@@ -1,5 +1,14 @@
 import { decodePointer, encodePointer, readPointer, resolvePointer } from '../contract/pointer';
 import { object } from '../contract/references';
+import {
+  childContractRole,
+  contractRoleAt,
+  declarationReference,
+  enclosingSchemaLimitation,
+  schemaLimitation,
+  supportedSchemaFormat,
+  type ContractRole,
+} from '../contract/structure';
 import type { CatalogAPIUsage } from '../catalog';
 import type { WorkflowReviewEvidence } from '../../types/review';
 import type { ReviewDocument, ReviewProjection } from './inputs';
@@ -17,6 +26,7 @@ export function contractDeclarationUser(
   if (!source || !usage.operation || usage.status !== 'located')
     return { used: false, bounded: false };
   const changed = decodePointer(evidence.pointer);
+  const profile = { eventSchemas: !!source.raw.asyncapi };
   let visits = 0,
     bounded = false;
   const inspect = (
@@ -25,6 +35,7 @@ export function contractDeclarationUser(
     path: string[],
     depth: number,
     seen: Set<string>,
+    role: ContractRole,
   ): boolean => {
     if (++visits > 10000 || depth > 32) {
       bounded = true;
@@ -36,34 +47,59 @@ export function contractDeclarationUser(
       overlap(path, changed)
     )
       return true;
-    if (value === null || typeof value !== 'object') return false;
-    if (typeof object(value).$ref === 'string') {
+    if (value === null || typeof value !== 'object' || role === 'literal') return false;
+    if (
+      role === 'schema' &&
+      (schemaLimitation(value, profile.eventSchemas ? supportedSchemaFormat : undefined) ||
+        enclosingSchemaLimitation(
+          doc.raw,
+          path,
+          profile,
+          profile.eventSchemas ? supportedSchemaFormat : undefined,
+        ))
+    ) {
+      bounded = true;
+      return false;
+    }
+    const reference = declarationReference(value, role);
+    if (reference) {
       try {
-        const ref = resolvePointer(String(object(value).$ref), doc.definition.uri);
+        const ref = resolvePointer(reference, doc.definition.uri);
         const token = JSON.stringify([ref.uri, ref.pointer]);
         if (!seen.has(token)) {
-          const targets = p.documents.filter((d) => d.definition.uri === ref.uri);
-          if (
-            targets.length === 1 &&
-            inspect(
-              targets[0],
-              readPointer(targets[0].raw, ref.tokens),
-              ref.tokens,
-              depth + 1,
-              new Set([...seen, token]),
-            )
+          const targets = p.documents.filter(
+            (d) =>
+              d.definition.uri === ref.uri &&
+              (ref.uri !== doc.definition.uri || d.definition.revision === doc.definition.revision),
+          );
+          const target = targets.length === 1 ? readPointer(targets[0].raw, ref.tokens) : undefined;
+          if (target === undefined) bounded = true;
+          else if (
+            inspect(targets[0], target, ref.tokens, depth + 1, new Set([...seen, token]), role)
           )
             return true;
         }
       } catch {
+        bounded = true;
         /* unresolved references remain part of catalog coverage */
       }
+      // reference object bodies are replaced; only schemas retain traversable siblings.
+      if (role !== 'schema') return false;
     }
     return Object.entries(value).some(
-      ([key, child]) => key !== '$ref' && inspect(doc, child, [...path, key], depth + 1, seen),
+      ([key, child]) =>
+        (key !== '$ref' || typeof role === 'object') &&
+        inspect(
+          doc,
+          child,
+          [...path, key],
+          depth + 1,
+          seen,
+          childContractRole(role, key, value, profile),
+        ),
     );
   };
-  type Seed = { doc: ReviewDocument; value: unknown; path: string[] };
+  type Seed = { doc: ReviewDocument; value: unknown; path: string[]; role?: ContractRole };
   const seeds: Seed[] = [];
   const follow = (seed: Seed): Seed => {
     const seen = new Set<string>();
@@ -77,14 +113,25 @@ export function contractDeclarationUser(
         const token = JSON.stringify([ref.uri, ref.pointer]);
         if (seen.has(token)) break;
         seen.add(token);
-        const targets = p.documents.filter((d) => d.definition.uri === ref.uri);
-        if (targets.length !== 1) break;
+        const targets = p.documents.filter(
+          (d) =>
+            d.definition.uri === ref.uri &&
+            (ref.uri !== seed.doc.definition.uri ||
+              d.definition.revision === seed.doc.definition.revision),
+        );
+        if (targets.length !== 1 || readPointer(targets[0].raw, ref.tokens) === undefined) {
+          bounded = true;
+          break;
+        }
         // Keep each reference's own authored occurrence as evidence without expanding unrelated fields.
         seeds.push({ doc: seed.doc, value: object(seed.value).$ref, path: [...seed.path, '$ref'] });
         seed = {
           doc: targets[0],
           value: readPointer(targets[0].raw, ref.tokens),
           path: ref.tokens,
+          role:
+            seed.role ??
+            contractRoleAt(seed.doc.raw, seed.path, { eventSchemas: !!seed.doc.raw.asyncapi }),
         };
       } catch {
         break;
@@ -96,12 +143,18 @@ export function contractDeclarationUser(
   const opPath = decodePointer(op.pointer ?? op.channelPointer ?? '#');
   if (source.raw.openapi) {
     const path = opPath.slice(0, 2);
-    const itemSeed = follow({ doc: source, value: readPointer(source.raw, path), path });
+    const itemSeed = follow({
+      doc: source,
+      value: readPointer(source.raw, path),
+      path,
+      role: 'pathItem',
+    });
     const item = object(itemSeed.value);
     const operationSeed = {
       doc: itemSeed.doc,
       value: item[opPath[2]],
       path: [...itemSeed.path, opPath[2]],
+      role: 'operation' as const,
     };
     const authored = object(operationSeed.value);
     seeds.push(operationSeed);
@@ -122,6 +175,7 @@ export function contractDeclarationUser(
           doc: itemSeed.doc,
           value: parameter,
           path: [...itemSeed.path, 'parameters', String(i)],
+          role: 'parameter' as const,
         };
         // Resolve identities for precedence without adding a shadowed declaration as a usage seed.
         const saved = seeds.length;
@@ -136,7 +190,12 @@ export function contractDeclarationUser(
     if (authored.servers === undefined)
       seeds.push(
         item.servers !== undefined
-          ? { doc: itemSeed.doc, value: item.servers, path: [...itemSeed.path, 'servers'] }
+          ? {
+              doc: itemSeed.doc,
+              value: item.servers,
+              path: [...itemSeed.path, 'servers'],
+              role: { array: 'server' },
+            }
           : { doc: source, value: source.raw.servers, path: ['servers'] },
       );
     if (authored.security === undefined)
@@ -158,7 +217,15 @@ export function contractDeclarationUser(
       seeds.push({ doc: source, value: source.raw[key], path: [key] });
   }
   const used = seeds.some((seed) =>
-    inspect(seed.doc, seed.value, seed.path, 0, new Set([encodePointer(seed.path)])),
+    inspect(
+      seed.doc,
+      seed.value,
+      seed.path,
+      0,
+      new Set([encodePointer(seed.path)]),
+      seed.role ??
+        contractRoleAt(seed.doc.raw, seed.path, { eventSchemas: !!seed.doc.raw.asyncapi }),
+    ),
   );
   return { used, bounded };
 }

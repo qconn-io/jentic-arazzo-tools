@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-const evidence = resolve('../../openspec/changes/compare-workflow-revisions/browser-evidence');
+const evidence = resolve('test-output/browser/archival/review');
 mkdirSync(evidence, { recursive: true });
 const observations: unknown[] = [];
 test.afterAll(() =>

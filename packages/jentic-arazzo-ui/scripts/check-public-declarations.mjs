@@ -5,15 +5,30 @@ import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
 // Compile a downstream consumer of each rolled entry, rather than source types.
-const directory = await mkdtemp(join(tmpdir(), 'arazzo-public-declarations-'));
+const installedRoot = process.argv[2];
+const directory = await mkdtemp(join(installedRoot ?? tmpdir(), 'arazzo-public-declarations-'));
 try {
-  for (const entry of ['arazzo-ui', 'arazzo-ui-standalone']) {
-    const declaration = fileURLToPath(new URL(`../types/${entry}.d.ts`, import.meta.url));
+  for (const entry of [
+    'arazzo-ui',
+    'arazzo-ui-standalone',
+    ...(installedRoot ? ['catalog'] : []),
+  ]) {
+    const declaration = installedRoot
+      ? `@jentic/arazzo-ui${entry === 'arazzo-ui' ? '' : entry === 'catalog' ? '/catalog' : '/standalone'}`
+      : fileURLToPath(new URL(`../types/${entry}.d.ts`, import.meta.url));
     const file = join(directory, `${entry}-consumer.ts`);
     await writeFile(
       file,
       `
 import type { ArazzoEdge, ArazzoEdgeType, ArazzoUIProps, RelationshipEdgeData, WorkflowRefNodeData } from ${JSON.stringify(declaration)};
+${
+  entry === 'arazzo-ui-standalone'
+    ? `import { ArazzoUIStandalone } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))};
+import type { ArazzoUIStandaloneProps } from ${JSON.stringify(declaration)};
+const standaloneProps: ArazzoUIStandaloneProps = { document: '{}', initialView: 'split', catalog: { version: 1, id: 'host', revision: '1', documents: [] }, onCatalogSelectionChange: value => value?.revision };
+void ArazzoUIStandalone; void standaloneProps;`
+    : `import { ArazzoUI } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))}; void ArazzoUI;`
+}
 import type { WorkflowCatalogManifest, WorkflowCatalogSelection, WorkflowCatalogCoverage, ArazzoCatalogProps } from ${JSON.stringify(declaration)};
 import { ArazzoCatalog, normalizeCatalogManifest } from ${JSON.stringify(declaration.replace(/\.d\.ts$/, '.js'))};
 import type { WorkflowReviewSnapshot, WorkflowReviewMatch, WorkflowReviewResult, ArazzoWorkflowReviewProps } from ${JSON.stringify(declaration)};
@@ -39,6 +54,10 @@ void catalogProps; void catalogComponent;
 import type { WorkflowRelationship } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private effective actions must not become public exports.
 import type { EffectiveAction } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private viewer projections must not become public exports.
+import type { ArazzoViewerModel } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private effective-use records must not become public exports.
+import type { EffectiveActionUse } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private native snapshots must not become public exports.
 import type { DocumentSnapshot } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private sequence scenes must not become public exports.
@@ -79,6 +98,7 @@ const executionFocus: ScenarioFocus = { kind: 'execute', pointer: '/workflows/0'
 const address: WorkflowActionAddress = { document: 'host:doc', pointer: '/workflows/0/onFailure/0', usePointer: '/workflows/0/onFailure/0', channel: 'onFailure', index: 0 };
 const location: WorkflowLocation = { version: 1, document: 'host:doc', root: 'root', view: 'docs', subview: 'sequence', selection: { kind: 'action', workflowId: 'child', stepId: 'capture', occurrence: [{ workflowId: 'root', stepId: 'second-item' }], action: address } };
 const props: ArazzoUIProps = { document: '{}', location, defaultLocation: location, documentIdentity: 'host:doc', onLocationChange: value => value.selection?.occurrence, onLocationStatus: (status: WorkflowLocationStatus) => status.state };
+const eventProps: ArazzoUIProps = { document: '{}', onNodeSelect: (id, node) => [id, node.data.type], onWorkflowSelect: id => id, onViewChange: view => view, onEdgeSelect: (id, edge) => [id, edge.data?.type] }; void eventProps;
 const sourceProvider: SourceDocumentProvider = {
   async load(request: SourceDocumentRequest): Promise<SourceDocumentContent> {
     const signal: AbortSignal | undefined = request.signal;
@@ -118,7 +138,7 @@ export function inspect(edge: ArazzoEdge) {
 }
 `,
     );
-    const program = ts.createProgram([file], {
+    const options = {
       noEmit: true,
       strict: true,
       skipLibCheck: false,
@@ -127,7 +147,12 @@ export function inspect(edge: ArazzoEdge) {
       module: ts.ModuleKind.ESNext,
       moduleResolution: ts.ModuleResolutionKind.Bundler,
       jsx: ts.JsxEmit.ReactJSX,
-    });
+      types: [],
+      ...(installedRoot ? { typeRoots: [join(installedRoot, 'node_modules/@types')] } : {}),
+    };
+    const host = ts.createCompilerHost(options);
+    host.getCurrentDirectory = () => directory;
+    const program = ts.createProgram([file], options, host);
     const diagnostics = ts.getPreEmitDiagnostics(program);
     if (diagnostics.length) {
       throw new Error(

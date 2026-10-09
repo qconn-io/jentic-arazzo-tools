@@ -8,11 +8,10 @@ import { SourceRegistry } from '../source/SourceRegistry';
 import { authoredDigest } from '../location/codec';
 import { normalizeCatalogManifest, documentKey } from './manifest';
 import { parseContract, object } from '../contract/references';
-import { projectArazzo } from '../contract/ArazzoAdapter';
-import { projectOpenAPI } from '../contract/OpenAPIAdapter';
-import { projectAsyncAPI } from '../contract/AsyncAPIAdapter';
 import type { ContractDocumentFacts } from '../contract/types';
 import type { InspectionResult } from '../inspection';
+import { buildViewerModel, type ArazzoViewerModel } from '../model/viewerModel';
+import { effectiveActionUses, type EffectiveActionUse } from '../model/effectiveUses';
 
 export interface CatalogLimits {
   maxDocuments: number;
@@ -36,6 +35,8 @@ export interface CatalogLoadedDocument {
   content: string | object;
   digest: string;
   inspection?: InspectionResult;
+  viewerModel?: ArazzoViewerModel;
+  effectiveUses?: EffectiveActionUse[];
   contracts?: ContractDocumentFacts;
   sources: Map<string, CatalogLoadedDocument | Error>;
 }
@@ -185,6 +186,8 @@ export async function loadCatalog(
     const result: CatalogLoadedDocument = { definition, uri, content, digest, sources: new Map() };
     const kind = definition.kind ?? 'arazzo';
     if (kind === 'arazzo') {
+      const { projectArazzo } = await import('../contract/ArazzoAdapter');
+      current();
       const count = Array.isArray(parsed.workflows)
         ? parsed.workflows.reduce<number>((n, w) => {
             const value = object(w).steps;
@@ -194,15 +197,63 @@ export async function loadCatalog(
       steps += count;
       if (steps > limits.maxSteps) throw new Error('Catalog authored step limit exceeded');
       result.inspection = (
-        await projectArazzo(parsed, uri, registry, definition.revision)
+        await projectArazzo(
+          parsed,
+          uri,
+          registry,
+          definition.revision,
+          registry.captureValidity(uri, definition.revision),
+        )
       ).inspection;
       if (result.inspection.support.semanticInspection === 'unsupported')
         throw new Error('Unsupported Arazzo inspection version');
+      result.viewerModel = buildViewerModel(result.inspection);
+      result.effectiveUses = effectiveActionUses(result.viewerModel, {
+        documentId: definition.id,
+        revision: definition.revision,
+        uri,
+      });
+      for (const use of result.effectiveUses)
+        if (use.action.status !== 'resolved')
+          setCoverage(
+            JSON.stringify([
+              definition.id,
+              definition.revision,
+              'effective-action',
+              use.workflowId,
+              use.stepId,
+              use.usePointer,
+            ]),
+            uri,
+            use.action.status === 'unsupported' ? 'unsupported' : 'failed',
+            definition.revision,
+            `Action inspection is ${use.action.status} at ${use.usePointer}; applicability retains authored provenance.`,
+          );
+      for (const diagnostic of result.inspection.snapshot.diagnostics ?? []) {
+        if (diagnostic.phase !== 'resolution') continue;
+        setCoverage(
+          JSON.stringify([
+            definition.id,
+            definition.revision,
+            'resolution',
+            diagnostic.code,
+            diagnostic.path,
+          ]),
+          uri,
+          diagnostic.category === 'unsupported-resolution' ? 'unsupported' : 'failed',
+          definition.revision,
+          diagnostic.message,
+        );
+      }
       for (const metadata of definition.workflows ?? [])
         if (!result.inspection.workflowsById.has(metadata.workflowId))
           throw new Error(`Catalog metadata names missing workflow: ${metadata.workflowId}`);
     } else {
-      const adapter = kind === 'asyncapi' ? projectAsyncAPI : projectOpenAPI;
+      const adapter =
+        kind === 'asyncapi'
+          ? (await import('../contract/AsyncAPIAdapter')).projectAsyncAPI
+          : (await import('../contract/OpenAPIAdapter')).projectOpenAPI;
+      current();
       result.contracts = await adapter(
         parsed,
         uri,

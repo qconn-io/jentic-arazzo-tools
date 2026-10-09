@@ -95,14 +95,17 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
                 <p>
                   Revision: <code>{value.content.revision ?? 'unpinned'}</code>
                 </p>
-                <p>Provider generation: {sourceRegistry.getProviderGeneration()}</p>
-                <details>
-                  <summary>Raw Source Document</summary>
-                  <pre>
-                    {typeof value.content.content === 'string'
-                      ? value.content.content
-                      : JSON.stringify(value.content.content, null, 2)}
-                  </pre>
+                <details data-advanced>
+                  <summary>Advanced source provenance</summary>
+                  <p>Provider generation: {sourceRegistry.getProviderGeneration()}</p>
+                  <details>
+                    <summary>Raw Source Document</summary>
+                    <pre>
+                      {typeof value.content.content === 'string'
+                        ? value.content.content
+                        : JSON.stringify(value.content.content, null, 2)}
+                    </pre>
+                  </details>
                 </details>
               </>
             )}

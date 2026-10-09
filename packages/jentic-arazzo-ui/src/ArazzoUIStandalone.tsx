@@ -100,6 +100,7 @@ import { ArazzoUI } from './ArazzoUI';
 import { JenticLogo } from './components/JenticLogo';
 import { UploadIcon } from './components/UploadIcon';
 import { ViewModeControl } from './components/ViewModeControl';
+import { AdvancedTools } from './components/AdvancedTools';
 import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 import type { ArazzoDocument } from './types/arazzo';
 
@@ -692,7 +693,6 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
                     border: '1px solid #444',
                     borderRadius: '6px',
                     fontSize: '13px',
-                    outline: 'none',
                     background: '#2a2a2a',
                     color: '#fff',
                   }}
@@ -742,90 +742,105 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
             </div>
             {hydration.error && <p role="status">{hydration.error}</p>}
             {navigationError && <p role="status">{navigationError}</p>}
-            <form
-              className="arazzo-scenario-loader"
-              onSubmit={(event) => {
-                event.preventDefault();
-                guides.load();
-              }}
+            <AdvancedTools
+              reveal={
+                !!(
+                  guides.manifest ||
+                  guides.selection ||
+                  guides.input ||
+                  props.viewProfile ||
+                  props.viewProfileAdapter
+                )
+              }
+              status={guides.message}
+              setup={
+                <form
+                  className="arazzo-scenario-loader"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    guides.load();
+                  }}
+                >
+                  <label>
+                    Scenario manifest URL{' '}
+                    <input
+                      type="url"
+                      aria-label="Scenario manifest URL"
+                      value={guides.input}
+                      onChange={(event) => guides.setInput(event.target.value)}
+                      placeholder="Explicit scenario manifest URL"
+                    />
+                  </label>
+                  <button type="submit" disabled={!guides.input.trim()}>
+                    Load scenario manifest
+                  </button>
+                  {guides.message && <p role="status">{guides.message}</p>}
+                </form>
+              }
             >
-              <label>
-                Scenario manifest URL{' '}
-                <input
-                  type="url"
-                  aria-label="Scenario manifest URL"
-                  value={guides.input}
-                  onChange={(event) => guides.setInput(event.target.value)}
-                  placeholder="Explicit scenario manifest URL"
-                />
-              </label>
-              <button type="submit" disabled={!guides.input.trim()}>
-                Load scenario manifest
-              </button>
-              {guides.message && <p role="status">{guides.message}</p>}
-            </form>
-            <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
-              <ArazzoUI
-                key={hydration.epoch}
-                ref={ref}
-                {...rest}
-                documentIdentity={documentIdentity}
-                documentRevision={documentRevision}
-                defaultLocation={hydration.location}
-                onLocationChange={props.onLocationChange}
-                sourceProvider={props.sourceProvider ?? browserProvider}
-                baseURI={externalSource?.uri ?? props.baseURI}
-                activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
-                onExternalNavigation={async (request) => {
-                  if (props.onExternalNavigation) {
-                    props.onExternalNavigation(request);
-                    return;
-                  }
-                  navigationController.current?.abort();
-                  navigationRegistry.cancelAll();
-                  const controller = new AbortController();
-                  navigationController.current = controller;
-                  const generation = ++sourceGeneration.current;
-                  setNavigationError('');
-                  try {
-                    const acquired = await navigationRegistry.acquire(
-                      request.documentUri,
-                      request.revision,
-                    );
-                    if (controller.signal.aborted || generation !== sourceGeneration.current)
+              <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
+                <ArazzoUI
+                  key={hydration.epoch}
+                  ref={ref}
+                  {...rest}
+                  documentIdentity={documentIdentity}
+                  documentRevision={documentRevision}
+                  defaultLocation={hydration.location}
+                  onLocationChange={props.onLocationChange}
+                  sourceProvider={props.sourceProvider ?? browserProvider}
+                  baseURI={externalSource?.uri ?? props.baseURI}
+                  activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
+                  onExternalNavigation={async (request) => {
+                    if (props.onExternalNavigation) {
+                      props.onExternalNavigation(request);
                       return;
-                    if (request.revision !== undefined && acquired.revision !== request.revision)
-                      throw new Error(
-                        `Revision mismatch: requested ${request.revision}, got ${acquired.revision ?? 'no revision'}`,
+                    }
+                    navigationController.current?.abort();
+                    navigationRegistry.cancelAll();
+                    const controller = new AbortController();
+                    navigationController.current = controller;
+                    const generation = ++sourceGeneration.current;
+                    setNavigationError('');
+                    try {
+                      const acquired = await navigationRegistry.acquire(
+                        request.documentUri,
+                        request.revision,
                       );
-                    commitSource(
-                      typeof acquired.content === 'string'
-                        ? acquired.content
-                        : JSON.stringify(acquired.content),
-                      {
-                        uri: acquired.retrievalURI,
-                        revision: acquired.revision,
-                        root: request.workflowId,
-                      },
-                    );
-                    setUrlInput(acquired.retrievalURI);
-                  } catch (error) {
-                    if (!controller.signal.aborted && generation === sourceGeneration.current)
-                      setNavigationError(error instanceof Error ? error.message : String(error));
-                  }
-                }}
-                scenarioManifest={guides.manifest}
-                scenarioManifestURI={guides.uri}
-                scenarioSelection={guides.selection}
-                onScenarioSelectionChange={guides.setSelection}
-                onScenarioLocationRequest={navigateScenarioLocation}
-                document={documentSource}
-                view={view}
-                onViewChange={handleViewChange}
-                className={undefined}
-                style={undefined}
-              />
-            </div>
+                      if (controller.signal.aborted || generation !== sourceGeneration.current)
+                        return;
+                      if (request.revision !== undefined && acquired.revision !== request.revision)
+                        throw new Error(
+                          `Revision mismatch: requested ${request.revision}, got ${acquired.revision ?? 'no revision'}`,
+                        );
+                      commitSource(
+                        typeof acquired.content === 'string'
+                          ? acquired.content
+                          : JSON.stringify(acquired.content),
+                        {
+                          uri: acquired.retrievalURI,
+                          revision: acquired.revision,
+                          root: request.workflowId,
+                        },
+                      );
+                      setUrlInput(acquired.retrievalURI);
+                    } catch (error) {
+                      if (!controller.signal.aborted && generation === sourceGeneration.current)
+                        setNavigationError(error instanceof Error ? error.message : String(error));
+                    }
+                  }}
+                  scenarioManifest={guides.manifest}
+                  scenarioManifestURI={guides.uri}
+                  scenarioSelection={guides.selection}
+                  onScenarioSelectionChange={guides.setSelection}
+                  onScenarioLocationRequest={navigateScenarioLocation}
+                  document={documentSource}
+                  view={view}
+                  onViewChange={handleViewChange}
+                  className={undefined}
+                  style={undefined}
+                />
+              </div>
+            </AdvancedTools>
             {dragging && (
               <div
                 style={{

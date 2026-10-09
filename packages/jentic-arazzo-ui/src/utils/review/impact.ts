@@ -10,6 +10,7 @@ import type { WorkflowCatalogIdentity } from '../../types/catalog';
 import { catalogKey } from '../catalog/manifest';
 import type { CatalogRelationship } from '../catalog';
 import type { ReviewProjection } from './inputs';
+import { decodePointer } from '../contract/pointer';
 const identity = (v: WorkflowCatalogIdentity): WorkflowCatalogIdentity => ({
   documentId: v.documentId,
   revision: v.revision,
@@ -43,7 +44,36 @@ export function findingImpact(
   const roots = new Map<string, { identity: WorkflowCatalogIdentity; stepId?: string }>();
   const addRoot = (v: WorkflowCatalogIdentity, stepId?: string) =>
     roots.set(JSON.stringify([catalogKey(v), stepId ?? null]), { identity: identity(v), stepId });
-  if (e.workflowId) {
+  const tokens = decodePointer(e.pointer);
+  const actionScope =
+    (tokens[0] === 'components' && ['successActions', 'failureActions'].includes(tokens[1])) ||
+    (tokens[0] === 'workflows' &&
+      (['successActions', 'failureActions'].includes(tokens[2]) ||
+        (tokens[2] === 'steps' && ['onSuccess', 'onFailure'].includes(tokens[4]))));
+  const uses = effects.filter((x) => x.location.revision === e.revision);
+  let documentScope = false;
+  if (actionScope || (!e.workflowId && tokens[0] === 'components' && uses.length)) {
+    uses.forEach((x) => {
+      const target = {
+        documentId: e.documentId,
+        revision: e.revision,
+        workflowId: x.location.root!,
+      };
+      addRoot(target, x.location.selection?.stepId);
+      const relation = p.index.relationships.find(
+        (r) =>
+          r.from.documentId === e.documentId &&
+          r.from.revision === e.revision &&
+          r.from.workflowId === target.workflowId &&
+          r.location.selection?.kind === 'action' &&
+          x.location.selection?.kind === 'action' &&
+          r.location.selection.stepId === x.location.selection.stepId &&
+          r.location.selection.action.pointer === x.location.selection.action.pointer &&
+          r.location.selection.action.usePointer === x.location.selection.action.usePointer,
+      );
+      if (relation) result.direct.push(relationship(relation));
+    });
+  } else if (e.workflowId) {
     const target = { documentId: e.documentId, revision: e.revision, workflowId: e.workflowId };
     addRoot(target, e.stepId);
     result.direct = p.index.relationships
@@ -76,26 +106,39 @@ export function findingImpact(
     }));
     usages.forEach((u) => addRoot(u.from, u.stepId));
   } else {
-    const uses = effects.filter((x) => x.location.revision === e.revision);
-    uses.forEach((x) => {
-      const target = {
-        documentId: e.documentId,
-        revision: e.revision,
-        workflowId: x.location.root!,
-      };
-      addRoot(target, x.location.selection?.stepId);
-      const relation = p.index.relationships.find(
-        (r) =>
-          r.declarationPointer === x.declarationPointer &&
-          r.location.selection?.stepId === x.location.selection?.stepId &&
-          r.from.workflowId === target.workflowId,
-      );
-      if (relation) result.direct.push(relationship(relation));
-    });
-    if (!uses.length)
+    // only explicit document metadata changes have document-wide authored scope.
+    documentScope = e.pointer === '#' || tokens[0] === 'info' || !!tokens[0]?.startsWith('x-');
+    if (documentScope) {
       p.index.entries
-        .filter((x) => x.documentId === e.documentId)
+        .filter(
+          (x) =>
+            x.documentId === e.documentId &&
+            x.revision === e.revision &&
+            x.metadata?.role === 'entry',
+        )
         .forEach((entry) => addRoot(entry));
+      result.coverage.push({
+        key: JSON.stringify([e.documentId, e.revision, 'document-metadata-scope', e.pointer]),
+        uri: e.uri,
+        revision: e.revision,
+        state: 'loaded',
+        message:
+          e.pointer === '#'
+            ? 'Explicit authored document scope; entry listings are not dependency paths.'
+            : 'Explicit document metadata scope; entry listings are not dependency paths.',
+      });
+    }
+  }
+  if (!roots.size) {
+    result.coverage.push({
+      key: JSON.stringify([e.documentId, e.revision, 'unlocated-use', e.pointer]),
+      uri: e.uri,
+      revision: e.revision,
+      state: result.complete ? 'loaded' : 'unsupported',
+      message: result.complete
+        ? 'No known applicable consumers in the supplied inspection scope.'
+        : 'No located applicable consumers; partial coverage leaves other consumers unknown.',
+    });
   }
   result.direct = [...new Map(result.direct.map((r) => [r.id, r])).values()].sort((a, b) =>
     a.id < b.id ? -1 : 1,
@@ -143,6 +186,7 @@ export function findingImpact(
         result.paths.push({ entry: identity(target), relationships: ordered });
       }
     }
+    if (documentScope) return;
     const edges = (incoming.get(key) ?? []).filter(
       (r) => !stepId || !r.targetStepId || r.targetStepId === stepId,
     );

@@ -10,3 +10,4 @@ isolate-*.log
 # Browser acceptance test output
 **/test-results/
 **/playwright-report/
+**/test-output/
