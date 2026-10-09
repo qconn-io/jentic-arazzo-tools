@@ -191,6 +191,7 @@ workflows:
     steps:
       - stepId: reserve-and-pay
         description: Obtain matching reservation and confirmed payment before license issuance.
+        x-example-actor: coordinator
         workflowId: reserve-and-capture
         parameters:
           - name: purchaseId

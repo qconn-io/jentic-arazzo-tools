@@ -142,7 +142,7 @@ export function exportWorkflowReview(
     }
     f.effects.forEach((e) =>
       lines.push(
-        `Inherited ${e.side} use: ${safe(e.declarationPointer)} / ${safe(JSON.stringify(canonical(e.location)))} / ${safe(JSON.stringify(canonical(e.value)))}`,
+        `Applicable ${e.side} use: ${safe(e.declarationPointer)} / ${safe(JSON.stringify(canonical(e.location)))} / ${safe(JSON.stringify(canonical(e.value)))}`,
       ),
     );
   }

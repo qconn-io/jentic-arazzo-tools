@@ -1,10 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-const evidence = resolve('../../openspec/changes/add-system-interaction-view/browser-evidence');
+const evidence = resolve('test-output/browser/archival/systems');
 mkdirSync(evidence, { recursive: true });
 async function systems(page: Page, path: string, profile = 'profile=digital-product') {
   await page.goto(`/?document=${encodeURIComponent(`http://localhost:3000${path}`)}&${profile}`);
+  await expect(page.locator('details.arazzo-advanced-tools')).toHaveAttribute('open', '');
   await page.getByRole('combobox', { name: 'Perspective' }).selectOption('systems');
   await expect(page.locator('.arazzo-systems')).toBeVisible();
 }

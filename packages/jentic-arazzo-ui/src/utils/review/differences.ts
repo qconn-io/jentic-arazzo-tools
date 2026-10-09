@@ -5,7 +5,8 @@ import type {
   WorkflowReviewOptions,
 } from '../../types/review';
 import { object } from '../contract/references';
-import { encodePointer, decodePointer } from '../contract/pointer';
+import { encodePointer } from '../contract/pointer';
+import { effectiveUseLocation, pointersOverlap } from '../model/effectiveUses';
 import { catalogKey } from '../catalog/manifest';
 import type { ReviewDocument, ReviewProjection } from './inputs';
 export interface Difference {
@@ -75,34 +76,14 @@ function evidence(
     : undefined;
   const location = entry ? structuredClone(entry.location) : undefined;
   if (location && stepId) location.selection = { kind: 'step', workflowId: workflowId!, stepId };
-  // Action locations retain both authored declaration and use addresses.
-  const step = entry?.workflow.steps.find((s) => s.stepId === stepId);
-  const actions = step ? [...step.actions.onSuccess, ...step.actions.onFailure] : [];
-  const action = actions.find(
-    (a) => pointer(path).startsWith(pointer(a.path) + '/') || pointer(path) === pointer(a.path),
+  // action addresses come from the same effective uses as catalog relationships.
+  const use = entry?.document.effectiveUses?.find(
+    (use) =>
+      use.workflowId === workflowId &&
+      use.stepId === stepId &&
+      (pointer(path) === use.usePointer || pointer(path).startsWith(use.usePointer + '/')),
   );
-  if (location && action)
-    location.selection = {
-      kind: 'action',
-      workflowId: workflowId!,
-      stepId: stepId!,
-      action: {
-        document: doc.definition.uri,
-        pointer:
-          '/' +
-          decodePointer(pointer(action.declarationPath ?? action.path))
-            .map((k) => k.replace(/~/g, '~0').replace(/\//g, '~1'))
-            .join('/'),
-        usePointer:
-          '/' +
-          decodePointer(pointer(action.path))
-            .map((k) => k.replace(/~/g, '~0').replace(/\//g, '~1'))
-            .join('/'),
-        channel: action.channel,
-        index: action.declarationPath ? 0 : action.authoredIndex,
-        ...(typeof action.value.name === 'string' ? { name: action.value.name } : {}),
-      },
-    };
+  const actionLocation = location && use ? effectiveUseLocation(location, use) : location;
   return {
     documentId: doc.definition.id,
     revision: doc.definition.revision,
@@ -113,43 +94,33 @@ function evidence(
     ...(present ? { value: value as WorkflowReviewEvidence['value'] } : {}),
     workflowId,
     stepId,
-    location,
+    location: actionLocation,
   };
 }
-function inherited(
+function applicableUses(
   projection: ReviewProjection,
   e: WorkflowReviewEvidence | undefined,
   side: 'baseline' | 'candidate',
 ): WorkflowReviewEffect[] {
   if (!e?.present) return [];
   const effects: WorkflowReviewEffect[] = [];
-  for (const entry of projection.index.entries.filter((x) => x.documentId === e.documentId))
-    for (const step of entry.workflow.steps)
-      for (const action of [...step.actions.onFailure, ...step.actions.onSuccess]) {
-        if (!action.declarationPath) continue;
-        const declarationPointer = pointer(action.declarationPath);
-        if (!(
-          e.pointer === declarationPointer ||
-          e.pointer.startsWith(declarationPointer + '/') ||
-          declarationPointer.startsWith(e.pointer + '/')
-        ))
-          continue;
-        const location = evidence(
-          projection,
-          projection.documents.find((d) => d.definition.id === e.documentId)!,
-          action.path,
-          action.value,
-          true,
-          entry.workflowId,
-          step.stepId,
-        ).location!;
-        effects.push({
-          side,
-          declarationPointer,
-          location,
-          value: action.value as WorkflowReviewEffect['value'],
-        });
-      }
+  for (const entry of projection.index.entries.filter(
+    (x) => x.documentId === e.documentId && x.revision === e.revision,
+  ))
+    for (const use of entry.document.effectiveUses ?? []) {
+      if (use.workflowId !== entry.workflowId) continue;
+      if (
+        !pointersOverlap(e.pointer, use.declarationPointer) &&
+        !pointersOverlap(e.pointer, use.usePointer)
+      )
+        continue;
+      effects.push({
+        side,
+        declarationPointer: use.declarationPointer,
+        location: effectiveUseLocation(entry.location, use),
+        value: use.action.value as WorkflowReviewEffect['value'],
+      });
+    }
   return effects;
 }
 export function authoredDifferences(
@@ -168,8 +139,8 @@ export function authoredDifferences(
       before,
       after,
       effects: [
-        ...inherited(baseline, before, 'baseline'),
-        ...inherited(candidate, after, 'candidate'),
+        ...applicableUses(baseline, before, 'baseline'),
+        ...applicableUses(candidate, after, 'candidate'),
       ],
     });
   const ids = [

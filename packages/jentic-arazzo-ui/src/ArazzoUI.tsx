@@ -78,6 +78,7 @@ export {
   authoredDigest,
   createLocationAdapter,
 } from './utils/location/codec';
+import { AdvancedProfileControls } from './components/AdvancedTools';
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -428,24 +429,26 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
     <div className="arazzo-viewer-shell">
       <WorkflowNavigation />
       {systems?.enabled && (
-        <div className="arazzo-systems-setting">
-          <label>
-            Perspective{' '}
-            <select
-              aria-label="Perspective"
-              value={systems.perspective}
-              onChange={(event) =>
-                systems.setPerspective(event.target.value as 'workflow' | 'systems')
-              }
-            >
-              <option value="workflow">Workflow</option>
-              <option value="systems">Systems</option>
-            </select>
-          </label>
-          {systems.perspective === 'workflow' && systems.selected && (
-            <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
-          )}
-        </div>
+        <AdvancedProfileControls>
+          <div className="arazzo-systems-setting">
+            <label>
+              Perspective{' '}
+              <select
+                aria-label="Perspective"
+                value={systems.perspective}
+                onChange={(event) =>
+                  systems.setPerspective(event.target.value as 'workflow' | 'systems')
+                }
+              >
+                <option value="workflow">Workflow</option>
+                <option value="systems">Systems</option>
+              </select>
+            </label>
+            {systems.perspective === 'workflow' && systems.selected && (
+              <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
+            )}
+          </div>
+        </AdvancedProfileControls>
       )}
       <InspectionStatus />
       {locationProps && <ScenarioPanel props={locationProps} />}

@@ -25,6 +25,10 @@ export function SystemsDetails() {
     ) : null;
   const row = systems.selected;
   if (!row) return null;
+  const actor = systems.scene.participants.find((participant) => participant.id === row.actor);
+  const sourceOwner = systems.scene.participants.find(
+    (participant) => participant.id === row.sourceOwner,
+  );
   const open = (
     workflowId = row.workflowId,
     stepId: string | null = row.step?.stepId ?? null,
@@ -57,6 +61,30 @@ export function SystemsDetails() {
       <p>
         Selected system: {row.workflowId}.{row.step?.stepId ?? row.kind}
       </p>
+      {(row.kind === 'exchange' || row.kind === 'call') && (
+        <dl>
+          <dt>Actor</dt>
+          <dd>{actor?.name ?? `Unknown actor: ${row.workflowId}`}</dd>
+          {sourceOwner && (
+            <>
+              <dt>Source owner</dt>
+              <dd>{sourceOwner.name}</dd>
+            </>
+          )}
+          {actor?.organizationalOwner && (
+            <>
+              <dt>Actor's organization</dt>
+              <dd>{actor.organizationalOwner}</dd>
+            </>
+          )}
+          {sourceOwner?.organizationalOwner && (
+            <>
+              <dt>Source owner's organization</dt>
+              <dd>{sourceOwner.organizationalOwner}</dd>
+            </>
+          )}
+        </dl>
+      )}
       <p>
         {row.kind === 'implementation'
           ? 'Descriptive implementation association, not an additional request.'

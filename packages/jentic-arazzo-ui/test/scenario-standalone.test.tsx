@@ -5,6 +5,7 @@ import { expect, test, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { ArazzoUIStandalone } from '../src/ArazzoUIStandalone';
 import { nestedCalls } from './fixtures/connected';
+import type { SourceDocumentContent, SourceDocumentProvider } from '../src/types/source';
 import { writeLocationURL } from '../src/utils/location/codec';
 vi.mock('mermaid', () => ({
   default: { initialize: vi.fn(), render: vi.fn(async () => ({ svg: '<svg />' })) },
@@ -85,6 +86,7 @@ test('replacement cancels obsolete manifest loading and valid new guides remain 
   });
   vi.stubGlobal('fetch', fetch);
   render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
+  fireEvent.click(screen.getByText('Advanced tools'));
   const input = await screen.findByRole('textbox', { name: 'Scenario manifest URL' });
   fireEvent.change(input, { target: { value: 'https://test/old' } });
   fireEvent.click(screen.getByRole('button', { name: 'Load scenario manifest' }));
@@ -98,12 +100,12 @@ test('replacement cancels obsolete manifest loading and valid new guides remain 
 });
 test('leaving a guide cancels a pending document handoff and ignores its late result', async () => {
   history.replaceState({}, '', '/');
-  let release: (value: any) => void = () => {};
+  let release: (value: SourceDocumentContent) => void = () => {};
   let signal: AbortSignal | undefined;
-  const provider = {
-    load: vi.fn((request: { signal?: AbortSignal }) => {
+  const provider: SourceDocumentProvider = {
+    load: vi.fn((request) => {
       signal = request.signal;
-      return new Promise<any>((resolve) => {
+      return new Promise<SourceDocumentContent>((resolve) => {
         release = resolve;
       });
     }),

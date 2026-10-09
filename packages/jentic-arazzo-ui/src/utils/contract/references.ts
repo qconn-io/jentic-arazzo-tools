@@ -3,6 +3,14 @@ import * as yamlAdapter from '@speclynx/apidom-parser-adapter-yaml-1-2';
 import type { SourceRegistry, SourceValidityToken } from '../source/SourceRegistry';
 import type { ContractValue, InspectedSchemaReference } from './types';
 import { decodePointer, encodePointer, readPointer, resolvePointer } from './pointer';
+import {
+  childContractRole,
+  contractRoleAt,
+  declarationReference,
+  enclosingSchemaLimitation,
+  schemaLimitation,
+  type ContractRole,
+} from './structure';
 
 export type ContractObject = { [key: string]: ContractValue };
 export const object = (value: unknown): ContractObject =>
@@ -66,40 +74,6 @@ export function createReferenceProjector(
   const diagnose = (message: string) => {
     if (!diagnostics.includes(message)) diagnostics.push(message);
   };
-  const literalKeys = new Set(['example', 'examples', 'default', 'enum', 'const']);
-  const mapKeys = new Set([
-    'channels',
-    'operations',
-    'messages',
-    'responses',
-    'content',
-    'securitySchemes',
-    'headers',
-  ]);
-  const schemaMaps = [
-    'properties',
-    'patternProperties',
-    '$defs',
-    'definitions',
-    'dependentSchemas',
-    'dependencies',
-  ];
-  const schemaArrays = ['allOf', 'anyOf', 'oneOf', 'prefixItems'];
-  const schemaSingles = [
-    'items',
-    'additionalProperties',
-    'additionalItems',
-    'contains',
-    'not',
-    'if',
-    'then',
-    'else',
-    'propertyNames',
-    'unevaluatedProperties',
-    'unevaluatedItems',
-    'contentSchema',
-  ];
-
   async function referenceTarget(
     ref: string,
     base: string,
@@ -139,7 +113,12 @@ export function createReferenceProjector(
     const acquired = await document;
     ensureCurrent();
     if (schema) {
-      const limitation = enclosingSchemaLimitation(acquired.root, resolved.tokens);
+      const limitation = enclosingSchemaLimitation(
+        acquired.root,
+        resolved.tokens,
+        profile,
+        supportsSchemaFormat,
+      );
       if (limitation) throw new Error(limitation);
     }
     const target = pointerValue(acquired.root, resolved.pointer);
@@ -154,72 +133,6 @@ export function createReferenceProjector(
     };
   }
 
-  function schemaLimitation(value: ContractObject): string | undefined {
-    if (
-      typeof value.schemaFormat === 'string' &&
-      supportsSchemaFormat &&
-      !supportsSchemaFormat(value.schemaFormat)
-    )
-      return `Unsupported schema format retained: ${value.schemaFormat}`;
-    if (
-      typeof value.$schema === 'string' &&
-      !/^https?:\/\/json-schema.org\/(draft\/(2020-12|2019-09)|draft-0[467])\/schema#?$/.test(
-        value.$schema,
-      ) &&
-      !/^https?:\/\/spec.openapis.org\/oas\/3\.1\/dialect\/base#?$/.test(value.$schema)
-    )
-      return `Unsupported schema dialect retained: ${value.$schema}`;
-    if (
-      value.$id !== undefined ||
-      value.id !== undefined ||
-      value.$anchor !== undefined ||
-      value.$dynamicAnchor !== undefined ||
-      value.$dynamicRef !== undefined
-    )
-      return 'Unsupported schema resource identifiers or anchors; authored schema retained';
-    return undefined;
-  }
-
-  function enclosingSchemaLimitation(
-    document: ContractValue,
-    tokens: string[],
-  ): string | undefined {
-    const contract = object(document);
-    if (
-      typeof contract.openapi === 'string' &&
-      typeof contract.jsonSchemaDialect === 'string' &&
-      contract.jsonSchemaDialect !== 'https://spec.openapis.org/oas/3.1/dialect/base'
-    )
-      return `Unsupported document schema dialect retained: ${contract.jsonSchemaDialect}`;
-    let mode: 'contract' | 'schema' | 'map' | 'array' =
-      contract.openapi || contract.asyncapi ? 'contract' : 'schema';
-    let value: ContractValue | undefined = document;
-    for (let index = 0; index <= tokens.length; index++) {
-      const current = object(value);
-      if (mode === 'schema') {
-        const limitation = schemaLimitation(current);
-        if (limitation) return limitation;
-      }
-      if (index === tokens.length) break;
-      const key = tokens[index];
-      if (mode === 'map' || mode === 'array') mode = 'schema';
-      else if (mode === 'schema') {
-        if (schemaMaps.includes(key)) mode = 'map';
-        else if (schemaArrays.includes(key) || (key === 'items' && Array.isArray(current.items)))
-          mode = 'array';
-        else if (
-          !schemaSingles.includes(key) &&
-          !(key === 'schema' && typeof current.schemaFormat === 'string')
-        )
-          mode = 'contract';
-      } else if (key === 'schemas' && tokens[index - 1] === 'components') mode = 'map';
-      else if (key === 'schema' || (profile.eventSchemas && ['payload', 'headers'].includes(key)))
-        mode = 'schema';
-      value = readPointer(value, [key]) as ContractValue | undefined;
-    }
-    return undefined;
-  }
-
   async function inspectSchema(
     value: ContractValue | undefined,
     base: string,
@@ -227,14 +140,29 @@ export function createReferenceProjector(
     links: Set<string>,
     location: string[],
     nesting: number,
+    role: ContractRole = 'schema',
   ): Promise<void> {
     ensureCurrent();
     if (nesting > 128) {
       diagnose('Inspection nesting limit reached; authored content is retained');
       return;
     }
-    if (value === null || typeof value !== 'object' || Array.isArray(value)) return;
-    const limitation = schemaLimitation(value);
+    if (value === null || typeof value !== 'object' || role === 'literal') return;
+    if (typeof role === 'object') {
+      for (const [key, child] of Object.entries(value))
+        await inspectSchema(
+          child,
+          base,
+          depth,
+          links,
+          [...location, key],
+          nesting + 1,
+          childContractRole(role, key, value, profile),
+        );
+      return;
+    }
+    if (Array.isArray(value)) return;
+    const limitation = schemaLimitation(value, supportsSchemaFormat);
     if (limitation) {
       diagnose(limitation);
       return;
@@ -281,36 +209,10 @@ export function createReferenceProjector(
         diagnose(`${record.diagnostic} (${ref})`);
       }
     }
-    for (const key of schemaMaps) {
-      for (const [name, child] of Object.entries(object(value[key])))
-        await inspectSchema(child, base, depth, links, [...location, key, name], nesting + 1);
-    }
-    for (const key of schemaArrays) {
-      const children = value[key];
-      if (Array.isArray(children))
-        for (let i = 0; i < children.length; i++)
-          await inspectSchema(
-            children[i],
-            base,
-            depth,
-            links,
-            [...location, key, String(i)],
-            nesting + 1,
-          );
-    }
-    for (const key of schemaSingles) {
-      const child = value[key];
-      if (Array.isArray(child) && key === 'items') {
-        for (let i = 0; i < child.length; i++)
-          await inspectSchema(
-            child[i],
-            base,
-            depth,
-            links,
-            [...location, key, String(i)],
-            nesting + 1,
-          );
-      } else await inspectSchema(child, base, depth, links, [...location, key], nesting + 1);
+    for (const [key, child] of Object.entries(value)) {
+      const childRole = childContractRole(role, key, value, profile);
+      if (childRole !== 'literal')
+        await inspectSchema(child, base, depth, links, [...location, key], nesting + 1, childRole);
     }
   }
 
@@ -358,48 +260,48 @@ export function createReferenceProjector(
     }
   }
 
-  async function project(
+  async function projectRole(
     value: ContractValue | undefined,
-    base = uri,
-    depth = 0,
-    links = new Set<string>(),
-    nesting = 0,
-    map = false,
-    location: string[] = [],
+    base: string,
+    depth: number,
+    links: Set<string>,
+    nesting: number,
+    role: ContractRole,
+    location: string[],
   ): Promise<ContractValue | undefined> {
     ensureCurrent();
     if (nesting > 128) {
       diagnose('Inspection nesting limit reached; authored content is retained');
       return value;
     }
-    if (Array.isArray(value))
-      return Promise.all(
-        value.map((item, index) =>
-          project(item, base, depth, links, nesting + 1, false, [...location, String(index)]).then(
-            (v) => v ?? null,
-          ),
-        ),
-      );
+    if (role === 'literal') return value;
+    if (role === 'schema') {
+      if (!unsupportedDefaultDialect)
+        await inspectSchema(value, base, depth, links, location, nesting);
+      return value;
+    }
     if (value === null || typeof value !== 'object') return value;
-    const ref = map ? undefined : string(value.$ref);
+    const ref = declarationReference(value, role);
     if (ref) {
       try {
         const target = await referenceTarget(ref, base, depth, links);
-        const projected = await project(
+        const projected = await projectRole(
           target.value,
           target.base,
           target.depth,
           target.links,
           nesting + 1,
-          false,
+          role,
           decodePointer(target.pointer),
         );
         // OpenAPI 3.1 Reference Objects permit summary/description overrides, not schema merging.
         if (!profile.openapi31) return projected;
         return {
           ...object(projected),
-          ...(typeof value.summary === 'string' ? { summary: value.summary } : {}),
-          ...(typeof value.description === 'string' ? { description: value.description } : {}),
+          ...(typeof object(value).summary === 'string' ? { summary: object(value).summary } : {}),
+          ...(typeof object(value).description === 'string'
+            ? { description: object(value).description }
+            : {}),
         };
       } catch (error) {
         ensureCurrent();
@@ -409,31 +311,54 @@ export function createReferenceProjector(
         return value;
       }
     }
+    if (Array.isArray(value))
+      return Promise.all(
+        value.map((item, index) =>
+          projectRole(
+            item,
+            base,
+            depth,
+            links,
+            nesting + 1,
+            childContractRole(role, String(index), value, profile),
+            [...location, String(index)],
+          ).then((v) => v ?? null),
+        ),
+      );
     const result: ContractObject = {};
-    for (const [key, item] of Object.entries(value)) {
-      const childLocation = [...location, key];
-      if (
-        !map &&
-        (key === 'schema' || (profile.eventSchemas && ['payload', 'headers'].includes(key)))
-      ) {
-        if (!unsupportedDefaultDialect)
-          await inspectSchema(item, base, depth, links, childLocation, nesting + 1);
-        result[key] = item;
-      } else
-        result[key] =
-          !map && (literalKeys.has(key) || key.startsWith('x-'))
-            ? item
-            : ((await project(
-                item,
-                base,
-                depth,
-                links,
-                nesting + 1,
-                !map && mapKeys.has(key),
-                childLocation,
-              )) ?? null);
-    }
+    for (const [key, item] of Object.entries(value))
+      result[key] =
+        (await projectRole(
+          item,
+          base,
+          depth,
+          links,
+          nesting + 1,
+          childContractRole(role, key, value, profile),
+          [...location, key],
+        )) ?? null;
     return result;
+  }
+  async function project(
+    value: ContractValue | undefined,
+    base = uri,
+    depth = 0,
+    links = new Set<string>(),
+    nesting = 0,
+    map = false,
+    location: string[] = [],
+  ): Promise<ContractValue | undefined> {
+    let role = contractRoleAt(root, location, profile);
+    // adapters also project operation/path-parameter fragments from external path-item documents.
+    const last = location[location.length - 1];
+    if (
+      ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace'].includes(last) ||
+      location[location.length - 2] === 'operations'
+    )
+      role = 'operation';
+    else if (last === 'parameters') role = { array: 'parameter' };
+    if (map && typeof role !== 'object') role = { map: role };
+    return projectRole(value, base, depth, links, nesting, role, location);
   }
   return { project, follow, schemaReferences };
 }

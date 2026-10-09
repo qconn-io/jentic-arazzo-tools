@@ -4,7 +4,7 @@ import type {
   WorkflowCatalogCoverage,
 } from '../../types/catalog';
 import type { WorkflowLocation } from '../../types/location';
-import type { WorkflowFact, ClassifiedTarget, ActionFact, PrerequisiteFact } from '../inspection';
+import type { WorkflowFact, ClassifiedTarget, PrerequisiteFact } from '../inspection';
 import type { ContractOperation } from '../contract/types';
 import {
   resolveScopedOperation,
@@ -14,10 +14,9 @@ import {
 import { encodePointer as encodeTokens } from '../contract/pointer';
 import { catalogKey, CATALOG_NAMESPACE } from './manifest';
 import type { CatalogLoadResult, CatalogLoadedDocument } from './load';
+import { effectiveUseLocation, type EffectiveActionUse } from '../model/effectiveUses';
 
 const encodePointer = (path: (string | number)[]) => encodeTokens(path.map(String));
-const addressPointer = (path: (string | number)[]) =>
-  '/' + path.map((p) => String(p).replace(/~/g, '~0').replace(/\//g, '~1')).join('/');
 
 export interface CatalogEntry extends WorkflowCatalogIdentity {
   key: string;
@@ -134,29 +133,16 @@ export function buildCatalogIndex(loaded: CatalogLoadResult): CatalogIndex {
       kind: CatalogRelationshipKind,
       target: ClassifiedTarget,
       fact: { path: (string | number)[]; declarationPath?: (string | number)[]; stepId?: string },
-      action?: ActionFact,
+      use?: EffectiveActionUse,
     ) => {
       const pointer = encodePointer(fact.path);
-      const location: WorkflowLocation = { ...entry.location };
+      let location: WorkflowLocation = { ...entry.location };
       if (fact.stepId)
         location.selection = { kind: 'step', workflowId: entry.workflowId, stepId: fact.stepId };
-      if (action && fact.stepId)
-        location.selection = {
-          kind: 'action',
-          workflowId: entry.workflowId,
-          stepId: fact.stepId,
-          action: {
-            document: entry.document.uri,
-            pointer: addressPointer(action.declarationPath ?? action.path),
-            usePointer: addressPointer(action.path),
-            channel: action.channel,
-            index: action.declarationPath ? 0 : action.authoredIndex,
-            ...(typeof action.value.name === 'string' ? { name: action.value.name } : {}),
-          },
-        };
+      if (use) location = effectiveUseLocation(entry.location, use);
       const to = destination(entry, target);
       relationships.push({
-        id: `${entry.key}:${pointer}`,
+        id: `${entry.key}:${pointer}${use ? `:${JSON.stringify(use.stepId)}` : ''}`,
         kind,
         from: entry,
         to,
@@ -165,22 +151,26 @@ export function buildCatalogIndex(loaded: CatalogLoadResult): CatalogIndex {
         status: to ? 'located' : 'unresolved',
         location,
         pointer,
-        declarationPointer: fact.declarationPath ? encodePointer(fact.declarationPath) : undefined,
+        declarationPointer:
+          use?.declarationPointer ??
+          (fact.declarationPath ? encodePointer(fact.declarationPath) : undefined),
       });
     };
     const prerequisites = (facts: PrerequisiteFact[]) =>
       facts.forEach((fact) => relationship('prerequisite', fact.target, fact));
-    const actions = (facts: ActionFact[]) =>
-      facts.forEach((fact) => {
+    const actions = (uses: EffectiveActionUse[]) =>
+      uses.forEach((use) => {
+        const fact = use.action;
         if (fact.target && (fact.value.type === 'goto' || fact.value.type === 'retry'))
-          relationship(fact.value.type, fact.target, fact, fact);
+          relationship(fact.value.type, fact.target, { ...fact, stepId: use.stepId }, use);
       });
     prerequisites(entry.workflow.prerequisites);
-    actions([...entry.workflow.actions.onSuccess, ...entry.workflow.actions.onFailure]);
+    actions(
+      (entry.document.effectiveUses ?? []).filter((use) => use.workflowId === entry.workflowId),
+    );
     for (const step of entry.workflow.steps) {
       if (step.callTarget) relationship('call', step.callTarget, step);
       prerequisites(step.prerequisites);
-      actions([...step.actions.onSuccess, ...step.actions.onFailure]);
       const binding = step.sourceBinding;
       if (step.value.workflowId !== undefined || !Object.keys(binding.locators).length) continue;
       const locators: OperationLocators = { ...binding.locators };
@@ -255,6 +245,9 @@ export function buildCatalogIndex(loaded: CatalogLoadResult): CatalogIndex {
   }
   const complete =
     loaded.coverage.every((c) => c.state === 'loaded') &&
+    [...documents.values()].every((doc) =>
+      (doc.effectiveUses ?? []).every((use) => use.action.status === 'resolved'),
+    ) &&
     relationships.every((r) => r.status === 'located') &&
     apiUsages.every((u) => u.status === 'located');
   return {
@@ -328,6 +321,7 @@ export function catalogReachability(
     maxPaths?: number;
     maxDepth?: number;
     maxVisits?: number;
+    stepId?: string;
   } = {},
 ) {
   const kinds = options.kinds ?? ['call'];
@@ -353,11 +347,13 @@ export function catalogReachability(
     identity: WorkflowCatalogIdentity,
     path: CatalogRelationship[],
     seen: string[],
+    stepId?: string,
   ) => {
-    if (++visits > maxVisits || paths.length >= maxPaths || path.length > maxDepth) {
+    if (visits >= maxVisits || paths.length >= maxPaths || path.length > maxDepth) {
       bounded = true;
       return;
     }
+    visits++;
     const key = catalogKey(identity);
     if (seen.includes(key)) {
       cycles.push([...seen, key]);
@@ -368,11 +364,78 @@ export function catalogReachability(
       found.set(key, entry);
       paths.push({ entry, relationships: [...path].reverse() });
     }
-    for (const relation of incoming.get(key) ?? [])
-      visit(relation.from, [...path, relation], [...seen, key]);
+    for (const relation of incoming.get(key) ?? []) {
+      if (stepId && relation.targetStepId && relation.targetStepId !== stepId) continue;
+      if (visits >= maxVisits || paths.length >= maxPaths) {
+        bounded = true;
+        break;
+      }
+      visit(
+        relation.from,
+        [...path, relation],
+        [...seen, key],
+        relation.location.selection?.stepId,
+      );
+    }
   };
-  visit(target, [], []);
-  return { entries: [...found.values()], paths, cycles, bounded };
+  visit(target, [], [], options.stepId);
+  return { entries: [...found.values()], paths, cycles, bounded, visits };
+}
+
+export function catalogOperationPaths(
+  index: CatalogIndex,
+  operationKey: string,
+  options: { maxPaths?: number; maxDepth?: number; maxVisits?: number } = {},
+) {
+  const maxPaths = Math.min(options.maxPaths ?? 100, 100);
+  const maxDepth = Math.min(options.maxDepth ?? 32, 32);
+  const maxVisits = Math.min(options.maxVisits ?? 10000, 10000);
+  if ([maxPaths, maxDepth, maxVisits].some((value) => !Number.isSafeInteger(value) || value < 1))
+    throw new Error('Invalid operation path bounds');
+  const usages = index.apiUsages.filter(
+    (use) => use.status === 'located' && use.operationKey === operationKey,
+  );
+  const paths: {
+    key: string;
+    usage: CatalogAPIUsage;
+    entry: CatalogEntry;
+    relationships: CatalogRelationship[];
+    location?: WorkflowLocation;
+  }[] = [];
+  const cycles: string[][] = [];
+  let visits = 0,
+    bounded = false;
+  for (const usage of usages) {
+    if (paths.length >= maxPaths || visits >= maxVisits) {
+      bounded = true;
+      break;
+    }
+    const target = index.byKey.get(catalogKey(usage.from));
+    if (!target) continue;
+    const reach = catalogReachability(index, usage.from, {
+      kinds: ['call', 'prerequisite', 'goto', 'retry', 'descriptive'],
+      maxPaths: maxPaths - paths.length,
+      maxVisits: maxVisits - visits,
+      maxDepth,
+      stepId: usage.stepId,
+    });
+    visits += reach.visits;
+    bounded ||= reach.bounded;
+    cycles.push(...reach.cycles);
+    paths.push(
+      ...reach.paths.map((path) => ({
+        ...path,
+        usage,
+        key: JSON.stringify([
+          operationKey,
+          usage.id,
+          path.relationships.map((relation) => relation.id),
+        ]),
+        location: catalogPathLocation(path, target, usage.stepId),
+      })),
+    );
+  }
+  return { usages, paths, cycles, visits, bounded, complete: index.complete && !bounded };
 }
 
 // occurrence addresses exist only for standard same-document calls; transfers are not nested calls.

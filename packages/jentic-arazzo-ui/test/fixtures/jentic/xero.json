@@ -1,0 +1,1450 @@
+{
+  "arazzo": "1.0.1",
+  "info": {
+    "title": "Jentic Generated Arazzo Specification",
+    "version": "1.0.0",
+    "description": "Automatically generated Arazzo specification from OpenAPI"
+  },
+  "sourceDescriptions": [
+    {
+      "name": "openapi_source",
+      "url": "./apis/openapi/xero.com/xero_accounting/7.0.0/openapi.json",
+      "type": "openapi"
+    }
+  ],
+  "workflows": [
+    {
+      "workflowId": "credit-note-application-to-invoice",
+      "summary": "Creates a credit note and applies its balance to an outstanding invoice, then retrieves the credit note's history to confirm the allocation.",
+      "description": "Creates a credit note and applies its balance to an outstanding invoice, then retrieves the credit note's history to confirm the allocation.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "xero-tenant-id": {
+            "type": "string"
+          },
+          "summarizeErrors": {
+            "type": "string"
+          },
+          "unitdp": {
+            "type": "string"
+          },
+          "Idempotency-Key": {
+            "type": "string"
+          },
+          "create-credit-note_body": {
+            "type": "object"
+          },
+          "If-Modified-Since": {
+            "type": "string"
+          },
+          "where": {
+            "type": "string"
+          },
+          "order": {
+            "type": "string"
+          },
+          "IDs": {
+            "type": "string"
+          },
+          "InvoiceNumbers": {
+            "type": "string"
+          },
+          "ContactIDs": {
+            "type": "string"
+          },
+          "Statuses": {
+            "type": "string"
+          },
+          "page": {
+            "type": "string"
+          },
+          "includeArchived": {
+            "type": "string"
+          },
+          "createdByMyApp": {
+            "type": "string"
+          },
+          "summaryOnly": {
+            "type": "string"
+          },
+          "pageSize": {
+            "type": "string"
+          },
+          "searchTerm": {
+            "type": "string"
+          },
+          "CreditNoteID": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-credit-note",
+          "description": "Creates a new credit note (e.g., for a customer return or overcharge).",
+          "operationId": "createCreditNotes",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "summarizeErrors",
+              "in": "query",
+              "value": "$inputs.summarizeErrors"
+            },
+            {
+              "name": "unitdp",
+              "in": "query",
+              "value": "$inputs.unitdp"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-credit-note_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "credit_note_id": "$response.body#/CreditNotes"
+          }
+        },
+        {
+          "stepId": "get-invoices-for-allocation",
+          "description": "Retrieves a list of invoices, optionally filtered by contact or status, to identify a suitable one for credit note allocation.",
+          "operationId": "getInvoices",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "If-Modified-Since",
+              "in": "header",
+              "value": "$inputs.If-Modified-Since"
+            },
+            {
+              "name": "where",
+              "in": "query",
+              "value": "$inputs.where"
+            },
+            {
+              "name": "order",
+              "in": "query",
+              "value": "$inputs.order"
+            },
+            {
+              "name": "IDs",
+              "in": "query",
+              "value": "$inputs.IDs"
+            },
+            {
+              "name": "InvoiceNumbers",
+              "in": "query",
+              "value": "$inputs.InvoiceNumbers"
+            },
+            {
+              "name": "ContactIDs",
+              "in": "query",
+              "value": "$inputs.ContactIDs"
+            },
+            {
+              "name": "Statuses",
+              "in": "query",
+              "value": "$inputs.Statuses"
+            },
+            {
+              "name": "page",
+              "in": "query",
+              "value": "$inputs.page"
+            },
+            {
+              "name": "includeArchived",
+              "in": "query",
+              "value": "$inputs.includeArchived"
+            },
+            {
+              "name": "createdByMyApp",
+              "in": "query",
+              "value": "$inputs.createdByMyApp"
+            },
+            {
+              "name": "unitdp",
+              "in": "query",
+              "value": "$inputs.unitdp"
+            },
+            {
+              "name": "summaryOnly",
+              "in": "query",
+              "value": "$inputs.summaryOnly"
+            },
+            {
+              "name": "pageSize",
+              "in": "query",
+              "value": "$inputs.pageSize"
+            },
+            {
+              "name": "searchTerm",
+              "in": "query",
+              "value": "$inputs.searchTerm"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "available_invoices": "$response.body#/available_invoices"
+          }
+        },
+        {
+          "stepId": "create-credit-note-allocation",
+          "description": "Applies a specified amount of the credit note's balance to a chosen invoice.",
+          "operationId": "createCreditNoteAllocation",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "CreditNoteID",
+              "in": "path",
+              "value": "$inputs.CreditNoteID"
+            },
+            {
+              "name": "summarizeErrors",
+              "in": "query",
+              "value": "$inputs.summarizeErrors"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "credit_note_id": "$steps.create-credit-note.outputs.credit_note_id",
+              "invoice_id_to_allocate": "$steps.get-invoices-for-allocation.outputs.available_invoices[0].InvoiceID"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "allocation_id": "$response.body#/Allocations"
+          }
+        },
+        {
+          "stepId": "get-credit-note-history",
+          "description": "Retrieves the history of the credit note, including details of the allocation event.",
+          "operationId": "getCreditNoteHistory",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "CreditNoteID",
+              "in": "path",
+              "value": "$inputs.CreditNoteID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "history_records": "$response.body#/history_records"
+          }
+        }
+      ],
+      "outputs": {
+        "credit_note_id": "$steps.create-credit-note.outputs.credit_note_id",
+        "available_invoices": "$steps.get-invoices-for-allocation.outputs.available_invoices",
+        "allocation_id": "$steps.create-credit-note-allocation.outputs.allocation_id",
+        "history_records": "$steps.get-credit-note-history.outputs.history_records"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "new-contact-onboarding-and-grouping",
+      "summary": "Adds a new contact (customer or supplier) to Xero, categorizes them into a contact group, attaches relevant onboarding documents, and logs the onboarding activity.",
+      "description": "Adds a new contact (customer or supplier) to Xero, categorizes them into a contact group, attaches relevant onboarding documents, and logs the onboarding activity.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "xero-tenant-id": {
+            "type": "string"
+          },
+          "summarizeErrors": {
+            "type": "string"
+          },
+          "Idempotency-Key": {
+            "type": "string"
+          },
+          "create-contact_body": {
+            "type": "object"
+          },
+          "create-contact-group_body": {
+            "type": "object"
+          },
+          "ContactGroupID": {
+            "type": "string"
+          },
+          "ContactID": {
+            "type": "string"
+          },
+          "FileName": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-contact",
+          "description": "Registers a new individual or organization as a contact in Xero with essential details.",
+          "operationId": "createContacts",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "summarizeErrors",
+              "in": "query",
+              "value": "$inputs.summarizeErrors"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-contact_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "contact_id": "$response.body#/contact_id"
+          }
+        },
+        {
+          "stepId": "create-contact-group",
+          "description": "Creates a new group to categorize contacts (e.g., 'Key Customers', 'Preferred Suppliers').",
+          "operationId": "createContactGroup",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-contact-group_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "contact_group_id": "$response.body#/ContactGroups"
+          }
+        },
+        {
+          "stepId": "add-contact-to-group",
+          "description": "Assigns the newly created contact to the specified contact group.",
+          "operationId": "createContactGroupContacts",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "ContactGroupID",
+              "in": "path",
+              "value": "$inputs.ContactGroupID"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "contact_group_id": "$steps.create-contact-group.outputs.contact_group_id",
+              "contact_id": "$steps.create-contact.outputs.contact_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "group_data": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-contact-attachment",
+          "description": "Uploads and attaches a document (e.g., W-9 form, contract) to the contact's record.",
+          "operationId": "createContactAttachmentByFileName",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "ContactID",
+              "in": "path",
+              "value": "$inputs.ContactID"
+            },
+            {
+              "name": "FileName",
+              "in": "path",
+              "value": "$inputs.FileName"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/octet-stream",
+            "payload": {
+              "contact_id": "$steps.create-contact.outputs.contact_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "attachment_id": "$response.body#/Attachments"
+          }
+        },
+        {
+          "stepId": "create-contact-history",
+          "description": "Adds a history record to the contact, documenting the onboarding process or other relevant notes.",
+          "operationId": "createContactHistory",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "ContactID",
+              "in": "path",
+              "value": "$inputs.ContactID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "history_records": "$response.body#/history_records"
+          }
+        }
+      ],
+      "outputs": {
+        "contact_id": "$steps.create-contact.outputs.contact_id",
+        "contact_group_id": "$steps.create-contact-group.outputs.contact_group_id",
+        "group_data": "$steps.add-contact-to-group.outputs.group_data",
+        "attachment_id": "$steps.create-contact-attachment.outputs.attachment_id",
+        "history_records": "$steps.create-contact-history.outputs.history_records"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "purchase-order-management",
+      "summary": "Manages the creation, documentation, and tracking of purchase orders, including generating printable PDFs and attaching supporting files.",
+      "description": "Manages the creation, documentation, and tracking of purchase orders, including generating printable PDFs and attaching supporting files.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "xero-tenant-id": {
+            "type": "string"
+          },
+          "summarizeErrors": {
+            "type": "string"
+          },
+          "Idempotency-Key": {
+            "type": "string"
+          },
+          "create-purchase-order_body": {
+            "type": "object"
+          },
+          "PurchaseOrderID": {
+            "type": "string"
+          },
+          "FileName": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-purchase-order",
+          "description": "Creates a new purchase order for goods or services from a supplier.",
+          "operationId": "createPurchaseOrders",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "summarizeErrors",
+              "in": "query",
+              "value": "$inputs.summarizeErrors"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-purchase-order_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "purchase_order_id": "$response.body#/PurchaseOrders"
+          }
+        },
+        {
+          "stepId": "get-purchase-order-pdf",
+          "description": "Retrieves the purchase order as a PDF document, suitable for sending to suppliers.",
+          "operationId": "getPurchaseOrderAsPdf",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "PurchaseOrderID",
+              "in": "path",
+              "value": "$inputs.PurchaseOrderID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "purchase_order_pdf_data": "$response.body#/purchase_order_pdf_data"
+          }
+        },
+        {
+          "stepId": "create-purchase-order-attachment",
+          "description": "Attaches supporting documents (e.g., vendor quotes, specifications) to the purchase order.",
+          "operationId": "createPurchaseOrderAttachmentByFileName",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "PurchaseOrderID",
+              "in": "path",
+              "value": "$inputs.PurchaseOrderID"
+            },
+            {
+              "name": "FileName",
+              "in": "path",
+              "value": "$inputs.FileName"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/octet-stream",
+            "payload": {
+              "purchase_order_id": "$steps.create-purchase-order.outputs.purchase_order_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "attachment_id": "$response.body#/Attachments"
+          }
+        },
+        {
+          "stepId": "update-purchase-order-status",
+          "description": "Updates the status of the purchase order (e.g., from DRAFT to AUTHORISED or BILLED) as it progresses.",
+          "operationId": "updatePurchaseOrder",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "PurchaseOrderID",
+              "in": "path",
+              "value": "$inputs.PurchaseOrderID"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "purchase_order_id": "$steps.create-purchase-order.outputs.purchase_order_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "updated_purchase_order_details": "$response.body#/updated_purchase_order_details"
+          }
+        },
+        {
+          "stepId": "get-purchase-order-history",
+          "description": "Retrieves the history of changes and events related to the purchase order.",
+          "operationId": "getPurchaseOrderHistory",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "PurchaseOrderID",
+              "in": "path",
+              "value": "$inputs.PurchaseOrderID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "history_records": "$response.body#/history_records"
+          }
+        }
+      ],
+      "outputs": {
+        "purchase_order_id": "$steps.create-purchase-order.outputs.purchase_order_id",
+        "purchase_order_pdf_data": "$steps.get-purchase-order-pdf.outputs.purchase_order_pdf_data",
+        "attachment_id": "$steps.create-purchase-order-attachment.outputs.attachment_id",
+        "updated_purchase_order_details": "$steps.update-purchase-order-status.outputs.updated_purchase_order_details",
+        "history_records": "$steps.get-purchase-order-history.outputs.history_records"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "invoice-lifecycle-management",
+      "summary": "Manages the full lifecycle of a sales invoice or purchase bill, from creation and sending to attaching documents, recording payments, and retrieving historical data.",
+      "description": "Manages the full lifecycle of a sales invoice or purchase bill, from creation and sending to attaching documents, recording payments, and retrieving historical data.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "xero-tenant-id": {
+            "type": "string"
+          },
+          "summarizeErrors": {
+            "type": "string"
+          },
+          "unitdp": {
+            "type": "string"
+          },
+          "Idempotency-Key": {
+            "type": "string"
+          },
+          "create-invoice_body": {
+            "type": "object"
+          },
+          "InvoiceID": {
+            "type": "string"
+          },
+          "FileName": {
+            "type": "string"
+          },
+          "IncludeOnline": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-invoice",
+          "description": "Creates a new sales invoice or purchase bill in Xero. Requires details like contact, line items, and type (ACCREC for sales, ACCPAY for purchases).",
+          "operationId": "createInvoices",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "summarizeErrors",
+              "in": "query",
+              "value": "$inputs.summarizeErrors"
+            },
+            {
+              "name": "unitdp",
+              "in": "query",
+              "value": "$inputs.unitdp"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-invoice_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_id": "$response.body#/invoice_id"
+          }
+        },
+        {
+          "stepId": "email-invoice",
+          "description": "Sends a copy of the created invoice to the associated contact via email.",
+          "operationId": "emailInvoice",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "InvoiceID",
+              "in": "path",
+              "value": "$inputs.InvoiceID"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "invoice_id": "$steps.create-invoice.outputs.invoice_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_data": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-invoice-attachment",
+          "description": "Attaches a document (e.g., receipt, contract) to the invoice for record-keeping.",
+          "operationId": "createInvoiceAttachmentByFileName",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "InvoiceID",
+              "in": "path",
+              "value": "$inputs.InvoiceID"
+            },
+            {
+              "name": "FileName",
+              "in": "path",
+              "value": "$inputs.FileName"
+            },
+            {
+              "name": "IncludeOnline",
+              "in": "query",
+              "value": "$inputs.IncludeOnline"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/octet-stream",
+            "payload": {
+              "invoice_id": "$steps.create-invoice.outputs.invoice_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "attachment_id": "$response.body#/Attachments"
+          }
+        },
+        {
+          "stepId": "record-invoice-payment",
+          "description": "Records a payment received or made against the invoice, linking it to a bank account.",
+          "operationId": "createPayment",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "invoice_id": "$steps.create-invoice.outputs.invoice_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "payment_id": "$response.body#/payment_id"
+          }
+        },
+        {
+          "stepId": "get-invoice-pdf",
+          "description": "Retrieves the invoice as a PDF file for archival or sharing outside Xero.",
+          "operationId": "getInvoiceAsPdf",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "InvoiceID",
+              "in": "path",
+              "value": "$inputs.InvoiceID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "invoice_pdf_data": "$response.body#/invoice_pdf_data"
+          }
+        },
+        {
+          "stepId": "get-invoice-history",
+          "description": "Retrieves the history of changes and events related to the invoice, providing an audit trail.",
+          "operationId": "getInvoiceHistory",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "InvoiceID",
+              "in": "path",
+              "value": "$inputs.InvoiceID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "history_records": "$response.body#/history_records"
+          }
+        }
+      ],
+      "outputs": {
+        "invoice_id": "$steps.create-invoice.outputs.invoice_id",
+        "invoice_data": "$steps.email-invoice.outputs.invoice_data",
+        "attachment_id": "$steps.create-invoice-attachment.outputs.attachment_id",
+        "payment_id": "$steps.record-invoice-payment.outputs.payment_id",
+        "invoice_pdf_data": "$steps.get-invoice-pdf.outputs.invoice_pdf_data",
+        "history_records": "$steps.get-invoice-history.outputs.history_records"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "expense-claim-submission-and-approval",
+      "summary": "Facilitates the process of submitting an expense receipt, creating an associated expense claim, updating its status for approval, and tracking its history.",
+      "description": "Facilitates the process of submitting an expense receipt, creating an associated expense claim, updating its status for approval, and tracking its history.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "xero-tenant-id": {
+            "type": "string"
+          },
+          "unitdp": {
+            "type": "string"
+          },
+          "Idempotency-Key": {
+            "type": "string"
+          },
+          "create-receipt_body": {
+            "type": "object"
+          },
+          "ExpenseClaimID": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-receipt",
+          "description": "Creates a new draft expense claim receipt, typically from a scanned document or photo.",
+          "operationId": "createReceipt",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "unitdp",
+              "in": "query",
+              "value": "$inputs.unitdp"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-receipt_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "receipt_id": "$response.body#/receipt_id"
+          }
+        },
+        {
+          "stepId": "create-expense-claim",
+          "description": "Creates an expense claim, linking it to the newly created receipt and the submitting user.",
+          "operationId": "createExpenseClaims",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "expense_claim_data": "$steps.create-receipt.outputs.receipt_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "expense_claim_id": "$response.body#/ExpenseClaims"
+          }
+        },
+        {
+          "stepId": "update-expense-claim-status",
+          "description": "Updates the status of the expense claim (e.g., from SUBMITTED to AUTHORISED) as part of an approval process.",
+          "operationId": "updateExpenseClaim",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "ExpenseClaimID",
+              "in": "path",
+              "value": "$inputs.ExpenseClaimID"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "expense_claim_id": "$steps.create-expense-claim.outputs.expense_claim_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "updated_expense_claim_details": "$response.body#/updated_expense_claim_details"
+          }
+        },
+        {
+          "stepId": "create-expense-claim-history",
+          "description": "Adds a history record to the expense claim, noting approval or other significant events.",
+          "operationId": "createExpenseClaimHistory",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "ExpenseClaimID",
+              "in": "path",
+              "value": "$inputs.ExpenseClaimID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "history_records": "$response.body#/history_records"
+          }
+        }
+      ],
+      "outputs": {
+        "receipt_id": "$steps.create-receipt.outputs.receipt_id",
+        "expense_claim_id": "$steps.create-expense-claim.outputs.expense_claim_id",
+        "updated_expense_claim_details": "$steps.update-expense-claim-status.outputs.updated_expense_claim_details",
+        "history_records": "$steps.create-expense-claim-history.outputs.history_records"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "sales-quote-process",
+      "summary": "Manages the creation, presentation, and tracking of sales quotes, including generating printable PDFs and attaching relevant files for customer review.",
+      "description": "Manages the creation, presentation, and tracking of sales quotes, including generating printable PDFs and attaching relevant files for customer review.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "xero-tenant-id": {
+            "type": "string"
+          },
+          "summarizeErrors": {
+            "type": "string"
+          },
+          "Idempotency-Key": {
+            "type": "string"
+          },
+          "create-quote_body": {
+            "type": "object"
+          },
+          "QuoteID": {
+            "type": "string"
+          },
+          "FileName": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-quote",
+          "description": "Creates a new sales quote for a potential customer with proposed items and pricing.",
+          "operationId": "createQuotes",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "summarizeErrors",
+              "in": "query",
+              "value": "$inputs.summarizeErrors"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-quote_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "quote_id": "$response.body#/quote_id"
+          }
+        },
+        {
+          "stepId": "get-quote-pdf",
+          "description": "Retrieves the sales quote as a PDF document for sharing with the customer.",
+          "operationId": "getQuoteAsPdf",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "QuoteID",
+              "in": "path",
+              "value": "$inputs.QuoteID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "quote_pdf_data": "$response.body#/quote_pdf_data"
+          }
+        },
+        {
+          "stepId": "create-quote-attachment",
+          "description": "Attaches supporting documents (e.g., product specifications, images) to the quote.",
+          "operationId": "createQuoteAttachmentByFileName",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "QuoteID",
+              "in": "path",
+              "value": "$inputs.QuoteID"
+            },
+            {
+              "name": "FileName",
+              "in": "path",
+              "value": "$inputs.FileName"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/octet-stream",
+            "payload": {
+              "quote_id": "$steps.create-quote.outputs.quote_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "attachment_id": "$response.body#/Attachments"
+          }
+        },
+        {
+          "stepId": "update-quote-status",
+          "description": "Updates the status of the quote (e.g., from DRAFT to SENT, ACCEPTED, or DECLINED) based on customer interaction.",
+          "operationId": "updateQuote",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "Idempotency-Key",
+              "in": "header",
+              "value": "$inputs.Idempotency-Key"
+            },
+            {
+              "name": "QuoteID",
+              "in": "path",
+              "value": "$inputs.QuoteID"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "quote_id": "$steps.create-quote.outputs.quote_id"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "updated_quote_details": "$response.body#/updated_quote_details"
+          }
+        },
+        {
+          "stepId": "get-quote-history",
+          "description": "Retrieves the history of changes and events related to the sales quote.",
+          "operationId": "getQuoteHistory",
+          "parameters": [
+            {
+              "name": "xero-tenant-id",
+              "in": "header",
+              "value": "$inputs.xero-tenant-id"
+            },
+            {
+              "name": "QuoteID",
+              "in": "path",
+              "value": "$inputs.QuoteID"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "history_records": "$response.body#/history_records"
+          }
+        }
+      ],
+      "outputs": {
+        "quote_id": "$steps.create-quote.outputs.quote_id",
+        "quote_pdf_data": "$steps.get-quote-pdf.outputs.quote_pdf_data",
+        "attachment_id": "$steps.create-quote-attachment.outputs.attachment_id",
+        "updated_quote_details": "$steps.update-quote-status.outputs.updated_quote_details",
+        "history_records": "$steps.get-quote-history.outputs.history_records"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    }
+  ],
+  "components": {
+    "successActions": {
+      "default_success": {
+        "name": "default_success",
+        "type": "end"
+      }
+    },
+    "failureActions": {
+      "auth_failure": {
+        "name": "auth_failure",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 401"
+          }
+        ]
+      },
+      "permission_denied": {
+        "name": "permission_denied",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 403"
+          }
+        ]
+      },
+      "not_found": {
+        "name": "not_found",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 404"
+          }
+        ]
+      },
+      "server_error": {
+        "name": "server_error",
+        "type": "retry",
+        "retryAfter": 2,
+        "retryLimit": 3,
+        "criteria": [
+          {
+            "condition": "$statusCode >= 500"
+          }
+        ]
+      },
+      "default_retry": {
+        "name": "default_retry",
+        "type": "retry",
+        "retryAfter": 1,
+        "retryLimit": 3
+      },
+      "default_failure": {
+        "name": "default_failure",
+        "type": "end"
+      }
+    }
+  }
+}

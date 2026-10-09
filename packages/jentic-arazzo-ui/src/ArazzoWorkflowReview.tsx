@@ -322,13 +322,13 @@ export function ArazzoWorkflowReview(props: ArazzoWorkflowReviewProps) {
                   .map((effect, i) => (
                     <details key={i}>
                       <summary>
-                        Inherited action use · {effect.location.root} /{' '}
+                        Applicable action use · {effect.location.root} /{' '}
                         {effect.location.selection?.stepId}
                       </summary>
                       <p>Declaration: {effect.declarationPointer}</p>
                       <ReadingValue value={effect.value} />
                       <button type="button" onClick={() => open(side, effect.location)}>
-                        Open inherited use
+                        Open applicable use
                       </button>
                     </details>
                   ))}

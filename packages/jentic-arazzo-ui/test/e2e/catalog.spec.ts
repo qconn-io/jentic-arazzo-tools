@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import { readFileSync, writeFileSync, mkdirSync, readdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
-const evidence = resolve('../../openspec/changes/add-workflow-capability-catalog/browser-evidence');
+const evidence = resolve('test-output/browser/archival/catalog');
 mkdirSync(evidence, { recursive: true });
 const observations: unknown[] = [];
 const catalog = 'http://localhost:3000/examples/catalog.json';

@@ -1,0 +1,1733 @@
+{
+  "arazzo": "1.0.1",
+  "info": {
+    "title": "Jentic Generated Arazzo Specification",
+    "version": "1.0.0",
+    "description": "Automatically generated Arazzo specification from OpenAPI"
+  },
+  "sourceDescriptions": [
+    {
+      "name": "openapi_source",
+      "url": "./apis/openapi/asana.com/main/1.0/openapi.json",
+      "type": "openapi"
+    }
+  ],
+  "workflows": [
+    {
+      "workflowId": "create-project-add-sections-and-tasks",
+      "summary": "Sets up a new project structure by creating the project, adding organizational sections within it, and then populating a section with an initial task.",
+      "description": "Sets up a new project structure by creating the project, adding organizational sections within it, and then populating a section with an initial task.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "create-project_body": {
+            "type": "object"
+          },
+          "project_gid": {
+            "type": "string"
+          },
+          "section_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-project",
+          "description": "Create a new project within a specified workspace and team.",
+          "operationId": "createProject",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-project_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "project_gid": "$response.body",
+            "project_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-section-todo",
+          "description": "Create a 'To Do' section within the newly created project.",
+          "operationId": "createSectionForProject",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$steps.create-project.outputs.project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "project_gid": "$steps.create-project.outputs.project_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "section_gid_todo": "$response.body",
+            "section_details_todo": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-section-done",
+          "description": "Create a 'Done' section within the newly created project.",
+          "operationId": "createSectionForProject",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$steps.create-project.outputs.project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "project_gid": "$steps.create-project.outputs.project_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "section_gid_done": "$response.body",
+            "section_details_done": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-initial-task",
+          "description": "Create the first task for the project.",
+          "operationId": "createTask",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "workspace_gid": "$steps.create-project.outputs.project_details.workspace.gid",
+              "projects": "$steps.create-project.outputs.project_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "task_gid": "$response.body",
+            "task_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "add-task-to-section",
+          "description": "Move the newly created task into the 'To Do' section.",
+          "operationId": "addTaskForSection",
+          "parameters": [
+            {
+              "name": "section_gid",
+              "in": "path",
+              "value": "$steps.create-section-todo.outputs.section_gid_todo"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "section_gid": "$steps.create-section-todo.outputs.section_gid_todo",
+              "task_gid": "$steps.create-initial-task.outputs.task_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "empty_response": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "project_gid": "$steps.create-project.outputs.project_gid",
+        "project_details": "$steps.create-project.outputs.project_details",
+        "section_gid_todo": "$steps.create-section-todo.outputs.section_gid_todo",
+        "section_details_todo": "$steps.create-section-todo.outputs.section_details_todo",
+        "section_gid_done": "$steps.create-section-done.outputs.section_gid_done",
+        "section_details_done": "$steps.create-section-done.outputs.section_details_done",
+        "task_gid": "$steps.create-initial-task.outputs.task_gid",
+        "task_details": "$steps.create-initial-task.outputs.task_details",
+        "empty_response": "$steps.add-task-to-section.outputs.empty_response"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "task-collaboration-and-context-addition",
+      "summary": "Enhances a task by adding a comment for discussion and attaching a relevant file for context.",
+      "description": "Enhances a task by adding a comment for discussion and attaching a relevant file for context.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "task_gid": {
+            "type": "string"
+          },
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "resource_subtype": {
+            "type": "string"
+          },
+          "file": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "connect_to_app": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "get-task",
+          "description": "Retrieve the details of a specific task.",
+          "operationId": "getTask",
+          "parameters": [
+            {
+              "name": "task_gid",
+              "in": "path",
+              "value": "$inputs.task_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "task_details": "$response.body",
+            "task_gid": "$response.body"
+          }
+        },
+        {
+          "stepId": "add-comment-to-task",
+          "description": "Add a comment (story) to the task.",
+          "operationId": "createStoryForTask",
+          "parameters": [
+            {
+              "name": "task_gid",
+              "in": "path",
+              "value": "$steps.get-task.outputs.task_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "task_gid": "$steps.get-task.outputs.task_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "story_gid": "$response.body",
+            "story_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "attach-file-to-task",
+          "description": "Upload and attach a file to the task.",
+          "operationId": "createAttachmentForObject",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "multipart/form-data",
+            "payload": {
+              "task_gid": "$steps.get-task.outputs.task_gid",
+              "resource_subtype": "$inputs.resource_subtype",
+              "file": "$inputs.file",
+              "url": "$inputs.url",
+              "name": "$inputs.name",
+              "connect_to_app": "$inputs.connect_to_app"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "attachment_gid": "$response.body",
+            "attachment_details": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "task_details": "$steps.get-task.outputs.task_details",
+        "task_gid": "$steps.get-task.outputs.task_gid",
+        "story_gid": "$steps.add-comment-to-task.outputs.story_gid",
+        "story_details": "$steps.add-comment-to-task.outputs.story_details",
+        "attachment_gid": "$steps.attach-file-to-task.outputs.attachment_gid",
+        "attachment_details": "$steps.attach-file-to-task.outputs.attachment_details"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "instantiate-project-from-template",
+      "summary": "Creates a new project based on a predefined template, waits for the asynchronous creation job to complete, and retrieves the new project details.",
+      "description": "Creates a new project based on a predefined template, waits for the asynchronous creation job to complete, and retrieves the new project details.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "project_template_gid": {
+            "type": "string"
+          },
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "job_gid": {
+            "type": "string"
+          },
+          "project_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "get-project-template",
+          "description": "Retrieve the details of a specific project template, including requested date variables.",
+          "operationId": "getProjectTemplate",
+          "parameters": [
+            {
+              "name": "project_template_gid",
+              "in": "path",
+              "value": "$inputs.project_template_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "project_template_details": "$response.body",
+            "project_template_gid": "$response.body"
+          }
+        },
+        {
+          "stepId": "instantiate-project",
+          "description": "Start the asynchronous job to create a new project from the template.",
+          "operationId": "instantiateProject",
+          "parameters": [
+            {
+              "name": "project_template_gid",
+              "in": "path",
+              "value": "$steps.get-project-template.outputs.project_template_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "project_template_gid": "$steps.get-project-template.outputs.project_template_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "job_gid": "$response.body",
+            "job_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "poll-job-status",
+          "description": "Poll the status of the project instantiation job until it succeeds or fails.",
+          "operationId": "getJob",
+          "parameters": [
+            {
+              "name": "job_gid",
+              "in": "path",
+              "value": "$steps.instantiate-project.outputs.job_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "job_status": "$response.body",
+            "new_project_gid": "$response.body",
+            "new_project_template_gid": "$response.body",
+            "new_task_gid": "$response.body"
+          }
+        },
+        {
+          "stepId": "get-new-project",
+          "description": "Retrieve the details of the newly created project once the job is complete.",
+          "operationId": "getProject",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$steps.poll-job-status.outputs.new_project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "project_details": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "project_template_details": "$steps.get-project-template.outputs.project_template_details",
+        "project_template_gid": "$steps.get-project-template.outputs.project_template_gid",
+        "job_gid": "$steps.instantiate-project.outputs.job_gid",
+        "job_details": "$steps.instantiate-project.outputs.job_details",
+        "job_status": "$steps.poll-job-status.outputs.job_status",
+        "new_project_gid": "$steps.poll-job-status.outputs.new_project_gid",
+        "new_project_template_gid": "$steps.poll-job-status.outputs.new_project_template_gid",
+        "new_task_gid": "$steps.poll-job-status.outputs.new_task_gid",
+        "project_details": "$steps.get-new-project.outputs.project_details"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "apply-custom-field-to-project-and-update-task",
+      "summary": "Finds a workspace-level custom field, applies it to a specific project, and then updates a task within that project with a value for the custom field.",
+      "description": "Finds a workspace-level custom field, applies it to a specific project, and then updates a task within that project with a value for the custom field.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "workspace_gid": {
+            "type": "string"
+          },
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "string"
+          },
+          "project_gid": {
+            "type": "string"
+          },
+          "task_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "find-custom-field",
+          "description": "Find a specific custom field within the workspace.",
+          "operationId": "getCustomFieldsForWorkspace",
+          "parameters": [
+            {
+              "name": "workspace_gid",
+              "in": "path",
+              "value": "$inputs.workspace_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "value": "$inputs.limit"
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "value": "$inputs.offset"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "custom_field_gid": "$response.body",
+            "custom_fields_list": "$response.body"
+          }
+        },
+        {
+          "stepId": "add-custom-field-to-project",
+          "description": "Associate the custom field with a specific project.",
+          "operationId": "addCustomFieldSettingForProject",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$inputs.project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "custom_field_gid": "$steps.find-custom-field.outputs.custom_field_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "custom_field_setting_response": "$response.body"
+          }
+        },
+        {
+          "stepId": "update-task-custom-field",
+          "description": "Update a task within the project to set a value for the newly added custom field.",
+          "operationId": "updateTask",
+          "parameters": [
+            {
+              "name": "task_gid",
+              "in": "path",
+              "value": "$inputs.task_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "custom_fields_object": "$steps.find-custom-field.outputs.custom_field_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "updated_task_details": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "custom_field_gid": "$steps.find-custom-field.outputs.custom_field_gid",
+        "custom_fields_list": "$steps.find-custom-field.outputs.custom_fields_list",
+        "custom_field_setting_response": "$steps.add-custom-field-to-project.outputs.custom_field_setting_response",
+        "updated_task_details": "$steps.update-task-custom-field.outputs.updated_task_details"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "create-dependent-tasks",
+      "summary": "Creates two tasks and establishes a dependency relationship where one task must be completed before the other can start.",
+      "description": "Creates two tasks and establishes a dependency relationship where one task must be completed before the other can start.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "create-blocker-task_body": {
+            "type": "object"
+          },
+          "task_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-blocker-task",
+          "description": "Create the first task (the blocker).",
+          "operationId": "createTask",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-blocker-task_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "blocker_task_gid": "$response.body",
+            "blocker_task_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-dependent-task",
+          "description": "Create the second task (the dependent).",
+          "operationId": "createTask",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "workspace_gid": "$steps.create-blocker-task.outputs.blocker_task_details.workspace.gid",
+              "projects": "$steps.create-blocker-task.outputs.blocker_task_details.projects[0].gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "dependent_task_gid": "$response.body",
+            "dependent_task_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "add-dependency",
+          "description": "Mark the second task as dependent on the first task.",
+          "operationId": "addDependenciesForTask",
+          "parameters": [
+            {
+              "name": "task_gid",
+              "in": "path",
+              "value": "$steps.create-dependent-task.outputs.dependent_task_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "task_gid": "$steps.create-dependent-task.outputs.dependent_task_gid",
+              "dependencies_array": "$steps.create-blocker-task.outputs.blocker_task_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "empty_response": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "blocker_task_gid": "$steps.create-blocker-task.outputs.blocker_task_gid",
+        "blocker_task_details": "$steps.create-blocker-task.outputs.blocker_task_details",
+        "dependent_task_gid": "$steps.create-dependent-task.outputs.dependent_task_gid",
+        "dependent_task_details": "$steps.create-dependent-task.outputs.dependent_task_details",
+        "empty_response": "$steps.add-dependency.outputs.empty_response"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "goal-setup-and-metric-definition",
+      "summary": "Creates a new organizational or team goal, associates it with a time period, and defines its initial metric for tracking progress.",
+      "description": "Creates a new organizational or team goal, associates it with a time period, and defines its initial metric for tracking progress.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "string"
+          },
+          "start_on": {
+            "type": "string"
+          },
+          "end_on": {
+            "type": "string"
+          },
+          "workspace": {
+            "type": "string"
+          },
+          "goal_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "find-time-period",
+          "description": "Find the appropriate time period GID for the goal.",
+          "operationId": "getTimePeriods",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "value": "$inputs.limit"
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "value": "$inputs.offset"
+            },
+            {
+              "name": "start_on",
+              "in": "query",
+              "value": "$inputs.start_on"
+            },
+            {
+              "name": "end_on",
+              "in": "query",
+              "value": "$inputs.end_on"
+            },
+            {
+              "name": "workspace",
+              "in": "query",
+              "value": "$inputs.workspace"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "time_period_gid": "$response.body",
+            "time_periods_list": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-goal",
+          "description": "Create a new goal within a workspace/team for the specified time period.",
+          "operationId": "createGoal",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "value": "$inputs.limit"
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "value": "$inputs.offset"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "time_period_gid": "$steps.find-time-period.outputs.time_period_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "goal_gid": "$response.body",
+            "goal_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "define-goal-metric",
+          "description": "Define the metric (e.g., number, currency) for the newly created goal.",
+          "operationId": "createGoalMetric",
+          "parameters": [
+            {
+              "name": "goal_gid",
+              "in": "path",
+              "value": "$steps.create-goal.outputs.goal_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "goal_gid": "$steps.create-goal.outputs.goal_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "goal_details_with_metric": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "time_period_gid": "$steps.find-time-period.outputs.time_period_gid",
+        "time_periods_list": "$steps.find-time-period.outputs.time_periods_list",
+        "goal_gid": "$steps.create-goal.outputs.goal_gid",
+        "goal_details": "$steps.create-goal.outputs.goal_details",
+        "goal_details_with_metric": "$steps.define-goal-metric.outputs.goal_details_with_metric"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "add-project-to-portfolio-for-overview",
+      "summary": "Adds an existing project to a portfolio to include it in a higher-level strategic overview.",
+      "description": "Adds an existing project to a portfolio to include it in a higher-level strategic overview.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "portfolio_gid": {
+            "type": "string"
+          },
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "project_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "get-portfolio",
+          "description": "Retrieve the details of the target portfolio.",
+          "operationId": "getPortfolio",
+          "parameters": [
+            {
+              "name": "portfolio_gid",
+              "in": "path",
+              "value": "$inputs.portfolio_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "portfolio_details": "$response.body",
+            "portfolio_gid": "$response.body"
+          }
+        },
+        {
+          "stepId": "get-project-to-add",
+          "description": "Retrieve the details of the project to be added.",
+          "operationId": "getProject",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$inputs.project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "project_details": "$response.body",
+            "project_gid": "$response.body"
+          }
+        },
+        {
+          "stepId": "add-project-to-portfolio",
+          "description": "Add the specified project as an item to the portfolio.",
+          "operationId": "addItemForPortfolio",
+          "parameters": [
+            {
+              "name": "portfolio_gid",
+              "in": "path",
+              "value": "$steps.get-portfolio.outputs.portfolio_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "portfolio_gid": "$steps.get-portfolio.outputs.portfolio_gid",
+              "item_gid": "$steps.get-project-to-add.outputs.project_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "empty_response": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "portfolio_details": "$steps.get-portfolio.outputs.portfolio_details",
+        "portfolio_gid": "$steps.get-portfolio.outputs.portfolio_gid",
+        "project_details": "$steps.get-project-to-add.outputs.project_details",
+        "project_gid": "$steps.get-project-to-add.outputs.project_gid",
+        "empty_response": "$steps.add-project-to-portfolio.outputs.empty_response"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "team-creation-and-user-assignment",
+      "summary": "Creates a new team within an organization and adds an existing user from the workspace to that team.",
+      "description": "Creates a new team within an organization and adds an existing user from the workspace to that team.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "string"
+          },
+          "create-team_body": {
+            "type": "object"
+          },
+          "workspace": {
+            "type": "string"
+          },
+          "team": {
+            "type": "string"
+          },
+          "team_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-team",
+          "description": "Create a new team within the specified organization/workspace.",
+          "operationId": "createTeam",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "value": "$inputs.limit"
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "value": "$inputs.offset"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-team_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "team_gid": "$response.body",
+            "team_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "find-user-to-add",
+          "description": "Find a user within the workspace/organization to add to the team.",
+          "operationId": "getUsers",
+          "parameters": [
+            {
+              "name": "workspace",
+              "in": "query",
+              "value": "$inputs.workspace"
+            },
+            {
+              "name": "team",
+              "in": "query",
+              "value": "$inputs.team"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "value": "$inputs.limit"
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "value": "$inputs.offset"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "user_gid": "$response.body",
+            "users_list": "$response.body"
+          }
+        },
+        {
+          "stepId": "add-user-to-team",
+          "description": "Add the specified user to the newly created team.",
+          "operationId": "addUserForTeam",
+          "parameters": [
+            {
+              "name": "team_gid",
+              "in": "path",
+              "value": "$steps.create-team.outputs.team_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "team_gid": "$steps.create-team.outputs.team_gid",
+              "user_gid": "$steps.find-user-to-add.outputs.user_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "team_membership_details": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "team_gid": "$steps.create-team.outputs.team_gid",
+        "team_details": "$steps.create-team.outputs.team_details",
+        "user_gid": "$steps.find-user-to-add.outputs.user_gid",
+        "users_list": "$steps.find-user-to-add.outputs.users_list",
+        "team_membership_details": "$steps.add-user-to-team.outputs.team_membership_details"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "manage-project-brief",
+      "summary": "Creates a project brief for an existing project to document its goals and scope, and then updates it.",
+      "description": "Creates a project brief for an existing project to document its goals and scope, and then updates it.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "project_gid": {
+            "type": "string"
+          },
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "project_brief_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "get-project-for-brief",
+          "description": "Retrieve the project for which to create the brief.",
+          "operationId": "getProject",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$inputs.project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "project_gid": "$response.body",
+            "project_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "create-project-brief",
+          "description": "Create a new project brief associated with the specified project.",
+          "operationId": "createProjectBrief",
+          "parameters": [
+            {
+              "name": "project_gid",
+              "in": "path",
+              "value": "$steps.get-project-for-brief.outputs.project_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "project_gid": "$steps.get-project-for-brief.outputs.project_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "project_brief_gid": "$response.body",
+            "project_brief_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "update-project-brief",
+          "description": "Update the content of the existing project brief.",
+          "operationId": "updateProjectBrief",
+          "parameters": [
+            {
+              "name": "project_brief_gid",
+              "in": "path",
+              "value": "$steps.create-project-brief.outputs.project_brief_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": {
+              "project_brief_gid": "$steps.create-project-brief.outputs.project_brief_gid"
+            }
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "updated_project_brief_details": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "project_gid": "$steps.get-project-for-brief.outputs.project_gid",
+        "project_details": "$steps.get-project-for-brief.outputs.project_details",
+        "project_brief_gid": "$steps.create-project-brief.outputs.project_brief_gid",
+        "project_brief_details": "$steps.create-project-brief.outputs.project_brief_details",
+        "updated_project_brief_details": "$steps.update-project-brief.outputs.updated_project_brief_details"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    },
+    {
+      "workflowId": "export-organization-data-enterprise",
+      "summary": "Initiates an organization data export, polls the job status until completion, and retrieves the download URL. Requires Enterprise plan and Service Account.",
+      "description": "Initiates an organization data export, polls the job status until completion, and retrieves the download URL. Requires Enterprise plan and Service Account.",
+      "inputs": {
+        "type": "object",
+        "properties": {
+          "opt_pretty": {
+            "type": "string"
+          },
+          "opt_fields": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "string"
+          },
+          "create-organization-export_body": {
+            "type": "object"
+          },
+          "organization_export_gid": {
+            "type": "string"
+          }
+        }
+      },
+      "steps": [
+        {
+          "stepId": "create-organization-export",
+          "description": "Request an export of the organization's data.",
+          "operationId": "createOrganizationExport",
+          "parameters": [
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "value": "$inputs.limit"
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "value": "$inputs.offset"
+            }
+          ],
+          "requestBody": {
+            "contentType": "application/json",
+            "payload": "$inputs.create-organization-export_body"
+          },
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "organization_export_gid": "$response.body",
+            "export_details": "$response.body"
+          }
+        },
+        {
+          "stepId": "poll-export-status",
+          "description": "Check the status of the organization export request periodically.",
+          "operationId": "getOrganizationExport",
+          "parameters": [
+            {
+              "name": "organization_export_gid",
+              "in": "path",
+              "value": "$steps.create-organization-export.outputs.organization_export_gid"
+            },
+            {
+              "name": "opt_pretty",
+              "in": "query",
+              "value": "$inputs.opt_pretty"
+            },
+            {
+              "name": "opt_fields",
+              "in": "query",
+              "value": "$inputs.opt_fields"
+            }
+          ],
+          "successCriteria": [
+            {
+              "condition": "$statusCode == 200"
+            }
+          ],
+          "outputs": {
+            "export_status": "$response.body",
+            "download_url": "$response.body"
+          }
+        }
+      ],
+      "outputs": {
+        "organization_export_gid": "$steps.create-organization-export.outputs.organization_export_gid",
+        "export_details": "$steps.create-organization-export.outputs.export_details",
+        "export_status": "$steps.poll-export-status.outputs.export_status",
+        "download_url": "$steps.poll-export-status.outputs.download_url"
+      },
+      "failureActions": [
+        {
+          "reference": "$components.failureActions.auth_failure"
+        },
+        {
+          "reference": "$components.failureActions.permission_denied"
+        },
+        {
+          "reference": "$components.failureActions.not_found"
+        },
+        {
+          "reference": "$components.failureActions.server_error"
+        }
+      ]
+    }
+  ],
+  "components": {
+    "successActions": {
+      "default_success": {
+        "name": "default_success",
+        "type": "end"
+      }
+    },
+    "failureActions": {
+      "auth_failure": {
+        "name": "auth_failure",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 401"
+          }
+        ]
+      },
+      "permission_denied": {
+        "name": "permission_denied",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 403"
+          }
+        ]
+      },
+      "not_found": {
+        "name": "not_found",
+        "type": "end",
+        "criteria": [
+          {
+            "condition": "$statusCode == 404"
+          }
+        ]
+      },
+      "server_error": {
+        "name": "server_error",
+        "type": "retry",
+        "retryAfter": 2,
+        "retryLimit": 3,
+        "criteria": [
+          {
+            "condition": "$statusCode >= 500"
+          }
+        ]
+      },
+      "default_retry": {
+        "name": "default_retry",
+        "type": "retry",
+        "retryAfter": 1,
+        "retryLimit": 3
+      },
+      "default_failure": {
+        "name": "default_failure",
+        "type": "end"
+      }
+    }
+  }
+}

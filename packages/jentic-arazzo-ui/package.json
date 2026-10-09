@@ -57,10 +57,15 @@
     "clean": "rimraf ./dist ./types ./build",
     "typescript:check-types": "tsc --noEmit",
     "typescript:declaration": "tsc -p tsconfig.declaration.json && api-extractor run -l -c ./config/api-extractor/api-extractor.ArazzoUI.json && api-extractor run -l -c ./config/api-extractor/api-extractor.ArazzoUIStandalone.json",
-    "test": "vitest run --config config/vitest/vitest.config.ts",
+    "test": "vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4}",
     "test:declarations": "node scripts/check-public-declarations.mjs",
     "prepack": "copyfiles -u 2 ../../LICENSE . && copyfiles -u 2 ../../NOTICE .",
-    "postpack": "rimraf NOTICE LICENSE"
+    "postpack": "rimraf NOTICE LICENSE",
+    "test:package": "node scripts/check-package-consumer.mjs",
+    "test:package:built": "node scripts/check-package-consumer.mjs --built",
+    "test:bundle": "node scripts/measure-package-consumers.mjs",
+    "test:browser": "node scripts/run-production-browser.mjs",
+    "test:browser:negative": "node scripts/run-production-browser.mjs --negative"
   },
   "repository": {
     "type": "git",
@@ -73,7 +78,8 @@
     "@jentic/arazzo-resolver": "1.0.0-alpha.32",
     "@speclynx/apidom-core": "^5.0.1",
     "@speclynx/apidom-datamodel": "^5.0.1",
-    "@speclynx/apidom-parser-adapter-yaml-1-2": "5.0.1",
+    "@speclynx/apidom-parser-adapter-yaml-1-2": "^5.0.1",
+    "@speclynx/apidom-reference": "^5.0.1",
     "@speclynx/apidom-traverse": "^5.0.1",
     "mermaid": "^11.16.1",
     "react-markdown": "^10.1.0",

@@ -3,7 +3,7 @@ import { readFileSync, mkdirSync, writeFileSync, readdirSync, existsSync } from 
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 const root = resolve('public/examples');
-const evidence = resolve('../../openspec/changes/add-authored-scenario-explorer/browser-evidence');
+const evidence = resolve('test-output/browser/archival/scenarios');
 mkdirSync(evidence, { recursive: true });
 const records: unknown[] = [];
 const build = resolve('build');
@@ -77,6 +77,7 @@ for (const { pack, scenarios } of fixtures)
         )!;
         await expect(page.locator('script[src]')).toHaveAttribute('src', `./${script}`);
       }
+      await expect(page.locator('details.arazzo-advanced-tools')).toHaveAttribute('open', '');
       const panel = page.getByRole('region', { name: 'Authored scenario guides' });
       await expect(panel).toContainText('Authored expectations');
       await panel.getByRole('button', { name: scenario.id, exact: true }).click();

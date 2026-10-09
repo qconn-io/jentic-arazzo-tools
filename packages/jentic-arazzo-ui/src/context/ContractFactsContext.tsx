@@ -93,6 +93,7 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
             acquired.retrievalURI,
             sourceRegistry,
             acquired.revision,
+            validity,
           ),
         };
       } else {
