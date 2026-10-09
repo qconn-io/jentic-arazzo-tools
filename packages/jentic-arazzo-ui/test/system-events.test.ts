@@ -31,7 +31,7 @@ it('requires exact declared message identities and current revisions, never equa
   const model = buildViewerModel(
     inspect(
       createSnapshot({
-        arazzo: '1.0.1',
+        arazzo: '1.1.0',
         info: { title: 'T', version: '1' },
         sourceDescriptions: [{ name: 'events', type: 'asyncapi', url: 'https://test/events' }],
         workflows: [
@@ -56,6 +56,8 @@ it('requires exact declared message identities and current revisions, never equa
   };
   const loaded = { events: { state: 'success' as const, facts } };
   expect(validateEventAssociation(model, a, loaded).valid).toBe(true);
+  const older = buildViewerModel(inspect(createSnapshot({ ...model.document, arazzo: '1.0.1' })));
+  expect(validateEventAssociation(older, a, loaded).valid).toBe(false);
   expect(
     validateEventAssociation(
       model,

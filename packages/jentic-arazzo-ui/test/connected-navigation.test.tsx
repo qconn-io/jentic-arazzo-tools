@@ -51,7 +51,7 @@ test('controlled overview requests do not replace the authoritative workflow', a
   await waitFor(() =>
     expect(screen.queryByRole('region', { name: 'Workflow overview' })).toBeNull(),
   );
-  expect(screen.getByRole('button', { name: 'Sequence' })).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Sequence diagram' })).toBeTruthy();
 });
 
 test('mode changes retain destination and replacement rebuilds the overview entries', async () => {

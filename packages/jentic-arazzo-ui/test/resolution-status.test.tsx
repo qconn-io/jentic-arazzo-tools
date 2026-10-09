@@ -41,9 +41,9 @@ test('one shared status distinguishes unchecked source content and available loc
   const control = await screen.findByText('Inspection status');
   fireEvent.click(control);
   const status = screen.getByRole('region', { name: 'Inspection status details' });
-  expect(status.textContent).toContain('Source documents were not fetched');
+  expect(status.textContent).toContain('API descriptions have not been loaded');
   expect(status.textContent).toContain('does not mean they are invalid or inaccessible');
-  fireEvent.click(screen.getByRole('button', { name: 'Sequence' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram' }));
   const sequence = screen.getByRole('region', { name: 'Sequence checkout' });
   expect(sequence.textContent).not.toContain('Schema validation');
   expect(sequence.textContent).not.toContain('unverified');

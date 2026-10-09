@@ -100,7 +100,7 @@ describe('private inspection profiles', () => {
 });
 
 describe('source-neutral bindings and profile extension contract', () => {
-  it('keeps bare source IDs unverified, conflicting locators ambiguous, and authored async metadata opaque', () => {
+  it('binds supported single-source IDs without verifying operations, keeping conflicting locators ambiguous, and authored async metadata opaque', () => {
     const input = document();
     input.sourceDescriptions = [
       { name: 'bus', type: 'asyncapi', url: 'https://example.org/bus' },
@@ -122,13 +122,13 @@ describe('source-neutral bindings and profile extension contract', () => {
     });
     const inspected = inspect(createSnapshot(input));
     expect(inspected.workflows[0].steps[0].sourceBinding).toMatchObject({
-      status: 'unverified',
+      status: 'declared',
       verification: 'unverified',
       intent: 'send',
       timeout: 0,
       correlationId: '$inputs.trace',
     });
-    expect(inspected.workflows[0].steps[0].sourceBinding.sourceName).toBeUndefined();
+    expect(inspected.workflows[0].steps[0].sourceBinding.sourceName).toBe('bus');
     expect(inspected.workflows[0].steps[1].sourceBinding).toMatchObject({
       status: 'declared',
       sourceName: 'bus',
@@ -349,4 +349,60 @@ it('warns at a reusable querystring parameter use in an older profile while reta
       declarationPath: ['components', 'parameters', 'wholeQuery'],
     }),
   );
+});
+
+describe('supported single-source operation-ID scope', () => {
+  const api = { name: 'api', type: 'openapi', url: './api' };
+  const bus = { name: 'bus', type: 'asyncapi', url: './bus' };
+  it.each([
+    ['1.0.1', [api], 'run', 'api'],
+    ['1.1.0', [api], 'run', 'api'],
+    ['1.1.0', [bus], 'run', 'bus'],
+    ['1.0.1', [bus], 'run', undefined],
+    ['1.0.1', [api], 'run', 'api'],
+    ['1.1.0', [api, { name: 'chain', type: 'arazzo', url: './chain' }], 'run', 'api'],
+    ['1.1.0', [api, bus], 'run', undefined],
+    ['1.1.0', [api, { name: 'api', type: 'arazzo', url: './chain' }], 'run', undefined],
+    ['1.1.0', [api, { name: 'future', type: 'unknown', url: './future' }], 'run', undefined],
+    ['1.1.0', [{ name: 'future', type: 'unknown', url: './future' }], 'run', undefined],
+    ['1.1.0', [{ type: 'openapi', url: './api' }], 'run', undefined],
+    ['1.1.0', [{ ...api, name: '' }], 'run', undefined],
+    ['1.1.0', [api, { ...api, url: './other' }], 'run', undefined],
+    ['1.1.0', [api], '$sourceDescriptions.api.', undefined],
+    ['1.1.0', [api], '$sourceDescriptions.absent.run', undefined],
+    ['1.1.0', [api], '{$sourceDescriptions.api.url', undefined],
+  ])('version %s with %j and %s binds only %s', (version, sources, operationId, name) => {
+    const input = {
+      arazzo: version,
+      info: { title: 'Scope', version: '1' },
+      sourceDescriptions: sources,
+      workflows: [{ workflowId: 'root', steps: [{ stepId: 'one', operationId }] }],
+    };
+    const before = JSON.stringify(input);
+    const binding = inspect(createSnapshot(input)).workflows[0].steps[0].sourceBinding;
+    expect(binding.sourceName).toBe(name);
+    expect(binding.verification).toBe('unverified');
+    expect(binding.locators).toEqual({ operationId });
+    expect(JSON.stringify(input)).toBe(before);
+  });
+  it('never applies the rule to pointers, conflicts or unsupported async metadata', () => {
+    for (const step of [
+      { operationPath: '#/paths/~1run/get' },
+      { operationId: 'run', operationPath: '#/paths/~1run/get' },
+      { operationId: 'run', action: 'send', timeout: 0, correlationId: '$inputs.id' },
+    ]) {
+      const input = {
+        arazzo: '1.0.1',
+        info: { title: 'Scope', version: '1' },
+        sourceDescriptions: [api],
+        workflows: [{ workflowId: 'root', steps: [{ stepId: 'one', ...step }] }],
+      };
+      const result = inspect(createSnapshot(input));
+      expect(result.workflows[0].steps[0].sourceBinding.sourceName).toBeUndefined();
+      expect(result.workflows[0].steps[0].sourceBinding.locators).toEqual(
+        'action' in step ? { operationId: 'run' } : step,
+      );
+      expect(result.workflows[0].steps[0].sourceBinding.intent).toBeUndefined();
+    }
+  });
 });

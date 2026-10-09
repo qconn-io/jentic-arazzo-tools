@@ -43,18 +43,18 @@ test('inspection does not fetch implicitly; explicit load and reload preserve do
     </ArazzoViewerProvider>,
   );
   expect(load).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Load source api' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
   await waitFor(() => expect(screen.getByText('located')).toBeTruthy(), { timeout: 5000 });
   expect(load).toHaveBeenCalledTimes(1);
   expect(screen.getByRole('region', { name: 'Inspection status details' }).textContent).toContain(
-    'api: acquired',
+    'api: API description loaded',
   );
   expect(
     screen.getByRole('region', { name: 'Inspection status details' }).textContent,
-  ).not.toContain('Source documents were not fetched');
+  ).not.toContain('API descriptions have not been loaded');
   expect(screen.getByText('r1')).toBeTruthy();
   expect(screen.getByText('Contract profile: openapi 3.1.0')).toBeTruthy();
-  fireEvent.click(screen.getByRole('button', { name: 'Reload source api' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Reload API description api' }));
   await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
   await waitFor(() => expect(screen.getByText('located')).toBeTruthy(), { timeout: 5000 });
 });
@@ -66,7 +66,7 @@ test('embedded inspection without provider retains authored locator without brow
     </ArazzoViewerProvider>,
   );
   expect(fetch).not.toHaveBeenCalled();
-  expect(screen.queryByRole('button', { name: 'Load source api' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Load API description api' })).toBeNull();
   expect(screen.getByText('$sourceDescriptions.api.get.item')).toBeTruthy();
   fetch.mockRestore();
 });
@@ -124,15 +124,15 @@ test('shared dependency reload hides affected facts and keeps unrelated panels l
     within(panel as HTMLElement),
   );
   for (let i = 0; i < sources.length; i++) {
-    fireEvent.click(panels[i].getByRole('button', { name: `Load source ${sources[i]}` }));
+    fireEvent.click(panels[i].getByRole('button', { name: `Load API description ${sources[i]}` }));
     await waitFor(() => expect(panels[i].getByText('located')).toBeTruthy());
   }
   revision = '2';
-  fireEvent.click(panels[0].getByRole('button', { name: 'Reload source a' }));
+  fireEvent.click(panels[0].getByRole('button', { name: 'Reload API description a' }));
   await waitFor(() => expect(panels[0].getByText('located')).toBeTruthy());
   expect(panels[0].getByText(/dependency 2/)).toBeTruthy();
   expect(panels[1].queryByText('Operation Details')).toBeNull();
-  expect(panels[1].getByRole('button', { name: 'Load source b' })).toBeTruthy();
+  expect(panels[1].getByRole('button', { name: 'Load API description b' })).toBeTruthy();
   expect(panels[2].getByText('located')).toBeTruthy();
   expect(load.mock.calls.filter(([request]) => request.uri.endsWith('/c'))).toHaveLength(1);
 });
@@ -161,7 +161,7 @@ test('explicitly loaded facts survive inspector unmount and are shared with anot
     </ArazzoViewerProvider>,
   );
   expect(load).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Load source api' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
   await screen.findByText('located');
   fireEvent.click(screen.getByText('Toggle inspector'));
   fireEvent.click(screen.getByText('Toggle inspector'));
@@ -195,14 +195,16 @@ test('advanced source provenance hides implementation generations while revision
       <ContractPanel workflowId="root" stepId="call" />
     </ArazzoViewerProvider>,
   );
-  fireEvent.click(screen.getByRole('button', { name: 'Load source api' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
   await screen.findByText('located');
   const generation = screen.getByText(/Provider generation:/);
   const advanced = generation.closest('details')!;
   expect(advanced).toBeTruthy();
   expect(advanced.open).toBe(false);
   expect(advanced.querySelector('summary')?.textContent).toBe('Advanced source provenance');
-  expect(screen.getByText('r1').closest('details')).toBeNull();
+  expect(screen.getByText('r1').closest('details')?.querySelector('summary')?.textContent).toBe(
+    'Source acquisition details',
+  );
   expect(screen.getByText('get.item POST /items')).toBeTruthy();
   expect(
     screen
@@ -214,4 +216,128 @@ test('advanced source provenance hides implementation generations while revision
   fireEvent.click(advanced.querySelector('summary')!);
   expect(advanced.open).toBe(true);
   expect(load).toHaveBeenCalledTimes(1);
+});
+
+test('bare single-source IDs retain source identity when an explicitly checked operation is missing', async () => {
+  const doc: ArazzoDocument = {
+    ...document,
+    workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'absent' }] }],
+  };
+  render(
+    <ArazzoViewerProvider
+      document={doc}
+      snapshot={createSnapshot(doc, { baseURI: 'https://example.test/flow' })}
+      sourceProvider={{
+        load: async () => ({ content: contract, retrievalURI: 'https://example.test/api.yaml' }),
+      }}
+    >
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  expect(screen.getByText(/Destination source:/).textContent).toBe('Destination source: api');
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  await screen.findByText('missing');
+  expect(screen.getByText(/Destination source:/).textContent).toBe('Destination source: api');
+});
+
+test('reader sees unchecked identity and a viewer limitation with technical details separate', () => {
+  render(
+    <ArazzoViewerProvider document={document}>
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  expect(screen.getByText('API description not loaded')).toBeTruthy();
+  expect(screen.getByText('This operation has not been checked.')).toBeTruthy();
+  expect(screen.getByText('API-description loading is unavailable in this viewer.')).toBeTruthy();
+  expect(
+    screen.getByText('not-loaded').closest('details')?.querySelector('summary')?.textContent,
+  ).toBe('Technical lookup details');
+});
+test.each([
+  ['missing', { ...contract, paths: {} }, 'Operation not found'],
+  [
+    'ambiguous',
+    {
+      ...contract,
+      paths: {
+        '/a': { get: { operationId: 'get.item' } },
+        '/b': { get: { operationId: 'get.item' } },
+      },
+    },
+    'Multiple matching operations',
+  ],
+  ['unsupported', { strange: true }, 'Unsupported API description'],
+])('reader wording for %s preserves technical lookup code', async (code, content, message) => {
+  render(
+    <ArazzoViewerProvider
+      document={document}
+      snapshot={createSnapshot(document, { baseURI: 'https://example.test/flow' })}
+      sourceProvider={{
+        load: async () => ({ content, retrievalURI: 'https://example.test/api.yaml' }),
+      }}
+    >
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  await screen.findByText(message);
+  expect(screen.getByText(code).closest('details')).toBeTruthy();
+});
+test('loading and denied acquisition show explicit recoverable states', async () => {
+  let deny!: (error: Error) => void;
+  render(
+    <ArazzoViewerProvider
+      document={document}
+      snapshot={createSnapshot(document, { baseURI: 'https://example.test/flow' })}
+      sourceProvider={{
+        load: () =>
+          new Promise((_, reject) => {
+            deny = reject;
+          }),
+      }}
+    >
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  expect(screen.getByText('Checking API description')).toBeTruthy();
+  expect(
+    screen.getByRole('button', { name: 'Checking API description api' }).hasAttribute('disabled'),
+  ).toBe(true);
+  await waitFor(() => expect(deny).toBeTypeOf('function'));
+  deny(new Error('Access denied by provider'));
+  await screen.findByText('API description unavailable');
+  expect(
+    screen.getByText('Access denied by provider', { selector: '[role="status"]' }),
+  ).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Retry API description api' })).toBeTruthy();
+});
+
+test('partial candidate checking never presents a unique operation', async () => {
+  const doc = {
+    ...document,
+    sourceDescriptions: ['a', 'b'].map((name) => ({
+      name,
+      type: 'openapi' as const,
+      url: `https://example.test/${name}`,
+    })),
+    workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'get.item' }] }],
+  };
+  render(
+    <ArazzoViewerProvider
+      document={doc}
+      sourceProvider={{ load: async ({ uri }) => ({ content: contract, retrievalURI: uri }) }}
+    >
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description a' }));
+  await screen.findByRole('button', { name: 'Reload API description a' });
+  expect(
+    screen.getByText(
+      'Some possible API descriptions remain unchecked. A unique operation has not been established.',
+    ),
+  ).toBeTruthy();
+  expect(screen.queryByText('Operation found')).toBeNull();
+  expect(screen.queryByRole('region', { name: 'Operation declaration' })).toBeNull();
 });

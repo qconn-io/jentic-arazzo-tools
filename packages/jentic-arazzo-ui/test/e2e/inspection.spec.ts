@@ -13,11 +13,11 @@ const eventDocument = '/examples/digital-product-stress/event-based.arazzo.yaml'
 
 async function selectStep(page: Page, document: string, step: string, workflow?: string) {
   await page.goto(`/?document=${encodeURIComponent(`http://localhost:3000${document}`)}`);
-  await page.getByRole('button', { name: 'diagram', exact: true }).click();
+  await page.getByRole('button', { name: 'Workflow diagram', exact: true }).click();
   if (workflow) await page.locator('.arazzo-workflow-navigation select').selectOption(workflow);
   await page
     .getByRole('button', {
-      name: `Details for ${workflow ?? 'client-journey'}.${step}`,
+      name: `View details for ${workflow ?? 'client-journey'}.${step}`,
       exact: true,
     })
     .click();
@@ -36,10 +36,12 @@ test.describe('API Contract Inspection', () => {
     });
     const panel = await selectStep(page, httpDocument, 'purchase');
     await expect(
-      panel.getByRole('button', { name: 'Load source coordinator', exact: true }),
+      panel.getByRole('button', { name: 'Load API description coordinator', exact: true }),
     ).toBeVisible();
     expect(requests).toBe(0);
-    await panel.getByRole('button', { name: 'Load source coordinator', exact: true }).click();
+    await panel
+      .getByRole('button', { name: 'Load API description coordinator', exact: true })
+      .click();
     await expect(panel).toContainText('located');
     await expect(panel).toContainText('purchaseProduct');
     await expect(panel).toContainText('Idempotency-Key');
@@ -50,7 +52,9 @@ test.describe('API Contract Inspection', () => {
     await expect(panel).toContainText('503');
     await expect(panel).toContainText('paymentToken');
     expect(requests).toBe(1);
-    await panel.getByRole('button', { name: 'Reload source coordinator', exact: true }).click();
+    await panel
+      .getByRole('button', { name: 'Reload API description coordinator', exact: true })
+      .click();
     await expect.poll(() => requests).toBe(2);
     await expect(panel).toContainText('located');
   });
@@ -59,7 +63,7 @@ test.describe('API Contract Inspection', () => {
     page,
   }) => {
     const panel = await selectStep(page, eventDocument, 'await-ready', 'event-driven-purchase');
-    await panel.getByRole('button', { name: 'Load source events', exact: true }).click();
+    await panel.getByRole('button', { name: 'Load API description events', exact: true }).click();
     await expect(panel).toContainText('located');
     await expect(panel).toContainText('receivePurchaseCompleted');
     await expect(panel).toContainText('receive');
@@ -81,11 +85,15 @@ test.describe('API Contract Inspection', () => {
       else await route.continue();
     });
     const panel = await selectStep(page, httpDocument, 'purchase');
-    await panel.getByRole('button', { name: 'Load source coordinator', exact: true }).click();
-    await expect(panel).toContainText('failed');
+    await panel
+      .getByRole('button', { name: 'Load API description coordinator', exact: true })
+      .click();
+    await expect(panel).toContainText('API description unavailable');
     await expect(panel).not.toContainText('Operation Details');
     failing = false;
-    await panel.getByRole('button', { name: 'Reload source coordinator', exact: true }).click();
+    await panel
+      .getByRole('button', { name: 'Retry API description coordinator', exact: true })
+      .click();
     await expect(panel).toContainText('located');
   });
 
@@ -93,7 +101,7 @@ test.describe('API Contract Inspection', () => {
     page,
   }) => {
     const panel = await selectStep(page, eventDocument, 'fulfil-command', 'purchase-event-worker');
-    await panel.getByRole('button', { name: 'Load source commerce', exact: true }).click();
+    await panel.getByRole('button', { name: 'Load API description commerce', exact: true }).click();
     await expect(
       panel.getByRole('button', { name: 'Open workflow fulfil-item', exact: true }),
     ).toBeVisible();
@@ -104,7 +112,7 @@ test.describe('API Contract Inspection', () => {
     await expect(page.getByRole('combobox', { name: 'Select workflow' })).toHaveValue(
       'fulfil-item',
     );
-    await page.getByRole('button', { name: 'docs', exact: true }).click();
+    await page.getByRole('button', { name: 'Read workflow', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1 })).toContainText('HTTP orchestration');
   });
 });
@@ -225,7 +233,7 @@ async function mountHost(page: Page, kind: 'replacement' | 'external' | 'unavail
     { reactUrl, domUrl, componentUrl, kind },
   );
   await page
-    .getByRole('button', { name: 'Details for host-flow.inspect-host', exact: true })
+    .getByRole('button', { name: 'View details for host-flow.inspect-host', exact: true })
     .click();
   return page.locator('.arazzo-contract-panel');
 }
@@ -235,11 +243,11 @@ test('provider replacement aborts pending work and uses the replacement content'
 }) => {
   const panel = await mountHost(page, 'replacement');
   expect(await page.evaluate(() => window.contractHostState.loads)).toBe(0);
-  await panel.getByRole('button', { name: 'Load source source', exact: true }).click();
+  await panel.getByRole('button', { name: 'Load API description source', exact: true }).click();
   await expect.poll(() => page.evaluate(() => window.contractHostState.loads)).toBe(1);
   await page.evaluate(() => window.replaceContractProvider());
   await expect.poll(() => page.evaluate(() => window.contractHostState.aborted)).toBe(true);
-  await panel.getByRole('button', { name: 'Load source source', exact: true }).click();
+  await panel.getByRole('button', { name: 'Load API description source', exact: true }).click();
   await expect(panel).toContainText('located');
   await expect(panel).toContainText('replacement-result');
 });
@@ -248,7 +256,7 @@ test('external navigation sends the retrieved URI, revision and workflow to the 
   page,
 }) => {
   const panel = await mountHost(page, 'external');
-  await panel.getByRole('button', { name: 'Load source source', exact: true }).click();
+  await panel.getByRole('button', { name: 'Load API description source', exact: true }).click();
   await panel.getByRole('button', { name: 'Open workflow child', exact: true }).click();
   await expect
     .poll(() => page.evaluate(() => window.contractHostState.navigation))
@@ -272,7 +280,7 @@ test('document replacement cancels source work and retains the new primary docum
   page,
 }) => {
   const panel = await mountHost(page, 'replacement');
-  await panel.getByRole('button', { name: 'Load source source', exact: true }).click();
+  await panel.getByRole('button', { name: 'Load API description source', exact: true }).click();
   await expect.poll(() => page.evaluate(() => window.contractHostState.loads)).toBe(1);
   await page.evaluate(() => window.replaceContractDocument());
   await expect.poll(() => page.evaluate(() => window.contractHostState.aborted)).toBe(true);
@@ -292,11 +300,13 @@ test('unavailable-target pack keeps candidate coverage incomplete until every AP
     'diagnostic-probe',
   );
   await expect(panel).toContainText('getLicenseByKey');
-  await panel.getByRole('button', { name: 'Load source license', exact: true }).click();
+  await panel.getByRole('button', { name: 'Load API description license', exact: true }).click();
   await expect(panel).toContainText('Incomplete candidate coverage');
-  await expect(panel.getByRole('status')).toContainText('not-loaded');
-  await panel.getByRole('button', { name: 'Load source coordinator', exact: true }).click();
-  await expect(panel.getByRole('status')).toContainText('located');
+  await expect(panel.getByRole('status')).toContainText('API description not loaded');
+  await panel
+    .getByRole('button', { name: 'Load API description coordinator', exact: true })
+    .click();
+  await expect(panel.getByRole('status')).toContainText('Operation found');
 });
 
 async function routeReferencedContract(
@@ -352,8 +362,10 @@ test('inspector keeps schema siblings and referenced constraints in separate acc
   await routeReferencedContract(page, state);
   const panel = await selectStep(page, httpDocument, 'purchase');
   expect(state.roots + state.schemas + state.responses).toBe(0);
-  await panel.getByRole('button', { name: 'Load source coordinator', exact: true }).click();
-  await expect(panel.getByRole('status')).toContainText('located');
+  await panel
+    .getByRole('button', { name: 'Load API description coordinator', exact: true })
+    .click();
+  await expect(panel.getByRole('status')).toContainText('Operation found');
   await panel.getByText('Request media types and schemas', { exact: true }).click();
   const request = panel
     .locator('details')
@@ -372,16 +384,22 @@ test('inspector keeps schema siblings and referenced constraints in separate acc
   await expect(references).toContainText('Revision: unpinned');
 });
 
-test('Reload source refreshes external schema and response dependencies', async ({ page }) => {
+test('Reload API description refreshes external schema and response dependencies', async ({
+  page,
+}) => {
   const state = { revision: 1, roots: 0, schemas: 0, responses: 0 };
   await routeReferencedContract(page, state);
   const panel = await selectStep(page, httpDocument, 'purchase');
-  await panel.getByRole('button', { name: 'Load source coordinator', exact: true }).click();
-  await expect(panel.getByRole('status')).toContainText('located');
+  await panel
+    .getByRole('button', { name: 'Load API description coordinator', exact: true })
+    .click();
+  await expect(panel.getByRole('status')).toContainText('Operation found');
   await expect(panel).toContainText('refreshed dependency 1');
   state.revision = 2;
-  await panel.getByRole('button', { name: 'Reload source coordinator', exact: true }).click();
-  await expect(panel.getByRole('status')).toContainText('located');
+  await panel
+    .getByRole('button', { name: 'Reload API description coordinator', exact: true })
+    .click();
+  await expect(panel.getByRole('status')).toContainText('Operation found');
   await expect(panel).toContainText('refreshed dependency 2');
   await expect(panel).not.toContainText('refreshed dependency 1');
   expect(state.roots).toBe(2);

@@ -1,8 +1,9 @@
+import { contractReadingStatus } from '../utils/contract/readingStatus';
 import React from 'react';
 import { useContractFacts } from '../context/ContractFactsContext';
 
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
-import { resolveScopedOperation } from '../utils/contract/OperationStatusResolver';
+import { resolveStepOperation } from '../utils/contract/stepOperation';
 
 function Declaration({ title, value }: { title: string; value: unknown }) {
   if (value === undefined) return null;
@@ -15,48 +16,58 @@ function Declaration({ title, value }: { title: string; value: unknown }) {
 }
 export function ContractPanel({ workflowId, stepId }: { workflowId: string; stepId?: string }) {
   const { model, sourceRegistry, sourceProvider, onExternalNavigation } = useArazzoViewer();
-  const binding = stepId
-    ? model.stepsByWorkflow.get(workflowId)?.get(stepId)?.sourceBinding
-    : undefined;
+  const step = stepId ? model.stepsByWorkflow.get(workflowId)?.get(stepId) : undefined;
+  const binding = step?.sourceBinding;
   const { loaded: currentLoaded, load } = useContractFacts();
   if (!binding || !Object.keys(binding.locators).length) return null;
   const sources = (model.document.sourceDescriptions ?? []).filter((source) =>
     binding.candidates.includes(source.name),
   );
-  const locators = { ...binding.locators };
-  if (binding.sourceName) {
-    for (const key of Object.keys(locators)) {
-      const locator = locators[key];
-      if (typeof locator !== 'string') continue;
-      const prefix = `$sourceDescriptions.${binding.sourceName}.`;
-      const urlPrefix = `{$sourceDescriptions.${binding.sourceName}.url}`;
-      locators[key] = locator.startsWith(prefix)
-        ? locator.slice(prefix.length)
-        : locator.startsWith(urlPrefix)
-          ? locator.slice(urlPrefix.length)
-          : locator;
-    }
-  }
-  const result = resolveScopedOperation(
-    locators,
-    sources.map((source) => currentLoaded[source.name] ?? { state: 'idle' }),
-  );
+  const result = resolveStepOperation(model, step!, currentLoaded);
+  const locators = result.normalizedLocators ?? binding.locators;
   const operation = result.operation;
   return (
     <section className="arazzo-contract-panel" aria-label="Contract and source">
       <h3>Contract &amp; Source</h3>
-      <p>
-        Authored locator: <code>{Object.values(binding.locators).join(' · ')}</code>
-      </p>
       {!Object.hasOwn(binding.locators, 'workflowId') && (
         <p role="status">
-          Status: <strong>{result.status}</strong>
+          <strong>{contractReadingStatus[result.status]}</strong>
         </p>
       )}
-      {result.diagnostics?.map((message) => (
-        <p key={message}>{message}</p>
-      ))}
-      {!sourceProvider && <p>Source not checked. Supply a source provider to enable inspection.</p>}
+      {result.sourceName && (
+        <p>
+          Destination source: <strong>{result.sourceName}</strong>
+        </p>
+      )}
+      {result.status === 'not-loaded' && <p>This operation has not been checked.</p>}
+      {result.status === 'not-loaded' &&
+        sources.some((source) => currentLoaded[source.name]?.state === 'success') && (
+          <p>
+            Some possible API descriptions remain unchecked. A unique operation has not been
+            established.
+          </p>
+        )}
+      <details>
+        <summary>Technical lookup details</summary>
+        <p>
+          Authored locator: <code>{Object.values(binding.locators).join(' · ')}</code>
+        </p>
+        <p>
+          Lookup status: <strong>{result.status}</strong>
+        </p>
+        {result.diagnostics?.map((message) => (
+          <p key={message}>{message}</p>
+        ))}
+      </details>
+      {!sourceProvider && (
+        <>
+          <p>API-description loading is unavailable in this viewer.</p>
+          <details data-advanced>
+            <summary>Developer configuration</summary>
+            <p>This host has no source provider configured for API-description loading.</p>
+          </details>
+        </>
+      )}
       {sources.map((source) => {
         const value = currentLoaded[source.name];
         const target = typeof locators.workflowId === 'string' ? locators.workflowId : undefined;
@@ -64,10 +75,23 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
         return (
           <section key={source.name} aria-label={`Source ${source.name}`}>
             <h4>{source.name}</h4>
-            <p>
-              Source URL: <code>{source.url}</code>
-            </p>
-            <p>Source state: {value?.state ?? 'not-loaded'}</p>
+            <details>
+              <summary>Source acquisition details</summary>
+              <p>
+                Source URL: <code>{source.url}</code>
+              </p>
+              <p>Source state: {value?.state ?? 'idle'}</p>
+              {value?.content && (
+                <>
+                  <p>
+                    Retrieval URI: <code>{value.content.retrievalURI}</code>
+                  </p>
+                  <p>
+                    Revision: <code>{value.content.revision ?? 'unpinned'}</code>
+                  </p>
+                </>
+              )}
+            </details>
             {sourceProvider && (
               <button
                 type="button"
@@ -75,7 +99,14 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
                 onClick={() => void load(source, !!value)}
               >
                 {' '}
-                {value ? 'Reload' : 'Load'} source {source.name}
+                {value?.state === 'loading'
+                  ? 'Checking'
+                  : value?.state === 'error'
+                    ? 'Retry'
+                    : value
+                      ? 'Reload'
+                      : 'Load'}{' '}
+                API description {source.name}
               </button>
             )}
             {value?.error && <p role="status">{value.error.message}</p>}
@@ -89,12 +120,6 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
             ))}
             {value?.content && (
               <>
-                <p>
-                  Retrieval URI: <code>{value.content.retrievalURI}</code>
-                </p>
-                <p>
-                  Revision: <code>{value.content.revision ?? 'unpinned'}</code>
-                </p>
                 <details data-advanced>
                   <summary>Advanced source provenance</summary>
                   <p>Provider generation: {sourceRegistry.getProviderGeneration()}</p>
@@ -111,7 +136,7 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
             )}
             {value?.workflowModel && (
               <>
-                <p>Status: {workflow ? 'located' : 'missing'}</p>
+                <p>{workflow ? 'Workflow found' : 'Workflow not found'}</p>
                 {workflow && onExternalNavigation && (
                   <button
                     type="button"
@@ -138,8 +163,8 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
             {operation.operationId} {operation.method} {operation.path}
           </p>
           <p>
-            Located means found in this source; it does not establish full contract validity or
-            execution.
+            Operation found means located in this source; it does not establish full contract
+            validity or execution.
           </p>
           {!!operation.schemaReferences?.length && (
             <section aria-label="Referenced schema declarations">

@@ -63,3 +63,37 @@ Source loading SHALL be deduplicated within a viewer session, cancellable on rep
 #### Scenario: Document changes during loading
 - **WHEN** a payment contract response arrives after the primary document was replaced
 - **THEN** it cannot attach its operation facts or located status to the replacement document
+
+### Requirement: Current operation evidence informs sequence destinations
+Explicitly loaded current API contract evidence SHALL inform the interactive sequence's operation destination when it establishes a unique match with complete relevant candidate coverage. Evidence SHALL remain distinct from authored source binding and SHALL NOT mutate the workflow, assert conformance for an unqualified multi-source locator, establish business-system ownership, or trigger acquisition. Known source identity SHALL remain visible even if its operation is missing or unchecked. Static output without supplied equivalent evidence SHALL retain authored-only coverage.
+
+#### Scenario: Unique operation after complete candidate loading
+- **WHEN** a bare operation ID has several relevant API sources and an explicit check of every candidate establishes exactly one operation
+- **THEN** the interactive sequence and inspector identify the same current source and operation while retaining any authored qualification diagnostic and making no validity or execution claim
+
+#### Scenario: Partial coverage and duplicate matches
+- **WHEN** only one of several candidates is loaded, a candidate fails or is unsupported, or two loaded candidates contain the operation
+- **THEN** the sequence retains the corresponding uncertainty, explains its reason, and does not promote the first match to a unique destination
+
+#### Scenario: Reload removes old lookup evidence
+- **WHEN** a previously unique operation changes source, disappears, or becomes duplicated after explicit source or dependency reload
+- **THEN** obsolete destination evidence is excluded immediately and only current complete evidence can establish the new destination
+
+#### Scenario: Replacement with repeated occurrences
+- **WHEN** the document or provider is replaced while lookup is pending and repeated calls use the same step
+- **THEN** late evidence cannot attach to the replacement and each occurrence retains its existing selection and call-path identity
+
+### Requirement: Reader-oriented contract status and next actions
+Contract inspection SHALL explain whether the API description is unchecked, loading, found, missing, ambiguous, unsupported or unavailable in plain language, with an applicable explicit load, retry or reload action when supported. Known API destination identity SHALL remain separate from operation checking. Technical lookup codes, locators and revision/acquisition provenance SHALL remain available in labeled details without dominating normal reading. Host-only configuration advice SHALL identify a host limitation rather than tell ordinary readers to supply a source provider.
+
+#### Scenario: Known API before checking
+- **WHEN** the Petstore API destination is known and its description is not loaded
+- **THEN** details identify the known API, say that the operation has not been checked, and offer Load API description when the host supports explicit loading
+
+#### Scenario: Error or incomplete lookup
+- **WHEN** acquisition fails or only some possible API descriptions have been checked
+- **THEN** the reader sees what is unavailable or remains unchecked, the relevant source identity, and available recovery actions without an authoritative unique-operation claim
+
+#### Scenario: Loading unavailable in an embedded host
+- **WHEN** the host supplied no source-loading capability
+- **THEN** ordinary workflow details remain readable and explain that API-description loading is unavailable in this viewer, while developer configuration information is available separately

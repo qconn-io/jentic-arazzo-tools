@@ -1,3 +1,4 @@
+import type { StepOperationResult } from '../contract/stepOperation';
 import type { ClassifiedTarget } from '../inspection';
 import type {
   ArazzoViewerModel,
@@ -29,6 +30,7 @@ export interface SequenceRow {
   expanded?: boolean;
   reason?: string;
   returnTo?: 'source-step';
+  destinationEvidence?: StepOperationResult;
 }
 export interface SequenceScene {
   rootWorkflowId: string;
@@ -38,6 +40,9 @@ export interface SequenceScene {
   bounded: boolean;
 }
 
+export const destinationKey = (model: ArazzoViewerModel, step: ViewerStep): string =>
+  JSON.stringify([model.documentId, step.workflowId, step.stepId]);
+
 // This is a display scene over inspected facts, never a trace or expression evaluator.
 // Full tuple identities distinguish repeated calls. Limits count every visible row,
 // including annotations and markers, and reserve the last row for omitted content.
@@ -45,6 +50,7 @@ export function buildSequence(
   model: ArazzoViewerModel,
   rootWorkflowId: string,
   expansion: Readonly<Record<string, boolean>> = {},
+  destinations: ReadonlyMap<string, StepOperationResult> = new Map(),
 ): SequenceScene {
   const scene: SequenceScene = {
     rootWorkflowId,
@@ -217,20 +223,27 @@ export function buildSequence(
           return false;
       } else {
         const binding = step.sourceBinding;
-        const to =
-          binding.sourceName && binding.status === 'declared'
-            ? participant('source', binding.sourceName)
-            : participant(
-                'unknown',
-                `${binding.status === 'ambiguous' ? 'Ambiguous' : 'Unknown'} destination · ${step.stepId}`,
-                id,
-              );
+        const evidence = destinations.get(destinationKey(model, step));
+        const sourceName =
+          binding.status === 'declared'
+            ? binding.sourceName
+            : evidence?.status === 'located'
+              ? evidence.sourceName
+              : undefined;
+        const to = sourceName
+          ? participant('source', sourceName)
+          : participant(
+              'unknown',
+              `${binding.status === 'ambiguous' ? 'Ambiguous' : 'Unknown'} destination · ${step.stepId}`,
+              id,
+            );
         const receive = binding.intent === 'receive';
         if (
           !append({
             ...base,
             id,
             kind: 'operation',
+            destinationEvidence: evidence,
             step,
             from: receive ? to : from,
             to: receive ? from : to,

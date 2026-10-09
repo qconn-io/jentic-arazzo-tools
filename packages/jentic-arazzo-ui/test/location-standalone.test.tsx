@@ -128,7 +128,7 @@ test('Forward hydration reconstructs the authored caller context for a callee ro
 });
 test('committing a followed call saves its public caller address for Forward', async () => {
   render(<ArazzoUIStandalone document={location.document} />);
-  fireEvent.click(await screen.findByRole('button', { name: 'Sequence' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   fireEvent.click(
     screen.getByRole('button', { name: /Open workflow payment from checkout.secondPayment/ }),
   );
@@ -205,7 +205,7 @@ test('controlled location mode requests preserve the host view and do not commit
   );
   await waitFor(() => expect(changed).toHaveBeenCalledTimes(1));
   const before = window.location.href;
-  fireEvent.click(screen.getByRole('button', { name: 'split' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Side by side' }));
   await waitFor(() => expect(changed).toHaveBeenCalledTimes(2));
   expect(changed.mock.calls[1][0].view).toBe('split');
   expect(window.location.href).toBe(before);

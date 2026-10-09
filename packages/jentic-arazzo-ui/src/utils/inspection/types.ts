@@ -100,6 +100,7 @@ export interface ActionFact extends Provenance {
 export interface SourceBinding extends Provenance {
   status: 'declared' | 'ambiguous' | 'unverified' | 'unsupported';
   verification: 'unverified';
+  basis?: 'explicit-locator' | 'single-source';
   sourceName?: string;
   sourceType?: string;
   source?: PlainObject;

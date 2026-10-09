@@ -1,11 +1,32 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { workflowReadingLabel } from '../utils/readingLabels';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import type { ViewerMode } from '../types/index';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 
-export function WorkflowNavigation() {
-  const { model, activeWorkflowId, setActiveWorkflow } = useArazzoViewer();
+export function WorkflowNavigation({ view = 'docs' }: { view?: ViewerMode }) {
+  const { model, activeWorkflowId, setActiveWorkflow, events } = useArazzoViewer();
   const session = useViewerSession();
   const [query, setQuery] = useState('');
+  const sequenceRequest = useRef<{ model: typeof model; workflowId: string }>();
+  useEffect(() => {
+    const request = sequenceRequest.current;
+    if (!request) return;
+    if (request.model !== model || request.workflowId !== activeWorkflowId) {
+      sequenceRequest.current = undefined;
+    } else if (view === 'docs' || view === 'split') {
+      sequenceRequest.current = undefined;
+      session.setView(request.workflowId, 'sequence');
+    }
+  }, [model, activeWorkflowId, view]);
+  const openSequence = () => {
+    if (activeWorkflowId === null) return;
+    if (view === 'docs' || view === 'split') session.setView(activeWorkflowId, 'sequence');
+    else if (!sequenceRequest.current) {
+      sequenceRequest.current = { model, workflowId: activeWorkflowId };
+      events?.onViewChange?.('docs');
+    }
+  };
   useEffect(() => setQuery(''), [model]);
   const results = useMemo(() => {
     const term = query.trim().toLocaleLowerCase();
@@ -52,8 +73,12 @@ export function WorkflowNavigation() {
         >
           <option value="">All workflows</option>
           {model.workflows.map((workflow) => (
-            <option key={workflow.workflowId} value={workflow.workflowId}>
-              {workflow.workflowId}
+            <option
+              key={workflow.workflowId}
+              value={workflow.workflowId}
+              title={workflowReadingLabel(workflow)}
+            >
+              {workflowReadingLabel(workflow)}
             </option>
           ))}
         </select>
@@ -91,6 +116,11 @@ export function WorkflowNavigation() {
             ))}
           </ul>
         </div>
+      )}
+      {activeWorkflowId !== null && (
+        <button aria-label={`Sequence diagram for ${activeWorkflowId}`} onClick={openSequence}>
+          Sequence diagram
+        </button>
       )}
       {activeWorkflowId !== null && (
         <span title={activeWorkflowId}>

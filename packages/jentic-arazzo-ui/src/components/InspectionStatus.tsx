@@ -18,23 +18,35 @@ export function InspectionStatus() {
         {checked ? (
           <>
             <p>
-              Source acquisition status is shown below. Operation lookup, profile limitations and
-              raw content are available in the contract inspector; acquisition does not establish
-              contract validity.
+              API-description availability is shown below. View step details to check an operation.
+              Loading a description does not establish contract validity.
             </p>
             <ul>
               {sources.map(({ name, entry }) => (
                 <li key={name}>
-                  {name}: {entry?.state === 'located' ? 'acquired' : (entry?.state ?? 'not-loaded')}
+                  {name}:{' '}
+                  {entry?.state === 'located'
+                    ? 'API description loaded; operations can be checked in details'
+                    : entry?.state === 'loading'
+                      ? 'Checking API description'
+                      : !entry
+                        ? 'API description not loaded'
+                        : 'API description unavailable'}
+                  {entry && (
+                    <details>
+                      <summary>Technical acquisition details</summary>
+                      <p>Acquisition state: {entry.state}</p>
+                    </details>
+                  )}
                 </li>
               ))}
             </ul>
           </>
         ) : (
           <p>
-            Source documents were not fetched, so their operations and versions were not checked.
-            This does not mean they are invalid or inaccessible. Declared source names remain
-            available.
+            API descriptions have not been loaded, so their operations and versions have not been
+            checked. This does not mean they are invalid or inaccessible. Declared source names
+            remain available.
           </p>
         )}
         <p>

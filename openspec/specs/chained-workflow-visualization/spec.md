@@ -34,7 +34,7 @@ The viewer SHALL distinguish the document's declared Arazzo feature version from
 - **THEN** its authored object and unsupported-feature warning remain visible, recognized defaults are retained, and no control transition is invented for that action
 
 ### Requirement: Transport-Neutral Operation Inspection
-The viewer and documentation SHALL preserve and describe authored operation/workflow/channel locators, declared source kind, asynchronous send/receive intent, correlation expressions, timeouts, and querystring values without imposing an HTTP operation shape. An unfetched source SHALL remain unverified; its version, protocol, operation details, and execution behavior SHALL NOT be inferred.
+The viewer and documentation SHALL preserve and describe authored operation/workflow/channel locators, declared source kind, asynchronous send/receive intent, correlation expressions, timeouts, and querystring values without imposing an HTTP operation shape. A source's identity established by an explicit locator or the supported single-source operation-ID rule SHALL remain distinct from operation verification. An unfetched source's contract SHALL remain unverified; its version, protocol, operation details, and execution behavior SHALL NOT be inferred.
 
 #### Scenario: Asynchronous send and receive
 - **WHEN** a 1.1 workflow declares an AsyncAPI send or receive step using an operation or channel locator, timeout, correlation expression, and explicit prerequisites
@@ -55,6 +55,14 @@ The viewer and documentation SHALL preserve and describe authored operation/work
 #### Scenario: Querystring value preservation
 - **WHEN** a 1.1 parameter uses querystring with a literal or expression-containing string
 - **THEN** every view exposes the location and complete authored value through its details without splitting it into individual query parameters or evaluating expressions; the default diagram need not print the full value
+
+#### Scenario: Unchanged single-source Petstore
+- **WHEN** the original Arazzo 1.0.1 Petstore document declares only petstoreAPI as its API source and uses bare operation IDs
+- **THEN** the viewer identifies petstoreAPI as the destination of all five operations without fetching it, preserves the exact authored IDs, and reports that operation declarations have not been checked
+
+#### Scenario: Profile-sensitive source uncertainty
+- **WHEN** there are several relevant non-Arazzo source descriptions, an unsupported source kind, conflicting locators, or unsupported asynchronous semantics
+- **THEN** single-source binding is not used to conceal that uncertainty or promote unsupported semantics, and no arbitrary first source is assigned
 
 ### Requirement: Unknown Content and Document Provenance Preservation
 Inspection and document retrieval SHALL preserve unknown authored fields, extensions, identifiers, schema dialect declarations, and unevaluated expressions. Reference diagnostics SHALL distinguish declaration and use-site ownership and retain available document/occurrence provenance. Supported reference expansion SHALL honor native resolution context; an unsupported identity/dialect rule SHALL preserve its affected references with a limitation instead of substituting semantics or resolving against a known-wrong base.
@@ -352,7 +360,7 @@ For supported inspection profiles, generated Mermaid flowcharts SHALL include ev
 - **THEN** generated Mermaid remains parseable and retains readable authored labels
 
 ### Requirement: Mermaid Inspection Sequence
-Generated sequence diagrams SHALL use the same classified source bindings, supported actions, parameter values, and inspection limitations as other views. They SHALL present connected schematic authored interactions with concise labels and relevant participants, retaining complete metadata in associated inspectable details. They SHALL NOT predict evaluated outcomes or guess source ownership and message delivery behavior. Local workflow calls SHALL follow the connected sequence requirements below rather than appearing only as notes.
+Generated sequence diagrams SHALL distinguish identifiable source destinations from unverified operation declarations and SHALL use the same classified source bindings, supported actions, parameter values, and inspection limitations as other views. They SHALL present connected schematic authored interactions with concise labels and relevant participants, retaining complete metadata in associated inspectable details. They SHALL NOT predict evaluated outcomes or guess source ownership and message delivery behavior. Local workflow calls SHALL follow the connected sequence requirements below rather than appearing only as notes.
 
 #### Scenario: Authored asynchronous interaction
 - **WHEN** an inspected workflow has AsyncAPI send/receive steps with prerequisites, correlation expressions, and timeouts
@@ -377,6 +385,14 @@ Generated sequence diagrams SHALL use the same classified source bindings, suppo
 #### Scenario: Unsupported version sequence
 - **WHEN** the document has no supported semantic inspection profile
 - **THEN** raw documentation and the limitation remain available without generating a guessed sequence diagram
+
+#### Scenario: Single-source static and interactive parity
+- **WHEN** the unchanged Petstore document is viewed interactively or exported as a static sequence without supplied contract facts
+- **THEN** both sequences contain one workflow participant and one petstoreAPI destination rather than five unknown destination lanes, without asserting a successful response or verified operation
+
+#### Scenario: Different supplied evidence scopes
+- **WHEN** interactive inspection has explicitly loaded contracts but static export has no supplied current contract evidence
+- **THEN** each presentation identifies its evidence scope and the static export does not claim the interactive lookup was performed
 
 ### Requirement: Connected Local Workflow Sequences
 For a selected workflow under a supported inspection profile, the sequence view SHALL show standard local workflow calls as identifiable call interactions and expandable groups containing the callee's authored interactions. Direct local calls SHALL initially be expanded within visible display limits; deeper calls SHALL offer explicit expansion controls. Each occurrence SHALL retain its caller, call step, callee, and authored input/output mappings. Structural call and return boundaries SHALL distinguish workflow composition from API exchanges and SHALL NOT imply a successful execution or fabricate an API response.

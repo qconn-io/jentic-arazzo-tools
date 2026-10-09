@@ -19,7 +19,9 @@ function viewport(narrow: boolean) {
 test('desktop inspector stays nonmodal, Escape dismisses and restores its origin', async () => {
   viewport(false);
   render(<ArazzoUI document={nestedCalls} />);
-  const origin = await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' });
+  const origin = await screen.findByRole('button', {
+    name: 'View details for checkout.firstPayment',
+  });
   fireEvent.click(origin);
   const panel = screen.getByRole('region', { name: 'Selection details' });
   expect(panel.hasAttribute('aria-modal')).toBe(false);
@@ -31,7 +33,9 @@ test('desktop inspector stays nonmodal, Escape dismisses and restores its origin
 test('narrow covering dialog excludes background, traps Tab both ways and releases it on close', async () => {
   viewport(true);
   render(<ArazzoUI document={nestedCalls} />);
-  const origin = await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' });
+  const origin = await screen.findByRole('button', {
+    name: 'View details for checkout.firstPayment',
+  });
   fireEvent.click(origin);
   const panel = screen.getByRole('dialog', { name: 'Selection details' });
   expect(panel.getAttribute('aria-modal')).toBe('true');
@@ -52,7 +56,9 @@ test('dismissal after mode switching restores visible navigation when origin was
   viewport(false);
   const mount = (view: 'docs' | 'diagram') => <ArazzoUI document={nestedCalls} view={view} />;
   const { rerender } = render(mount('docs'));
-  fireEvent.click(await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'View details for checkout.firstPayment' }),
+  );
   rerender(mount('diagram'));
   fireEvent.click(screen.getByRole('button', { name: 'Close details' }));
   expect(document.activeElement).toBe(screen.getByRole('combobox', { name: 'Select workflow' }));
@@ -66,7 +72,9 @@ test('a covering embedded inspector excludes covered host controls and restores 
       <ArazzoUI document={nestedCalls} />
     </>,
   );
-  const origin = await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' });
+  const origin = await screen.findByRole('button', {
+    name: 'View details for checkout.firstPayment',
+  });
   const host = screen.getByRole('button', { name: 'Host control' });
   fireEvent.click(origin);
   expect(host.closest('[inert]')).toBeTruthy();
@@ -78,7 +86,9 @@ test('a covering embedded inspector excludes covered host controls and restores 
 test('an origin inside subsequently collapsed documentation uses visible navigation fallback', async () => {
   viewport(false);
   render(<ArazzoUI document={nestedCalls} />);
-  fireEvent.click(await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'View details for checkout.firstPayment' }),
+  );
   const workflow = document.querySelector<HTMLDetailsElement>(
     'details[data-workflow-id="checkout"]',
   )!;

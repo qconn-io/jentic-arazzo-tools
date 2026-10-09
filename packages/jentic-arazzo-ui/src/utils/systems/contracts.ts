@@ -1,8 +1,6 @@
 import type { ArazzoViewerModel, ViewerStep } from '../model/viewerModel';
-import {
-  resolveScopedOperation,
-  type OperationSourceCandidate,
-} from '../contract/OperationStatusResolver';
+import type { OperationSourceCandidate } from '../contract/OperationStatusResolver';
+import { resolveStepOperation } from '../contract/stepOperation';
 import { resolvePointer } from '../contract/pointer';
 import type { ContractDeclarationIdentity } from '../contract/types';
 import type { WorkflowEventAssociation, WorkflowContractIdentity } from '../../types/profile';
@@ -12,25 +10,7 @@ export function lookupSystemOperation(
   step: ViewerStep,
   loaded: Readonly<Record<string, OperationSourceCandidate>>,
 ) {
-  const binding = step.sourceBinding;
-  const locators = { ...binding.locators };
-  if (binding.sourceName)
-    for (const [key, value] of Object.entries(locators)) {
-      if (typeof value !== 'string') continue;
-      const prefix = `$sourceDescriptions.${binding.sourceName}.`;
-      const url = `{$sourceDescriptions.${binding.sourceName}.url}`;
-      locators[key] = value.startsWith(prefix)
-        ? value.slice(prefix.length)
-        : value.startsWith(url)
-          ? value.slice(url.length)
-          : value;
-    }
-  return resolveScopedOperation(
-    locators,
-    model.document.sourceDescriptions
-      .filter((s) => binding.candidates.includes(s.name))
-      .map((s) => loaded[s.name] ?? { state: 'idle' }),
-  );
+  return resolveStepOperation(model, step, loaded);
 }
 function identityMatches(
   actual: ContractDeclarationIdentity | undefined,

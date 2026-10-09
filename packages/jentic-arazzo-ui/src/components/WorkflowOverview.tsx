@@ -1,3 +1,4 @@
+import { workflowReadingLabel } from '../utils/readingLabels';
 import React, { useState } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import type { WorkflowRelationship } from '../utils/model/viewerModel';
@@ -50,11 +51,11 @@ export function WorkflowOverview() {
               <button
                 onClick={() => setActiveWorkflow(workflow.workflowId)}
                 aria-label={`Open workflow ${workflow.workflowId}`}
+                title={workflowReadingLabel(workflow)}
               >
-                {workflow.workflowId}
+                {workflowReadingLabel(workflow)}
               </button>
             </h3>
-            {workflow.value.summary && <p>{workflow.value.summary}</p>}
             {groups.map(([direction, relationships]) => (
               <div key={direction}>
                 <strong>{direction}</strong>

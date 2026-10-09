@@ -15,7 +15,7 @@ test('expanded stress sequence retains participant context and gives every occur
     await loadDocument(readFileSync('public/examples/digital-product-stress/arazzo.yaml', 'utf8'))
   ).document;
   render(<ArazzoUI document={doc} />);
-  fireEvent.click(await screen.findByRole('button', { name: 'Sequence' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   const sequence = screen.getByRole('region', { name: 'Sequence full-stress-journey' });
   for (let i = 0; i < 10; i++) {
     const expand = within(sequence).queryAllByRole('button', { name: /^Expand / });
@@ -27,18 +27,18 @@ test('expanded stress sequence retains participant context and gives every occur
     .map((el) => el.getAttribute('aria-label') ?? el.textContent);
   expect(new Set(names).size).toBe(names.length);
   const captures = within(sequence).getAllByRole('button', {
-    name: /^Inspect capture-authorized-payment.capture-payment.*operation/,
+    name: /^View details for capture-authorized-payment.capture-payment.*operation/,
   });
   expect(captures).toHaveLength(2);
   expect(captures[0].getAttribute('aria-label')).not.toBe(captures[1].getAttribute('aria-label'));
   expect(
     within(sequence).getAllByRole('button', {
-      name: /^Inspect capture-authorized-payment.capture-payment.*transfer.*retry/,
+      name: /^View details for capture-authorized-payment.capture-payment.*transfer.*retry/,
     }),
   ).toHaveLength(2);
   expect(
     within(sequence).getAllByRole('button', {
-      name: /^Inspect capture-authorized-payment.capture-payment.*transfer.*goto/,
+      name: /^View details for capture-authorized-payment.capture-payment.*transfer.*goto/,
     }),
   ).toHaveLength(2);
   expect(sequence.querySelector('[aria-label="Sequence participants"]')).toBeTruthy();

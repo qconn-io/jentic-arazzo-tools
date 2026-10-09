@@ -51,23 +51,27 @@ export function InspectionStepCard({
       <Handle type="source" position={Position.Left} id="prerequisite-out" style={{ top: 28 }} />
       <Handle type="target" position={Position.Left} id="prerequisite-in" style={{ top: 48 }} />
       <div
+        className="arazzo-step-card-header"
         style={{ padding: '12px 14px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}
       >
-        <strong>{data.step.stepId}</strong>{' '}
+        <strong tabIndex={0} title={data.step.stepId}>
+          {data.step.stepId}
+        </strong>{' '}
         <span>{data.type === 'workflowRef' ? 'WORKFLOW CALL' : binding?.sourceType || 'STEP'}</span>
-      </div>
-      <div style={{ padding: '10px 14px' }}>
         {owner && (
           <button
-            aria-label={`Details for ${owner}.${data.step.stepId}`}
+            className="arazzo-detail-action nodrag nopan"
+            aria-label={`View details for ${owner}.${data.step.stepId}`}
             onClick={(event) => {
               event.stopPropagation();
               session.inspectStep(owner, data.step.stepId, event.currentTarget);
             }}
           >
-            Details
+            View details
           </button>
         )}
+      </div>
+      <div style={{ padding: '10px 14px' }}>
         {binding?.sourceName && <div style={rowStyle}>Source: {binding.sourceName}</div>}
         {['operationId', 'operationPath', 'channelPath', 'workflowId'].map((key) => {
           const locator = (data.step as unknown as Record<string, unknown>)[key];

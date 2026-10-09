@@ -82,7 +82,10 @@ describe('shared-model cards and prerequisite paths', () => {
         .hasAttribute('disabled'),
     ).toBe(true);
     expect(screen.queryByText('Timeout: 123 ms')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Details for a.receive' }));
+    const detail = screen.getByRole('button', { name: 'View details for a.receive' });
+    expect(detail.closest('.arazzo-step-card-header')).toBeTruthy();
+    expect(detail.classList.contains('nodrag')).toBe(true);
+    fireEvent.click(detail);
     const details = screen.getByRole('region', { name: 'Selection details' });
     expect(details.textContent).toContain('"timeout": 123');
     expect(details.textContent).toContain('$message.header.id');
@@ -152,7 +155,7 @@ it('renders inherited reusable action values, unresolved occurrences, criteria a
     </ReactFlowProvider>,
   );
   expect(container.textContent).not.toContain('$statusCode == 401');
-  fireEvent.click(screen.getByRole('button', { name: 'Details for a.receive' }));
+  fireEvent.click(screen.getByRole('button', { name: 'View details for a.receive' }));
   const details = screen.getByRole('region', { name: 'Selection details' });
   expect(details.textContent).toContain('effective-token');
   expect(details.textContent).toContain('"value": 0');
@@ -199,4 +202,25 @@ it('opens graph calls even when they fall beyond the sequence display budget', (
   );
   fireEvent.click(screen.getByRole('button', { name: 'Call callee (local-workflow)' }));
   expect(onWorkflowSelect).toHaveBeenCalledWith('callee');
+});
+
+it('header details stop parent activation and preserve one public scoped node callback', () => {
+  const parent = vi.fn();
+  const selected = vi.fn();
+  render(
+    <ReactFlowProvider>
+      <ArazzoViewerProvider document={doc} events={{ onNodeSelect: selected }}>
+        <div onClick={parent}>
+          <Cards />
+        </div>
+      </ArazzoViewerProvider>
+    </ReactFlowProvider>,
+  );
+  const action = screen.getByRole('button', { name: 'View details for a.receive' });
+  expect(action.closest('.arazzo-step-card-header')).toBeTruthy();
+  fireEvent.click(action);
+  expect(parent).not.toHaveBeenCalled();
+  expect(selected).toHaveBeenCalledTimes(1);
+  expect(selected.mock.calls[0][1].data.workflowId).toBe('a');
+  expect(selected.mock.calls[0][1].data.step.stepId).toBe('receive');
 });

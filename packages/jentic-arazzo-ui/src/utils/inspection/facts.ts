@@ -347,7 +347,10 @@ export function extractFacts(
       const matches = sources.filter((source) =>
         braced
           ? braced[1] === source.name
-          : locator.startsWith(`$sourceDescriptions.${source.name}.`),
+          : typeof source.name === 'string' &&
+            source.name.length > 0 &&
+            locator.startsWith(`$sourceDescriptions.${source.name}.`) &&
+            locator.length > `$sourceDescriptions.${source.name}.`.length,
       );
       matches.forEach((source) => {
         candidates.set(source.name, source);
@@ -362,19 +365,48 @@ export function extractFacts(
             ? ['arazzo']
             : ['openapi', 'asyncapi'];
       sources
-        .filter((source) => types.includes(source.type))
+        .filter((source) =>
+          step.operationId !== undefined || step.operationPath !== undefined
+            ? source.type !== 'arazzo'
+            : types.includes(source.type),
+        )
         .forEach((source) => candidates.set(source.name, source));
     }
     const conflicting = Object.keys(locators).length > 1;
+    const relevant = sources.filter((source) => source.type !== 'arazzo');
+    const supportedKind = (source: PlainObject) =>
+      source.type === 'openapi' || (source.type === 'asyncapi' && supports('asyncIntent'));
+    const bareId =
+      typeof step.operationId === 'string' &&
+      step.operationId.length > 0 &&
+      !/^[${}]/.test(step.operationId);
+    const unsupportedAsync =
+      (!supports('asyncIntent') &&
+        ['action', 'channelPath', 'timeout', 'correlationId'].some((field) =>
+          Object.hasOwn(step, field),
+        )) ||
+      (Object.hasOwn(step, 'action') && !['send', 'receive'].includes(step.action));
+    const singleSource =
+      !explicitNames.size &&
+      bareId &&
+      !unsupportedAsync &&
+      relevant.length === 1 &&
+      supportedKind(relevant[0]) &&
+      typeof relevant[0].name === 'string' &&
+      relevant[0].name.length > 0 &&
+      sources.filter((source) => source.name === relevant[0].name).length === 1;
+    const uniqueExplicit =
+      explicitNames.size === 1 &&
+      sources.filter((source) => explicitNames.has(source.name)).length === 1;
     const source =
-      candidates.size === 1 && explicitNames.size === 1 && !conflicting
+      candidates.size === 1 && (uniqueExplicit || singleSource) && !conflicting
         ? [...candidates.values()][0]
         : undefined;
     const status =
       conflicting || candidates.size > 1
         ? 'ambiguous'
         : source
-          ? ['openapi', 'asyncapi', 'arazzo'].includes(source.type)
+          ? source.type === 'arazzo' || supportedKind(source)
             ? 'declared'
             : 'unsupported'
           : 'unverified';
@@ -408,6 +440,7 @@ export function extractFacts(
       path,
       status,
       verification: 'unverified',
+      basis: source ? (singleSource ? 'single-source' : 'explicit-locator') : undefined,
       sourceName: source?.name,
       sourceType: source?.type,
       source: source ? clone(source) : undefined,

@@ -1,7 +1,11 @@
+import { contractReadingStatus } from '../utils/contract/readingStatus';
+import { interactionReadingLabel, interactionReadingTitle } from '../utils/readingLabels';
 import React, { useEffect, useMemo, useRef, useId } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
-import { buildSequence, type SequenceRow } from '../utils/sequence/sequenceModel';
+import { useContractFacts } from '../context/ContractFactsContext';
+import { resolveStepOperation } from '../utils/contract/stepOperation';
+import { buildSequence, destinationKey, type SequenceRow } from '../utils/sequence/sequenceModel';
 
 function wrap(label: string, width = 30): string[] {
   const words = label.replace(/[\r\n]+/g, ' ').split(/\s+/);
@@ -21,9 +25,23 @@ function wrap(label: string, width = 30): string[] {
 export function SequenceView({ workflowId }: { workflowId: string }) {
   const { model, navigateToTarget } = useArazzoViewer();
   const session = useViewerSession();
+  const { loaded } = useContractFacts();
   const scene = useMemo(
-    () => buildSequence(model, workflowId, session.expansions[workflowId]),
-    [model, workflowId, session.expansions],
+    () =>
+      buildSequence(
+        model,
+        workflowId,
+        session.expansions[workflowId],
+        new Map(
+          model.workflows.flatMap((workflow) =>
+            workflow.steps.map(
+              (step) =>
+                [destinationKey(model, step), resolveStepOperation(model, step, loaded)] as const,
+            ),
+          ),
+        ),
+      ),
+    [model, workflowId, session.expansions, loaded],
   );
   const container = useRef<HTMLDivElement>(null);
   const controls = useRef(new Map<string, HTMLButtonElement>());
@@ -60,6 +78,10 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
   return (
     <section aria-label={`Sequence ${workflowId}`} className="arazzo-sequence">
       <p>Schematic authored interactions · structural continuations are not evaluated outcomes.</p>
+      <p>
+        Destinations use authored source bindings and explicitly loaded current contracts. Operation
+        lookup does not establish validity or execution.
+      </p>
       <p role="status" className="arazzo-sequence-context">
         Root: {workflowId}
         {session.selectedRow && (
@@ -85,7 +107,11 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                 {participant.name}
               </span>
               <small>
-                {participant.kind} · {participant.id}
+                {participant.kind === 'source'
+                  ? 'API description'
+                  : participant.kind === 'workflow'
+                    ? 'Workflow'
+                    : 'Destination not established'}
               </small>
             </div>
           ))}
@@ -104,7 +130,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
           {scene.participants.map((participant) => (
             <g key={participant.id}>
               <title>
-                {participant.name} ({participant.kind}) · {participant.id}
+                {participant.name} ({participant.kind})
               </title>
               <line
                 x1={xs.get(participant.id)}
@@ -153,7 +179,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                 }}
               >
                 <title>
-                  {row.label}
+                  {interactionReadingLabel(row)}
                   {contextName(row)}
                 </title>
                 {selected && (
@@ -167,7 +193,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                   />
                 )}
                 <text x={(x1 + x2) / 2} y={y - 26} textAnchor="middle" fontSize={13} fill="#0f172a">
-                  {wrap(row.label).map((line, i) => (
+                  {wrap(interactionReadingLabel(row)).map((line, i) => (
                     <tspan x={(x1 + x2) / 2} dy={i ? 16 : 0} key={i}>
                       {line}
                     </tspan>
@@ -213,20 +239,34 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
       <ol aria-label="Ordered interactions" className="arazzo-sequence-list">
         {scene.rows.map((row) => (
           <li key={row.id} style={{ paddingLeft: Math.min(row.depth, 8) * 12 }}>
-            <span tabIndex={0} title={row.label}>
-              {row.label}
+            <span tabIndex={0} title={interactionReadingTitle(row)}>
+              {interactionReadingLabel(row)}
             </span>{' '}
+            {row.kind === 'operation' &&
+              row.step &&
+              row.step.sourceBinding.status !== 'declared' &&
+              row.destinationEvidence?.status !== 'located' && (
+                <p className="arazzo-destination-explanation">
+                  The API destination is not established.{' '}
+                  {row.step.diagnostics.map((diagnostic) => diagnostic.message).join(' ')} View
+                  details to inspect the authored locator and available API descriptions.
+                </p>
+              )}
+            {row.destinationEvidence && (
+              <small title={row.destinationEvidence.diagnostics?.join(' · ')}>
+                {contractReadingStatus[row.destinationEvidence.status]}
+              </small>
+            )}
             {(row.step || row.kind === 'prerequisite' || row.kind === 'marker') && (
               <button
                 ref={(element) => {
                   if (row.kind !== 'call' && element) controls.current.set(row.id, element);
                 }}
-                aria-label={`${['operation', 'call', 'transfer'].includes(row.kind) ? 'Inspect' : 'Inspect context for'} ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}${contextName(row)}`}
+                className="arazzo-detail-action"
+                aria-label={`${['operation', 'call', 'transfer'].includes(row.kind) ? 'View details for' : 'View context details for'} ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}${contextName(row)}`}
                 onClick={(event) => select(row, event.currentTarget)}
               >
-                {row.kind === 'operation' || row.kind === 'call' || row.kind === 'transfer'
-                  ? 'Details'
-                  : 'Inspect context'}
+                View details
               </button>
             )}
             {row.kind === 'call' && row.target?.navigable && (

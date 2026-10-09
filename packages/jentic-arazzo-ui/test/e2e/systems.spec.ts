@@ -77,7 +77,7 @@ for (const width of [1440, 480]) {
     });
     await panel.getByRole('checkbox', { name: 'Show declared event relationships' }).check();
     await expect(panel).toContainText('Contract not established');
-    await panel.getByRole('button', { name: 'Load source events', exact: true }).click();
+    await panel.getByRole('button', { name: 'Load API description events', exact: true }).click();
     await expect(panel).toContainText(
       'Declared event association; delivery and correlation success are not established',
     );

@@ -43,7 +43,7 @@ test('search opens observation-250 beyond the sequence display budget', async ()
     )
   ).document;
   render(<ArazzoUI document={doc} />);
-  fireEvent.click(await screen.findByRole('button', { name: 'Sequence' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   fireEvent.change(screen.getByRole('searchbox'), { target: { value: 'observation-250' } });
   fireEvent.click(
     screen.getByRole('button', { name: /Inspect authored step .*\.observation-250/ }),
@@ -96,4 +96,76 @@ test('host selection supersedes an unaccepted authored search navigation', async
   rerender(mount('audit', 'host-selected-node'));
   expect(screen.queryByRole('region', { name: 'Selection details' })).toBeNull();
   expect(selected).not.toHaveBeenCalled();
+});
+
+test('layout names keep public callback values and expose selected state', async () => {
+  const { ViewModeControl } = await import('../src/components/ViewModeControl');
+  const change = vi.fn();
+  render(<ViewModeControl value="split" onChange={change} />);
+  const group = screen.getByRole('group', { name: 'Layout' });
+  expect(within(group).getByText('Layout')).toBeTruthy();
+  for (const [name, value] of [
+    ['Workflow diagram', 'diagram'],
+    ['Read workflow', 'docs'],
+    ['Side by side', 'split'],
+  ]) {
+    const button = within(group).getByRole('button', { name });
+    expect(button.getAttribute('aria-pressed')).toBe(String(value === 'split'));
+    fireEvent.click(button);
+    expect(change).toHaveBeenLastCalledWith(value);
+  }
+});
+test('reading view has scoped selection and overview has no invented sequence', async () => {
+  render(<ArazzoUI document={nestedCalls} />);
+  const group = await screen.findByRole('group', { name: 'Reading view' });
+  expect(within(group).getByText('Reading view')).toBeTruthy();
+  expect(
+    within(group).getByRole('button', { name: 'Step descriptions' }).getAttribute('aria-pressed'),
+  ).toBe('true');
+  fireEvent.click(within(group).getByRole('button', { name: 'Sequence diagram' }));
+  expect(
+    within(group).getByRole('button', { name: 'Sequence diagram' }).getAttribute('aria-pressed'),
+  ).toBe('true');
+  fireEvent.click(screen.getByRole('button', { name: 'All workflows' }));
+  expect(screen.queryByRole('group', { name: 'Reading view' })).toBeNull();
+  expect(screen.queryByRole('button', { name: /Sequence diagram for/ })).toBeNull();
+});
+test('direct sequence request waits for the controlled layout and emits only one request', async () => {
+  const change = vi.fn();
+  const mount = (view: 'diagram' | 'docs' | 'split', workflow = 'checkout', doc = nestedCalls) => (
+    <ArazzoUI document={doc} view={view} activeWorkflowId={workflow} onViewChange={change} />
+  );
+  const { rerender } = render(mount('diagram'));
+  const direct = await screen.findByRole('button', { name: 'Sequence diagram for checkout' });
+  fireEvent.click(direct);
+  fireEvent.click(direct);
+  expect(change).toHaveBeenCalledExactlyOnceWith('docs');
+  expect(screen.queryByRole('region', { name: 'Sequence checkout' })).toBeNull();
+  rerender(mount('docs'));
+  expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
+  rerender(mount('split'));
+  fireEvent.click(screen.getByRole('button', { name: 'Step descriptions' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram for checkout' }));
+  expect(screen.getByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
+  expect(change).toHaveBeenCalledTimes(1);
+});
+test('unaccepted direct sequence request is cancelled on workflow or document replacement', async () => {
+  const mount = (view: 'diagram' | 'docs', workflow: string, doc = nestedCalls) => (
+    <ArazzoUI document={doc} view={view} activeWorkflowId={workflow} onViewChange={vi.fn()} />
+  );
+  const { rerender } = render(mount('diagram', 'checkout'));
+  fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram for checkout' }));
+  rerender(mount('diagram', 'payment'));
+  rerender(mount('docs', 'checkout'));
+  expect(
+    await screen.findByRole('button', { name: 'Step descriptions', pressed: true }),
+  ).toBeTruthy();
+  rerender(mount('diagram', 'checkout'));
+  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram for checkout' }));
+  rerender(mount('diagram', 'checkout', structuredClone(nestedCalls)));
+  await screen.findByRole('button', { name: 'Sequence diagram for checkout' });
+  rerender(mount('docs', 'checkout'));
+  expect(
+    await screen.findByRole('button', { name: 'Step descriptions', pressed: true }),
+  ).toBeTruthy();
 });

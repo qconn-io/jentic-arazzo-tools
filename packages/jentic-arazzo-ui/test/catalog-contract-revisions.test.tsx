@@ -81,7 +81,7 @@ it('inspects the same exact contract revision as the index, including two source
   );
   const load = await screen.findByRole(
     'button',
-    { name: 'Load source pay-new' },
+    { name: 'Load API description pay-new' },
     { timeout: 5000 },
   );
   fireEvent.click(load);

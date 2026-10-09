@@ -71,13 +71,13 @@ for (const width of [1440, 480]) {
     await page.getByLabel('Finding category').selectOption('mappings');
     await page.getByRole('button', { name: /mappings.*value/ }).click();
     await before.getByRole('button', { name: 'Open before location' }).click();
-    await before.getByRole('button', { name: 'Load source pay' }).click();
+    await before.getByRole('button', { name: 'Load API description pay' }).click();
     await expect(before.getByLabel('Selection details', { exact: true })).toContainText(
       'Revision: baseline-r1',
     );
     if (width === 480) await page.getByRole('button', { name: 'Close details' }).click();
     await after.getByRole('button', { name: 'Open after location' }).click();
-    await after.getByRole('button', { name: 'Load source pay' }).click();
+    await after.getByRole('button', { name: 'Load API description pay' }).click();
     await expect(after.getByLabel('Selection details', { exact: true })).toContainText(
       'Revision: candidate-r2',
     );
@@ -123,7 +123,7 @@ for (const width of [1440, 480]) {
     await expect(after).toContainText('Potential entry');
     await expect(after).toContainText('Runtime effect undetermined');
     await after.getByRole('button', { name: /Direct api:.*capture-evidence/ }).click();
-    await after.getByRole('button', { name: 'Load source events' }).click();
+    await after.getByRole('button', { name: 'Load API description events' }).click();
     await expect(after.getByLabel('Selection details', { exact: true })).toContainText(
       'Revision: candidate-e2',
     );

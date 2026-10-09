@@ -83,10 +83,7 @@ import '@jentic/arazzo-ui/styles.css';
 
 function App() {
   return (
-    <ArazzoUIStandalone
-      document="https://example.com/workflow.arazzo.yaml"
-      initialView="docs"
-    />
+    <ArazzoUIStandalone document="https://example.com/workflow.arazzo.yaml" initialView="docs" />
   );
 }
 ```
@@ -95,11 +92,11 @@ function App() {
 
 Both components are available as UMD builds that bundle all dependencies into a single file and expose an imperative API. Build artifacts are located in `./dist/`:
 
-| File | Description |
-|------|-------------|
-| `dist/arazzo-ui.js` | ArazzoUI UMD bundle |
+| File                           | Description                   |
+| ------------------------------ | ----------------------------- |
+| `dist/arazzo-ui.js`            | ArazzoUI UMD bundle           |
 | `dist/arazzo-ui-standalone.js` | ArazzoUIStandalone UMD bundle |
-| `dist/arazzo-ui.css` | Required stylesheet |
+| `dist/arazzo-ui.css`           | Required stylesheet           |
 
 #### ArazzoUI
 
@@ -161,22 +158,36 @@ When the document is a URL, it is displayed below the title in the docs view.
 
 The `view` prop (or `initialView` for standalone) controls the display:
 
-| Mode | Description |
-|------|-------------|
-| `diagram` | Interactive React Flow diagram of workflows |
-| `docs` | Documentation view with workflow details, steps, parameters, and actions |
-| `split` | Side-by-side diagram and docs |
+| Mode      | Description                                                          |
+| --------- | -------------------------------------------------------------------- |
+| `diagram` | **Workflow diagram** — interactive workflow cards and relationships  |
+| `docs`    | **Read workflow** — step descriptions, sequence diagram or flowchart |
+| `split`   | **Side by side** — workflow diagram and reading pane                 |
 
 In split view, clicking a step node in the diagram expands the workflow and scrolls to that step in the docs pane. Switching workflow tabs in the diagram scrolls to the corresponding workflow in docs.
 
 ## Chained workflow inspection
 
-The **All workflows** button and **Select workflow** menu are visible above the
-panes in Docs, Diagram, and Split modes. Start in the default Docs view, select
-All workflows to see classified incoming and outgoing relationships, filter by
-Call, Prerequisite, One-way goto, or Retry recovery, then open a workflow entry. Its header offers Documentation, Sequence, and Flowchart.
-All workflows returns to the document overview; Sequence shows the selected
-workflow's authored interactions. Changing view mode retains the destination.
+The **Layout** control offers **Workflow diagram**, **Read workflow**, and
+**Side by side**. The **All workflows** button and **Select workflow** menu are
+visible above the panes. Workflow choices show authored summaries alongside their
+exact IDs. Select All workflows to see classified relationships, filter by Call,
+Prerequisite, One-way goto, or Retry recovery, then open a workflow entry.
+
+Use the **Sequence diagram** shortcut in workflow navigation to read the selected
+workflow's interactions directly. It requests Read workflow when the reading pane
+is absent and retains Side by side when both panes are visible. In a controlled
+host, the host must accept `onViewChange('docs')` before the reading pane opens.
+The selected workflow's **Reading view** control offers **Step descriptions**,
+**Sequence diagram**, and **Flowchart**, and marks the active representation.
+All workflows returns to the relationships overview. Changing layout retains the
+destination; the public values `diagram`/`docs`/`split` and
+`docs`/`sequence`/`flowchart`, including old links, remain unchanged.
+
+A failed flowchart shows **Unable to draw this flowchart**, **Retry diagram** and
+**Read step descriptions**. Retry only redraws the diagram; it does not load API
+descriptions. Rendering details are available separately, and a replaced
+document cannot receive an obsolete drawing.
 
 The overview shows prerequisites, workflow calls, and understood
 success/failure transitions, including parallel relationships and loops. Select a
@@ -193,7 +204,7 @@ empty string back to `null` when updating the prop. Prop updates do not emit an
 additional selection callback. Setting `selectedNodeId` to `null` clears a
 controlled node selection; `clearSelection()` clears an uncontrolled selection.
 
-In **Sequence**, direct local calls initially show their downstream interactions.
+In **Sequence diagram**, direct local calls initially show their downstream interactions.
 Use **Expand** on a deeper call; each call occurrence has its own expansion and
 mapping context. **Collapse** retains the selected root workflow. Workflow lanes
 show control context, API lanes show declared sources, and ambiguous destinations
@@ -202,7 +213,7 @@ headings retained at the top. Focus a shortened participant name to read its ful
 value. The selected root and caller path stay outside the scrolling canvas.
 Operation, action, and boundary controls identify their role and call occurrence.
 
-Choose **Details** in the ordered interaction list or on a diagram card to inspect
+Choose **View details** in the ordered interaction list or on a diagram card to inspect
 owning workflow/caller context, parameters, request or message payload trees,
 outputs, success criteria, prerequisites, and possible recovery actions. Caller
 mappings and callee declarations are separate. Recovery cards show target
@@ -214,7 +225,7 @@ Values remain authored: `0`, `false`, `null`, empty containers/strings, and
 expressions are not evaluated. Scalar type labels distinguish a string from a
 number or boolean; expressions remain selectable in full. **Not declared** means
 absence. **Advanced authored content and provenance** retains original snapshots,
-resolved inspection facts, unresolved references, and diagnostics. Default Docs
+resolved inspection facts, unresolved references, and diagnostics. Default Step descriptions
 keeps concise step descriptions and shared inspection controls; exported Markdown
 retains full values and provenance.
 
@@ -245,8 +256,8 @@ Open the indicated local workflow to inspect it as a new root. Row-limit markers
 offer **View complete documentation** to reach interactions omitted from the canvas. External and missing
 calls retain their classification and cannot expand unavailable content.
 
-The compact **Inspection status** control explains that source documents were not
-fetched and operations were not checked, without implying invalidity or
+The compact **Inspection status** control explains API-description availability
+and whether operations have been checked, without implying invalidity or
 inaccessibility. It names detected resolution limitations individually, including
 unsupported `$self`, unavailable base URI and unsupported schema dialects, and
 explains when references remain authored. It introduces no additional resolver
@@ -324,25 +335,25 @@ viewer-generated tracking IDs; it is not a validation result.
 
 ### ArazzoUIProps
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `document` | `ArazzoDocument \| string` | *required* | Arazzo document, URL, or inline content |
-| `view` | `'diagram' \| 'docs' \| 'split'` | `'docs'` | Active view mode |
-| `activeWorkflowId` | `string \| null` | first workflow | Omit for uncontrolled first-workflow selection; `null` selects All workflows |
-| `selectedNodeId` | `string \| null` | `null` | Controlled diagram node selection; `null` clears it |
-| `className` | `string` | — | CSS class for the root element |
-| `style` | `CSSProperties` | — | Inline styles for the root element |
-| `onNodeSelect` | `(nodeId, node) => void` | — | Called when a diagram node is clicked |
-| `onEdgeSelect` | `(edgeId, edge) => void` | — | Called with a public edge, including relationship data |
-| `onWorkflowSelect` | `(workflowId) => void` | — | Called on workflow navigation; `''` represents All workflows |
-| `onViewChange` | `(view) => void` | — | Called when the view mode changes |
+| Prop               | Type                             | Default        | Description                                                                  |
+| ------------------ | -------------------------------- | -------------- | ---------------------------------------------------------------------------- |
+| `document`         | `ArazzoDocument \| string`       | _required_     | Arazzo document, URL, or inline content                                      |
+| `view`             | `'diagram' \| 'docs' \| 'split'` | `'docs'`       | Active view mode                                                             |
+| `activeWorkflowId` | `string \| null`                 | first workflow | Omit for uncontrolled first-workflow selection; `null` selects All workflows |
+| `selectedNodeId`   | `string \| null`                 | `null`         | Controlled diagram node selection; `null` clears it                          |
+| `className`        | `string`                         | —              | CSS class for the root element                                               |
+| `style`            | `CSSProperties`                  | —              | Inline styles for the root element                                           |
+| `onNodeSelect`     | `(nodeId, node) => void`         | —              | Called when a diagram node is clicked                                        |
+| `onEdgeSelect`     | `(edgeId, edge) => void`         | —              | Called with a public edge, including relationship data                       |
+| `onWorkflowSelect` | `(workflowId) => void`           | —              | Called on workflow navigation; `''` represents All workflows                 |
+| `onViewChange`     | `(view) => void`                 | —              | Called when the view mode changes                                            |
 
 ### ArazzoUIStandaloneProps
 
 Inherits all `ArazzoUIProps` except `view`, plus:
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
+| Prop          | Type                             | Default  | Description                            |
+| ------------- | -------------------------------- | -------- | -------------------------------------- |
 | `initialView` | `'diagram' \| 'docs' \| 'split'` | `'docs'` | Initial view mode (managed internally) |
 
 ## Ref API
@@ -352,7 +363,7 @@ Both components expose an imperative API via React ref:
 ```jsx
 const ref = useRef(null);
 
-<ArazzoUI ref={ref} document={doc} view="diagram" />
+<ArazzoUI ref={ref} document={doc} view="diagram" />;
 
 // Later:
 ref.current.fitView();
@@ -450,15 +461,15 @@ Extensions cannot replace document, root, or occurrence identity.
 
 ## API Contract Inspection
 
-Select a step to inspect its authored source binding in **Contract & Source**. Selecting a step does not fetch a contract: use **Load source <name>** to request a declared source and **Reload source <name>** to refresh it. Standalone viewing supplies a browser fetch provider; embedded viewing uses the optional `sourceProvider` supplied by the host. Browser fetches omit credentials and remain subject to browser CORS rules.
+Select a step to inspect its authored source binding in **Contract & Source**. Selecting a step does not fetch a contract: use **Load API description <name>** to request a declared source and **Reload API description <name>** to refresh it. Standalone viewing supplies a browser fetch provider; embedded viewing uses the optional `sourceProvider` supplied by the host. Browser fetches omit credentials and remain subject to browser CORS rules.
 
 Supported inspection profiles are OpenAPI 3.0/3.1 and AsyncAPI 3. OpenAPI details retain parameters, request bodies, response alternatives, examples and effective security. AsyncAPI details retain send/receive direction, channel, messages, payloads, headers, correlation information and bindings. AsyncAPI 2 and Swagger 2 are reported as unsupported. Inspection displays authored contract facts; it does not execute requests, validate runtime values, select a successful response, or infer message delivery guarantees.
 
-A source can be not loaded, loading, located, missing, ambiguous, unsupported, failed, or limited by an acquisition budget. **Located** means the locator identifies a unique operation in the retrieved document; it is not a validation result. Retrieval URI, revision when supplied, and provider generation identify the acquired source. Relative source URLs and references require a document base URI. Inline content without a base reports that limitation instead of resolving against the viewer page.
+Reader messages distinguish **API description not loaded**, **Checking API description**, **Operation found**, **Operation not found**, **Multiple matching operations**, **Unsupported API description**, and **API description unavailable**. An unavailable description offers **Retry** when loading is supported. Partial candidate coverage does not establish a unique operation. **Operation found** means the locator identifies a unique operation in the retrieved document; it does not establish validity or execution. **Technical lookup details** retains exact locators/status codes; **Source acquisition details** retains retrieval URI and revision. **Advanced source provenance** retains provider generation. When loading is unavailable in this viewer, developer configuration help is shown separately. Relative source URLs and references require a document base URI. Inline content without a base reports that limitation instead of resolving against the viewer page.
 
 Schemas retain their authored references and sibling constraints. **Referenced schema declarations** shows targets separately, including their retrieval URI, revision when supplied, and reference limitations. Inspection does not flatten schemas or combine constraints. Recursive links remain finite; unsupported schema dialects, resource identifiers and anchors retain their authored content with an explanation.
 
-Reload refreshes the selected source and its reference dependencies, including failed dependencies. Other loaded sources that depend on invalidated entries return to not loaded and require an explicit Load source action; unrelated sources stay available. Cancelled or obsolete projections cannot publish their old facts.
+Reload refreshes the selected source and its reference dependencies, including failed dependencies. Other loaded sources that depend on invalidated entries return to not loaded and require an explicit Load API description action; unrelated sources stay available. Cancelled or obsolete projections cannot publish their old facts.
 
 The registry shares source acquisitions within a viewer and limits them to four concurrent requests, 32 documents, eight reference levels, and 10 MiB per document. Provider replacement and document replacement invalidate the source scope and abort pending acquisitions. These bounds protect inspection work; a host should also bound its own network response reading.
 
@@ -607,14 +618,22 @@ const manifest: WorkflowCatalogManifest = {
   revision: 'portfolio-2026-10',
   capabilities: [{ id: 'purchase', name: 'Purchase' }],
   owners: [{ id: 'payments-team', name: 'Payments team' }],
-  documents: [{
-    id: 'commerce',
-    revision: 'commerce-v3',
-    uri: 'https://example.test/commerce.arazzo.yaml',
-    // expectedDigest: 'sha256:<64 lowercase hexadecimal characters>',
-    workflows: [{ workflowId: 'purchase', role: 'entry',
-      capabilities: ['purchase'], owner: 'payments-team' }],
-  }],
+  documents: [
+    {
+      id: 'commerce',
+      revision: 'commerce-v3',
+      uri: 'https://example.test/commerce.arazzo.yaml',
+      // expectedDigest: 'sha256:<64 lowercase hexadecimal characters>',
+      workflows: [
+        {
+          workflowId: 'purchase',
+          role: 'entry',
+          capabilities: ['purchase'],
+          owner: 'payments-team',
+        },
+      ],
+    },
+  ],
 };
 // provider must return revision 'commerce-v3' when no expectedDigest is supplied.
 <ArazzoCatalog manifest={manifest} sourceProvider={provider} />;
@@ -691,12 +710,19 @@ Missing contracts and unsupported inspection profiles retain coverage warnings; 
 raw authored declarations remain readable. Invalid or colliding identities prevent results.
 
 ```tsx
-import { ArazzoWorkflowReview, compareWorkflowRevisions, exportWorkflowReview } from '@jentic/arazzo-ui';
+import {
+  ArazzoWorkflowReview,
+  compareWorkflowRevisions,
+  exportWorkflowReview,
+} from '@jentic/arazzo-ui';
 import '@jentic/arazzo-ui/styles.css';
 
 // baseline and candidate are immutable supplied WorkflowReviewSnapshot values.
-<ArazzoWorkflowReview baseline={baseline} candidate={candidate}
-  onLocationRequest={(side, location) => inspectRevision(side, location)} />;
+<ArazzoWorkflowReview
+  baseline={baseline}
+  candidate={candidate}
+  onLocationRequest={(side, location) => inspectRevision(side, location)}
+/>;
 const review = await compareWorkflowRevisions(baseline, candidate);
 const json = exportWorkflowReview(review, 'json');
 const markdown = exportWorkflowReview(review, 'markdown');

@@ -8,6 +8,6 @@ import '../src/components/WorkflowTabs.css';
 test('TSX components and CSS imports execute with jsdom', () => {
   const change = vi.fn();
   render(<ViewModeControl value="docs" onChange={change} />);
-  fireEvent.click(screen.getByRole('button', { name: 'diagram' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Workflow diagram' }));
   expect(change).toHaveBeenCalledExactlyOnceWith('diagram');
 });

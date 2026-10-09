@@ -18,6 +18,7 @@ export interface LoadedSource {
   scope?: ArazzoViewerModel['inspection']['snapshot'];
   provider?: import('../types/source').SourceDocumentProvider;
   validity?: SourceValidityToken;
+  requestedRevision?: string;
   state: 'idle' | 'loading' | 'success' | 'error';
   facts?: ContractDocumentFacts;
   workflowModel?: ArazzoViewerModel;
@@ -43,8 +44,8 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
   );
   const [loaded, setLoaded] = useState<Record<string, LoadedSource>>({});
   const scope = model.inspection.snapshot;
-  const current = useRef({ scope, sourceProvider });
-  current.current = { scope, sourceProvider };
+  const current = useRef({ scope, sourceProvider, revisions });
+  current.current = { scope, sourceProvider, revisions };
   const requests = useRef(new Map<string, object>());
   useEffect(() => {
     setLoaded({});
@@ -55,9 +56,10 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
   }, [scope, sourceProvider]);
   const currentLoaded = Object.fromEntries(
     Object.entries(loaded).filter(
-      ([, value]) =>
+      ([name, value]) =>
         value.scope === scope &&
         value.provider === sourceProvider &&
+        value.requestedRevision === revisions[name] &&
         (!value.validity || sourceRegistry.isCurrent(value.validity)),
     ),
   );
@@ -67,19 +69,30 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
     requests.current.set(source.name, token);
     if (reload) sourceRegistry.reload(source.url, revision, scope.baseURI);
     const resolvedURI = sourceRegistry.resolveUri(source.url, scope.baseURI).resolvedUri;
-    const validity = sourceRegistry.captureValidity(resolvedURI, revision);
+    let validity: SourceValidityToken | undefined;
     const isCurrent = () =>
       current.current.scope === scope &&
       current.current.sourceProvider === sourceProvider &&
+      current.current.revisions[source.name] === revision &&
       requests.current.get(source.name) === token &&
-      sourceRegistry.isCurrent(validity);
-    setLoaded((old) => ({
-      ...old,
-      [source.name]: { state: 'loading', validity, scope, provider: sourceProvider },
-    }));
+      (!validity || sourceRegistry.isCurrent(validity));
     let acquired: SourceDocumentContent | undefined;
     try {
-      acquired = await sourceRegistry.acquire(source.url, revision, scope.baseURI);
+      const acquisition = sourceRegistry.acquire(source.url, revision, scope.baseURI);
+      // Reserve the requested pin before capture; returned-provenance fallback
+      // must not attach a new pinned projection to an older unpinned entry.
+      validity = sourceRegistry.captureValidity(resolvedURI, revision);
+      setLoaded((old) => ({
+        ...old,
+        [source.name]: {
+          state: 'loading',
+          validity,
+          requestedRevision: revision,
+          scope,
+          provider: sourceProvider,
+        },
+      }));
+      acquired = await acquisition;
       if (!isCurrent()) return;
       let value: LoadedSource;
       if (source.type === 'arazzo') {
@@ -117,7 +130,13 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
       if (isCurrent())
         setLoaded((old) => ({
           ...old,
-          [source.name]: { ...value, validity, scope, provider: sourceProvider },
+          [source.name]: {
+            ...value,
+            validity,
+            requestedRevision: revision,
+            scope,
+            provider: sourceProvider,
+          },
         }));
     } catch (error) {
       if (isCurrent())
@@ -125,6 +144,7 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
           ...old,
           [source.name]: {
             state: 'error',
+            requestedRevision: revision,
             scope,
             provider: sourceProvider,
             validity,

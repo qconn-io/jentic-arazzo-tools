@@ -1,0 +1,233 @@
+{
+  "capturedAt": "2026-10-09T12:48:28.625Z",
+  "artifacts": {
+    "index.html": "46b8ce826b5dbd0d8754963d702d8177018230cb6a6ae217e7c0b7a172f25f9b",
+    "arazzo-ui-standalone.e2d1a95f.js": "96c9f1aa75e11e56d1673898372771444f8adf80b9cd357065894046dc8e7416",
+    "arazzo-ui.322b3741.css": "50a91548d807223df255469fa40c823db90260ab38fef7f13958932999119d4e",
+    "petstore-order-workflow.arazzo.yaml": "8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569"
+  },
+  "observations": [
+    {
+      "fixture": "petstore",
+      "width": 1440,
+      "view": "descriptions",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "petstore",
+      "width": 1440,
+      "view": "description-controls",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "petstore",
+      "width": 1440,
+      "view": "cards",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "petstore",
+      "width": 1440,
+      "view": "sequence-canvas",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "petstore",
+      "width": 1440,
+      "view": "sequence",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "petstore",
+      "width": 1440,
+      "view": "flowchart",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "long",
+      "width": 1440,
+      "view": "descriptions",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "long",
+      "width": 1440,
+      "view": "description-controls",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "long",
+      "width": 1440,
+      "view": "cards",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "long",
+      "width": 1440,
+      "view": "sequence-canvas",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "long",
+      "width": 1440,
+      "view": "sequence",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "long",
+      "width": 1440,
+      "view": "flowchart",
+      "viewport": 1440,
+      "page": 1440,
+      "body": 1440
+    },
+    {
+      "fixture": "petstore",
+      "width": 480,
+      "view": "descriptions",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "petstore",
+      "width": 480,
+      "view": "description-controls",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "petstore",
+      "width": 480,
+      "view": "cards",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "petstore",
+      "width": 480,
+      "view": "sequence-canvas",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "petstore",
+      "width": 480,
+      "view": "sequence",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "petstore",
+      "width": 480,
+      "view": "flowchart",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "long",
+      "width": 480,
+      "view": "descriptions",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "long",
+      "width": 480,
+      "view": "description-controls",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "long",
+      "width": 480,
+      "view": "cards",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "long",
+      "width": 480,
+      "view": "sequence-canvas",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "long",
+      "width": 480,
+      "view": "sequence",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    },
+    {
+      "fixture": "long",
+      "width": 480,
+      "view": "flowchart",
+      "viewport": 480,
+      "page": 480,
+      "body": 480
+    }
+  ],
+  "errors": [],
+  "failures": [
+    {
+      "id": "F1-flowchart-readability",
+      "fixture": "petstore",
+      "width": 1440,
+      "minimumTextPixels": 9.5064587765235,
+      "state": "FAIL",
+      "owner": "gate-workflow-ux-regressions",
+      "explanation": "Fit-to-width Mermaid labels fall below the 12px reading size used by existing cards. Rendering recovery does not repair this."
+    },
+    {
+      "id": "F1-flowchart-readability",
+      "fixture": "petstore",
+      "width": 480,
+      "minimumTextPixels": 2.964369015302705,
+      "state": "FAIL",
+      "owner": "gate-workflow-ux-regressions",
+      "explanation": "Fit-to-width Mermaid labels fall below the 12px reading size used by existing cards. Rendering recovery does not repair this."
+    },
+    {
+      "id": "F1-flowchart-readability",
+      "fixture": "long",
+      "width": 480,
+      "minimumTextPixels": 9.597051597051598,
+      "state": "FAIL",
+      "owner": "gate-workflow-ux-regressions",
+      "explanation": "Fit-to-width Mermaid labels fall below the 12px reading size used by existing cards. Rendering recovery does not repair this."
+    }
+  ]
+}

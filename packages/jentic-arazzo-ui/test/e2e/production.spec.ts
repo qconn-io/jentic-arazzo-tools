@@ -108,10 +108,10 @@ test('identified installed ESM plain viewing and provider denial', async ({ page
   await expect(page.getByRole('heading', { name: 'Scoped consumers', exact: true })).toBeVisible();
   expect((await hostState(page)).providerRequests).toEqual([]);
   await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('helper');
-  await page.getByRole('button', { name: 'Inspect helper.capture', exact: true }).click();
+  await page.getByRole('button', { name: 'View details for helper.capture', exact: true }).click();
   const panel = inspector(page);
   expect((await hostState(page)).providerRequests).toEqual([]);
-  await panel.getByRole('button', { name: 'Load source pay', exact: true }).click();
+  await panel.getByRole('button', { name: 'Load API description pay', exact: true }).click();
   await expect(panel).toContainText('failed');
   await expect(panel).toContainText('Explicit host provider denied');
   expect((await hostState(page)).providerRequests).toEqual(['https://example.test/pay.json']);
@@ -135,16 +135,16 @@ test('standalone viewing discloses setup and acquires only explicitly loaded con
   await page.keyboard.press('Enter');
   await expect(page.getByRole('textbox', { name: 'Scenario manifest URL' })).toBeVisible();
   expect(contractRequests).toEqual([]);
-  await page.getByRole('button', { name: 'diagram', exact: true }).click();
+  await page.getByRole('button', { name: 'Workflow diagram', exact: true }).click();
   await page
-    .getByRole('button', { name: 'Details for client-journey.purchase', exact: true })
+    .getByRole('button', { name: 'View details for client-journey.purchase', exact: true })
     .click();
   expect(contractRequests).toEqual([]);
   (page as Page & { acceptanceExplicitSources: Set<string> }).acceptanceExplicitSources.add(
     `${baseURL}/examples/digital-product/coordinator.openapi.yaml`,
   );
   await inspector(page)
-    .getByRole('button', { name: 'Load source coordinator', exact: true })
+    .getByRole('button', { name: 'Load API description coordinator', exact: true })
     .click();
   await expect(inspector(page)).toContainText('purchaseProduct');
   await expect(inspector(page)).toContainText('requestBody');
@@ -287,7 +287,9 @@ test('pinned Jentic Asana, Xero and Stripe remain readable without acquisition',
   for (const [name, [workflow, step]] of Object.entries(documents)) {
     await page.goto(`/consumer/?surface=representative&fixture=${name}`);
     await page.getByRole('combobox', { name: 'Select workflow' }).selectOption(workflow);
-    await page.getByRole('button', { name: `Inspect ${workflow}.${step}`, exact: true }).click();
+    await page
+      .getByRole('button', { name: `View details for ${workflow}.${step}`, exact: true })
+      .click();
     await expect(inspector(page)).toContainText(step);
     expect((await hostState(page)).providerRequests).toEqual([]);
     await page.keyboard.press('Escape');

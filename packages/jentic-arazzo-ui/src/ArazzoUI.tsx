@@ -427,7 +427,7 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
 
   return (
     <div className="arazzo-viewer-shell">
-      <WorkflowNavigation />
+      <WorkflowNavigation view={view} />
       {systems?.enabled && (
         <AdvancedProfileControls>
           <div className="arazzo-systems-setting">

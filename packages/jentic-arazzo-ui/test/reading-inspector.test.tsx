@@ -90,7 +90,9 @@ test('default documentation links to shared details without repeating full proje
     <ArazzoUI document={nestedCalls} view={view} />
   );
   const { rerender } = render(mountUI('docs'));
-  fireEvent.click(await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' }));
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'View details for checkout.firstPayment' }),
+  );
   const projection = () =>
     screen
       .getByRole('region', { name: 'Selection details' })

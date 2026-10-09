@@ -19,7 +19,7 @@ export function generateMermaidSequence(
       `    participant ${participant.id} as ${mermaidLabel(`${participant.name} (${participant.kind})`)}`,
     );
   lines.push(
-    `    Note over ${scene.participants[0].id}: ${mermaidLabel('Schematic authored interactions; bounded to eight call levels and 200 rows. Full metadata in documentation.')}`,
+    `    Note over ${scene.participants[0].id}: ${mermaidLabel('Schematic authored interactions; authored-only source bindings, operations not checked; bounded to eight call levels and 200 rows. Full metadata in documentation.')}`,
   );
   const rowMap = new Map(scene.rows.map((row) => [row.id, row]));
   const lastRows = new Map<string, number>();

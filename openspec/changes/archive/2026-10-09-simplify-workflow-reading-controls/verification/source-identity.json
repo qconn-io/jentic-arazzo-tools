@@ -1,0 +1,7 @@
+{
+  "head": "6c3323445df6720cf602cd2a23e5a78525aa956f",
+  "branch": "feature/visualize-chained-workflows",
+  "sourceTreeSha256": "b1baa99248a48d560e810fbee5d90be1cb4181f1a9178291dc51042f6106b357",
+  "sourceHashMethod": "sorted source-relative path, NUL, file bytes, NUL for every file under packages/jentic-arazzo-ui/src",
+  "fixtureSha256": "8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569"
+}

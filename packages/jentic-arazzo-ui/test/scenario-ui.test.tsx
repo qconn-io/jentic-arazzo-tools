@@ -259,7 +259,7 @@ test('guide focus is absent when inspecting a different occurrence of the same a
   fireEvent.click(within(sequence).getByRole('button', { name: /Expand checkout.firstPayment/ }));
   fireEvent.click(
     within(sequence).getByRole('button', {
-      name: /Inspect payment.charge .*checkout.firstPayment/,
+      name: /View details for payment.charge .*checkout.firstPayment/,
     }),
   );
   const details = await screen.findByRole('region', { name: 'Selection details' });
