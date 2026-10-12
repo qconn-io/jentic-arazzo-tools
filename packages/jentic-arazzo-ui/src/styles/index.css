@@ -245,7 +245,7 @@
   padding: 16px;
   margin: 12px 0;
   background: white;
-  border: 1px solid #cbd5e1;
+  border: 1px solid #94c83d;
   border-radius: 8px;
   overflow-wrap: anywhere;
 }
@@ -253,7 +253,16 @@
   min-width: 0;
 }
 .arazzo-overview-entry h3 {
-  margin: 0;
+  margin: -16px -16px 0;
+}
+.arazzo-overview-entry h3 .arazzo-overview-link {
+  display: block;
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  border-radius: 7px 7px 0 0;
+  font-size: 15px;
+  font-weight: 700;
 }
 .arazzo-overview-summary,
 .arazzo-overview-unavailable {
@@ -278,9 +287,9 @@
   width: fit-content;
   max-width: 100%;
   padding: 6px 10px;
-  border: 1px solid #94a3b8;
+  border: 1px solid #94c83d;
   border-radius: 5px;
-  background: #fff;
+  background: #f3fae8;
   color: #172033;
   font: inherit;
   font-size: 13px;
@@ -290,8 +299,8 @@
 }
 .arazzo-overview-filters > summary:hover,
 .arazzo-overview-relationships > summary:hover {
-  background: #f1f5f9;
-  border-color: #64748b;
+  background: #ecf5dc;
+  border-color: #6ba543;
 }
 .arazzo-overview-filters label {
   display: flex;
@@ -319,10 +328,12 @@
 .arazzo-overview-link {
   cursor: pointer;
   text-align: left;
+  background: #f3fae8;
+  border-color: #94c83d;
 }
 .arazzo-overview-link:hover {
-  background: #f1f5f9;
-  border-color: #64748b;
+  background: #ecf5dc;
+  border-color: #6ba543;
 }
 .arazzo-overview-relationships ul {
   padding-inline-start: 22px;
