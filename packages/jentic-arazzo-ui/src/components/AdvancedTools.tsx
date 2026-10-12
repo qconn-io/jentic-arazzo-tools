@@ -14,8 +14,12 @@ export function GuideSetup({
     <>
       <div className="arazzo-guide-setup">
         <details className="arazzo-advanced-tools">
-          <summary>Load guides from a URL</summary>
-          {setup}
+          <summary>Help and guides</summary>
+          <p>Follow an author-provided walkthrough to find its declared workflow steps.</p>
+          <details>
+            <summary>Load guides from a URL</summary>
+            {setup}
+          </details>
         </details>
         {status}
       </div>

@@ -1,0 +1,66 @@
+
+> jentic-arazzo-tools@0.0.0-ignore typescript:check-types
+> lerna run typescript:check-types
+
+lerna notice cli v9.0.7
+
+ Lerna (powered by Nx)   Running target typescript:check-types for 5 projects:
+
+- @jentic/arazzo-parser
+- @jentic/arazzo-resolver
+- @jentic/arazzo-runner
+- @jentic/arazzo-ui
+- @jentic/arazzo-validator
+
+
+
+> @jentic/arazzo-parser:"typescript:check-types"
+
+(node:938422) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-parser@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-validator:"typescript:check-types"
+
+(node:938474) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-validator@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-resolver:"typescript:check-types"
+
+(node:938473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-resolver@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-runner:"typescript:check-types"
+
+(node:938588) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-runner@1.0.0-alpha.13 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-ui:"typescript:check-types"
+
+(node:938587) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+
+
+ Lerna (powered by Nx)   Successfully ran target typescript:check-types for 5 projects
+
+

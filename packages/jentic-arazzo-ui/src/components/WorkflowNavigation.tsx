@@ -1,32 +1,12 @@
 import { workflowReadingLabel } from '../utils/readingLabels';
-import React, { useEffect, useMemo, useState, useRef } from 'react';
-import type { ViewerMode } from '../types/index';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 
-export function WorkflowNavigation({ view = 'docs' }: { view?: ViewerMode }) {
-  const { model, activeWorkflowId, setActiveWorkflow, events } = useArazzoViewer();
+export function WorkflowNavigation() {
+  const { model, activeWorkflowId, setActiveWorkflow } = useArazzoViewer();
   const session = useViewerSession();
   const [query, setQuery] = useState('');
-  const sequenceRequest = useRef<{ model: typeof model; workflowId: string }>();
-  useEffect(() => {
-    const request = sequenceRequest.current;
-    if (!request) return;
-    if (request.model !== model || request.workflowId !== activeWorkflowId) {
-      sequenceRequest.current = undefined;
-    } else if (view === 'docs' || view === 'split') {
-      sequenceRequest.current = undefined;
-      session.setView(request.workflowId, 'sequence');
-    }
-  }, [model, activeWorkflowId, view]);
-  const openSequence = () => {
-    if (activeWorkflowId === null) return;
-    if (view === 'docs' || view === 'split') session.setView(activeWorkflowId, 'sequence');
-    else if (!sequenceRequest.current) {
-      sequenceRequest.current = { model, workflowId: activeWorkflowId };
-      events?.onViewChange?.('docs');
-    }
-  };
   useEffect(() => setQuery(''), [model]);
   const results = useMemo(() => {
     const term = query.trim().toLocaleLowerCase();
@@ -83,45 +63,43 @@ export function WorkflowNavigation({ view = 'docs' }: { view?: ViewerMode }) {
           ))}
         </select>
       </label>
-      <label>
-        Search workflows and steps
-        <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
-      </label>
-      {query.trim() && (
-        <div className="arazzo-search-results">
-          <p role="status">{results.length} authored locations</p>
-          <ul aria-label="Search results">
-            {results.map((result) => (
-              <li key={JSON.stringify(result)}>
-                <button
-                  aria-label={
-                    result.stepId
-                      ? `Inspect authored step ${result.workflowId}.${result.stepId}`
-                      : `Open authored workflow ${result.workflowId}`
-                  }
-                  onClick={(event) =>
-                    result.stepId
-                      ? session.openAuthoredStep(
-                          result.workflowId,
-                          result.stepId,
-                          event.currentTarget,
-                        )
-                      : select(result.workflowId)
-                  }
-                >
-                  {result.workflowId}
-                  {result.stepId ? ` · ${result.stepId} · authored step` : ' · workflow'}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {activeWorkflowId !== null && (
-        <button aria-label={`Sequence diagram for ${activeWorkflowId}`} onClick={openSequence}>
-          Sequence diagram
-        </button>
-      )}
+      <details className="arazzo-search-disclosure">
+        <summary>Search workflows and steps</summary>
+        <label>
+          Search workflows and steps
+          <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+        </label>
+        {query.trim() && (
+          <div className="arazzo-search-results">
+            <p role="status">{results.length} authored locations</p>
+            <ul aria-label="Search results">
+              {results.map((result) => (
+                <li key={JSON.stringify(result)}>
+                  <button
+                    aria-label={
+                      result.stepId
+                        ? `Inspect authored step ${result.workflowId}.${result.stepId}`
+                        : `Open authored workflow ${result.workflowId}`
+                    }
+                    onClick={(event) =>
+                      result.stepId
+                        ? session.openAuthoredStep(
+                            result.workflowId,
+                            result.stepId,
+                            event.currentTarget,
+                          )
+                        : select(result.workflowId)
+                    }
+                  >
+                    {result.workflowId}
+                    {result.stepId ? ` · ${result.stepId} · authored step` : ' · workflow'}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </details>
       {activeWorkflowId !== null && (
         <span title={activeWorkflowId}>
           {activeWorkflowId} · {incoming} incoming · {outgoing} outgoing

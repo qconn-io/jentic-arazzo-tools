@@ -50,19 +50,23 @@ Manifest errors, unavailable documents, stale waypoints, missing actions, and di
 - **THEN** the guide identifies the stale reference and retains its authored expectation without selecting a namesake step or marking the scenario failed
 
 ### Requirement: Benefit-first guided walkthrough discovery
-Optional scenario guides SHALL be presented as Guided walkthroughs with an adjacent explanation that they contain author-provided descriptions and links through a workflow. Supplied guides SHALL be selectable directly. Optional setup SHALL use Load guides from a URL with format help and an explicitly loadable compatible example; understanding a manifest or prior README reading SHALL NOT be required to identify the feature's purpose. Legacy array and versioned manifests, scenario selections, query parameters and restored waypoints SHALL remain supported. Guide visits SHALL remain authored inspection rather than execution or test results.
+Optional scenario guides SHALL be presented as Guided walkthroughs with an explanation that they contain author-provided descriptions and links through a workflow. Without supplied or restored guide context, the reader SHALL encounter no empty guide panel or persistent guide-loading row; guide purpose, Load guides from a URL, format help and an explicitly loadable compatible example SHALL remain reachable through contextual help or a feature-specific disclosure. Supplied guides SHALL be directly selectable through a compact named guide entry without re-entering a URL, and an active or restored guide SHALL reveal its narrative, navigation and applicable status. Legacy array and versioned manifests, scenario selections, query parameters and restored waypoints SHALL remain supported. Guide visits SHALL remain authored inspection rather than execution or test results.
 
 #### Scenario: No guides supplied
 - **WHEN** a new reader opens a plain workflow with no guide configuration
-- **THEN** the viewer briefly explains what a guided walkthrough offers and exposes optional loading without requiring setup to read the workflow or acquiring sibling files
+- **THEN** ordinary reading contains no empty Guided walkthroughs section or guide URL form, and opening contextual guide help explains the optional capability without acquiring content
 
 #### Scenario: Supplied guide discovery
-- **WHEN** guide content is explicitly supplied by the host or selected example configuration
-- **THEN** the reader can choose a named walkthrough directly without entering another URL and sees its authored narrative and supported step navigation
+- **WHEN** guides are supplied by the host or explicitly selected example configuration
+- **THEN** a compact guide entry gives direct access to named walkthroughs, and selecting one reveals its authored narrative and supported step navigation
 
 #### Scenario: Format help and explicit example
-- **WHEN** a reader opens guide-loading help
-- **THEN** the help explains the separate guide file and accepted format with a concrete example and performs no acquisition until the reader chooses an explicit load action
+- **WHEN** a reader opens guide-loading help from its contextual entry
+- **THEN** the separate guide format and compatible example are explained and nothing is acquired until an explicit loading action
+
+#### Scenario: Restored unavailable guide
+- **WHEN** a shared guide location cannot retrieve its manifest
+- **THEN** its feature-local status and recovery are revealed while its valid base workflow remains readable, without silently hiding the requested context
 
 ### Requirement: Recoverable guide setup states
 Guide loading, empty content, malformed content, unavailable URLs, incompatible document identities and stale waypoints SHALL produce feature-local explanations and applicable retry, replacement or return-to-workflow actions. Restored optional context SHALL reveal its relevant status without reopening unrelated setup. At desktop and 480-pixel widths, guide setup and details SHALL preserve keyboard operation, focus containment when covering, and valid dismissal origins.

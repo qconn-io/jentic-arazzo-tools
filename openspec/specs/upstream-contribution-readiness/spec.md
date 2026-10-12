@@ -31,20 +31,19 @@ The browser acceptance command SHALL build and serve its own current production 
 - **THEN** acceptance uses its own identified production server and does not silently validate that development instance
 
 ### Requirement: Optional tools use progressive disclosure
-
-Plain workflow viewing SHALL retain immediately available document loading, view switching, workflow navigation/search, and details. Optional setup SHALL use feature-specific, benefit-oriented disclosure with adjacent explanations rather than a mandatory generic advanced-tools control. Supplied guided walkthroughs SHALL be directly available in their guide area, and configured Systems view selection SHALL be available near the workflow reading controls. Unconfigured reading SHALL remain uncluttered and usable. Explicit supplied or restored optional context SHALL reveal its relevant controls and status. Loading, failure, coverage, and support limitations SHALL remain visible in context; diagnostic implementation metadata SHALL be available through advanced inspection without dominating normal business details. This disclosure SHALL NOT require a new profile-loading or editing workflow.
+Plain workflow viewing SHALL retain immediately available workflow selection, sequence/step reading and interaction details, with document loading, search, sharing and alternative presentations accessible through compact, understandable controls. Optional configuration SHALL use contextual, feature-specific disclosure with benefit-oriented explanations; an empty guide panel or unavailable Systems promotion SHALL NOT appear above ordinary reading. Supplied guides SHALL be accessible through a compact named guide entry and configured Systems through More views. Explicit supplied or restored optional context SHALL reveal its relevant controls and status without mandatory unrelated setup. Loading, failure, coverage and support limitations SHALL remain visible where they affect reading; diagnostic implementation metadata SHALL be available through advanced inspection. This disclosure SHALL NOT introduce profile editing or hide semantic uncertainty.
 
 #### Scenario: Ordinary workflow without optional metadata
-- **WHEN** a reader opens an ordinary document without a supplied scenario/profile/catalog context
-- **THEN** its workflow can be explored immediately and optional configuration fields remain available behind a keyboard-operable disclosure
+- **WHEN** a reader opens an ordinary document without scenario/profile/catalog context
+- **THEN** its sequence is readable immediately under the implicit default, optional forms and empty panels do not occupy persistent reading space, and guide purpose/loading remains reachable through contextual help
 
 #### Scenario: Shared authored guide
 - **WHEN** a valid shared link restores a scenario manifest and waypoint
-- **THEN** the relevant guide and its load/status controls are discoverable without another setup step and closing details retains supported guide navigation
+- **THEN** the relevant guide and its status are revealed without another setup step and closing details retains supported guide navigation
 
 #### Scenario: First-time optional-feature discovery
-- **WHEN** a reader interested in Jentic and Arazzo opens the viewer without knowledge of its manifest or profile formats
-- **THEN** the interface explains Guided walkthroughs and Systems view through their purpose and availability, and format-specific setup is accessible only as an explained optional next step
+- **WHEN** a reader deliberately seeks optional functionality through contextual help or More views
+- **THEN** guide purpose and Systems metadata requirements are explained at that point, explicit loading/configuration boundaries remain intact, and ordinary workflow comprehension does not require completing that discovery task
 
 ### Requirement: Consistent accessible controls
 
@@ -95,13 +94,61 @@ The handoff SHALL provide concise current acceptance results, reproducible comma
 - **THEN** the handoff describes the delivered behavior and does not claim that issue closed without demonstrating its requested acceptance
 
 ### Requirement: Human comprehension evidence is honest
-
-Acceptance SHALL provide a repeatable unfamiliar-reader protocol for an API Owner and a Developer covering purchase explanation, unknown actor ownership, repeated mappings, recovery/timeout interpretation, operation entry paths, and before/after impact. Actual sessions SHALL record assistance, task outcome, effort/time, incorrect interpretations, and supporting explanations with consent. Automated walkthroughs SHALL remain labeled operability evidence. When participants are unavailable, the record SHALL identify human validation as outstanding and SHALL NOT claim measured ease of understanding or final product approval.
+Acceptance SHALL provide separate core-reading and optional/specialist unfamiliar-reader tasks for an API Owner and a Developer. The core segment SHALL begin at the plain entry and assess explaining interactions, direct selection, following a call and returning, guards/recovery/timeout interpretation, and repeated mappings without prior guide or Systems training. Separate applicable segments SHALL retain guide discovery, unknown actor/ownership interpretation, operation entry paths and before/after impact coverage. Actual sessions SHALL record consent, assistance, task outcome, effort/time, incorrect interpretations and supporting explanations. Automated walkthroughs SHALL remain labelled operability evidence. Core success SHALL NOT be presented as optional-feature acceptance, and missing required participants, unresolved corrections or unperformed required segments SHALL leave final UX acceptance pending.
 
 #### Scenario: Browser tests pass without participant sessions
-- **WHEN** automated acceptance passes but no unfamiliar-reader sessions were conducted
-- **THEN** local engineering results can be reported as passing while human comprehension remains explicitly outstanding
+- **WHEN** automated acceptance passes but unfamiliar-reader sessions have not occurred
+- **THEN** engineering results can be reported as passing while human comprehension and final UX acceptance remain outstanding
 
 #### Scenario: Reader infers a business outcome or ownership
-- **WHEN** a participant mistakes an unknown actor for a supplied owner, a receive declaration for observed delivery, or potential impact for proven failure
-- **THEN** acceptance records the incorrect interpretation and the affected task for targeted improvement rather than counting it as an unassisted success
+- **WHEN** a participant mistakes an unknown actor for a supplied owner, a receive declaration for observed delivery or potential impact for proven failure
+- **THEN** the incorrect interpretation and affected task are recorded for targeted improvement rather than counted as an unassisted success
+
+#### Scenario: Core success and optional discovery failure
+- **WHEN** a reader completes core workflow tasks but needs assistance finding guide help in the separate optional segment
+- **THEN** the outcomes remain separately recorded, the optional discovery defect retains required follow-up, and the overall gate is not declared complete by deleting that coverage
+
+#### Scenario: Candidate changes after observations
+- **WHEN** presentation or behaviour changes after a participant session or screenshot review
+- **THEN** affected acceptance is repeated on the identified final candidate and historical observations are retained with their original status
+
+### Requirement: Baseline-inclusive production acceptance inventory
+Maintained acceptance SHALL enumerate the unchanged default Petstore Arazzo 1.0.1 document, all nine existing digital-product and stress Arazzo documents, and adversarial supported 1.0/1.1 source-binding fixtures. Inventory entries SHALL identify expected source/operation relationships, exercised representations, version and fixture digest. Missing entries or expectations SHALL fail coverage. Current built standalone and installed ESM viewer consumers SHALL be tested at 1440 and 480 pixels; ordinary entry tests SHALL start without preconfigured guide/profile query parameters.
+
+#### Scenario: Default document regression
+- **WHEN** the production acceptance command opens the default entry without document or optional setup parameters
+- **THEN** it verifies unchanged Petstore's five interactions use one known petstoreAPI destination, checks its labels/detail controls and captures the result from the identified current build
+
+#### Scenario: An example is omitted
+- **WHEN** an existing inventoried Arazzo example or required representation is missing from the acceptance run
+- **THEN** coverage fails instead of reporting all examples accepted from a smaller configured subset
+
+### Requirement: Acceptance gates detect their target failures
+The maintained gate SHALL demonstrate deterministic failure for wrong known-source destinations, stale lookup evidence, silent rendering failure, undiscoverable optional guidance, and incompatible legacy locations or public consumers. Negative checks SHALL assert the relevant failure reason; a missing server, unrelated crash or dependency failure SHALL NOT count as successful detection. Fixture perturbations SHALL use isolated test inputs or ignored output without altering authored public samples or tracked source.
+
+#### Scenario: Petstore destination fault
+- **WHEN** an isolated negative input recreates per-step unknown lanes for unchanged single-source Petstore
+- **THEN** the destination assertion fails for that exact mismatch and the normal unmodified candidate still passes
+
+#### Scenario: Setup-only discovery coverage
+- **WHEN** optional-guide acceptance is changed to bypass the normal entry and use a preconfigured guide URL
+- **THEN** the discovery coverage check rejects the missing first-use path even if subsequent waypoint clicks succeed
+
+#### Scenario: Stale or blank presentation
+- **WHEN** a controlled negative case leaks old operation evidence or produces a blank failed diagram
+- **THEN** acceptance fails its freshness or localized-error assertion rather than relying only on console-error or geometry checks
+
+### Requirement: Final series readiness requires current complete evidence
+Final readiness SHALL require the three preceding repairs individually verified and integrated on the same identified candidate, passing required engineering checks, complete example/compatibility/discovery coverage, reviewed visual evidence, successful gate negative controls, and completed unfamiliar-reader tasks. Every discovery SHALL map to a requirement, owned implementation task and current evidence. Any failing mandatory check, unresolved discovered regression, unperformed required reader session or unexplained evidence gap SHALL block final UX acceptance. Automation-only engineering success SHALL be reportable separately. The gate SHALL make no absolute future-defect guarantee and SHALL NOT waive a failure by editing samples, deleting coverage or silently lowering an expectation.
+
+#### Scenario: Engineering passes but human validation is pending
+- **WHEN** package/browser checks pass and unfamiliar-reader sessions have not been conducted
+- **THEN** engineering success is recorded separately and final UX acceptance remains pending with the missing tasks identified
+
+#### Scenario: A new regression is discovered
+- **WHEN** integration or a newcomer task exposes a defect introduced by the series
+- **THEN** it is assigned to the owning repair, fixed and reverified with permanent targeted coverage before final acceptance can pass
+
+#### Scenario: Stale acceptance artifacts
+- **WHEN** evidence predates a relevant candidate, fixture or production artifact change
+- **THEN** it is rejected as current evidence and the affected acceptance is rerun with fresh identity and failure records

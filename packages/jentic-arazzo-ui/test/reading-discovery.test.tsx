@@ -11,6 +11,25 @@ vi.mock('mermaid', () => ({
 }));
 Element.prototype.scrollIntoView = vi.fn();
 
+test('Docs bulk disclosure follows the rendered workflow details across overview selection', async () => {
+  render(<ArazzoUI document={nestedCalls} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Step descriptions' }));
+  const detail = document.querySelector<HTMLDetailsElement>('.workflow-details')!;
+  expect(detail.open).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: 'Collapse All' }));
+  expect(detail.open).toBe(false);
+  fireEvent.click(screen.getByRole('button', { name: 'Expand All' }));
+  expect(detail.open).toBe(true);
+  fireEvent.click(screen.getByRole('button', { name: 'All workflows' }));
+  expect(document.querySelector('.workflow-details')).toBeNull();
+  expect(screen.queryByRole('button', { name: /^(Expand|Collapse) All$/ })).toBeNull();
+  fireEvent.change(screen.getByRole('combobox', { name: 'Select workflow' }), {
+    target: { value: 'checkout' },
+  });
+  expect(document.querySelector<HTMLDetailsElement>('.workflow-details')?.open).toBe(true);
+  expect(screen.getByRole('button', { name: 'Collapse All' })).toBeTruthy();
+});
+
 test('authored search scopes duplicate step IDs and operation locators without guessing occurrences', async () => {
   const doc = structuredClone(nestedCalls);
   doc.workflows[2].steps[0].stepId = 'charge';
@@ -61,6 +80,12 @@ test('overview filters classified incoming and outgoing calls, prerequisites, go
   fireEvent.click(await screen.findByRole('button', { name: 'All workflows' }));
   const overview = screen.getByRole('region', { name: 'Workflow overview' });
   expect(overview.querySelectorAll('article')).toHaveLength(18);
+  expect(within(overview).getAllByRole('button', { name: /^Open workflow / })).toHaveLength(18);
+  expect(overview.querySelectorAll('details[open]')).toHaveLength(0);
+  const disclosures = within(overview).getAllByText(/^Relationships \(/);
+  expect(disclosures.length).toBeGreaterThan(0);
+  disclosures.forEach((disclosure) => fireEvent.click(disclosure));
+  fireEvent.click(within(overview).getByText('Relationship filters'));
   const filter = within(overview).getByRole('combobox', { name: 'Relationship type' });
   for (const [type, label] of [
     ['call', 'Call'],
@@ -121,8 +146,7 @@ test('reading view has scoped selection and overview has no invented sequence', 
   expect(within(group).getByText('Reading view')).toBeTruthy();
   expect(
     within(group).getByRole('button', { name: 'Step descriptions' }).getAttribute('aria-pressed'),
-  ).toBe('true');
-  fireEvent.click(within(group).getByRole('button', { name: 'Sequence diagram' }));
+  ).toBe('false');
   expect(
     within(group).getByRole('button', { name: 'Sequence diagram' }).getAttribute('aria-pressed'),
   ).toBe('true');
@@ -130,13 +154,38 @@ test('reading view has scoped selection and overview has no invented sequence', 
   expect(screen.queryByRole('group', { name: 'Reading view' })).toBeNull();
   expect(screen.queryByRole('button', { name: /Sequence diagram for/ })).toBeNull();
 });
+test('implicit embedded reading selects sequence without requesting a host view change', async () => {
+  const change = vi.fn();
+  render(<ArazzoUI document={nestedCalls} onViewChange={change} />);
+  expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
+  expect(change).not.toHaveBeenCalled();
+});
+test('an explicit descriptions layout retains its historical initial representation', async () => {
+  render(<ArazzoUI document={nestedCalls} view="docs" />);
+  await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' });
+  expect(screen.queryByRole('region', { name: 'Sequence checkout' })).toBeNull();
+});
+test('More views keeps alternatives reachable and Side by side reversible', async () => {
+  render(<ArazzoUI document={nestedCalls} />);
+  await screen.findByRole('region', { name: 'Sequence checkout' });
+  fireEvent.click(screen.getByText('More views'));
+  const alternatives = screen.getByRole('group', { name: 'More views' });
+  expect(within(alternatives).getByRole('button', { name: 'Workflow diagram' })).toBeTruthy();
+  expect(within(alternatives).getByRole('button', { name: 'Flowchart' })).toBeTruthy();
+  const sideBySide = within(alternatives).getByRole('button', { name: 'Side by side' });
+  fireEvent.click(sideBySide);
+  expect(sideBySide.getAttribute('aria-pressed')).toBe('true');
+  fireEvent.click(sideBySide);
+  expect(sideBySide.getAttribute('aria-pressed')).toBe('false');
+  expect(screen.getByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
+});
 test('direct sequence request waits for the controlled layout and emits only one request', async () => {
   const change = vi.fn();
   const mount = (view: 'diagram' | 'docs' | 'split', workflow = 'checkout', doc = nestedCalls) => (
     <ArazzoUI document={doc} view={view} activeWorkflowId={workflow} onViewChange={change} />
   );
   const { rerender } = render(mount('diagram'));
-  const direct = await screen.findByRole('button', { name: 'Sequence diagram for checkout' });
+  const direct = await screen.findByRole('button', { name: 'Sequence diagram' });
   fireEvent.click(direct);
   fireEvent.click(direct);
   expect(change).toHaveBeenCalledExactlyOnceWith('docs');
@@ -145,7 +194,7 @@ test('direct sequence request waits for the controlled layout and emits only one
   expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
   rerender(mount('split'));
   fireEvent.click(screen.getByRole('button', { name: 'Step descriptions' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram for checkout' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram' }));
   expect(screen.getByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
   expect(change).toHaveBeenCalledTimes(1);
 });
@@ -154,16 +203,16 @@ test('unaccepted direct sequence request is cancelled on workflow or document re
     <ArazzoUI document={doc} view={view} activeWorkflowId={workflow} onViewChange={vi.fn()} />
   );
   const { rerender } = render(mount('diagram', 'checkout'));
-  fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram for checkout' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   rerender(mount('diagram', 'payment'));
   rerender(mount('docs', 'checkout'));
   expect(
     await screen.findByRole('button', { name: 'Step descriptions', pressed: true }),
   ).toBeTruthy();
   rerender(mount('diagram', 'checkout'));
-  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram for checkout' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram' }));
   rerender(mount('diagram', 'checkout', structuredClone(nestedCalls)));
-  await screen.findByRole('button', { name: 'Sequence diagram for checkout' });
+  await screen.findByRole('button', { name: 'Sequence diagram' });
   rerender(mount('docs', 'checkout'));
   expect(
     await screen.findByRole('button', { name: 'Step descriptions', pressed: true }),

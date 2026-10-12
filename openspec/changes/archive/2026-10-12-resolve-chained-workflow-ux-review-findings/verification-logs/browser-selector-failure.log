@@ -1,0 +1,535 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test:browser
+> node scripts/run-production-browser.mjs
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} test/workflow-ux-inventory.test.ts test/production-input-identity.test.ts test/production-coverage.test.ts
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+
+ Test Files  3 passed (3)
+      Tests  8 passed (8)
+   Start at  16:28:59
+   Duration  1.37s (tests 54%, import 23%, transform 13%, setup 10%, worker 1%)
+
+
+> @jentic/arazzo-parser@1.0.0-alpha.32 build:es
+> cross-env BABEL_ENV=es babel src --out-dir src --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward'
+
+Successfully compiled 5 files with Babel (153ms).
+
+> @jentic/arazzo-parser@1.0.0-alpha.32 typescript:declaration
+> tsc -p tsconfig.declaration.json && api-extractor run -l -c ./config/api-extractor/api-extractor.json
+
+
+[1mapi-extractor 7.58.12 [36m - https://api-extractor.com/[39m
+[22m
+Analysis will use the bundled TypeScript version 5.9.3
+
+API Extractor completed successfully
+
+> @jentic/arazzo-resolver@1.0.0-alpha.32 build:es
+> cross-env BABEL_ENV=es babel src --out-dir src --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward'
+
+Successfully compiled 4 files with Babel (191ms).
+
+> @jentic/arazzo-resolver@1.0.0-alpha.32 typescript:declaration
+> tsc -p tsconfig.declaration.json && api-extractor run -l -c ./config/api-extractor/api-extractor.json
+
+
+[1mapi-extractor 7.58.12 [36m - https://api-extractor.com/[39m
+[22m
+Analysis will use the bundled TypeScript version 5.9.3
+
+API Extractor completed successfully
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build
+> npm run clean && run-p --max-parallel ${CPU_CORES:-2} typescript:declaration build:umd:ui build:umd:standalone build:esm:ui build:esm:standalone && npm run build:app
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 clean
+> rimraf ./dist ./types ./build
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 typescript:declaration
+> tsc -p tsconfig.declaration.json && api-extractor run -l -c ./config/api-extractor/api-extractor.ArazzoUI.json && api-extractor run -l -c ./config/api-extractor/api-extractor.ArazzoUIStandalone.json
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:umd:ui
+> cross-env BUILD_ENTRY=ArazzoUI vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 4321 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css     28.87 kB │ gzip:     5.67 kB
+dist/arazzo-ui.js   8,042.88 kB │ gzip: 1,897.29 kB
+
+✓ built in 1.14s
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:umd:standalone
+> cross-env BUILD_ENTRY=ArazzoUIStandalone vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 4328 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css               28.87 kB │ gzip:     5.67 kB
+dist/arazzo-ui-standalone.js  8,106.63 kB │ gzip: 1,913.40 kB
+
+✓ built in 1.08s
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:esm:ui
+> cross-env BUILD_FORMAT=esm BUILD_ENTRY=ArazzoUI vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 103 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css                 27.90 kB │ gzip:  5.24 kB
+dist/ArazzoAdapter-B3tpZBjI.js      0.99 kB │ gzip:  0.52 kB
+dist/OpenAPIAdapter-BS3qWENz.js     4.36 kB │ gzip:  1.73 kB
+dist/AsyncAPIAdapter-DbK37Amd.js    4.80 kB │ gzip:  1.66 kB
+dist/references-Bq70qXUm.js        18.52 kB │ gzip:  4.94 kB
+dist/loadDocument-kcw66vOP.js      27.88 kB │ gzip:  7.72 kB
+dist/inspection-ozTL5K8C.js        28.52 kB │ gzip:  7.07 kB
+dist/arazzo-ui.mjs                433.19 kB │ gzip: 96.39 kB
+
+✓ built in 79ms
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:esm:standalone
+> cross-env BUILD_FORMAT=esm BUILD_ENTRY=ArazzoUIStandalone vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 110 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css                 27.90 kB │ gzip:   5.24 kB
+dist/ArazzoAdapter-B3tpZBjI.js      0.99 kB │ gzip:   0.52 kB
+dist/OpenAPIAdapter-BS3qWENz.js     4.36 kB │ gzip:   1.73 kB
+dist/AsyncAPIAdapter-DbK37Amd.js    4.80 kB │ gzip:   1.66 kB
+dist/references-Bq70qXUm.js        18.52 kB │ gzip:   4.94 kB
+dist/loadDocument-kcw66vOP.js      27.88 kB │ gzip:   7.72 kB
+dist/inspection-ozTL5K8C.js        28.52 kB │ gzip:   7.07 kB
+dist/arazzo-ui-standalone.mjs     474.03 kB │ gzip: 106.92 kB
+
+✓ built in 90ms
+
+[1mapi-extractor 7.58.12 [36m - https://api-extractor.com/[39m
+[22m
+Analysis will use the bundled TypeScript version 5.9.3
+
+API Extractor completed successfully
+
+[1mapi-extractor 7.58.12 [36m - https://api-extractor.com/[39m
+[22m
+Analysis will use the bundled TypeScript version 5.9.3
+
+API Extractor completed successfully
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:app
+> npm run build:umd:standalone && rimraf ./build && mkdir -p ./build && cp ./dist/arazzo-ui-standalone.js ./dist/arazzo-ui.css ./build/ && node ./scripts/copy-public-assets.mjs && rm -f ./build/main.tsx ./build/index.html && mv ./build/app.html ./build/index.html && node ./scripts/hash-build-assets.mjs
+
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 build:umd:standalone
+> cross-env BUILD_ENTRY=ArazzoUIStandalone vite build --config config/vite/vite.config.ts
+
+vite v8.1.5 building client environment for production...
+[2Ktransforming...✓ 4328 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/arazzo-ui.css               28.87 kB │ gzip:     5.67 kB
+dist/arazzo-ui-standalone.js  8,106.63 kB │ gzip: 1,913.40 kB
+
+✓ built in 930ms
+arazzo-ui-standalone.js -> arazzo-ui-standalone.aac43f64.js
+arazzo-ui.css -> arazzo-ui.0bfa1c59.css
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test:package:built
+> node scripts/check-package-consumer.mjs --built
+
+PASS arazzo-ui: relationship callback, source provider, external navigation and private-model boundary
+PASS arazzo-ui-standalone: relationship callback, source provider, external navigation and private-model boundary
+
+up to date in 1s
+PASS arazzo-ui: relationship callback, source provider, external navigation and private-model boundary
+PASS arazzo-ui-standalone: relationship callback, source provider, external navigation and private-model boundary
+PASS catalog: relationship callback, source provider, external navigation and private-model boundary
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+PASS installed arazzo-ui browser UMD + CSS
+PASS installed arazzo-ui-standalone browser UMD + CSS
+PASS packed package acceptance: /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test-output/package-consumer/metadata.json
+
+added 340 packages in 4s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+{
+  "path": "/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test-output/package-consumer-unpinned/evidence-1791815408718.json",
+  "coverage": [
+    {
+      "key": "[\"flow\",\"old\"]",
+      "uri": "https://example.test/flow.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"pay\",\"old\"]",
+      "uri": "https://example.test/pay.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"https://example.test/flow.json\",\"old\"]",
+      "uri": "https://example.test/flow.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"https://example.test/pay.json\",\"old\"]",
+      "uri": "https://example.test/pay.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"flow\",\"old\",\"source\",\"pay\"]",
+      "uri": "https://example.test/pay.json",
+      "revision": "old",
+      "state": "loaded"
+    }
+  ],
+  "caughtExceptions": 12
+}
+PASS unconstrained advertised-range packed consumer
+
+added 340 packages in 5s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+{
+  "path": "/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test-output/package-consumer-unpinned-yaml-input/evidence-1791815417750.json",
+  "coverage": [
+    {
+      "key": "[\"flow\",\"old\"]",
+      "uri": "https://example.test/flow.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"pay\",\"old\"]",
+      "uri": "https://example.test/pay.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"https://example.test/flow.json\",\"old\"]",
+      "uri": "https://example.test/flow.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"https://example.test/pay.json\",\"old\"]",
+      "uri": "https://example.test/pay.json",
+      "revision": "old",
+      "state": "loaded"
+    },
+    {
+      "key": "[\"flow\",\"old\",\"source\",\"pay\"]",
+      "uri": "https://example.test/pay.json",
+      "revision": "old",
+      "state": "loaded"
+    }
+  ],
+  "caughtExceptions": 13
+}
+PASS unconstrained advertised-range packed consumer
+[WebServer] (node:942433) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 168 tests using 1 worker
+
+(node:942460) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘    1 [desktop] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing (884ms)
+(node:942590) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    2 [desktop] › test/e2e/production.spec.ts:145:1 › identified installed ESM plain viewing and provider denial (935ms)
+  ✓    3 [desktop] › test/e2e/production.spec.ts:159:1 › standalone viewing discloses setup and acquires only explicitly loaded contracts (1.9s)
+  ✓    4 [desktop] › test/e2e/production.spec.ts:192:1 › repeated calls retain distinct contexts and helpers have Unknown actor (1.1s)
+  ✓    5 [desktop] › test/e2e/production.spec.ts:215:1 › operation panel opens both entry occurrences without another workflow choice (1.5s)
+  ✓    6 [desktop] › test/e2e/production.spec.ts:244:1 › shared defaults show scoped before and after potential impact (1.3s)
+  ✓    7 [desktop] › test/e2e/production.spec.ts:261:1 › scenario focus, dismissal and restored guide context (2.6s)
+  ✓    8 [desktop] › test/e2e/production.spec.ts:318:1 › pinned Jentic Asana, Xero and Stripe remain readable without acquisition (1.8s)
+  ✓    9 [desktop] › test/e2e/production.spec.ts:337:3 › F1 flowchart labels stay readable with contained keyboard scrolling: petstore (1.9s)
+  ✓   10 [desktop] › test/e2e/production.spec.ts:337:3 › F1 flowchart labels stay readable with contained keyboard scrolling: long-label (1.6s)
+  ✓   11 [desktop] › test/e2e/workflow-ux.spec.ts:197:1 › UX default bare entry preserves five known Petstore interactions and readable details (2.4s)
+  ✓   12 [desktop] › test/e2e/workflow-ux.spec.ts:282:1 › UX Petstore descriptions keep detail entry with its step and overview has no bulk workflow control (1.8s)
+  ✓   13 [desktop] › test/e2e/workflow-ux.spec.ts:319:1 › UX following a local call retains sequence and exact caller return (1.8s)
+  ✓   14 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/petstore-order-workflow.arazzo.yaml (3.7s)
+  ✓   15 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/petstore-order-workflow.arazzo.yaml authenticateAndOrderPet (2.1s)
+  ✓   16 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product/arazzo.yaml (4.1s)
+  ✓   17 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product/arazzo.yaml client-journey (1.7s)
+  ✓   18 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product/arazzo.yaml fulfil-purchase (1.8s)
+  ✓   19 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product/arazzo.yaml reserve-and-capture (1.7s)
+  ✓   20 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/arazzo.yaml (4.2s)
+  ✓   21 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml full-stress-journey (2.1s)
+  ✓   22 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml initialize-session (1.7s)
+  ✓   23 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml batch-fulfilment (2.0s)
+  ✓   24 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml fulfil-item (2.0s)
+  ✓   25 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml prepare-commerce (1.8s)
+  ✓   26 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reserve-and-capture (1.6s)
+  ✓   27 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reserve-inventory (1.9s)
+  ✓   28 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml capture-authorized-payment (2.0s)
+  ✓   29 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reconcile-payment (1.9s)
+  ✓   30 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reconcile-license (1.9s)
+  ✓   31 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml compensate-purchase (1.8s)
+  ✓   32 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml release-reservation (1.9s)
+  ✓   33 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml abort-purchase (1.8s)
+  ✓   34 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml record-ready (1.8s)
+  ✓   35 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml record-failure (1.7s)
+  ✓   36 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml poll-purchase-until-ready (1.7s)
+  ✓   37 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml resume-existing-purchase (1.9s)
+  ✓   38 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml step-recovery-probe (2.0s)
+  ✓   39 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/event-based.arazzo.yaml (4.2s)
+  ✓   40 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml event-driven-purchase (1.9s)
+  ✓   41 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml purchase-event-worker (1.8s)
+  ✓   42 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml activation-audit-worker (1.7s)
+  ✓   43 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml poll-purchase-until-ready (1.3s)
+  ✓   44 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml (4.0s)
+  ✓   45 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml recursive-A (1.5s)
+  ✓   46 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml recursive-B (1.9s)
+  ✓   47 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml (4.0s)
+  ✓   48 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-0 (2.0s)
+  ✓   49 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-1 (1.6s)
+  ✓   50 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-2 (1.7s)
+  ✓   51 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-3 (1.6s)
+  ✓   52 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-4 (1.9s)
+  ✓   53 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-5 (1.6s)
+  ✓   54 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-6 (1.6s)
+  ✓   55 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-7 (1.6s)
+  ✓   56 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-8 (1.7s)
+  ✓   57 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-9 (1.6s)
+  ✓   58 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-10 (1.7s)
+  ✓   59 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-11 (1.6s)
+  ✓   60 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml (10.0s)
+  ✓   61 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml row-limit (2.5s)
+  ✓   62 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml (3.2s)
+  ✓   63 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml metadata-heavy-entry (2.1s)
+  ✓   64 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml record-ready (1.4s)
+  ✓   65 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml (3.9s)
+  ✓   66 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml diagnostic-probe (1.8s)
+  ✓   67 [desktop] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml (3.9s)
+  ✓   68 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml cycle-A (1.6s)
+  ✓   69 [desktop] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml cycle-B (1.6s)
+  ✓   70 [desktop] › test/e2e/workflow-ux.spec.ts:487:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current (2.0s)
+  ✓   71 [desktop] › test/e2e/workflow-ux.spec.ts:564:1 › UX partial and duplicate candidate coverage never promotes an unchecked unique destination (1.7s)
+  ✓   72 [desktop] › test/e2e/workflow-ux.spec.ts:617:1 › UX first-use guide discovery starts at plain entry and help performs no acquisition (2.1s)
+  ✓   73 [desktop] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide empty remains local and normal workflow reading recovers (1.5s)
+  ✓   74 [desktop] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide malformed remains local and normal workflow reading recovers (1.5s)
+  ✓   75 [desktop] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide unavailable remains local and normal workflow reading recovers (1.4s)
+  ✓   76 [desktop] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide mismatched remains local and normal workflow reading recovers (872ms)
+  ✓   77 [desktop] › test/e2e/workflow-ux.spec.ts:725:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 (2.7s)
+  ✓   78 [desktop] › test/e2e/workflow-ux.spec.ts:783:1 › UX rejected flowchart exposes retry and descriptions without blank success (1.8s)
+  ✓   79 [desktop] › test/e2e/workflow-ux.spec.ts:820:1 › UX installed ESM controlled requests, repeated scopes and obsolete provider/document results (1.4s)
+  ✓   80 [desktop] › test/e2e/workflow-ux.spec.ts:887:3 › UX obsolete Mermaid svg after replacement cannot overwrite current reading (1.1s)
+  ✓   81 [desktop] › test/e2e/workflow-ux.spec.ts:887:3 › UX obsolete Mermaid error after replacement cannot overwrite current reading (1.2s)
+  ✓   82 [desktop] › test/e2e/workflow-ux.spec.ts:930:1 › UX configured and stale Systems context keeps exact return and explanatory limitations (1.4s)
+  ✓   83 [desktop] › test/e2e/workflow-ux.spec.ts:968:1 › UX recursive, depth and row boundaries explain limits and expose complete authored content (4.3s)
+  ✓   84 [desktop] › test/e2e/workflow-ux.spec.ts:1000:1 › UX restored unavailable guide preserves its exact current workflow occurrence (2.7s)
+(node:947006) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   85 [mobile] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing (886ms)
+(node:947115) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   86 [mobile] › test/e2e/production.spec.ts:145:1 › identified installed ESM plain viewing and provider denial (971ms)
+  ✓   87 [mobile] › test/e2e/production.spec.ts:159:1 › standalone viewing discloses setup and acquires only explicitly loaded contracts (1.7s)
+  ✓   88 [mobile] › test/e2e/production.spec.ts:192:1 › repeated calls retain distinct contexts and helpers have Unknown actor (1.7s)
+  ✓   89 [mobile] › test/e2e/production.spec.ts:215:1 › operation panel opens both entry occurrences without another workflow choice (1.7s)
+  ✓   90 [mobile] › test/e2e/production.spec.ts:244:1 › shared defaults show scoped before and after potential impact (2.5s)
+  ✓   91 [mobile] › test/e2e/production.spec.ts:261:1 › scenario focus, dismissal and restored guide context (2.8s)
+  ✓   92 [mobile] › test/e2e/production.spec.ts:318:1 › pinned Jentic Asana, Xero and Stripe remain readable without acquisition (1.7s)
+  ✓   93 [mobile] › test/e2e/production.spec.ts:337:3 › F1 flowchart labels stay readable with contained keyboard scrolling: petstore (1.8s)
+  ✓   94 [mobile] › test/e2e/production.spec.ts:337:3 › F1 flowchart labels stay readable with contained keyboard scrolling: long-label (1.7s)
+  ✓   95 [mobile] › test/e2e/workflow-ux.spec.ts:197:1 › UX default bare entry preserves five known Petstore interactions and readable details (2.6s)
+  ✓   96 [mobile] › test/e2e/workflow-ux.spec.ts:282:1 › UX Petstore descriptions keep detail entry with its step and overview has no bulk workflow control (2.4s)
+  ✓   97 [mobile] › test/e2e/workflow-ux.spec.ts:319:1 › UX following a local call retains sequence and exact caller return (2.0s)
+  ✓   98 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/petstore-order-workflow.arazzo.yaml (3.8s)
+  ✓   99 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/petstore-order-workflow.arazzo.yaml authenticateAndOrderPet (2.5s)
+  ✓  100 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product/arazzo.yaml (3.9s)
+  ✓  101 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product/arazzo.yaml client-journey (1.7s)
+  ✓  102 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product/arazzo.yaml fulfil-purchase (1.8s)
+  ✓  103 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product/arazzo.yaml reserve-and-capture (1.7s)
+  ✓  104 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/arazzo.yaml (4.1s)
+  ✓  105 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml full-stress-journey (1.7s)
+  ✓  106 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml initialize-session (1.8s)
+  ✓  107 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml batch-fulfilment (2.0s)
+  ✓  108 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml fulfil-item (2.1s)
+  ✓  109 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml prepare-commerce (1.8s)
+  ✓  110 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reserve-and-capture (1.8s)
+  ✓  111 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reserve-inventory (1.7s)
+  ✓  112 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml capture-authorized-payment (2.1s)
+  ✓  113 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reconcile-payment (1.8s)
+  ✓  114 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml reconcile-license (1.7s)
+  ✓  115 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml compensate-purchase (2.1s)
+  ✓  116 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml release-reservation (1.7s)
+  ✓  117 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml abort-purchase (1.8s)
+  ✓  118 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml record-ready (1.6s)
+  ✓  119 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml record-failure (2.0s)
+  ✓  120 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml poll-purchase-until-ready (1.8s)
+  ✓  121 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml resume-existing-purchase (1.8s)
+  ✓  122 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/arazzo.yaml step-recovery-probe (1.9s)
+  ✓  123 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/event-based.arazzo.yaml (4.0s)
+  ✓  124 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml event-driven-purchase (1.9s)
+  ✓  125 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml purchase-event-worker (2.2s)
+  ✓  126 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml activation-audit-worker (1.7s)
+  ✓  127 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/event-based.arazzo.yaml poll-purchase-until-ready (1.8s)
+  ✓  128 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml (3.8s)
+  ✓  129 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml recursive-A (1.6s)
+  ✓  130 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml recursive-B (1.8s)
+  ✓  131 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml (4.3s)
+  ✓  132 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-0 (1.5s)
+  ✓  133 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-1 (1.5s)
+  ✓  134 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-2 (1.5s)
+  ✓  135 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-3 (1.8s)
+  ✓  136 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-4 (1.6s)
+  ✓  137 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-5 (1.6s)
+  ✓  138 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-6 (1.6s)
+  ✓  139 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-7 (1.5s)
+  ✓  140 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-8 (1.8s)
+  ✓  141 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-9 (1.7s)
+  ✓  142 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-10 (1.5s)
+  ✓  143 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml layer-11 (1.8s)
+  ✓  144 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml (12.5s)
+  ✓  145 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml row-limit (2.8s)
+  ✓  146 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml (3.7s)
+  ✓  147 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml metadata-heavy-entry (1.3s)
+  ✓  148 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml record-ready (1.2s)
+  ✓  149 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml (3.1s)
+  ✓  150 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml diagnostic-probe (1.2s)
+  ✓  151 [mobile] › test/e2e/workflow-ux.spec.ts:357:3 › UX root reading matrix public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml (3.7s)
+  ✓  152 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml cycle-A (1.6s)
+  ✓  153 [mobile] › test/e2e/workflow-ux.spec.ts:422:5 › UX workflow sequence public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml cycle-B (1.6s)
+  ✓  154 [mobile] › test/e2e/workflow-ux.spec.ts:487:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current (1.9s)
+  ✓  155 [mobile] › test/e2e/workflow-ux.spec.ts:564:1 › UX partial and duplicate candidate coverage never promotes an unchecked unique destination (1.7s)
+  ✓  156 [mobile] › test/e2e/workflow-ux.spec.ts:617:1 › UX first-use guide discovery starts at plain entry and help performs no acquisition (1.5s)
+  ✓  157 [mobile] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide empty remains local and normal workflow reading recovers (1.5s)
+  ✓  158 [mobile] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide malformed remains local and normal workflow reading recovers (1.1s)
+  ✓  159 [mobile] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide unavailable remains local and normal workflow reading recovers (1.0s)
+  ✓  160 [mobile] › test/e2e/workflow-ux.spec.ts:685:3 › UX guide mismatched remains local and normal workflow reading recovers (860ms)
+  ✓  161 [mobile] › test/e2e/workflow-ux.spec.ts:725:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 (2.7s)
+  ✓  162 [mobile] › test/e2e/workflow-ux.spec.ts:783:1 › UX rejected flowchart exposes retry and descriptions without blank success (1.8s)
+  ✓  163 [mobile] › test/e2e/workflow-ux.spec.ts:820:1 › UX installed ESM controlled requests, repeated scopes and obsolete provider/document results (1.5s)
+  ✓  164 [mobile] › test/e2e/workflow-ux.spec.ts:887:3 › UX obsolete Mermaid svg after replacement cannot overwrite current reading (1.2s)
+  ✓  165 [mobile] › test/e2e/workflow-ux.spec.ts:887:3 › UX obsolete Mermaid error after replacement cannot overwrite current reading (1.1s)
+  ✓  166 [mobile] › test/e2e/workflow-ux.spec.ts:930:1 › UX configured and stale Systems context keeps exact return and explanatory limitations (1.5s)
+  ✓  167 [mobile] › test/e2e/workflow-ux.spec.ts:968:1 › UX recursive, depth and row boundaries explain limits and expose complete authored content (3.3s)
+  ✓  168 [mobile] › test/e2e/workflow-ux.spec.ts:1000:1 › UX restored unavailable guide preserves its exact current workflow occurrence (2.3s)
+
+
+  1) [desktop] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      40 |       ),
+      41 |     ),
+    > 42 |   ).toBe(true);
+         |     ^
+      43 |   const prerequisites = list.locator('button[aria-label^="Inspect helper · prerequisite"]');
+      44 |   await expect(prerequisites).toHaveCount(2);
+      45 |   for (let i = 0; i < 2; i++) {
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/production.spec.ts:42:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-desktop/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      40 |       ),
+      41 |     ),
+    > 42 |   ).toBe(true);
+         |     ^
+      43 |   const prerequisites = list.locator('button[aria-label^="Inspect helper · prerequisite"]');
+      44 |   await expect(prerequisites).toHaveCount(2);
+      45 |   for (let i = 0; i < 2; i++) {
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/production.spec.ts:42:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-mobile/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/results/production-UX-installed-em-f2d20-try-modality-and-raw-sizing-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing 
+    [mobile] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing 
+  166 passed (6.0m)
+file:///home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/scripts/run-production-browser.mjs:37
+        : reject(new Error(`${command} ${args.join(' ')} failed (${signal ?? code})`)),
+                 ^
+
+Error: npx playwright test --config playwright.production.config.ts failed (1)
+    at ChildProcess.<anonymous> (file:///home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/scripts/run-production-browser.mjs:37:18)
+    at ChildProcess.emit (node:events:509:20)
+    at ChildProcess._handle.onexit (node:internal/child_process:294:12)
+
+Node.js v26.3.1
+npm error Lifecycle script `test:browser` failed with error:
+npm error code 1
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c node scripts/run-production-browser.mjs

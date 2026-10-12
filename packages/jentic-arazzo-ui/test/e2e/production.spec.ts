@@ -7,16 +7,179 @@ type HostState = {
 };
 installProductionChecks();
 
+test('UX installed embed preserves prerequisite order, geometry modality and raw sizing', async ({
+  page,
+}, info) => {
+  await page.goto('/consumer/?surface=embedded-repair');
+  const viewer = page.locator('.embedded-repair');
+  await expect(viewer.getByRole('list', { name: 'Ordered interactions' })).toHaveCount(1);
+  const list = viewer.locator('ol[aria-label="Ordered interactions"]');
+  const root = viewer.locator('button[aria-label^="Inspect entry · prerequisite"]');
+  await expect(root).toHaveCount(1);
+  expect(
+    await root.evaluate(
+      (node) =>
+        node.closest('ol') === null &&
+        !!(
+          node.compareDocumentPosition(
+            document.querySelector('ol[aria-label="Ordered interactions"]')!,
+          ) & Node.DOCUMENT_POSITION_FOLLOWING
+        ),
+    ),
+  ).toBe(true);
+  const first = list.locator('button[aria-label^="Inspect entry.first-item · call"]');
+  const dependencies = list.locator(
+    'button[aria-label^="Inspect entry.first-item · prerequisite"]',
+  );
+  await expect(dependencies).toHaveCount(2);
+  await expect(dependencies.nth(0)).toContainText('missing');
+  await expect(dependencies.nth(1)).toContainText('external-step');
+  expect(
+    await first.evaluate((node) =>
+      [
+        ...node
+          .closest('li')!
+          .querySelectorAll('button[aria-label^="Inspect entry.first-item · prerequisite"]'),
+      ].every(
+        (before) => !!(before.compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING),
+      ),
+    ),
+  ).toBe(true);
+  const prerequisites = list.locator('button[aria-label^="Inspect helper · prerequisite"]');
+  await expect(prerequisites).toHaveCount(2);
+  for (let i = 0; i < 2; i++) {
+    const path = `entry.${i ? 'second' : 'first'}-item`;
+    await expect(prerequisites.nth(i)).toHaveAttribute('aria-label', new RegExp(path));
+    expect(
+      await prerequisites.nth(i).evaluate((node) => {
+        const item = node.closest('li')!;
+        const next = item.nextElementSibling!;
+        return (
+          item.querySelector('button[aria-label*=" · call"]') !== null &&
+          next.querySelector('button[aria-label^="Inspect helper.capture · operation"]') !== null
+        );
+      }),
+    ).toBe(true);
+  }
+  await info.attach('embedded-prerequisites', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  const navigation = viewer.locator('.arazzo-workflow-navigation');
+  await navigation.evaluate((node) => {
+    node.setAttribute('inert', 'preserved');
+    node.setAttribute('aria-hidden', 'false');
+  });
+  const origin = prerequisites.nth(1);
+  await origin.click();
+  await expect(page.getByRole('dialog', { name: 'Selection details' })).toHaveAttribute(
+    'aria-modal',
+    'true',
+  );
+  await expect(page.getByRole('button', { name: 'Wide host', exact: true })).toBeVisible();
+  expect(
+    await page
+      .getByRole('button', { name: 'Wide host', exact: true })
+      .evaluate((node) => node.closest('[inert]') === null),
+  ).toBe(true);
+  await expect(inspector(page)).toContainText('entry.second-item');
+  await expect(
+    inspector(page).locator('[data-reading-section="Caller-supplied parameters"]'),
+  ).toContainText('2499');
+  const close = inspector(page).getByRole('button', { name: 'Close details' });
+  await close.focus();
+  await page.keyboard.press('Shift+Tab');
+  expect(await inspector(page).evaluate((node) => node.contains(document.activeElement))).toBe(
+    true,
+  );
+  await info.attach('embedded-covering', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await page.keyboard.press('Escape');
+  await expect(origin).toBeFocused();
+  await expect(navigation).toHaveAttribute('inert', 'preserved');
+  await expect(navigation).toHaveAttribute('aria-hidden', 'false');
+  await navigation.evaluate((node) => {
+    node.removeAttribute('inert');
+    node.removeAttribute('aria-hidden');
+  });
+  if (info.project.name === 'desktop') {
+    await page.getByRole('button', { name: 'Wide host', exact: true }).click();
+    await origin.click();
+    await expect(page.getByRole('region', { name: 'Selection details' })).not.toHaveAttribute(
+      'aria-modal',
+    );
+    await page.getByRole('button', { name: 'Narrow host', exact: true }).click();
+    await expect(page.getByRole('dialog', { name: 'Selection details' })).toBeVisible();
+    await page.getByRole('button', { name: 'Wide host', exact: true }).click();
+    await expect(page.getByRole('region', { name: 'Selection details' })).toBeVisible();
+    await expect(viewer.locator('[inert]')).toHaveCount(0);
+    await info.attach('embedded-nonmodal', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Narrow host', exact: true }).click();
+  }
+  await origin.click();
+  await expect(page.getByRole('dialog', { name: 'Selection details' })).toBeVisible();
+  await origin.evaluate((node) => node.remove());
+  await page.keyboard.press('Escape');
+  await expect(viewer.getByRole('combobox', { name: 'Select workflow' })).toBeFocused();
+  await viewer.getByRole('button', { name: 'Step descriptions', exact: true }).click();
+  await viewer.getByRole('combobox', { name: 'Select workflow' }).selectOption('helper');
+  await viewer.getByRole('button', { name: 'Step descriptions', exact: true }).click();
+  const long = viewer.locator('.timeline-item-last');
+  await expect(long.locator('h3 button')).toBeVisible();
+  await expect(long.locator('h3 button')).toContainText('a-very-long-authored-step-title');
+  expect(
+    await long.evaluate((node) => {
+      const marker = node.querySelector('.timeline-marker')!.getBoundingClientRect();
+      const heading = node.querySelector('h3')!.getBoundingClientRect();
+      return (
+        heading.left >= marker.right && heading.right <= node.getBoundingClientRect().right + 1
+      );
+    }),
+  ).toBe(true);
+  await long.locator('h3 button').focus();
+  await expect(long.locator('h3 button')).toBeFocused();
+  await info.attach('embedded-long-timeline', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await page.getByRole('button', { name: 'Replace supported profile' }).click();
+  await expect(viewer).toContainText('has no semantic inspection profile');
+  await expect(viewer.locator('pre')).toContainText('1.2.0');
+  await expect(viewer.locator('.arazzo-sequence')).toHaveCount(0);
+  const bounds = await viewer.boundingBox();
+  expect(bounds?.width).toBe(400);
+  expect(bounds?.height).toBe(700);
+  await info.attach('embedded-unsupported', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await page.getByRole('button', { name: 'Replace supported profile' }).click();
+  await expect(viewer.getByRole('region', { name: 'Sequence entry' })).toBeVisible();
+  expect((await viewer.boundingBox())?.height).toBe(700);
+});
+async function choose(page: Page, name: string) {
+  const disclosure = page.locator('details.arazzo-more-views');
+  if (!(await disclosure.evaluate((element) => (element as HTMLDetailsElement).open)))
+    await disclosure.locator(':scope > summary').click();
+  await disclosure.getByRole('button', { name, exact: true }).click();
+}
+
 async function hostState(page: Page): Promise<HostState> {
   return page.evaluate(() => (window as unknown as { acceptanceState: HostState }).acceptanceState);
 }
 
 test('identified installed ESM plain viewing and provider denial', async ({ page }) => {
   await page.goto('/consumer/');
-  await expect(page.getByRole('heading', { name: 'Scoped consumers', exact: true })).toBeVisible();
+  await expect(page.locator('.arazzo-document-identity')).toContainText('Scoped consumers');
   expect((await hostState(page)).providerRequests).toEqual([]);
   await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('helper');
-  await page.getByRole('button', { name: 'View details for helper.capture', exact: true }).click();
+  await page.getByRole('button', { name: 'Inspect helper.capture', exact: true }).click();
   const panel = inspector(page);
   expect((await hostState(page)).providerRequests).toEqual([]);
   await panel.getByRole('button', { name: 'Load API description pay', exact: true }).click();
@@ -41,12 +204,11 @@ test('standalone viewing discloses setup and acquires only explicitly loaded con
   await expect(advanced).not.toHaveAttribute('open', '');
   await advanced.locator(':scope > summary').focus();
   await page.keyboard.press('Enter');
+  await page.getByText('Load guides from a URL', { exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Guide file URL' })).toBeVisible();
   expect(contractRequests).toEqual([]);
-  await page.getByRole('button', { name: 'Workflow diagram', exact: true }).click();
-  await page
-    .getByRole('button', { name: 'View details for client-journey.purchase', exact: true })
-    .click();
+  await choose(page, 'Workflow diagram');
+  await page.getByRole('button', { name: 'Inspect client-journey.purchase', exact: true }).click();
   expect(contractRequests).toEqual([]);
   (page as Page & { acceptanceExplicitSources: Set<string> }).acceptanceExplicitSources.add(
     `${baseURL}/examples/digital-product/coordinator.openapi.yaml`,
@@ -61,7 +223,7 @@ test('standalone viewing discloses setup and acquires only explicitly loaded con
 
 test('repeated calls retain distinct contexts and helpers have Unknown actor', async ({ page }) => {
   await page.goto('/consumer/');
-  await page.getByRole('combobox', { name: 'Perspective' }).selectOption('systems');
+  await choose(page, 'Systems view');
   await expect(page.locator('.arazzo-systems')).toContainText('Client');
   for (const step of ['first-item', 'second-item']) {
     await page
@@ -138,6 +300,7 @@ test('scenario focus, dismissal and restored guide context', async ({
   );
   await expect(page.locator('details.arazzo-advanced-tools')).not.toHaveAttribute('open', '');
   const panel = page.getByRole('region', { name: 'Guided walkthroughs' });
+  await panel.locator(':scope > details > summary').click();
   const guide = panel.getByRole('button', { name: 'completion-timeout', exact: true });
   await guide.focus();
   await page.keyboard.press('Enter');
@@ -195,9 +358,7 @@ test('pinned Jentic Asana, Xero and Stripe remain readable without acquisition',
   for (const [name, [workflow, step]] of Object.entries(documents)) {
     await page.goto(`/consumer/?surface=representative&fixture=${name}`);
     await page.getByRole('combobox', { name: 'Select workflow' }).selectOption(workflow);
-    await page
-      .getByRole('button', { name: `View details for ${workflow}.${step}`, exact: true })
-      .click();
+    await page.getByRole('button', { name: `Inspect ${workflow}.${step}`, exact: true }).click();
     await expect(inspector(page)).toContainText(step);
     expect((await hostState(page)).providerRequests).toEqual([]);
     await page.keyboard.press('Escape');
@@ -236,7 +397,7 @@ for (const fixture of ['petstore', 'long-label'] as const) {
       );
       await page.goto(`/?document=${encodeURIComponent(url)}`);
     } else await page.goto('/');
-    await page.getByRole('button', { name: 'Flowchart', exact: true }).click();
+    await choose(page, 'Flowchart');
     const region = page.getByRole('region', { name: 'Flowchart', exact: true });
     const svg = region.locator('svg');
     await expect(svg).toBeVisible();

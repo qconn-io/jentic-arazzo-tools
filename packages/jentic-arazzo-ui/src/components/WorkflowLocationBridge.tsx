@@ -268,7 +268,7 @@ export function WorkflowLocationBridge({
       ...(props.documentRevision ? { revision: props.documentRevision } : {}),
       root: workflowRequest.root,
       view,
-      subview: session.views[workflowRequest.root ?? ''] ?? 'docs',
+      subview: session.views[workflowRequest.root ?? ''] ?? session.defaultView,
       ...(extensions.current || systems?.extension || guide
         ? {
             extensions: {
@@ -328,7 +328,7 @@ export function WorkflowLocationBridge({
       digest: readyDigest,
       root: viewer.activeWorkflowId,
       view,
-      subview: session.views[viewer.activeWorkflowId ?? ''] ?? 'docs',
+      subview: session.views[viewer.activeWorkflowId ?? ''] ?? session.defaultView,
       ...(extensions.current || systems?.extension || guide
         ? {
             extensions: {

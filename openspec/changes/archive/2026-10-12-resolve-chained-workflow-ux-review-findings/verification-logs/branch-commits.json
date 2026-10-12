@@ -1,0 +1,112 @@
+[
+  {
+    "sha": "db98e5b87ecac6a6619056c9567c8adfdf798962",
+    "title": "feat(ui): improve reading and gate workflow UX regressions",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "08cfba6f6fbde4c36be11d10575e519ecbe0c07c",
+    "title": "fix(ui): restore source binding and simplify workflow reading",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "6c3323445df6720cf602cd2a23e5a78525aa956f",
+    "title": "docs(openspec): propose workflow UX repair series",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "6f74975b8a24d1e0d5c4db246a724c3435b154fa",
+    "title": "fix(ui): prepare workflow visualization for upstream",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "a0d08472050d44f2079232f1535c9a6ac326af57",
+    "title": "feat(ui): add workflow revision review and archive change",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "ae44276bfe8c0a1212c31237db914927db555d0a",
+    "title": "feat(ui): add workflow capability catalog and archive change",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "181cb0f67dfdda6801239a765f46ce735fb7930a",
+    "title": "feat(ui): add authored scenario explorer and archive change",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "3fa43b2110e145bcf73bbce07b3f5274074be3dd",
+    "title": "feat(ui): add systems view and strengthen contract inspection",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "24092a228d9da51453775bf25caa544a3b3e80c0",
+    "title": "chore: remove temporary repair scripts and backup files",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "503c2145523575b9f5f063db3366a643ba2e7a52",
+    "title": "feat: complete inspect-api-contracts OpenSpec change",
+    "signoff": ""
+  },
+  {
+    "sha": "856c84c12ebfa8606c1a451a797c6a9d4309dee5",
+    "title": "feat(ui): add workflow deep links and archive change",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "b208f7a3ad9de10ea2b680f59cf981e6042d29fb",
+    "title": "feat(ui): improve workflow reading and record product roadmap",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "87f272b32f629a2332f19f399acf7e35fb8cac09",
+    "title": "feat(arazzo-ui): add connected sequences and shared navigation",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "21de1761c003a27bbd4cf18cd57723766ad91e9c",
+    "title": "chore(openspec): refresh workflow guidance and agent ignore rules",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "e91d44cc58fbcf1dd1e6a53acf31922fc763eafb",
+    "title": "docs(arazzo-ui): document inspection contracts and verification",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "b5fd78821685689d2b369fa028ccbe974491991c",
+    "title": "fix(arazzo-ui): resolve architecture verification defects",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "a8c563a9995a6b3e10e51ea6f784154fd2131485",
+    "title": "docs(openspec): record review fixes and fresh verification evidence",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "b64ed67cf3c3f45a64a1c9ddead133f831bbac77",
+    "title": "fix(arazzo-ui): improve dense relationship overview readability",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "47043e07da31c5c97431e8f80c995d8ea5e20f04",
+    "title": "fix(arazzo-ui): resolve chained workflow semantic review findings",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "73799de69fc903a68f2ab511851ca9865eb2a536",
+    "title": "feat(arazzo-ui): visualize chained workflows",
+    "signoff": ""
+  },
+  {
+    "sha": "e3c9a5d631eaefd4df7a313ff799f91a83fb6ef4",
+    "title": "docs(openspec): save chained workflow visualization plan",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  },
+  {
+    "sha": "86b3de094da5472c17f67585171a794c9c2fdfe6",
+    "title": "chore(openspec): add planning configuration and workflows",
+    "signoff": "Maksim Kogan <maksim.kogan.work@gmail.com>"
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "description": "Failed-case summary of the superseded selector run; full text log retained separately. Screenshot attachments omitted.",
+  "stats": {
+    "startTime": "2026-10-12T14:30:19.375Z",
+    "duration": 357795.824,
+    "expected": 166,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  },
+  "failures": [
+    {
+      "title": "UX installed embed preserves prerequisite order, geometry modality and raw sizing",
+      "project": "desktop",
+      "status": "failed",
+      "errors": [
+        {
+          "location": {
+            "file": "/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/production.spec.ts",
+            "column": 5,
+            "line": 42
+          },
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  40 |       ),\n  41 |     ),\n> 42 |   ).toBe(true);\n     |     ^\n  43 |   const prerequisites = list.locator('button[aria-label^=\"Inspect helper \u00b7 prerequisite\"]');\n  44 |   await expect(prerequisites).toHaveCount(2);\n  45 |   for (let i = 0; i < 2; i++) {\n    at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/production.spec.ts:42:5"
+        }
+      ]
+    },
+    {
+      "title": "UX installed embed preserves prerequisite order, geometry modality and raw sizing",
+      "project": "mobile",
+      "status": "failed",
+      "errors": [
+        {
+          "location": {
+            "file": "/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/production.spec.ts",
+            "column": 5,
+            "line": 42
+          },
+          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  40 |       ),\n  41 |     ),\n> 42 |   ).toBe(true);\n     |     ^\n  43 |   const prerequisites = list.locator('button[aria-label^=\"Inspect helper \u00b7 prerequisite\"]');\n  44 |   await expect(prerequisites).toHaveCount(2);\n  45 |   for (let i = 0; i < 2; i++) {\n    at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/production.spec.ts:42:5"
+        }
+      ]
+    }
+  ]
+}

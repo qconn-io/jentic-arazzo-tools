@@ -220,6 +220,7 @@ test('authored actions retain declaration identity when no call occurrence is se
   await screen.findByRole('region', { name: 'Selection details' });
   await waitFor(() => expect(changed).toHaveBeenCalledTimes(1));
   expect(changed.mock.calls[0][0].selection).toMatchObject({ kind: 'action', action });
+  expect(document.querySelector<HTMLDetailsElement>('.arazzo-step-actions')?.open).toBe(true);
   expect(changed.mock.calls[0][0].selection.occurrence).toBeUndefined();
 });
 test('a host controlling both workflow and location receives the requested root once', async () => {

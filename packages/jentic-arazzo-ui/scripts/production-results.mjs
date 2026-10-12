@@ -101,8 +101,19 @@ export const faultCases = [
       'UX legacy document query/hash and shared occurrence history preserve exact second-item 2499',
     reason: 'UX legacy hash must restore the authored stress document',
   },
+  {
+    name: 'lost-identity',
+    title: 'UX default bare entry preserves five known Petstore interactions and readable details',
+    reason: 'UX direct identity activation must inspect the authored step',
+  },
+  {
+    name: 'lost-sequence-follow',
+    title: 'UX following a local call retains sequence and exact caller return',
+    reason: 'UX sequence follow must open the accepted callee in sequence',
+  },
 ];
 export const requiredUXTitles = [
+  'UX installed embed preserves prerequisite order, geometry modality and raw sizing',
   ...faultCases.map((fault) => fault.title),
   'identified installed ESM plain viewing and provider denial',
   'standalone viewing discloses setup and acquires only explicitly loaded contracts',

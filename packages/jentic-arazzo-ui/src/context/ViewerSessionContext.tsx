@@ -21,6 +21,7 @@ interface DetailSelection {
   row?: SequenceRow;
 }
 interface Session {
+  defaultView: WorkflowView;
   locationStatus?: WorkflowLocationStatus;
   setLocationStatus: (status: WorkflowLocationStatus) => void;
   cancelLocationRestoration: () => void;
@@ -30,8 +31,8 @@ interface Session {
   setExpansion: (root: string, id: string, expanded: boolean) => void;
   selectedRow?: SequenceRow;
   details: DetailSelection | null;
-  inspectRow: (row: SequenceRow, origin?: HTMLElement) => void;
-  inspectStep: (workflowId: string, stepId: string, origin?: HTMLElement) => void;
+  inspectRow: (row: SequenceRow, origin?: HTMLElement | SVGElement) => void;
+  inspectStep: (workflowId: string, stepId: string, origin?: HTMLElement | SVGElement) => void;
   openAuthoredStep: (workflowId: string, stepId: string, origin?: HTMLElement) => void;
   closeDetails: () => void;
   restoreDetailsFocus: (fallback?: HTMLElement) => void;
@@ -55,7 +56,13 @@ export const useViewerSession = () => {
   return session;
 };
 
-export function ViewerSessionProvider({ children }: { children: React.ReactNode }) {
+export function ViewerSessionProvider({
+  children,
+  defaultView = 'docs',
+}: {
+  children: React.ReactNode;
+  defaultView?: WorkflowView;
+}) {
   const viewer = useArazzoViewer();
   const { model, activeWorkflowId, selectedNodeId } = viewer;
   const [locationStatus, setLocationStatus] = useState<WorkflowLocationStatus>();
@@ -65,7 +72,7 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
   const [details, setDetails] = useState<DetailSelection | null>(null);
   const [trail, setTrail] = useState<CallerFrame[]>([]);
   const [focusRowId, setFocusRowId] = useState<string>();
-  const origin = useRef<HTMLElement>();
+  const origin = useRef<HTMLElement | SVGElement>();
   const requestedSelection = useRef<string>();
   const authoredRequest = useRef<{
     workflowId: string;
@@ -77,6 +84,7 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     destination: string;
     frame: CallerFrame;
     back: boolean;
+    carrySequence?: boolean;
     selectionRequestVersion: number;
   }>();
   const restoration = useRef<{
@@ -198,6 +206,8 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
           navigable: true,
         });
       } else {
+        if (request.carrySequence)
+          setViews((current) => ({ ...current, [request.destination]: 'sequence' }));
         setTrail((frames) => [...frames, request.frame]);
         setSelectedRow(undefined);
         setDetails(null);
@@ -230,7 +240,7 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
   const inspectStep = (
     workflowId: string,
     stepId: string,
-    control?: HTMLElement,
+    control?: HTMLElement | SVGElement,
     row?: SequenceRow,
   ) => {
     restoration.current = undefined;
@@ -251,6 +261,7 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     }
   };
   const value: Session = {
+    defaultView,
     locationStatus,
     setLocationStatus,
     cancelLocationRestoration: () => {
@@ -315,10 +326,10 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
     restoreDetailsFocus: (fallback) => {
       let control = origin.current;
       if (control?.isConnected) {
-        let ancestor: HTMLElement | null = control;
+        let ancestor: Element | null = control;
         while (ancestor) {
           if (
-            ancestor.hidden ||
+            (ancestor instanceof HTMLElement && ancestor.hidden) ||
             ancestor.hasAttribute('inert') ||
             ancestor.matches(':disabled') ||
             (ancestor.tagName === 'DETAILS' &&
@@ -350,12 +361,13 @@ export function ViewerSessionProvider({ children }: { children: React.ReactNode 
         selectionRequestVersion: viewer.selectionRequestVersion,
         destination: row.target.workflowId,
         back: false,
+        carrySequence: (views[root] ?? defaultView) === 'sequence',
         frame: {
           documentId: model.documentId,
           root,
           row,
           expansion: expansions[root] ?? {},
-          view: views[root] ?? 'sequence',
+          view: views[root] ?? defaultView,
           callee: row.target.workflowId,
         },
       };

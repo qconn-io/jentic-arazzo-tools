@@ -93,28 +93,29 @@ test('a host-configured profile exposes Systems beside reading controls', async 
       }}
     />,
   );
-  const perspective = await screen.findByRole('combobox', { name: 'Perspective' });
-  expect(perspective.closest('details')).toBeNull();
+  await screen.findByRole('combobox', { name: 'Select workflow' });
+  const perspective = screen
+    .getByRole('group', { name: 'More views' })
+    .querySelector('button:last-child') as HTMLButtonElement;
+  expect(perspective.textContent).toBe('Systems view');
   expect(screen.getByText('Load guides from a URL').closest('details')!.open).toBe(false);
-  expect(
-    screen.getByText(
-      'See the participants and their interactions using supplied system information.',
-    ),
-  ).toBeTruthy();
-  fireEvent.change(perspective, { target: { value: 'systems' } });
+  fireEvent.click(perspective);
   await screen.findByRole('region', { name: 'Systems checkout' });
 });
 
 test('covering details excludes advanced setup from background interaction and returns guide focus on Escape', async () => {
   setupURL();
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    })),
-  );
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+    width: 400,
+    height: 700,
+    left: 0,
+    right: 400,
+    top: 0,
+    bottom: 700,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  });
   render(
     <ArazzoUIStandalone
       document={nestedCalls}

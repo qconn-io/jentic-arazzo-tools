@@ -61,12 +61,16 @@ The inspector and Systems SHALL share viewer-local explicitly loaded contract pr
 - **THEN** both perspectives exclude obsolete projections and explicit loading is required to restore current facts
 
 ### Requirement: Explained system-view availability
-Systems view SHALL explain that it shows participants and their interactions using explicitly supplied association metadata. When configured, its view switch SHALL be discoverable beside workflow reading controls rather than hidden in unrelated guide setup. Without metadata, a concise availability explanation SHALL preserve ordinary workflow reading and SHALL NOT imply invalid Arazzo content or prompt a mandatory profile authoring/loading workflow. Explicit actor and source-owner boundaries SHALL remain unchanged.
+Systems view SHALL remain an optional perspective enabled by explicitly supplied participant/association metadata or a deliberately selected adapter. When configured, its entry SHALL be available through More views and identify it as a viewer perspective using supplied system information, not a required Arazzo concept. An explicit host or restored Systems selection SHALL retain its supported behaviour. Without metadata and without an explicit Systems request, ordinary reading SHALL contain no Systems availability panel or disabled promotion; contextual help SHALL explain the optional capability without suggesting invalid Arazzo or mandatory setup. Explicit requests with missing, stale or invalid metadata SHALL receive a local explanation and access to ordinary workflow reading. Actor, source-owner, organizational-owner and descriptive-association boundaries SHALL remain unchanged, with no inferred identities or new profile-authoring workflow.
 
 #### Scenario: Configured systems view
 - **WHEN** the host supplies a supported participant profile
-- **THEN** the reader can discover Systems view from the normal reading controls, understand its purpose, switch to it and return to the same supported workflow occurrence
+- **THEN** More views offers Systems with its supplied-information distinction, and the reader can enter it and return to the same supported workflow occurrence
 
 #### Scenario: Workflow without participant metadata
-- **WHEN** Petstore is opened without a participant profile
-- **THEN** the UI explains that Systems view needs supplied participant information, retains ordinary API/workflow views, and neither invents actors nor asks the reader to complete unexplained setup
+- **WHEN** Petstore opens without participant metadata or an explicit Systems request
+- **THEN** no unavailable Systems control occupies the reading area, and contextual help explains the optional metadata requirement without inventing actors or requiring setup
+
+#### Scenario: Restored Systems context cannot be satisfied
+- **WHEN** an explicit host or shared location requests Systems using absent, stale or incompatible metadata
+- **THEN** the viewer explains the unavailable context locally, preserves the valid base workflow and does not substitute guessed participants

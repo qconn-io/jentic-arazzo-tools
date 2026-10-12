@@ -51,6 +51,48 @@ window.acceptanceState = {
   aborted: 0,
 };
 
+function EmbeddedRepair({ input }: { input: ArazzoDocument }) {
+  const [width, setWidth] = useState(400);
+  const [unsupported, setUnsupported] = useState(false);
+  const document = useMemo(() => {
+    const doc = structuredClone(input);
+    doc.arazzo = unsupported ? '1.2.0' : '1.1.0';
+    doc.sourceDescriptions.push({
+      name: 'remote',
+      type: 'arazzo',
+      url: 'https://example.test/remote.yaml',
+    });
+    doc.workflows[0].dependsOn = ['unrelated'];
+    doc.workflows[0].steps[0].dependsOn = [
+      'absent',
+      '$sourceDescriptions.remote.helper.steps.capture',
+    ];
+    doc.workflows[0].steps[0].parameters = [{ name: 'amount', value: 0 }];
+    doc.workflows[0].steps[1].parameters = [{ name: 'amount', value: 2499 }];
+    doc.workflows[1].dependsOn = ['unrelated'];
+    doc.workflows[1].steps.push({
+      stepId:
+        'a-very-long-authored-step-title-that-must-wrap-without-overlapping-its-timeline-marker-or-expanding-the-host',
+      operationId: '$sourceDescriptions.pay.capture',
+    });
+    return doc;
+  }, [input, unsupported]);
+  return (
+    <>
+      <button onClick={() => setWidth(400)}>Narrow host</button>
+      <button onClick={() => setWidth(1200)}>Wide host</button>
+      <button onClick={() => setUnsupported((value) => !value)}>Replace supported profile</button>
+      <div style={{ width, maxWidth: '100%', height: 700 }} data-testid="embedded-host">
+        <ArazzoUI
+          document={document}
+          className="embedded-repair"
+          style={{ width: '100%', height: 700 }}
+        />
+      </div>
+    </>
+  );
+}
+
 function ControlledAcceptance({ input }: { input: ArazzoDocument }) {
   const [document, setDocument] = useState<ArazzoDocument>(() => ({
     ...input,
@@ -176,7 +218,9 @@ fetch('/fixtures/readiness.json')
         },
       };
       const surface = query.get('surface') ?? 'host';
-      if (surface === 'controlled') root.render(<ControlledAcceptance input={fixtures.document} />);
+      if (surface === 'embedded-repair') root.render(<EmbeddedRepair input={fixtures.document} />);
+      else if (surface === 'controlled')
+        root.render(<ControlledAcceptance input={fixtures.document} />);
       else if (surface === 'systems')
         root.render(
           <ArazzoUI

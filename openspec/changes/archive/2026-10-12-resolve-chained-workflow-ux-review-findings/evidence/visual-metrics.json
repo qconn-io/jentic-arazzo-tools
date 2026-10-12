@@ -1,0 +1,367 @@
+{
+  "browser": "153.0.8010.12",
+  "builtAt": "2026-10-12T14:44:12.125Z",
+  "identitySha256": "fe5e00cb7406e1e6af9224a26809b179bc9c057456c2550519dd1a1dfd92fa25",
+  "views": [
+    {
+      "width": 1440,
+      "default-sequence": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/default-sequence-1440.png",
+        "sha256": "2079dde0c54938d0f2ca339e4b48ac9ac4d381f9dd0ba60f10c7cf420bd96c38"
+      },
+      "entry": {
+        "first": {
+          "x": 145,
+          "y": 573.96875,
+          "width": 230,
+          "height": 99,
+          "top": 573.96875,
+          "right": 375,
+          "bottom": 672.96875,
+          "left": 145
+        },
+        "next": {
+          "x": 145,
+          "y": 673.96875,
+          "width": 230,
+          "height": 99,
+          "top": 673.96875,
+          "right": 375,
+          "bottom": 772.96875,
+          "left": 145
+        },
+        "canvas": {
+          "x": 29,
+          "y": 491.34375,
+          "width": 1382,
+          "height": 580,
+          "top": 491.34375,
+          "right": 1411,
+          "bottom": 1071.34375,
+          "left": 29
+        },
+        "scrollTop": 0,
+        "fontSize": 13,
+        "pageWidth": 1440
+      },
+      "step-descriptions": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/step-descriptions-1440.png",
+        "sha256": "0b37520db1b1efbae347d7f67720def039137dd3342802f9539bd1a820eb8feb"
+      },
+      "timeline": {
+        "dots": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "lines": [
+          {
+            "height": 114.96875,
+            "color": "rgb(148, 200, 61)"
+          },
+          {
+            "height": 114.96875,
+            "color": "rgb(148, 200, 61)"
+          },
+          {
+            "height": 114.96875,
+            "color": "rgb(148, 200, 61)"
+          },
+          {
+            "height": 114.96875,
+            "color": "rgb(148, 200, 61)"
+          }
+        ],
+        "focused": "Inspect authenticateAndOrderPet.loginUser",
+        "keyboardOutline": "rgb(37, 99, 235) solid 3px"
+      },
+      "repeated-prerequisites": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/repeated-prerequisites-1440.png",
+        "sha256": "a5aeccfc959f28bed4d5953d550e0457d6530003138464ff04d8699edec41680"
+      },
+      "covering-inspector": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/covering-inspector-1440.png",
+        "sha256": "356fcab2d1abd96032578d978d63445fe145da3fa495c6545f57b1ba98e18d6f"
+      },
+      "covering": {
+        "viewer": {
+          "x": 0,
+          "y": 21,
+          "width": 400,
+          "height": 700,
+          "top": 21,
+          "right": 400,
+          "bottom": 721,
+          "left": 0
+        },
+        "panel": {
+          "x": 0,
+          "y": 21,
+          "width": 400,
+          "height": 700,
+          "top": 21,
+          "right": 400,
+          "bottom": 721,
+          "left": 0
+        },
+        "modal": "true",
+        "focused": "Close details",
+        "inert": 5
+      },
+      "nonmodal-inspector": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/nonmodal-inspector-1440.png",
+        "sha256": "58d932c918e35e2ee412bac5100acb1fbbba158a06c4c68f0ddf6ceca96463e7"
+      },
+      "nonmodal": {
+        "viewer": {
+          "x": 0,
+          "y": 21,
+          "width": 1200,
+          "height": 700,
+          "top": 21,
+          "right": 1200,
+          "bottom": 721,
+          "left": 0
+        },
+        "panel": {
+          "x": 720,
+          "y": 21,
+          "width": 480,
+          "height": 700,
+          "top": 21,
+          "right": 1200,
+          "bottom": 721,
+          "left": 720
+        },
+        "modal": null,
+        "inert": 0
+      },
+      "long-timeline": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/long-timeline-1440.png",
+        "sha256": "9fc47f33fbea90235f9141c78070e843745ea09f9f99042a6a776426e68bfa5d"
+      },
+      "long": {
+        "heading": {
+          "x": 73,
+          "y": 517.484375,
+          "width": 298,
+          "height": 106,
+          "top": 517.484375,
+          "right": 371,
+          "bottom": 623.484375,
+          "left": 73
+        },
+        "marker": {
+          "x": 29,
+          "y": 492.984375,
+          "width": 28,
+          "height": 185.09375,
+          "top": 492.984375,
+          "right": 57,
+          "bottom": 678.078125,
+          "left": 29
+        },
+        "focused": true,
+        "outline": "rgb(29, 78, 216) none 3px",
+        "text": "a-very-long-authored-step-title-that-must-wrap-without-overlapping-its-timeline-marker-or-expanding-the-host",
+        "keyboardOutline": "rgb(37, 99, 235) solid 3px"
+      },
+      "unsupported-fallback": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/unsupported-fallback-1440.png",
+        "sha256": "36420665881440aa298e80a3cd373a3bc1a65031228d4e44adae13efe3a9b836"
+      },
+      "raw": {
+        "bounds": {
+          "x": 0,
+          "y": 21,
+          "width": 400,
+          "height": 700,
+          "top": 21,
+          "right": 400,
+          "bottom": 721,
+          "left": 0
+        },
+        "className": "arazzo-ui embedded-repair",
+        "overflow": "auto",
+        "semanticRows": 0
+      },
+      "errors": [],
+      "timeline-middle": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/timeline-middle-1440.png",
+        "sha256": "0b37520db1b1efbae347d7f67720def039137dd3342802f9539bd1a820eb8feb"
+      },
+      "timeline-last": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/timeline-last-1440.png",
+        "sha256": "017a7be35af9bdd2ac1da8d7ce0a939d97c698721c3b217e8182e68fa2ece096"
+      }
+    },
+    {
+      "width": 480,
+      "default-sequence": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/default-sequence-480.png",
+        "sha256": "f8f3a8e1b6a8dbd682800d1ce25763a2c04cd8e97c867c9a8f7e20b2345b8118"
+      },
+      "entry": {
+        "first": {
+          "x": 137,
+          "y": 682.953125,
+          "width": 230,
+          "height": 99,
+          "top": 682.953125,
+          "right": 367,
+          "bottom": 781.953125,
+          "left": 137
+        },
+        "next": {
+          "x": 137,
+          "y": 782.953125,
+          "width": 230,
+          "height": 99,
+          "top": 782.953125,
+          "right": 367,
+          "bottom": 881.953125,
+          "left": 137
+        },
+        "canvas": {
+          "x": 21,
+          "y": 600.328125,
+          "width": 438,
+          "height": 522,
+          "top": 600.328125,
+          "right": 459,
+          "bottom": 1122.328125,
+          "left": 21
+        },
+        "scrollTop": 0,
+        "fontSize": 13,
+        "pageWidth": 480
+      },
+      "step-descriptions": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/step-descriptions-480.png",
+        "sha256": "e006ba805b7aee05465c37ba27cfda95babe8a7ef778e34d03bc624f66bf0b08"
+      },
+      "timeline": {
+        "dots": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+        ],
+        "lines": [
+          {
+            "height": 114.96875,
+            "color": "rgb(148, 200, 61)"
+          },
+          {
+            "height": 138.765625,
+            "color": "rgb(148, 200, 61)"
+          },
+          {
+            "height": 138.765625,
+            "color": "rgb(148, 200, 61)"
+          },
+          {
+            "height": 138.765625,
+            "color": "rgb(148, 200, 61)"
+          }
+        ],
+        "focused": "Inspect authenticateAndOrderPet.loginUser",
+        "keyboardOutline": "rgb(37, 99, 235) solid 3px"
+      },
+      "repeated-prerequisites": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/repeated-prerequisites-480.png",
+        "sha256": "320270f3077ba494803744f59ab83353acc92e65de28440a130bd8fdaaf1f5d0"
+      },
+      "covering-inspector": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/covering-inspector-480.png",
+        "sha256": "5dbe3f73a7fb71e10acfacdf8d1c6e45b46c6d2c43f169931b7c9451a28a95e8"
+      },
+      "covering": {
+        "viewer": {
+          "x": 0,
+          "y": 21,
+          "width": 400,
+          "height": 700,
+          "top": 21,
+          "right": 400,
+          "bottom": 721,
+          "left": 0
+        },
+        "panel": {
+          "x": 0,
+          "y": 21,
+          "width": 400,
+          "height": 700,
+          "top": 21,
+          "right": 400,
+          "bottom": 721,
+          "left": 0
+        },
+        "modal": "true",
+        "focused": "Close details",
+        "inert": 5
+      },
+      "long-timeline": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/long-timeline-480.png",
+        "sha256": "4b8b782c35d5ecdac82a342e5102b710d9c48052f0e560784d7db053b51e11f7"
+      },
+      "long": {
+        "heading": {
+          "x": 65,
+          "y": 519.484375,
+          "width": 314,
+          "height": 106,
+          "top": 519.484375,
+          "right": 379,
+          "bottom": 625.484375,
+          "left": 65
+        },
+        "marker": {
+          "x": 21,
+          "y": 494.984375,
+          "width": 28,
+          "height": 185.09375,
+          "top": 494.984375,
+          "right": 49,
+          "bottom": 680.078125,
+          "left": 21
+        },
+        "focused": true,
+        "outline": "rgb(29, 78, 216) none 3px",
+        "text": "a-very-long-authored-step-title-that-must-wrap-without-overlapping-its-timeline-marker-or-expanding-the-host",
+        "keyboardOutline": "rgb(37, 99, 235) solid 3px"
+      },
+      "unsupported-fallback": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/unsupported-fallback-480.png",
+        "sha256": "620aee86aabfcb892f94c730c19602fd7d020053140d5a6d927175aa45951a17"
+      },
+      "raw": {
+        "bounds": {
+          "x": 0,
+          "y": 21,
+          "width": 400,
+          "height": 700,
+          "top": 21,
+          "right": 400,
+          "bottom": 721,
+          "left": 0
+        },
+        "className": "arazzo-ui embedded-repair",
+        "overflow": "auto",
+        "semanticRows": 0
+      },
+      "errors": [],
+      "timeline-middle": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/timeline-middle-480.png",
+        "sha256": "c3953a39d09eaf359c3d690610e2f99124b47fc77afe4f1ac93f14696f716969"
+      },
+      "timeline-last": {
+        "path": "openspec/changes/resolve-chained-workflow-ux-review-findings/evidence/timeline-last-480.png",
+        "sha256": "3b64d0f74a52612f4310daa027cc89fc374afcc8cb7c13a3308039cce026b9d8"
+      }
+    }
+  ]
+}

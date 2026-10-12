@@ -26,16 +26,12 @@ test('flowchart rejection is visible, retry clears it only after success and des
   expect(screen.queryByText('Unable to draw this flowchart')).toBeNull();
   expect(document.activeElement).toBe(screen.getByRole('region', { name: 'Flowchart' }));
   fireEvent.click(screen.getByRole('button', { name: 'Step descriptions' }));
-  expect(
-    screen.getByRole('button', { name: 'View details for checkout.firstPayment' }),
-  ).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Inspect checkout.firstPayment' })).toBeTruthy();
 });
 test('error action reads the exact selected workflow without clearing detail selection', async () => {
   draw.mockRejectedValue(new Error('Draw failure'));
-  render(<ArazzoUI document={nestedCalls} />);
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'View details for checkout.firstPayment' }),
-  );
+  render(<ArazzoUI document={nestedCalls} view="docs" />);
+  fireEvent.click(await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' }));
   fireEvent.click(screen.getByRole('button', { name: 'Flowchart' }));
   await screen.findByText('Unable to draw this flowchart');
   fireEvent.click(screen.getByRole('button', { name: 'Read step descriptions' }));
@@ -43,7 +39,7 @@ test('error action reads the exact selected workflow without clearing detail sel
   expect(screen.getByRole('region', { name: 'Selection details' }).textContent).toContain(
     'checkout.firstPayment',
   );
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Step descriptions' }));
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close details' }));
 });
 test.each(['svg', 'error'])(
   'late %s from an obsolete render cannot replace the new document',

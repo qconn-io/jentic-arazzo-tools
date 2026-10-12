@@ -402,11 +402,18 @@ export function extractFacts(
       candidates.size === 1 && (uniqueExplicit || singleSource) && !conflicting
         ? [...candidates.values()][0]
         : undefined;
+    const compatible =
+      source &&
+      (step.workflowId !== undefined
+        ? source.type === 'arazzo'
+        : step.channelPath !== undefined
+          ? source.type === 'asyncapi' && supports('asyncIntent')
+          : supportedKind(source));
     const status =
       conflicting || candidates.size > 1
         ? 'ambiguous'
         : source
-          ? source.type === 'arazzo' || supportedKind(source)
+          ? compatible
             ? 'declared'
             : 'unsupported'
           : 'unverified';
@@ -433,7 +440,7 @@ export function extractFacts(
         { ...owner, path },
         'unsupported-feature',
         'unsupported-source-kind',
-        `source kind ${String(source?.type)} is not understood`,
+        `source kind ${String(source?.type)} does not support this authored locator`,
       );
     return {
       ...owner,

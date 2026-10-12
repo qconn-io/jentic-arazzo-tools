@@ -1,0 +1,370 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-sequence.test.tsx -t prerequisites precede
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+ ❯ test/reading-sequence.test.tsx (5 tests | 1 failed | 4 skipped) 537ms
+   × prerequisites precede their exact root, step and repeated callee occurrences 535ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/reading-sequence.test.tsx > prerequisites precede their exact root, step and repeated callee occurrences
+AssertionError: expected <ol …(2)>…(7)</ol> to be null
+
+- Expected:
+null
+
++ Received:
+<ol
+  aria-label="Ordered interactions"
+  class="arazzo-sequence-list"
+>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"prepare\",\"interaction\"]]"
+    style="padding-left: 0px;"
+  >
+    <button
+      aria-label="Inspect checkout.prepare · operation · root checkout · path root · row 4"
+      class="arazzo-reading-identity"
+      title="prepare · Operation · $sourceDescriptions.store.api.prepare"
+    >
+      1. prepare · Operation
+    </button>
+     
+    <small
+      title="Incomplete candidate coverage; all relevant declared sources must be checked before uniqueness is established"
+    >
+      API description not loaded
+    </small>
+    <details
+      class="arazzo-step-actions"
+    >
+      <summary
+        aria-label="Conditions and recovery for checkout.prepare · operation · root checkout · path root · row 4"
+      >
+        Conditions and recovery (
+        0
+        )
+      </summary>
+      <p>
+        Possible authored actions; criteria are not evaluated.
+      </p>
+      <p>
+        Prerequisites:
+         
+        absent (missing), $sourceDescriptions.remote.payment (malformed)
+      </p>
+      <ul />
+    </details>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"checkout\",\"prerequisite\",0]]"
+    >
+      <button
+        aria-label="Inspect checkout · prerequisite · root checkout · path root · row 1"
+        class="arazzo-reading-identity"
+        title="Prerequisite: audit (local-workflow)"
+      >
+        Prerequisite: audit (local-workflow)
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"prepare\",\"prerequisite\",0]]"
+    >
+      <button
+        aria-label="Inspect checkout.prepare · prerequisite · root checkout · path root · row 2"
+        class="arazzo-reading-identity"
+        title="prepare depends on absent (missing) · $sourceDescriptions.store.api.prepare"
+      >
+        prepare depends on absent (missing)
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"prepare\",\"prerequisite\",1]]"
+    >
+      <button
+        aria-label="Inspect checkout.prepare · prerequisite · root checkout · path root · row 3"
+        class="arazzo-reading-identity"
+        title="prepare depends on $sourceDescriptions.remote.payment (malformed) · $sourceDescriptions.store.api.prepare"
+      >
+        prepare depends on $sourceDescriptions.remote.payment (malformed)
+      </button>
+    </div>
+  </li>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"firstPayment\",\"interaction\"]]"
+    style="padding-left: 0px;"
+  >
+    <button
+      aria-label="Inspect checkout.firstPayment · call · root checkout · path checkout.firstPayment · row 6"
+      class="arazzo-reading-identity"
+      title="firstPayment: Call payment · payment"
+    >
+      2. firstPayment: Call payment
+    </button>
+     
+    <details
+      class="arazzo-step-actions"
+    >
+      <summary
+        aria-label="Conditions and recovery for checkout.firstPayment · call · root checkout · path checkout.firstPayment · row 6"
+      >
+        Conditions and recovery (
+        0
+        )
+      </summary>
+      <p>
+        Possible authored actions; criteria are not evaluated.
+      </p>
+      <p>
+        Prerequisites:
+         
+        prepare (local-step)
+      </p>
+      <ul />
+    </details>
+    <button
+      aria-label="Collapse checkout.firstPayment → payment · call · root checkout · path checkout.firstPayment · row 6"
+    >
+      Collapse
+    </button>
+    <button
+      aria-label="Open workflow payment from checkout.firstPayment · call · root checkout · path checkout.firstPayment · row 6"
+    >
+      Open workflow
+    </button>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"firstPayment\",\"prerequisite\",0]]"
+    >
+      <button
+        aria-label="Inspect checkout.firstPayment · prerequisite · root checkout · path root · row 5"
+        class="arazzo-reading-identity"
+        title="firstPayment depends on prepare (local-step) · payment"
+      >
+        firstPayment depends on prepare (local-step)
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"firstPayment\"]],[\"payment\",\"prerequisite\",0]]"
+    >
+      <button
+        aria-label="Inspect payment · prerequisite · root checkout · path checkout.firstPayment · row 7"
+        class="arazzo-reading-identity"
+        title="Prerequisite: audit (local-workflow)"
+      >
+        Prerequisite: audit (local-workflow)
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"firstPayment\"]],[\"continuation\"]]"
+    >
+      <span
+        title="Structural continuation to checkout after firstPayment · payment"
+      >
+        Structural continuation to checkout after firstPayment
+      </span>
+    </div>
+  </li>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"firstPayment\"]],[\"charge\",\"interaction\"]]"
+    style="padding-left: 12px;"
+  >
+    <button
+      aria-label="Inspect payment.charge · operation · root checkout · path checkout.firstPayment · row 8"
+      class="arazzo-reading-identity"
+      title="charge · Operation · $sourceDescriptions.store-api.charge"
+    >
+      2.1. charge · Operation
+    </button>
+     
+    <small
+      title="Incomplete candidate coverage; all relevant declared sources must be checked before uniqueness is established"
+    >
+      API description not loaded
+    </small>
+  </li>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"firstPayment\"]],[\"audit\",\"interaction\"]]"
+    style="padding-left: 12px;"
+  >
+    <button
+      aria-label="Inspect payment.audit · call · root checkout · path checkout.firstPayment → payment.audit · row 9"
+      class="arazzo-reading-identity"
+      title="audit: Call audit · audit"
+    >
+      2.2. audit: Call audit
+    </button>
+     
+    <button
+      aria-label="Expand payment.audit → audit · call · root checkout · path checkout.firstPayment → payment.audit · row 9"
+    >
+      Expand
+    </button>
+    <button
+      aria-label="Open workflow audit from payment.audit · call · root checkout · path checkout.firstPayment → payment.audit · row 9"
+    >
+      Open workflow
+    </button>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"firstPayment\"],[\"payment\",\"audit\"]],[\"marker\",\"collapsed\"]]"
+    >
+      <button
+        aria-label="Inspect payment.audit · marker collapsed · root checkout · path checkout.firstPayment → payment.audit · row 10"
+        class="arazzo-reading-identity"
+        title="audit: Collapsed call — expand to show interactions · audit"
+      >
+        audit: Collapsed call — expand to show interactions
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"firstPayment\"],[\"payment\",\"audit\"]],[\"continuation\"]]"
+    >
+      <span
+        title="Structural continuation to payment after audit · audit"
+      >
+        Structural continuation to payment after audit
+      </span>
+    </div>
+  </li>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[],[\"secondPayment\",\"interaction\"]]"
+    style="padding-left: 0px;"
+  >
+    <button
+      aria-label="Inspect checkout.secondPayment · call · root checkout · path checkout.secondPayment · row 13"
+      class="arazzo-reading-identity"
+      title="secondPayment: Call payment · payment"
+    >
+      3. secondPayment: Call payment
+    </button>
+     
+    <button
+      aria-label="Collapse checkout.secondPayment → payment · call · root checkout · path checkout.secondPayment · row 13"
+    >
+      Collapse
+    </button>
+    <button
+      aria-label="Open workflow payment from checkout.secondPayment · call · root checkout · path checkout.secondPayment · row 13"
+    >
+      Open workflow
+    </button>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"secondPayment\"]],[\"payment\",\"prerequisite\",0]]"
+    >
+      <button
+        aria-label="Inspect payment · prerequisite · root checkout · path checkout.secondPayment · row 14"
+        class="arazzo-reading-identity"
+        title="Prerequisite: audit (local-workflow)"
+      >
+        Prerequisite: audit (local-workflow)
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"secondPayment\"]],[\"continuation\"]]"
+    >
+      <span
+        title="Structural continuation to checkout after secondPayment · payment"
+      >
+        Structural continuation to checkout after secondPayment
+      </span>
+    </div>
+  </li>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"secondPayment\"]],[\"charge\",\"interaction\"]]"
+    style="padding-left: 12px;"
+  >
+    <button
+      aria-label="Inspect payment.charge · operation · root checkout · path checkout.secondPayment · row 15"
+      class="arazzo-reading-identity"
+      title="charge · Operation · $sourceDescriptions.store-api.charge"
+    >
+      3.1. charge · Operation
+    </button>
+     
+    <small
+      title="Incomplete candidate coverage; all relevant declared sources must be checked before uniqueness is established"
+    >
+      API description not loaded
+    </small>
+  </li>
+  <li
+    data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"secondPayment\"]],[\"audit\",\"interaction\"]]"
+    style="padding-left: 12px;"
+  >
+    <button
+      aria-label="Inspect payment.audit · call · root checkout · path checkout.secondPayment → payment.audit · row 16"
+      class="arazzo-reading-identity"
+      title="audit: Call audit · audit"
+    >
+      3.2. audit: Call audit
+    </button>
+     
+    <button
+      aria-label="Expand payment.audit → audit · call · root checkout · path checkout.secondPayment → payment.audit · row 16"
+    >
+      Expand
+    </button>
+    <button
+      aria-label="Open workflow audit from payment.audit · call · root checkout · path checkout.secondPayment → payment.audit · row 16"
+    >
+      Open workflow
+    </button>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"secondPayment\"],[\"payment\",\"audit\"]],[\"marker\",\"collapsed\"]]"
+    >
+      <button
+        aria-label="Inspect payment.audit · marker collapsed · root checkout · path checkout.secondPayment → payment.audit · row 17"
+        class="arazzo-reading-identity"
+        title="audit: Collapsed call — expand to show interactions · audit"
+      >
+        audit: Collapsed call — expand to show interactions
+      </button>
+    </div>
+    <div
+      class="arazzo-sequence-annotation"
+      data-sequence-list-id="[\"c48ec3be-ecd9-409e-963b-4104aecfd4f4\",\"checkout\",[[\"checkout\",\"secondPayment\"],[\"payment\",\"audit\"]],[\"continuation\"]]"
+    >
+      <span
+        title="Structural continuation to payment after audit · audit"
+      >
+        Structural continuation to payment after audit
+      </span>
+    </div>
+  </li>
+</ol>
+
+ ❯ test/reading-sequence.test.tsx:23:30
+     21|   const list = within(sequence).getByRole('list', { name: 'Ordered int…
+     22|   const root = within(sequence).getAllByRole('button', { name: /^Inspe…
+     23|   expect(root.closest('ol')).toBeNull();
+       |                              ^
+     24|   expect(root.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_F…
+     25|   const first = within(list).getByRole('button', { name: /^Inspect che…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  16:19:54
+   Duration  3.23s (transform 32%, import 27%, environment 22%, tests 17%, setup 2%)
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-sequence.test.tsx -t 'prerequisites precede'

@@ -58,4 +58,3 @@
   112:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
 ✖ 36 problems (0 errors, 36 warnings)
-

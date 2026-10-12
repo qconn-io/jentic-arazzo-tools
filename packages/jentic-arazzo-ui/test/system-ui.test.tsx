@@ -7,6 +7,10 @@ import { readFileSync } from 'node:fs';
 import { ArazzoUI } from '../src/ArazzoUI';
 Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true });
 Element.prototype.scrollIntoView = vi.fn();
+const systemsButton = () =>
+  screen
+    .getByRole('group', { name: 'More views' })
+    .querySelector('button:last-child') as HTMLButtonElement;
 test('Systems is optional and preserves exact exchange inspection on workflow return', async () => {
   render(
     <ArazzoUI
@@ -15,9 +19,9 @@ test('Systems is optional and preserves exact exchange inspection on workflow re
       viewProfileAdapter="digital-product"
     />,
   );
-  const settings = await screen.findByRole('combobox', { name: 'Perspective' });
-  expect((settings as HTMLSelectElement).value).toBe('workflow');
-  fireEvent.change(settings, { target: { value: 'systems' } });
+  await screen.findByRole('combobox', { name: 'Select workflow' });
+  expect(systemsButton().getAttribute('aria-pressed')).toBe('false');
+  fireEvent.click(systemsButton());
   await screen.findByRole('region', { name: 'Systems client-journey' });
   const call = screen.getByRole('button', {
     name: 'Expand standard call fulfil-purchase.reserve-and-pay',
@@ -38,7 +42,7 @@ test('unconfigured documents have no Systems switch and keep standard defaults',
     <ArazzoUI document={readFileSync('public/examples/digital-product/arazzo.yaml', 'utf8')} />,
   );
   await waitFor(() => expect(screen.getAllByText('client-journey').length).toBeGreaterThan(0));
-  expect(screen.queryByRole('combobox', { name: 'Perspective' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Systems view' })).toBeNull();
 });
 
 test('namespaced locations restore descriptive associations and helper expansion', async () => {
@@ -119,9 +123,10 @@ test('host-controlled locations reject unaccepted Systems perspective changes', 
       onLocationChange={changed}
     />,
   );
-  const select = await screen.findByRole('combobox', { name: 'Perspective' });
+  await screen.findByRole('combobox', { name: 'Select workflow' });
+  const select = systemsButton();
   await waitFor(() => expect(changed).toHaveBeenCalled());
-  fireEvent.change(select, { target: { value: 'systems' } });
+  fireEvent.click(select);
   await waitFor(() =>
     expect(
       changed.mock.calls.some(
@@ -129,7 +134,7 @@ test('host-controlled locations reject unaccepted Systems perspective changes', 
       ),
     ).toBe(true),
   );
-  await waitFor(() => expect((select as HTMLSelectElement).value).toBe('workflow'));
+  await waitFor(() => expect(select.getAttribute('aria-pressed')).toBe('false'));
 });
 test('restores an ordinary controlled step location after Systems', async () => {
   const document = readFileSync('public/examples/digital-product/arazzo.yaml', 'utf8');
@@ -174,11 +179,7 @@ test('restores an ordinary controlled step location after Systems', async () => 
       }}
     />,
   );
-  await waitFor(() =>
-    expect((screen.getByRole('combobox', { name: 'Perspective' }) as HTMLSelectElement).value).toBe(
-      'workflow',
-    ),
-  );
+  await waitFor(() => expect(systemsButton().getAttribute('aria-pressed')).toBe('false'));
 });
 test('malformed controlled extension remains diagnostic instead of crashing', async () => {
   class Boundary extends React.Component<{ children: React.ReactNode }, { error: string }> {
@@ -244,9 +245,7 @@ test('manual workflow-to-Systems switch preserves an already selected nested occ
     />,
   );
   await screen.findByRole('region', { name: 'Selection details' });
-  fireEvent.change(screen.getByRole('combobox', { name: 'Perspective' }), {
-    target: { value: 'systems' },
-  });
+  fireEvent.click(systemsButton());
   await screen.findByText('Selected system: reserve-and-capture.capture-payment');
 });
 

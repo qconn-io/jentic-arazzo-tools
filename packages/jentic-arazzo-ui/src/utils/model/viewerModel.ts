@@ -18,10 +18,44 @@ export interface EffectiveAction extends ActionFact {
   applicableWorkflowId: string;
   applicableStepId: string;
 }
+export interface ApplicableParameter extends ParameterFact {
+  origin: 'workflow' | 'step';
+  isOverride: boolean;
+  applicableWorkflowId: string;
+  applicableStepId: string;
+}
 export interface ViewerStep extends StepFact {
   internalId: string;
   nodeId: string;
   effectiveActions: Record<ActionChannel, EffectiveAction[]>;
+  applicableParameters: ApplicableParameter[];
+}
+
+function applicableParameters(workflow: WorkflowFact, step: StepFact): ApplicableParameter[] {
+  const matches = (a: ParameterFact, b: ParameterFact) =>
+    a.status === 'resolved' &&
+    b.status === 'resolved' &&
+    typeof a.value.name === 'string' &&
+    a.value.name.length > 0 &&
+    a.value.name === b.value.name &&
+    a.value.in === b.value.in;
+  const entries = [
+    ...workflow.parameters
+      .filter((entry) => !step.parameters.some((other) => matches(entry, other)))
+      .map((entry) => ({ entry, origin: 'workflow' as const, isOverride: false })),
+    ...step.parameters.map((entry) => ({
+      entry,
+      origin: 'step' as const,
+      isOverride: workflow.parameters.some((other) => matches(entry, other)),
+    })),
+  ];
+  return entries.map(({ entry, origin, isOverride }) => ({
+    ...entry,
+    origin,
+    isOverride,
+    applicableWorkflowId: workflow.workflowId,
+    applicableStepId: step.stepId,
+  }));
 }
 export interface TransferSemantics {
   target: ClassifiedTarget;
@@ -237,6 +271,7 @@ export function buildViewerModel(inspection: InspectionResult): ArazzoViewerMode
         onSuccess: effectiveActions(workflow, step, 'onSuccess'),
         onFailure: effectiveActions(workflow, step, 'onFailure'),
       };
+      const applicable = applicableParameters(workflow, step);
       if (step.callTarget)
         addRelationship({
           kind: 'call',
@@ -245,7 +280,7 @@ export function buildViewerModel(inspection: InspectionResult): ArazzoViewerMode
           targetWorkflowId: step.callTarget.workflowId,
           target: step.callTarget,
           path: [...step.path, 'workflowId'],
-          parameters: step.parameters,
+          parameters: applicable,
         });
       for (const channel of ['onSuccess', 'onFailure'] as const)
         for (const action of effective[channel]) {
@@ -278,7 +313,13 @@ export function buildViewerModel(inspection: InspectionResult): ArazzoViewerMode
             action,
           });
         }
-      return { ...step, internalId: stepInternalId, nodeId, effectiveActions: effective };
+      return {
+        ...step,
+        internalId: stepInternalId,
+        nodeId,
+        effectiveActions: effective,
+        applicableParameters: applicable,
+      };
     });
     for (const prerequisite of workflow.prerequisites)
       addRelationship({

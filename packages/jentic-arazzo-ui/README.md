@@ -75,16 +75,14 @@ function App() {
 
 ### ArazzoUIStandalone
 
-Self-contained viewer with a built-in header including the Jentic logo, a URL input for loading documents, and a view mode toggle. Use this for a drop-in widget that works without any external UI.
+Self-contained viewer with a built-in header and compact document loading. Use this for a drop-in widget that works without external UI. Bare entry opens the first workflow sequence; `initialView="docs"` explicitly starts with step descriptions.
 
 ```jsx
 import { ArazzoUIStandalone } from '@jentic/arazzo-ui/standalone';
 import '@jentic/arazzo-ui/styles.css';
 
 function App() {
-  return (
-    <ArazzoUIStandalone document="https://example.com/workflow.arazzo.yaml" initialView="docs" />
-  );
+  return <ArazzoUIStandalone document="https://example.com/workflow.arazzo.yaml" />;
 }
 ```
 
@@ -152,7 +150,7 @@ The `document` prop accepts multiple input types:
 <ArazzoUI document={arazzoDocumentObject} view="docs" />
 ```
 
-When the document is a URL, it is displayed below the title in the docs view.
+When the document is a URL, its address remains available in Document information. A document-only URL does not select a representation.
 
 ## View modes
 
@@ -168,21 +166,28 @@ In split view, clicking a step node in the diagram expands the workflow and scro
 
 ## Chained workflow inspection
 
-The **Layout** control offers **Workflow diagram**, **Read workflow**, and
-**Side by side**. The **All workflows** button and **Select workflow** menu are
-visible above the panes. Workflow choices show authored summaries alongside their
-exact IDs. Select All workflows to see classified relationships, filter by Call,
-Prerequisite, One-way goto, or Retry recovery, then open a workflow entry.
+Bare `ArazzoUI` and `ArazzoUIStandalone` entries open the first workflow's
+**Sequence diagram**. An explicit `view` or `initialView` retains its previous
+initial representation: `docs` opens **Step descriptions**. Explicit and restored
+locations take precedence; legacy links without a subview keep their existing
+interpretation. Applying the implicit default emits no `onViewChange` callback.
 
-Use the **Sequence diagram** shortcut in workflow navigation to read the selected
-workflow's interactions directly. It requests Read workflow when the reading pane
-is absent and retains Side by side when both panes are visible. In a controlled
-host, the host must accept `onViewChange('docs')` before the reading pane opens.
-The selected workflow's **Reading view** control offers **Step descriptions**,
-**Sequence diagram**, and **Flowchart**, and marks the active representation.
-All workflows returns to the relationships overview. Changing layout retains the
-destination; the public values `diagram`/`docs`/`split` and
-`docs`/`sequence`/`flowchart`, including old links, remain unchanged.
+Selected workflows have primary **Sequence diagram** and **Step descriptions**
+controls. **More views** reveals Workflow diagram, Flowchart and a reversible
+Side by side choice. Systems appears there only with a supplied profile or
+adapter. All workflows opens the relationship overview; each entry can reveal
+calls, prerequisites, goto and retry links independently. The public layout
+values `diagram`/`docs`/`split` and subviews `docs`/`sequence`/`flowchart`
+remain unchanged. A controlled host must accept `onViewChange('docs')` before
+switching from Workflow diagram into a reading pane.
+
+Select a visible step or call identity in a card, sequence diagram, numbered
+interaction or description heading to inspect its exact authored occurrence.
+Expand/collapse and follow-call actions remain separate. Returning from a
+followed local call preserves the caller sequence and scoped location.
+Document information holds complete descriptions, source declarations and
+provenance; Help and optional views explains optional metadata without loading
+external sources. Search and standalone Load document are disclosures.
 
 A failed flowchart shows **Unable to draw this flowchart**, **Retry diagram** and
 **Read step descriptions**. Retry only redraws the diagram; it does not load API
@@ -500,9 +505,9 @@ A loaded Arazzo source exposes the referenced external workflow. **Open workflow
 
 ### Optional Systems perspective
 
-Systems view lets readers see participants and their interactions using supplied system information. When configured, **Workflow view / Systems view** appears beside the workflow reading controls. Without metadata, the **Systems view** help explains that this document has no supplied system participant information; normal workflow reading remains available. No participant setup is required, and the viewer does not infer actors or API owners. Stale or invalid supplied information has separate diagnostics.
+Systems view lets readers see participants and their interactions using supplied system information. When configured, **Systems view** appears in **More views**. Without metadata, **Help and optional views** explains that this document has no supplied system participant information; normal workflow reading remains available. No participant setup is required, and the viewer does not infer actors or API owners. Stale or invalid supplied information has separate diagnostics.
 
-Hosts can supply `viewProfile` (version 1) and select `perspective="systems"`, or let readers use the optional Perspective setting. `onPerspectiveChange` supports a controlled host. Existing `ViewerMode` and `DiagramType` unions and default workflow views remain unchanged. With no profile, standard views do not interpret presentation extensions.
+Hosts can supply `viewProfile` (version 1) and select `perspective="systems"`, or let readers choose Systems view from More views. `onPerspectiveChange` supports a controlled host. Existing `ViewerMode` and `DiagramType` unions remain unchanged; only the implicit bare-entry reading default is now sequence. With no profile, standard views do not interpret presentation extensions.
 
 Profiles bind explicit business participants, workflow/step actors, API source owners, descriptive operation implementations, and declared event endpoints to one document identity and optional revision. Every binding retains an authored field location or host provenance. Organizational ownership is separate optional catalog data. Invalid/stale/conflicting references remain diagnostic; missing identities become Unknown participants while authored interactions remain inspectable.
 
@@ -520,7 +525,7 @@ The `jentic.systems` workflow-location extension preserves the system root, sema
 
 **Guided walkthroughs** are author-provided descriptions and links through a workflow. Select a supplied guide by its name (or its authored ID when no title is provided). Reading a guide does not run the workflow.
 
-A guide file is an optional, separate JSON document. In the standalone viewer, open **Load guides from a URL**, enter its **Guide file URL**, then choose **Load guides**. **Guide file format** explains the accepted formats. **Open guided example** explicitly switches to the digital-product document and its compatible guide file; opening help alone loads nothing. Loading errors offer **Retry guide loading** while ordinary reading and previously loaded valid guides remain available. Empty files, stale waypoints and guides for another document have local explanations and applicable return actions.
+A guide file is an optional, separate JSON document. In the standalone viewer, open **Help and guides**, then **Load guides from a URL**, enter its **Guide file URL**, then choose **Load guides**. **Guide file format** explains the accepted formats. **Open guided example** explicitly switches to the digital-product document and its compatible guide file; opening help alone loads nothing. Loading errors offer **Retry guide loading** while ordinary reading and previously loaded valid guides remain available. Empty files, stale waypoints and guides for another document have local explanations and applicable return actions.
 
 Developers can supply `scenarioManifest` to either viewer, or use an explicit manifest URL with `scenarioManifestURI` or `?scenarios=<manifest URL>` alongside `?document=<document URL>`. The viewer never
 searches sibling files for guides. Guide text is labeled as **authored expectations**: opening

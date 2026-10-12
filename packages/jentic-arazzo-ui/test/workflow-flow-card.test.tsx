@@ -65,9 +65,10 @@ function Cards() {
 }
 describe('shared-model cards and prerequisite paths', () => {
   it('shows authored async metadata and the same effective inspection order', () => {
+    const selected = vi.fn();
     render(
       <ReactFlowProvider>
-        <ArazzoViewerProvider document={doc}>
+        <ArazzoViewerProvider document={doc} events={{ onNodeSelect: selected }}>
           <Cards />
         </ArazzoViewerProvider>
       </ReactFlowProvider>,
@@ -82,10 +83,11 @@ describe('shared-model cards and prerequisite paths', () => {
         .hasAttribute('disabled'),
     ).toBe(true);
     expect(screen.queryByText('Timeout: 123 ms')).toBeNull();
-    const detail = screen.getByRole('button', { name: 'View details for a.receive' });
+    const detail = screen.getByRole('button', { name: 'Inspect a.receive' });
     expect(detail.closest('.arazzo-step-card-header')).toBeTruthy();
     expect(detail.classList.contains('nodrag')).toBe(true);
     fireEvent.click(detail);
+    expect(selected).toHaveBeenCalledTimes(1);
     const details = screen.getByRole('region', { name: 'Selection details' });
     expect(details.textContent).toContain('"timeout": 123');
     expect(details.textContent).toContain('$message.header.id');
@@ -155,7 +157,7 @@ it('renders inherited reusable action values, unresolved occurrences, criteria a
     </ReactFlowProvider>,
   );
   expect(container.textContent).not.toContain('$statusCode == 401');
-  fireEvent.click(screen.getByRole('button', { name: 'View details for a.receive' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Inspect a.receive' }));
   const details = screen.getByRole('region', { name: 'Selection details' });
   expect(details.textContent).toContain('effective-token');
   expect(details.textContent).toContain('"value": 0');
@@ -216,7 +218,7 @@ it('header details stop parent activation and preserve one public scoped node ca
       </ArazzoViewerProvider>
     </ReactFlowProvider>,
   );
-  const action = screen.getByRole('button', { name: 'View details for a.receive' });
+  const action = screen.getByRole('button', { name: 'Inspect a.receive' });
   expect(action.closest('.arazzo-step-card-header')).toBeTruthy();
   fireEvent.click(action);
   expect(parent).not.toHaveBeenCalled();

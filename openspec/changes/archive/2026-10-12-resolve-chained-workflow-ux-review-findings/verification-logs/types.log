@@ -1,0 +1,95 @@
+
+> jentic-arazzo-tools@0.0.0-ignore typescript:check-types
+> lerna run typescript:check-types
+
+lerna notice cli v9.0.7
+
+ Lerna (powered by Nx)   Running target typescript:check-types for 5 projects:
+
+- @jentic/arazzo-parser
+- @jentic/arazzo-resolver
+- @jentic/arazzo-runner
+- @jentic/arazzo-ui
+- @jentic/arazzo-validator
+
+
+
+> @jentic/arazzo-parser:"typescript:check-types"
+
+(node:933919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-parser@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-resolver:"typescript:check-types"
+
+(node:935101) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-resolver@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-validator:"typescript:check-types"
+
+(node:935102) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-validator@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-runner:"typescript:check-types"
+
+(node:935366) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-runner@1.0.0-alpha.13 typescript:check-types
+> tsc --noEmit
+
+
+> @jentic/arazzo-ui:"typescript:check-types"
+
+(node:935365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 typescript:check-types
+> tsc --noEmit
+
+test/e2e/review-app.tsx(4,38): error TS7016: Could not find a declaration file for module '@jentic/arazzo-ui'. '/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/dist/arazzo-ui.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jentic__arazzo-ui` if it exists or add a new declaration (.d.ts) file containing `declare module '@jentic/arazzo-ui';`
+test/package/acceptance-app.tsx(15,8): error TS7016: Could not find a declaration file for module '@jentic/arazzo-ui'. '/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/dist/arazzo-ui.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jentic__arazzo-ui` if it exists or add a new declaration (.d.ts) file containing `declare module '@jentic/arazzo-ui';`
+test/package/acceptance-app.tsx(16,31): error TS7016: Could not find a declaration file for module '@jentic/arazzo-ui/catalog'. '/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/dist/arazzo-ui.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jentic__arazzo-ui` if it exists or add a new declaration (.d.ts) file containing `declare module '@jentic/arazzo-ui/catalog';`
+test/package/acceptance-app.tsx(17,36): error TS7016: Could not find a declaration file for module '@jentic/arazzo-ui/standalone'. '/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/dist/arazzo-ui-standalone.mjs' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/jentic__arazzo-ui` if it exists or add a new declaration (.d.ts) file containing `declare module '@jentic/arazzo-ui/standalone';`
+test/package/acceptance-app.tsx(103,37): error TS7006: Parameter 'workflow' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(117,22): error TS7031: Binding element 'uri' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(117,27): error TS7031: Binding element 'signal' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(164,22): error TS7006: Parameter 'value' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(167,43): error TS7006: Parameter 'item' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(194,22): error TS7006: Parameter 'value' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(195,26): error TS7006: Parameter 'value' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(196,26): error TS7006: Parameter 'value' implicitly has an 'any' type.
+test/package/acceptance-app.tsx(215,20): error TS7006: Parameter 'request' implicitly has an 'any' type.
+test/reading-focus.test.tsx(16,19): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+test/reading-focus.test.tsx(47,19): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+npm error Lifecycle script `typescript:check-types` failed with error:
+npm error code 2
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c tsc --noEmit
+
+
+
+ Lerna (powered by Nx)   Running target typescript:check-types for 5 projects failed
+
+Failed tasks:
+
+- @jentic/arazzo-ui:typescript:check-types
+

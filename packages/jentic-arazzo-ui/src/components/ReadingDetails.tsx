@@ -59,6 +59,25 @@ function ValueRows({
             {row.label}
             {row.location && <small> · {row.location}</small>}
             {row.status && row.status !== 'resolved' && <small> · {row.status}</small>}
+            {row.origin && (
+              <small>
+                {' '}
+                · {row.origin}
+                {row.isOverride ? ' · overrides workflow parameter' : ''}
+              </small>
+            )}
+            {row.path && (
+              <small title={`Use site /${row.path.join('/')}`}>
+                {' '}
+                · use site /{row.path.join('/')}
+              </small>
+            )}
+            {row.declarationPath && (
+              <small title={`Declaration /${row.declarationPath.join('/')}`}>
+                {' '}
+                · declaration /{row.declarationPath.join('/')}
+              </small>
+            )}
           </dt>
           <dd>
             <PresentValue {...row} />

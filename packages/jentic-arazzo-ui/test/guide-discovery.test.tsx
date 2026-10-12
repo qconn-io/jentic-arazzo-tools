@@ -66,7 +66,7 @@ test('supplied named and ID fallback guides are available while empty guides exp
     />,
   );
   await screen.findByRole('button', { name: 'Payment reading' });
-  expect(screen.getByRole('button', { name: 'fallback' }).closest('details')).toBeNull();
+  expect(screen.getByRole('button', { name: 'fallback' }).closest('details')?.open).toBe(false);
   rerender(<ArazzoUI document={nestedCalls} documentIdentity="host:doc" scenarioManifest={[]} />);
   await screen.findByText('This guide file contains no walkthroughs.');
   expect(screen.getByRole('combobox', { name: 'Select workflow' })).toBeTruthy();
@@ -74,10 +74,10 @@ test('supplied named and ID fallback guides are available while empty guides exp
 
 test('unconfigured Systems help is contextual and a stale supplied profile is separately diagnostic', async () => {
   const { rerender } = render(<ArazzoUI document={nestedCalls} documentIdentity="host:doc" />);
-  await screen.findByText('Systems view');
-  fireEvent.click(screen.getByText('Systems view'));
+  await screen.findByText('Help and optional views');
+  fireEvent.click(screen.getByText('Help and optional views'));
   expect(
-    screen.getByText('This document has no supplied system participant information.'),
+    screen.getByText(/This document has no supplied system participant information/),
   ).toBeTruthy();
   expect(screen.queryByRole('combobox', { name: 'Perspective' })).toBeNull();
   rerender(
@@ -98,7 +98,7 @@ test('unconfigured Systems help is contextual and a stale supplied profile is se
   await screen.findByText('Supplied system information has limitations.');
   expect(screen.getByText(/Profile version\/document\/revision/)).toBeTruthy();
   expect(
-    screen.queryByText('This document has no supplied system participant information.'),
+    screen.queryByText(/This document has no supplied system participant information/),
   ).toBeNull();
 });
 

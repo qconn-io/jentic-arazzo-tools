@@ -1,0 +1,782 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-focus.test.tsx
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+ ❯ test/reading-focus.test.tsx (7 tests | 2 failed) 3287ms
+   × narrow covering dialog excludes background, traps Tab both ways and releases it on close 1116ms
+   × a covering embedded inspector scopes inert to the viewer and restores existing background state 1097ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/reading-focus.test.tsx > narrow covering dialog excludes background, traps Tab both ways and releases it on close
+TestingLibraryElementError: Unable to find role="dialog" and name "Selection details"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui "[39m
+      [33mstyle[39m=[32m"width: 100%; height: 100%; display: flex;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-viewer-shell"[39m
+      [36m>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Workflows"[39m
+          [33mclass[39m=[32m"arazzo-workflow-navigation"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+          [36m>[39m
+            [0mAll workflows[0m
+          [36m</button>[39m
+          [36m<label>[39m
+            [0mSelect workflow[0m
+            [36m<select>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mAll workflows[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"checkout"[39m
+                [33mvalue[39m=[32m"checkout"[39m
+              [36m>[39m
+                [0mcheckout[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"payment"[39m
+                [33mvalue[39m=[32m"payment"[39m
+              [36m>[39m
+                [0mpayment[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"audit"[39m
+                [33mvalue[39m=[32m"audit"[39m
+              [36m>[39m
+                [0maudit[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"client"[39m
+                [33mvalue[39m=[32m"client"[39m
+              [36m>[39m
+                [0mclient[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-search-disclosure"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mSearch workflows and steps[0m
+            [36m</summary>[39m
+            [36m<label>[39m
+              [0mSearch workflows and steps[0m
+              [36m<input[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+          [36m</details>[39m
+          [36m<span[39m
+            [33mtitle[39m=[32m"checkout"[39m
+          [36m>[39m
+            [0mcheckout[0m
+            [0m · [0m
+            [0m0[0m
+            [0m incoming · [0m
+            [0m2[0m
+            [0m outgoing[0m
+          [36m</span>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"arazzo-reading-controls"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Reading view"[39m
+            [33mclass[39m=[32m"workflow-view-toggle"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"arazzo-control-scope"[39m
+            [36m>[39m
+              [0mReading view[0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+            [36m>[39m
+              [0mSequence diagram[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+            [36m>[39m
+              [0mStep descriptions[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-more-views"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mMore views[0m
+            [36m</summary>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"More views"[39m
+              [33mrole[39m=[32m"group"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mWorkflow diagram[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mFlowchart[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mSide by side[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</details>[39m
+        [36m</div>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-reader-help"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mHelp and optional views[0m
+          [36m</summary>[39m
+          [36m<p>[39m
+            [0mSequence diagrams and step descriptions show authored workflow declarations; they do not run operations.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mThis document has no supplied system participant information. Systems view requires a supplied profile or configured adapter.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mGuided walkthroughs use separately supplied author descriptions and require deliberate loading in the standalone viewer.[0m
+          [36m</p>[39m
+        [36m</details>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-inspection-status"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mInspection status[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Inspection status details"[39m
+            [33mrole[39m=[32m"region"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0mAPI descriptions have not been loaded, so their operations and versions have not been checked. This does not mean they are invalid or inaccessible. Declared source names remain available.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mInspection scope: Arazzo [0m
+              [0m1.1.0[0m
+              [0m, profile [0m
+              [0m1.1[0m
+              [0m. These views do not establish schema validation or execution support.[0m
+            [36m</p>[39m
+            [36m<ul>[39m
+              [36m<li>[39m
+                [0mSelected Arazzo 1.1 inspection; full 1.1 conformance is not established.[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<p>[39m
+              [0mReference expansion bypassed: unavailable base URI. Authored references are preserved.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mUnderstood local workflow calls remain inspectable. Missing and ambiguous targets are marked at their occurrences; external content is not expanded.[0m
+            [36m</p>[39m
+          [36m</div>[39m
+        [36m</details>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"ara...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui "[39m
+      [33mstyle[39m=[32m"width: 100%; height: 100%; display: flex;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-viewer-shell"[39m
+      [36m>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Workflows"[39m
+          [33mclass[39m=[32m"arazzo-workflow-navigation"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+          [36m>[39m
+            [0mAll workflows[0m
+          [36m</button>[39m
+          [36m<label>[39m
+            [0mSelect workflow[0m
+            [36m<select>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mAll workflows[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"checkout"[39m
+                [33mvalue[39m=[32m"checkout"[39m
+              [36m>[39m
+                [0mcheckout[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"payment"[39m
+                [33mvalue[39m=[32m"payment"[39m
+              [36m>[39m
+                [0mpayment[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"audit"[39m
+                [33mvalue[39m=[32m"audit"[39m
+              [36m>[39m
+                [0maudit[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"client"[39m
+                [33mvalue[39m=[32m"client"[39m
+              [36m>[39m
+                [0mclient[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-search-disclosure"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mSearch workflows and steps[0m
+            [36m</summary>[39m
+            [36m<label>[39m
+              [0mSearch workflows and steps[0m
+              [36m<input[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+          [36m</details>[39m
+          [36m<span[39m
+            [33mtitle[39m=[32m"checkout"[39m
+          [36m>[39m
+            [0mcheckout[0m
+            [0m · [0m
+            [0m0[0m
+            [0m incoming · [0m
+            [0m2[0m
+            [0m outgoing[0m
+          [36m</span>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"arazzo-reading-controls"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Reading view"[39m
+            [33mclass[39m=[32m"workflow-view-toggle"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"arazzo-control-scope"[39m
+            [36m>[39m
+              [0mReading view[0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+            [36m>[39m
+              [0mSequence diagram[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+            [36m>[39m
+              [0mStep descriptions[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-more-views"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mMore views[0m
+            [36m</summary>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"More views"[39m
+              [33mrole[39m=[32m"group"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mWorkflow diagram[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mFlowchart[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mSide by side[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</details>[39m
+        [36m</div>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-reader-help"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mHelp and optional views[0m
+          [36m</summary>[39m
+          [36m<p>[39m
+            [0mSequence diagrams and step descriptions show authored workflow declarations; they do not run operations.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mThis document has no supplied system participant information. Systems view requires a supplied profile or configured adapter.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mGuided walkthroughs use separately supplied author descriptions and require deliberate loading in the standalone viewer.[0m
+          [36m</p>[39m
+        [36m</details>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-inspection-status"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mInspection status[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Inspection status details"[39m
+            [33mrole[39m=[32m"region"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0mAPI descriptions have not been loaded, so their operations and versions have not been checked. This does not mean they are invalid or inaccessible. Declared source names remain available.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mInspection scope: Arazzo [0m
+              [0m1.1.0[0m
+              [0m, profile [0m
+              [0m1.1[0m
+              [0m. These views do not establish schema validation or execution support.[0m
+            [36m</p>[39m
+            [36m<ul>[39m
+              [36m<li>[39m
+                [0mSelected Arazzo 1.1 inspection; full 1.1 conformance is not established.[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<p>[39m
+              [0mReference expansion bypassed: unavailable base URI. Authored references are preserved.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mUnderstood local workflow calls remain inspectable. Missing and ambiguous targets are marked at their occurrences; external content is not expanded.[0m
+            [36m</p>[39m
+          [36m</div>[39m
+        [36m</details>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"ara...
+ ❯ waitForWrapper ../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ test/reading-focus.test.tsx:42:30
+     40|   });
+     41|   fireEvent.click(origin);
+     42|   const panel = await screen.findByRole('dialog', { name: 'Selection d…
+       |                              ^
+     43|   expect(panel.getAttribute('aria-modal')).toBe('true');
+     44|   expect(document.querySelector('.arazzo-workflow-navigation')?.closes…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  test/reading-focus.test.tsx > a covering embedded inspector scopes inert to the viewer and restores existing background state
+TestingLibraryElementError: Unable to find role="dialog" and name "Selection details"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<button>[39m
+      [0mHost control[0m
+    [36m</button>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui "[39m
+      [33mstyle[39m=[32m"width: 100%; height: 100%; display: flex;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-viewer-shell"[39m
+      [36m>[39m
+        [36m<nav[39m
+          [33maria-hidden[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Workflows"[39m
+          [33mclass[39m=[32m"arazzo-workflow-navigation"[39m
+          [33minert[39m=[32m"preserved"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+          [36m>[39m
+            [0mAll workflows[0m
+          [36m</button>[39m
+          [36m<label>[39m
+            [0mSelect workflow[0m
+            [36m<select>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mAll workflows[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"checkout"[39m
+                [33mvalue[39m=[32m"checkout"[39m
+              [36m>[39m
+                [0mcheckout[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"payment"[39m
+                [33mvalue[39m=[32m"payment"[39m
+              [36m>[39m
+                [0mpayment[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"audit"[39m
+                [33mvalue[39m=[32m"audit"[39m
+              [36m>[39m
+                [0maudit[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"client"[39m
+                [33mvalue[39m=[32m"client"[39m
+              [36m>[39m
+                [0mclient[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-search-disclosure"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mSearch workflows and steps[0m
+            [36m</summary>[39m
+            [36m<label>[39m
+              [0mSearch workflows and steps[0m
+              [36m<input[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+          [36m</details>[39m
+          [36m<span[39m
+            [33mtitle[39m=[32m"checkout"[39m
+          [36m>[39m
+            [0mcheckout[0m
+            [0m · [0m
+            [0m0[0m
+            [0m incoming · [0m
+            [0m2[0m
+            [0m outgoing[0m
+          [36m</span>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"arazzo-reading-controls"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Reading view"[39m
+            [33mclass[39m=[32m"workflow-view-toggle"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"arazzo-control-scope"[39m
+            [36m>[39m
+              [0mReading view[0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+            [36m>[39m
+              [0mSequence diagram[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+            [36m>[39m
+              [0mStep descriptions[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-more-views"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mMore views[0m
+            [36m</summary>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"More views"[39m
+              [33mrole[39m=[32m"group"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mWorkflow diagram[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mFlowchart[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mSide by side[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</details>[39m
+        [36m</div>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-reader-help"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mHelp and optional views[0m
+          [36m</summary>[39m
+          [36m<p>[39m
+            [0mSequence diagrams and step descriptions show authored workflow declarations; they do not run operations.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mThis document has no supplied system participant information. Systems view requires a supplied profile or configured adapter.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mGuided walkthroughs use separately supplied author descriptions and require deliberate loading in the standalone viewer.[0m
+          [36m</p>[39m
+        [36m</details>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-inspection-status"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mInspection status[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Inspection status details"[39m
+            [33mrole[39m=[32m"region"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0mAPI descriptions have not been loaded, so their operations and versions have not been checked. This does not mean they are invalid or inaccessible. Declared source names remain available.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mInspection scope: Arazzo [0m
+              [0m1.1.0[0m
+              [0m, profile [0m
+              [0m1.1[0m
+              [0m. These views do not establish schema validation or execution support.[0m
+            [36m</p>[39m
+            [36m<ul>[39m
+              [36m<li>[39m
+                [0mSelected Arazzo 1.1 inspection; full 1.1 conformance is not established.[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<p>[39m
+              [0mReference expansion bypassed: unavailable base URI. Authored references are preserved.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mUnderstood local workflow calls remain inspectable. Missing and ambiguous targets are marked at their occurrences; externa...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<button>[39m
+      [0mHost control[0m
+    [36m</button>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui "[39m
+      [33mstyle[39m=[32m"width: 100%; height: 100%; display: flex;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-viewer-shell"[39m
+      [36m>[39m
+        [36m<nav[39m
+          [33maria-hidden[39m=[32m"false"[39m
+          [33maria-label[39m=[32m"Workflows"[39m
+          [33mclass[39m=[32m"arazzo-workflow-navigation"[39m
+          [33minert[39m=[32m"preserved"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+          [36m>[39m
+            [0mAll workflows[0m
+          [36m</button>[39m
+          [36m<label>[39m
+            [0mSelect workflow[0m
+            [36m<select>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mAll workflows[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"checkout"[39m
+                [33mvalue[39m=[32m"checkout"[39m
+              [36m>[39m
+                [0mcheckout[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"payment"[39m
+                [33mvalue[39m=[32m"payment"[39m
+              [36m>[39m
+                [0mpayment[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"audit"[39m
+                [33mvalue[39m=[32m"audit"[39m
+              [36m>[39m
+                [0maudit[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"client"[39m
+                [33mvalue[39m=[32m"client"[39m
+              [36m>[39m
+                [0mclient[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-search-disclosure"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mSearch workflows and steps[0m
+            [36m</summary>[39m
+            [36m<label>[39m
+              [0mSearch workflows and steps[0m
+              [36m<input[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+          [36m</details>[39m
+          [36m<span[39m
+            [33mtitle[39m=[32m"checkout"[39m
+          [36m>[39m
+            [0mcheckout[0m
+            [0m · [0m
+            [0m0[0m
+            [0m incoming · [0m
+            [0m2[0m
+            [0m outgoing[0m
+          [36m</span>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"arazzo-reading-controls"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Reading view"[39m
+            [33mclass[39m=[32m"workflow-view-toggle"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"arazzo-control-scope"[39m
+            [36m>[39m
+              [0mReading view[0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+            [36m>[39m
+              [0mSequence diagram[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+            [36m>[39m
+              [0mStep descriptions[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-more-views"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mMore views[0m
+            [36m</summary>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"More views"[39m
+              [33mrole[39m=[32m"group"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mWorkflow diagram[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mFlowchart[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mSide by side[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</details>[39m
+        [36m</div>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-reader-help"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mHelp and optional views[0m
+          [36m</summary>[39m
+          [36m<p>[39m
+            [0mSequence diagrams and step descriptions show authored workflow declarations; they do not run operations.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mThis document has no supplied system participant information. Systems view requires a supplied profile or configured adapter.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mGuided walkthroughs use separately supplied author descriptions and require deliberate loading in the standalone viewer.[0m
+          [36m</p>[39m
+        [36m</details>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-inspection-status"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mInspection status[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Inspection status details"[39m
+            [33mrole[39m=[32m"region"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0mAPI descriptions have not been loaded, so their operations and versions have not been checked. This does not mean they are invalid or inaccessible. Declared source names remain available.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mInspection scope: Arazzo [0m
+              [0m1.1.0[0m
+              [0m, profile [0m
+              [0m1.1[0m
+              [0m. These views do not establish schema validation or execution support.[0m
+            [36m</p>[39m
+            [36m<ul>[39m
+              [36m<li>[39m
+                [0mSelected Arazzo 1.1 inspection; full 1.1 conformance is not established.[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<p>[39m
+              [0mReference expansion bypassed: unavailable base URI. Authored references are preserved.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mUnderstood local workflow calls remain inspectable. Missing and ambiguous targets are marked at their occurrences; externa...
+ ❯ waitForWrapper ../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ test/reading-focus.test.tsx:84:16
+     82|   navigation.setAttribute('aria-hidden', 'false');
+     83|   fireEvent.click(origin);
+     84|   await screen.findByRole('dialog', { name: 'Selection details' });
+       |                ^
+     85|   expect(host.closest('[inert]')).toBeNull();
+     86|   expect(screen.getByRole('button', { name: 'Host control' })).toBe(ho…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  16:23:06
+   Duration  6.07s (tests 55%, transform 18%, import 15%, environment 10%, setup 2%)
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-focus.test.tsx

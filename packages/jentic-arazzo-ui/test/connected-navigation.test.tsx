@@ -3,7 +3,7 @@ import React from 'react';
 import { expect, test, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { ArazzoUI } from '../src/ArazzoUI';
-import { nestedCalls } from './fixtures/connected';
+import { difficultCalls, nestedCalls } from './fixtures/connected';
 Element.prototype.scrollIntoView = vi.fn();
 vi.mock('mermaid', () => ({
   default: { initialize: vi.fn(), render: vi.fn(async () => ({ svg: '<svg />' })) },
@@ -23,6 +23,9 @@ test('default Docs exposes shared navigation and a meaningful overview without s
   );
   fireEvent.click(within(nav).getByRole('button', { name: 'All workflows' }));
   const overview = screen.getByRole('region', { name: 'Workflow overview' });
+  within(overview)
+    .getAllByText(/^Relationships \(/)
+    .forEach((disclosure) => fireEvent.click(disclosure));
   expect(within(overview).getAllByText('Call').length).toBeGreaterThan(0);
   expect(within(overview).getAllByText('Incoming').length).toBeGreaterThan(0);
   expect(container.querySelector('details[data-workflow-id]')).toBeNull();
@@ -52,6 +55,31 @@ test('controlled overview requests do not replace the authoritative workflow', a
     expect(screen.queryByRole('region', { name: 'Workflow overview' })).toBeNull(),
   );
   expect(screen.getByRole('button', { name: 'Sequence diagram' })).toBeTruthy();
+});
+
+test('overview keeps missing targets visible and navigates from a scoped incoming relationship', async () => {
+  const callback = vi.fn();
+  render(<ArazzoUI document={difficultCalls} onWorkflowSelect={callback} />);
+  fireEvent.click(await screen.findByRole('button', { name: 'All workflows' }));
+  const overview = screen.getByRole('region', { name: 'Workflow overview' });
+  const entry = within(overview)
+    .getByRole('button', { name: /^Open workflow entry with a very long/ })
+    .closest('article')!;
+  expect(within(entry).getByText(/2 unavailable relationships/)).toBeTruthy();
+  fireEvent.click(within(entry).getByText(/^Relationships \(/));
+  expect(within(entry).getByText(/absent \(missing/)).toBeTruthy();
+  const auditEntry = within(overview)
+    .getByRole('button', { name: 'Open workflow audit' })
+    .closest('article')!;
+  fireEvent.click(within(auditEntry).getByText(/^Relationships \(/));
+  const incoming = within(auditEntry).getByText('Incoming').parentElement!;
+  const goto = incoming.querySelector('[data-relationship-type="goto"]')!;
+  fireEvent.click(
+    within(goto as HTMLElement).getByRole('button', { name: /entry with a very long/ }),
+  );
+  expect(callback).toHaveBeenLastCalledWith(
+    'entry with a very long authored name that must remain available to readers',
+  );
 });
 
 test('mode changes retain destination and replacement rebuilds the overview entries', async () => {

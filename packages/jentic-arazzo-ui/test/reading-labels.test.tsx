@@ -50,9 +50,7 @@ test('sequence exposes authored step and qualified operation without generated p
   expect(sequence.querySelector('[aria-label="Sequence participants"]')!.textContent).not.toMatch(
     /\bP\d+\b/,
   );
-  fireEvent.click(
-    within(list).getByRole('button', { name: /^View details for root.findAvailablePets/ }),
-  );
+  fireEvent.click(within(list).getByRole('button', { name: /^Inspect root.findAvailablePets/ }));
   expect(screen.getByRole('region', { name: 'Selection details' }).textContent).toContain(
     '$sourceDescriptions.api.findPetsByStatus',
   );
@@ -78,7 +76,10 @@ test('unknown sequence destinations explain uncertainty without merging occurren
   expect(sequence.querySelector('[aria-label="Sequence participants"]')!.children).toHaveLength(3);
   expect(sequence.textContent).toContain('The API destination is not established');
   expect(
-    within(sequence).getAllByRole('button', { name: /^View details for root\.[ab]/ }),
+    within(within(sequence).getByRole('list', { name: 'Ordered interactions' })).getAllByRole(
+      'button',
+      { name: /^Inspect root\.[ab]/ },
+    ),
   ).toHaveLength(2);
 });
 

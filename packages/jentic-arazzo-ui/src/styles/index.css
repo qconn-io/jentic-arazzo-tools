@@ -164,6 +164,10 @@
   margin: 12px 0;
   overflow-wrap: anywhere;
 }
+.arazzo-sequence-annotation {
+  margin: 4px 0 4px 12px;
+  color: #475569;
+}
 .arazzo-sequence-list button {
   margin: 4px;
   padding: 4px 8px;
@@ -175,6 +179,7 @@
   bottom: 0;
   z-index: 30;
   width: min(480px, 100%);
+  box-sizing: border-box;
   background: white;
   border: 2px solid #94a3b8;
   box-shadow: -4px 0 16px #0002;
@@ -243,6 +248,88 @@
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   overflow-wrap: anywhere;
+}
+.arazzo-workflow-overview {
+  min-width: 0;
+}
+.arazzo-overview-entry h3 {
+  margin: 0;
+}
+.arazzo-overview-summary,
+.arazzo-overview-unavailable {
+  margin: 8px 0 0;
+  line-height: 1.45;
+}
+.arazzo-overview-summary {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.arazzo-overview-unavailable {
+  color: #92400e;
+}
+.arazzo-overview-filters,
+.arazzo-overview-relationships {
+  margin: 8px 0;
+}
+.arazzo-overview-filters > summary,
+.arazzo-overview-relationships > summary {
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #94a3b8;
+  border-radius: 5px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.arazzo-overview-filters > summary:hover,
+.arazzo-overview-relationships > summary:hover {
+  background: #f1f5f9;
+  border-color: #64748b;
+}
+.arazzo-overview-filters label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.arazzo-overview-filters select,
+.arazzo-overview-link {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid #94a3b8;
+  border-radius: 5px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.arazzo-overview-link {
+  cursor: pointer;
+  text-align: left;
+}
+.arazzo-overview-link:hover {
+  background: #f1f5f9;
+  border-color: #64748b;
+}
+.arazzo-overview-relationships ul {
+  padding-inline-start: 22px;
+}
+.arazzo-overview-relationships li {
+  margin-block: 8px;
+  line-height: 1.45;
 }
 .arazzo-ui button:focus-visible,
 .arazzo-ui select:focus-visible,
@@ -363,6 +450,18 @@
   gap: 8px;
   min-width: 0;
 }
+.arazzo-toolbar-source-disclosure {
+  min-width: 0;
+  color: #fff;
+}
+.arazzo-toolbar-source-disclosure summary {
+  cursor: pointer;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.arazzo-toolbar-source-disclosure[open] .arazzo-toolbar-source {
+  padding-top: 8px;
+}
 .arazzo-toolbar-logo {
   display: block;
 }
@@ -412,18 +511,12 @@
     grid-row: 1;
     justify-self: end;
   }
-  .arazzo-toolbar-source {
+  .arazzo-toolbar-source-disclosure {
     grid-column: 1 / -1;
     grid-row: 2;
   }
 }
 @media (max-width: 600px) {
-  .arazzo-selection-details {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    z-index: 1000;
-  }
   .arazzo-viewer-panes {
     flex-direction: column;
   }
@@ -623,11 +716,10 @@
   padding: 4px 0;
 }
 @media (min-width: 601px) {
-  .arazzo-viewer-shell:has(.arazzo-scenario-panel):has(.arazzo-selection-details) {
-    padding-right: min(480px, 45%);
-  }
-  .arazzo-viewer-shell:has(.arazzo-scenario-panel) > .arazzo-selection-details {
-    width: min(480px, 45%);
+  .arazzo-viewer-shell:has(.arazzo-scenario-panel):has(
+      .arazzo-selection-details[data-covering='false']
+    ) {
+    padding-right: 480px;
   }
 }
 
@@ -989,24 +1081,187 @@
   background: #dbeafe;
   border-color: #2563eb;
 }
+.arazzo-reading-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 6px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+.arazzo-reading-controls .workflow-view-toggle {
+  margin: 0;
+  align-items: center;
+}
+.arazzo-more-views {
+  position: relative;
+}
+.arazzo-more-views summary {
+  cursor: pointer;
+  font-size: 13px;
+  border: 1px solid #94a3b8;
+  border-radius: 5px;
+  padding: 7px 10px;
+  background: #fff;
+}
+.arazzo-more-views > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 7px 0;
+}
+.arazzo-more-views button {
+  font: inherit;
+  font-size: 13px;
+  border: 1px solid #94a3b8;
+  border-radius: 5px;
+  padding: 6px 10px;
+  background: #fff;
+  color: #172033;
+  cursor: pointer;
+}
+.arazzo-more-views button[aria-pressed='true'] {
+  background: #dbeafe;
+  border-color: #2563eb;
+}
+.arazzo-document-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  font-size: 14px;
+}
+.arazzo-document-identity span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.arazzo-document-information {
+  margin: 5px 0 8px;
+  font-size: 13px;
+}
+.arazzo-document-information summary {
+  cursor: pointer;
+}
+.arazzo-docs-prose .workflows-header-row {
+  margin: 4px 0;
+}
+.arazzo-docs-prose .workflow-summary-bar {
+  padding: 8px 12px;
+}
+.arazzo-docs-prose .workflow-details-content {
+  padding: 2px 12px 12px;
+}
+.arazzo-docs-view > div {
+  padding: 10px 16px !important;
+}
+.arazzo-workflow-navigation {
+  padding: 6px 10px;
+  gap: 6px;
+  max-height: 34%;
+}
+.arazzo-workflow-navigation label {
+  flex: 1 1 200px;
+}
+.arazzo-search-disclosure summary {
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px;
+}
+.arazzo-search-disclosure[open] {
+  flex-basis: 100%;
+}
+.arazzo-search-disclosure label {
+  display: flex;
+}
+.arazzo-reader-help {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.arazzo-reader-help summary {
+  cursor: pointer;
+}
+.arazzo-reader-help[open] {
+  max-height: 22vh;
+  overflow: auto;
+}
+.arazzo-scenario-panel {
+  flex-shrink: 0;
+  padding: 4px 12px;
+}
+.arazzo-scenario-panel > details > summary {
+  cursor: pointer;
+  font-size: 13px;
+}
+.arazzo-scenario-panel > details[open] {
+  max-height: 28vh;
+  overflow: auto;
+}
+@media (max-width: 600px) {
+  .arazzo-docs-view > div {
+    padding: 8px !important;
+  }
+  .arazzo-workflow-navigation label {
+    flex: 0 1 128px;
+    min-width: 0;
+    font-size: 0;
+    gap: 0;
+  }
+  .arazzo-workflow-navigation select {
+    min-width: 118px;
+    font-size: 13px;
+  }
+  .arazzo-workflow-navigation > span {
+    display: none;
+  }
+  .arazzo-reading-controls {
+    padding: 4px 8px;
+  }
+}
 .arazzo-step-card-header {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.arazzo-step-card-header strong {
+.arazzo-step-card-header :is(strong, .arazzo-reading-identity) {
   flex: 1;
   min-width: 0;
   overflow-wrap: anywhere;
 }
-.arazzo-step-card-header .arazzo-detail-action {
-  flex-shrink: 0;
+.arazzo-ui .arazzo-reading-identity {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: #1d4ed8;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
 }
-.arazzo-docs-view [aria-label='Step detail controls'] {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
+.arazzo-ui .arazzo-reading-identity:hover {
+  background: #eff6ff;
+  color: #1e40af;
+}
+.arazzo-sequence svg [data-sequence-id] {
+  cursor: pointer;
+}
+.arazzo-sequence svg [data-sequence-id]:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
 }
 .arazzo-docs-view :is(.workflow-summary-title, .workflow-summary-text),
 .arazzo-workflow-overview button {

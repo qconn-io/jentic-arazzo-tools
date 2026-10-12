@@ -2,9 +2,38 @@ import { expect, test } from 'vitest';
 import { createSnapshot, inspect } from '../src/utils/inspection';
 import { buildViewerModel } from '../src/utils/model/viewerModel';
 import { buildSequence } from '../src/utils/sequence/sequenceModel';
+import { projectSequenceNumbers } from '../src/utils/sequence/readingProjection';
+import { loadDocument } from '../src/utils/loading/loadDocument';
+import { readFileSync } from 'node:fs';
 import { nestedCalls, recursiveCalls, difficultCalls } from './fixtures/connected';
 import type { ArazzoDocument } from '../src/types/arazzo';
 const modelFor = (document: ArazzoDocument) => buildViewerModel(inspect(createSnapshot(document)));
+
+test('presentation numbers authored steps and repeated nested calls without changing scene identity', async () => {
+  const petstore = (
+    await loadDocument(readFileSync('public/petstore-order-workflow.arazzo.yaml', 'utf8'))
+  ).document;
+  const scene = buildSequence(modelFor(petstore), petstore.workflows[0].workflowId);
+  const before = scene.rows.map((row) => row.id);
+  const numbers = projectSequenceNumbers(scene);
+  expect(scene.rows.filter((row) => numbers.has(row.id)).map((row) => numbers.get(row.id))).toEqual(
+    ['1', '2', '3', '4', '5'],
+  );
+  expect(
+    scene.rows
+      .filter((row) => row.kind === 'transfer' || row.kind === 'continuation')
+      .every((row) => !numbers.has(row.id)),
+  ).toBe(true);
+  expect(scene.rows.map((row) => row.id)).toEqual(before);
+
+  const repeated = buildSequence(modelFor(nestedCalls), 'checkout');
+  const repeatedNumbers = projectSequenceNumbers(repeated);
+  const captures = repeated.rows.filter(
+    (row) => row.kind === 'operation' && row.step?.stepId === 'charge',
+  );
+  expect(captures.map((row) => repeatedNumbers.get(row.id))).toEqual(['2.1', '3.1']);
+  expect(captures[0].id).not.toBe(captures[1].id);
+});
 
 test('initial scene expands direct repeated calls with owning facts and distinct full paths', () => {
   const model = modelFor(nestedCalls);

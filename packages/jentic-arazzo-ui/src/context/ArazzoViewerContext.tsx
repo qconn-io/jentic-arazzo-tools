@@ -58,6 +58,7 @@ interface StandaloneProviderProps {
   events?: ViewerEvents;
   sourceProvider?: SourceDocumentProvider;
   onExternalNavigation?: (request: ExternalNavigationRequest) => void;
+  initialReadingView?: 'docs' | 'sequence' | 'flowchart';
   children: React.ReactNode;
 }
 type ProviderProps =
@@ -195,6 +196,7 @@ function StandaloneProvider({
   events,
   sourceProvider,
   onExternalNavigation,
+  initialReadingView,
   children,
 }: StandaloneProviderProps) {
   const sourceRegistry = useSourceRegistry(
@@ -415,7 +417,7 @@ function StandaloneProvider({
   return (
     <ArazzoViewerContext.Provider value={value}>
       <ContractFactsProvider key={model.documentId}>
-        <ViewerSessionProvider>{children}</ViewerSessionProvider>
+        <ViewerSessionProvider defaultView={initialReadingView}>{children}</ViewerSessionProvider>
       </ContractFactsProvider>
     </ArazzoViewerContext.Provider>
   );

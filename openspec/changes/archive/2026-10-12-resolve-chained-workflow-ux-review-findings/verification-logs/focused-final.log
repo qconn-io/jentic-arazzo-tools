@@ -1,0 +1,13 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-sequence.test.tsx test/reading-inspector.test.tsx test/reading-focus.test.tsx test/optional-tools.test.tsx test/scenario-ui.test.tsx
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+
+ Test Files  5 passed (5)
+      Tests  31 passed (31)
+   Start at  16:33:27
+   Duration  5.55s (tests 53%, import 19%, environment 14%, transform 12%, setup 2%)
+

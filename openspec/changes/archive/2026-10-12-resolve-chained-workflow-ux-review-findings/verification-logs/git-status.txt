@@ -1,0 +1,72 @@
+ M openspec/changes/archive/2026-10-05-add-workflow-deep-links/verification-logs/lint.log
+ M openspec/changes/archive/2026-10-05-add-workflow-deep-links/verification-logs/types.log
+ M openspec/changes/archive/2026-10-05-add-workflow-deep-links/verification-logs/ui-tests.log
+ M openspec/changes/archive/2026-10-05-improve-workflow-reading/verification-logs/lint.log
+ M openspec/changes/archive/2026-10-05-improve-workflow-reading/verification-logs/type-check.log
+ M openspec/changes/archive/2026-10-05-improve-workflow-reading/verification-logs/ui-tests.log
+ D openspec/changes/gate-workflow-ux-regressions/.openspec.yaml
+ D openspec/changes/gate-workflow-ux-regressions/acceptance-protocol.md
+ D openspec/changes/gate-workflow-ux-regressions/design.md
+ D openspec/changes/gate-workflow-ux-regressions/human-results.md
+ D openspec/changes/gate-workflow-ux-regressions/proposal.md
+ D openspec/changes/gate-workflow-ux-regressions/specs/upstream-contribution-readiness/spec.md
+ D openspec/changes/gate-workflow-ux-regressions/specs/workflow-reading/spec.md
+ D openspec/changes/gate-workflow-ux-regressions/tasks.md
+ D openspec/changes/gate-workflow-ux-regressions/verification.md
+ M openspec/specs/authored-scenario-exploration/spec.md
+ M openspec/specs/system-interaction-perspective/spec.md
+ M openspec/specs/upstream-contribution-readiness/spec.md
+ M openspec/specs/workflow-reading/spec.md
+ M packages/jentic-arazzo-ui/README.md
+ M packages/jentic-arazzo-ui/scripts/production-results.mjs
+ M packages/jentic-arazzo-ui/src/ArazzoUI.tsx
+ M packages/jentic-arazzo-ui/src/ArazzoUIStandalone.tsx
+ M packages/jentic-arazzo-ui/src/components/AdvancedTools.tsx
+ M packages/jentic-arazzo-ui/src/components/DocsView.tsx
+ M packages/jentic-arazzo-ui/src/components/ReadingDetails.tsx
+ M packages/jentic-arazzo-ui/src/components/ScenarioPanel.tsx
+ M packages/jentic-arazzo-ui/src/components/SelectionDetails.tsx
+ M packages/jentic-arazzo-ui/src/components/SequenceView.tsx
+ M packages/jentic-arazzo-ui/src/components/WorkflowLocationBridge.tsx
+ M packages/jentic-arazzo-ui/src/components/WorkflowNavigation.tsx
+ M packages/jentic-arazzo-ui/src/components/WorkflowOverview.tsx
+ M packages/jentic-arazzo-ui/src/context/ArazzoViewerContext.tsx
+ M packages/jentic-arazzo-ui/src/context/ViewerSessionContext.tsx
+ M packages/jentic-arazzo-ui/src/nodes/StepNode.tsx
+ M packages/jentic-arazzo-ui/src/styles/index.css
+ M packages/jentic-arazzo-ui/src/utils/documentation/docGenerator.ts
+ M packages/jentic-arazzo-ui/src/utils/documentation/markdownFormatter.ts
+ M packages/jentic-arazzo-ui/src/utils/documentation/mermaidFlowchartGenerator.ts
+ M packages/jentic-arazzo-ui/src/utils/inspection/facts.ts
+ M packages/jentic-arazzo-ui/src/utils/model/viewerModel.ts
+ M packages/jentic-arazzo-ui/src/utils/sequence/occurrenceDetails.ts
+ M packages/jentic-arazzo-ui/test/connected-navigation.test.tsx
+ M packages/jentic-arazzo-ui/test/diagram-render-recovery.test.tsx
+ M packages/jentic-arazzo-ui/test/e2e/production.spec.ts
+ M packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts
+ M packages/jentic-arazzo-ui/test/guide-discovery.test.tsx
+ M packages/jentic-arazzo-ui/test/location-standalone.test.tsx
+ M packages/jentic-arazzo-ui/test/location-ui.test.tsx
+ M packages/jentic-arazzo-ui/test/optional-tools.test.tsx
+ M packages/jentic-arazzo-ui/test/package/acceptance-app.tsx
+ M packages/jentic-arazzo-ui/test/reading-discovery.test.tsx
+ M packages/jentic-arazzo-ui/test/reading-focus.test.tsx
+ M packages/jentic-arazzo-ui/test/reading-inspector.test.tsx
+ M packages/jentic-arazzo-ui/test/reading-labels.test.tsx
+ M packages/jentic-arazzo-ui/test/reading-sequence.test.tsx
+ M packages/jentic-arazzo-ui/test/scenario-ui.test.tsx
+ M packages/jentic-arazzo-ui/test/sequence-model.test.ts
+ M packages/jentic-arazzo-ui/test/sequence-ui.test.tsx
+ M packages/jentic-arazzo-ui/test/system-ui.test.tsx
+ M packages/jentic-arazzo-ui/test/workflow-flow-card.test.tsx
+?? openspec/changes/archive/2026-10-12-close-visual-review-findings/
+?? openspec/changes/archive/2026-10-12-correct-workflow-inspection-semantics/
+?? openspec/changes/archive/2026-10-12-gate-workflow-ux-regressions/
+?? openspec/changes/archive/2026-10-12-simplify-workflow-reading/
+?? openspec/changes/resolve-chained-workflow-ux-review-findings/
+?? packages/jentic-arazzo-ui/src/components/ReadingControls.tsx
+?? packages/jentic-arazzo-ui/src/context/ReadingIntentContext.ts
+?? packages/jentic-arazzo-ui/src/utils/sequence/readingProjection.ts
+?? packages/jentic-arazzo-ui/test/fixtures/inspection-semantics.ts
+?? packages/jentic-arazzo-ui/test/inspection-semantics-ui.test.tsx
+?? packages/jentic-arazzo-ui/test/inspection-semantics.test.ts

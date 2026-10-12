@@ -85,6 +85,7 @@ import React, {
   useMemo,
   useState,
   useEffect,
+  useContext,
 } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 import { loadDocument } from './utils/loading/loadDocument';
@@ -95,10 +96,12 @@ import { ArazzoViewerProvider, useArazzoViewer } from './context/ArazzoViewerCon
 import { DiagramView, DiagramViewRef } from './components/DiagramView';
 import { DocsView } from './components/DocsView';
 import { WorkflowNavigation } from './components/WorkflowNavigation';
+import { ReadingControls } from './components/ReadingControls';
 import { CallerNavigation } from './components/CallerNavigation';
 import { SelectionDetails } from './components/SelectionDetails';
 import { WorkflowLocationBridge } from './components/WorkflowLocationBridge';
 import { InspectionStatus } from './components/InspectionStatus';
+import { ReadingIntentContext } from './context/ReadingIntentContext';
 import type { ArazzoDocument, ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 
 export type {
@@ -180,9 +183,16 @@ function detectUrl(value: ArazzoDocument | string): string | null {
  * @public
  */
 export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI(props, ref) {
+  const [localView, setLocalView] = useState<ViewerMode>();
+  const standaloneImplicit = useContext(ReadingIntentContext);
+  const implicitSequence =
+    standaloneImplicit ??
+    (props.view === undefined &&
+      props.location === undefined &&
+      props.defaultLocation === undefined);
   const {
     document: rawDocument,
-    view = props.location?.view ?? props.defaultLocation?.view ?? 'docs',
+    view = localView ?? props.location?.view ?? props.defaultLocation?.view ?? 'docs',
     activeWorkflowId: controlledWorkflowId,
     selectedNodeId: controlledSelectedNodeId,
     className,
@@ -205,6 +215,7 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
   useEffect(() => {
     let cancelled = false;
 
+    setLocalView(undefined);
     setLoading(true);
     setWorkflowRequest(undefined);
     setError(null);
@@ -249,13 +260,18 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
         )
           setWorkflowRequest({ id: ++workflowRequestId.current, root: id || null });
       },
-      onViewChange,
+      onViewChange: (next: ViewerMode) => {
+        if (props.view === undefined && props.location === undefined) setLocalView(next);
+        onViewChange?.(next);
+      },
     }),
     [
       onNodeSelect,
       onEdgeSelect,
       onWorkflowSelect,
       onViewChange,
+      props.view,
+      props.location,
       controlledWorkflowId,
       props.onLocationChange,
     ],
@@ -333,6 +349,8 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
     return (
       <RawInspectionView
         ref={ref}
+        className={className}
+        style={style}
         snapshot={snapshot!}
         messages={inspection.diagnostics.map((d) => d.message)}
       />
@@ -360,6 +378,7 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
         events={events}
         sourceProvider={props.sourceProvider}
         onExternalNavigation={props.onExternalNavigation}
+        initialReadingView={implicitSequence ? 'sequence' : 'docs'}
       >
         <SystemsProvider props={props}>
           <ScenarioProvider props={props}>
@@ -426,37 +445,33 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
 
   return (
     <div className="arazzo-viewer-shell">
-      <WorkflowNavigation view={view} />
-      {systems?.enabled && (
-        <div className="arazzo-systems-setting">
-          <p>See the participants and their interactions using supplied system information.</p>
-          <label>
-            Perspective{' '}
-            <select
-              aria-label="Perspective"
-              value={systems.perspective}
-              onChange={(event) =>
-                systems.setPerspective(event.target.value as 'workflow' | 'systems')
-              }
-            >
-              <option value="workflow">Workflow view</option>
-              <option value="systems">Systems view</option>
-            </select>
-          </label>
-          {systems.perspective === 'workflow' && systems.selected && (
-            <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
-          )}
-        </div>
-      )}
-      {!systems?.enabled && (
-        <details className="arazzo-systems-availability">
-          <summary>Systems view</summary>
-          <p>This document has no supplied system participant information.</p>
+      <WorkflowNavigation />
+      <ReadingControls view={view} />
+      <details className="arazzo-reader-help">
+        <summary>Help and optional views</summary>
+        <p>
+          Sequence diagrams and step descriptions show authored workflow declarations; they do not
+          run operations.
+        </p>
+        {!systems?.enabled && (
           <p>
-            Systems view shows participants and their interactions using explicitly supplied
-            associations. Workflow reading remains available.
+            This document has no supplied system participant information. Systems view requires a
+            supplied profile or configured adapter.
           </p>
-        </details>
+        )}
+        {systems?.enabled && (
+          <p>
+            Systems view uses supplied viewer metadata to describe participants and implementation
+            associations.
+          </p>
+        )}
+        <p>
+          Guided walkthroughs use separately supplied author descriptions and require deliberate
+          loading in the standalone viewer.
+        </p>
+      </details>
+      {systems?.enabled && systems.perspective === 'workflow' && systems.selected && (
+        <button onClick={systems.returnToSystems}>Restore Systems perspective</button>
       )}
       {systems?.enabled && systems.scene.diagnostics.length > 0 && (
         <details className="arazzo-systems-diagnostics">
@@ -503,8 +518,8 @@ const ArazzoUIInner = forwardRef<ArazzoUIRef, ArazzoUIInnerProps>(function Arazz
 
 const RawInspectionView = forwardRef<
   ArazzoUIRef,
-  { snapshot: DocumentSnapshot; messages: string[] }
->(function RawInspectionView({ snapshot, messages }, ref) {
+  { snapshot: DocumentSnapshot; messages: string[] } & Pick<ArazzoUIProps, 'className' | 'style'>
+>(function RawInspectionView({ snapshot, messages, className, style }, ref) {
   useImperativeHandle(
     ref,
     () => ({
@@ -520,7 +535,10 @@ const RawInspectionView = forwardRef<
     [snapshot],
   );
   return (
-    <div className="arazzo-ui" style={{ overflow: 'auto', padding: 24 }}>
+    <div
+      className={`arazzo-ui ${className ?? ''}`}
+      style={{ width: '100%', height: '100%', overflow: 'auto', padding: 24, ...style }}
+    >
       <p>{messages.join(' ')}</p>
       <pre>{JSON.stringify(snapshot.document, null, 2)}</pre>
     </div>

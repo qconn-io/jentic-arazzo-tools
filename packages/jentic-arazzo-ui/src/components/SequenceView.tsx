@@ -1,11 +1,12 @@
 import { contractReadingStatus } from '../utils/contract/readingStatus';
 import { interactionReadingLabel, interactionReadingTitle } from '../utils/readingLabels';
-import React, { useEffect, useMemo, useRef, useId } from 'react';
+import React, { useEffect, useMemo, useRef, useId, useState } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 import { useContractFacts } from '../context/ContractFactsContext';
 import { resolveStepOperation } from '../utils/contract/stepOperation';
 import { buildSequence, destinationKey, type SequenceRow } from '../utils/sequence/sequenceModel';
+import { projectSequenceSteps } from '../utils/sequence/readingProjection';
 
 function wrap(label: string, width = 30): string[] {
   const words = label.replace(/[\r\n]+/g, ' ').split(/\s+/);
@@ -44,10 +45,63 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
     [model, workflowId, session.expansions, loaded],
   );
   const container = useRef<HTMLDivElement>(null);
+  const steps = useMemo(() => projectSequenceSteps(scene), [scene]);
+  const visibleRows = useMemo(() => scene.rows.filter((row) => row.kind !== 'transfer'), [scene]);
+  const stepRows = visibleRows.filter((row) => steps.has(row.id));
+  const prelude: SequenceRow[] = [];
+  const prerequisites = new Map<string, SequenceRow[]>();
+  const annotations = new Map<string, SequenceRow[]>();
+  for (const [index, row] of visibleRows.entries()) {
+    if (steps.has(row.id)) continue;
+    if (row.kind === 'prerequisite') {
+      if (!row.step && !row.parentId) prelude.push(row);
+      else {
+        const owner = row.step
+          ? stepRows.find((step) => step.step === row.step && step.parentId === row.parentId)
+          : stepRows.find((step) => step.id === row.parentId);
+        if (owner) {
+          const placement = row.step ? prerequisites : annotations;
+          placement.set(owner.id, [...(placement.get(owner.id) ?? []), row]);
+        } else prelude.push(row);
+      }
+      continue;
+    }
+    const owner =
+      stepRows.find((step) => step.id === row.parentId) ??
+      stepRows.find(
+        (step) =>
+          step.step === row.step &&
+          step.workflowId === row.workflowId &&
+          step.parentId === row.parentId,
+      ) ??
+      stepRows.find(
+        (step) => step.workflowId === row.workflowId && step.parentId === row.parentId,
+      ) ??
+      [...visibleRows.slice(0, index)].reverse().find((step) => steps.has(step.id)) ??
+      stepRows[0];
+    if (owner) annotations.set(owner.id, [...(annotations.get(owner.id) ?? []), row]);
+  }
+  const [openActions, setOpenActions] = useState<Record<string, boolean>>({});
+  const toggleActions = (id: string) =>
+    setOpenActions((current) => ({ ...current, [id]: !current[id] }));
+  const hasStepContext = (row: SequenceRow) =>
+    !!row.step &&
+    (!!steps.get(row.id)?.actions.length ||
+      !!row.step.prerequisites.length ||
+      row.step.sourceBinding.timeout !== undefined ||
+      row.step.sourceBinding.correlationId !== undefined);
+  const readingLabel = (row: SequenceRow) =>
+    `${steps.has(row.id) ? `${steps.get(row.id)?.number}. ` : ''}${interactionReadingLabel(row)}`;
   const controls = useRef(new Map<string, HTMLButtonElement>());
   const markerId = useId().replace(/:/g, '');
   const width = Math.max(660, scene.participants.length * 230);
-  const height = 130 + scene.rows.length * 100;
+  const offsets: number[] = [];
+  let usedHeight = 0;
+  for (const row of visibleRows) {
+    offsets.push(usedHeight);
+    usedHeight += 100 + (openActions[row.id] ? (steps.get(row.id)?.actions.length ?? 0) * 20 : 0);
+  }
+  const height = 30 + usedHeight;
   const xs = new Map(scene.participants.map((p, i) => [p.id, 115 + i * 230]));
   const contextName = (row: SequenceRow) =>
     ` · ${row.kind}${row.action ? ` ${row.action.channel} ${row.action.value.type} ${row.action.value.name} position ${row.action.effectiveIndex + 1}` : ''}${row.reason ? ` ${row.reason}` : ''} · root ${workflowId} · path ${row.path.map(([owner, step]) => `${owner}.${step}`).join(' → ') || 'root'} · row ${scene.rows.indexOf(row) + 1}`;
@@ -68,20 +122,86 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
       if (control) session.consumeFocus();
     }
   }, [session.focusRowId, scene]);
-  const select = (row: SequenceRow, control: HTMLElement) => {
+  useEffect(() => {
+    const selected = session.selectedRow ?? session.details?.row;
+    if (selected?.kind !== 'transfer') return;
+    const owner = Array.from(steps).find(([, presentation]) =>
+      presentation.actions.some((entry) => entry.transfer?.id === selected.id),
+    )?.[0];
+    if (owner)
+      setOpenActions((current) => (current[owner] ? current : { ...current, [owner]: true }));
+  }, [session.selectedRow, session.details, steps]);
+  const select = (row: SequenceRow, control: HTMLElement | SVGElement) => {
     session.inspectRow(row, control);
     const svgRow = Array.from(
       container.current?.querySelectorAll<SVGGElement>('[data-sequence-id]') ?? [],
     ).find((element) => element.getAttribute('data-sequence-id') === row.id);
     svgRow?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   };
+  const renderAnnotation = (annotation: SequenceRow) => (
+    <div
+      className="arazzo-sequence-annotation"
+      data-sequence-list-id={annotation.id}
+      key={annotation.id}
+    >
+      {annotation.kind === 'prerequisite' || annotation.kind === 'marker' ? (
+        <button
+          ref={(element) => {
+            if (element) controls.current.set(annotation.id, element);
+            else controls.current.delete(annotation.id);
+          }}
+          className="arazzo-reading-identity"
+          title={interactionReadingTitle(annotation)}
+          aria-label={`Inspect ${annotation.workflowId}${annotation.step ? `.${annotation.step.stepId}` : ''}${contextName(annotation)}`}
+          onClick={(event) => select(annotation, event.currentTarget)}
+        >
+          {interactionReadingLabel(annotation)}
+        </button>
+      ) : (
+        <span title={interactionReadingTitle(annotation)}>
+          {interactionReadingLabel(annotation)}
+        </span>
+      )}
+      {annotation.kind === 'marker' && annotation.reason === 'rows' && (
+        <button
+          aria-label={`View complete documentation for ${annotation.workflowId}${contextName(annotation)}`}
+          onClick={() => {
+            if (annotation.workflowId !== workflowId && annotation.target) {
+              session.clearTrail();
+              navigateToTarget(annotation.target);
+            }
+            session.setView(annotation.workflowId, 'docs');
+          }}
+        >
+          View complete documentation for {annotation.workflowId}
+        </button>
+      )}
+      {annotation.kind === 'marker' &&
+        annotation.reason !== 'collapsed' &&
+        annotation.reason !== 'rows' &&
+        annotation.step &&
+        annotation.target?.navigable && (
+          <button
+            aria-label={`Open workflow ${annotation.target.workflowId}${contextName(annotation)}`}
+            onClick={() => session.followCall(workflowId, annotation)}
+          >
+            Open workflow {annotation.target.workflowId}
+          </button>
+        )}
+    </div>
+  );
   return (
     <section aria-label={`Sequence ${workflowId}`} className="arazzo-sequence">
-      <p>Schematic authored interactions · structural continuations are not evaluated outcomes.</p>
-      <p>
-        Destinations use authored source bindings and explicitly loaded current contracts. Operation
-        lookup does not establish validity or execution.
-      </p>
+      <details className="arazzo-sequence-reading-help">
+        <summary>How to read this sequence</summary>
+        <p>
+          Schematic authored interactions · structural continuations are not evaluated outcomes.
+        </p>
+        <p>
+          Destinations use authored source bindings and explicitly loaded current contracts.
+          Operation lookup does not establish validity or execution.
+        </p>
+      </details>
       <p role="status" className="arazzo-sequence-context">
         Root: {workflowId}
         {session.selectedRow && (
@@ -142,11 +262,11 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
               />
             </g>
           ))}
-          {scene.rows
+          {visibleRows
             .filter((row) => row.kind === 'call' && row.expanded)
             .map((row) => {
-              const first = scene.rows.indexOf(row);
-              const last = scene.rows.reduce(
+              const first = visibleRows.indexOf(row);
+              const last = visibleRows.reduce(
                 (end, other, index) => (descendant(other, row.id) ? index : end),
                 first,
               );
@@ -154,9 +274,17 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                 <rect
                   key={row.id}
                   x={8 + row.depth * 12}
-                  y={105 + first * 100}
+                  y={5 + offsets[first]}
                   width={width - 16 - row.depth * 24}
-                  height={(last - first + 1) * 100 - 8}
+                  height={
+                    offsets[last] +
+                    100 +
+                    (openActions[visibleRows[last].id]
+                      ? (steps.get(visibleRows[last].id)?.actions.length ?? 0) * 20
+                      : 0) -
+                    offsets[first] -
+                    8
+                  }
                   rx={6}
                   fill="none"
                   stroke="#7c3aed"
@@ -164,22 +292,27 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                 />
               );
             })}
-          {scene.rows.map((row, index) => {
+          {visibleRows.map((row, index) => {
             const x1 = xs.get(row.from)!,
               x2 = xs.get(row.to)!;
-            const y = 155 + index * 100;
+            const y = 55 + offsets[index];
             const selected = session.selectedRow?.id === row.id;
             return (
               <g
                 key={row.id}
                 data-sequence-id={row.id}
-                onClick={() => {
-                  const control = controls.current.get(row.id);
-                  if (control) select(row, control);
+                role="button"
+                tabIndex={0}
+                aria-label={`Inspect ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}${contextName(row)}`}
+                onClick={(event) => select(row, event.currentTarget)}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter' && event.key !== ' ') return;
+                  event.preventDefault();
+                  select(row, event.currentTarget);
                 }}
               >
                 <title>
-                  {interactionReadingLabel(row)}
+                  {readingLabel(row)}
                   {contextName(row)}
                 </title>
                 {selected && (
@@ -193,7 +326,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                   />
                 )}
                 <text x={(x1 + x2) / 2} y={y - 26} textAnchor="middle" fontSize={13} fill="#0f172a">
-                  {wrap(interactionReadingLabel(row)).map((line, i) => (
+                  {wrap(readingLabel(row)).map((line, i) => (
                     <tspan x={(x1 + x2) / 2} dy={i ? 16 : 0} key={i}>
                       {line}
                     </tspan>
@@ -231,17 +364,73 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                     markerEnd={`url(#${markerId})`}
                   />
                 )}
+                {hasStepContext(row) && (
+                  <text
+                    x={(x1 + x2) / 2}
+                    y={y + 58}
+                    textAnchor="middle"
+                    fontSize={12}
+                    fill="#1d4ed8"
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${openActions[row.id] ? 'Hide' : 'Show'} Conditions and recovery for ${row.workflowId}.${row.step?.stepId}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      toggleActions(row.id);
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key !== 'Enter' && event.key !== ' ') return;
+                      event.preventDefault();
+                      event.stopPropagation();
+                      toggleActions(row.id);
+                    }}
+                  >
+                    Conditions and recovery
+                  </text>
+                )}
+                {openActions[row.id] &&
+                  steps.get(row.id)?.actions.map(({ action }, actionIndex) => {
+                    const label = `${action.channel === 'onSuccess' ? 'Success' : 'Failure'} · ${action.value.name ?? 'Authored action'} · ${action.value.type ?? action.status}${action.value.type === 'end' ? ' (end)' : ''}`;
+                    return (
+                      <text
+                        key={`${action.channel}:${action.effectiveIndex}`}
+                        x={(x1 + x2) / 2}
+                        y={y + 80 + actionIndex * 20}
+                        textAnchor="middle"
+                        fontSize={12}
+                        fill="#475569"
+                      >
+                        <title>{label}</title>
+                        {wrap(label, 54)[0]}
+                      </text>
+                    );
+                  })}
               </g>
             );
           })}
         </svg>
       </div>
+      {prelude.map(renderAnnotation)}
       <ol aria-label="Ordered interactions" className="arazzo-sequence-list">
-        {scene.rows.map((row) => (
-          <li key={row.id} style={{ paddingLeft: Math.min(row.depth, 8) * 12 }}>
-            <span tabIndex={0} title={interactionReadingTitle(row)}>
-              {interactionReadingLabel(row)}
-            </span>{' '}
+        {stepRows.map((row) => (
+          <li
+            key={row.id}
+            data-sequence-list-id={row.id}
+            style={{ paddingLeft: Math.min(row.depth, 8) * 12 }}
+          >
+            {prerequisites.get(row.id)?.map(renderAnnotation)}
+            <button
+              ref={(element) => {
+                if (element) controls.current.set(row.id, element);
+                else controls.current.delete(row.id);
+              }}
+              className="arazzo-reading-identity"
+              title={interactionReadingTitle(row)}
+              aria-label={`Inspect ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}${contextName(row)}`}
+              onClick={(event) => select(row, event.currentTarget)}
+            >
+              {readingLabel(row)}
+            </button>{' '}
             {row.kind === 'operation' &&
               row.step &&
               row.step.sourceBinding.status !== 'declared' &&
@@ -257,25 +446,68 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                 {contractReadingStatus[row.destinationEvidence.status]}
               </small>
             )}
-            {(row.step || row.kind === 'prerequisite' || row.kind === 'marker') && (
-              <button
-                ref={(element) => {
-                  if (row.kind !== 'call' && element) controls.current.set(row.id, element);
-                }}
-                className="arazzo-detail-action"
-                aria-label={`${['operation', 'call', 'transfer'].includes(row.kind) ? 'View details for' : 'View context details for'} ${row.workflowId}${row.step ? `.${row.step.stepId}` : ''}${contextName(row)}`}
-                onClick={(event) => select(row, event.currentTarget)}
-              >
-                View details
-              </button>
+            {hasStepContext(row) && (
+              <details className="arazzo-step-actions" open={!!openActions[row.id]}>
+                <summary
+                  aria-label={`Conditions and recovery for ${row.workflowId}.${row.step?.stepId}${contextName(row)}`}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    toggleActions(row.id);
+                  }}
+                >
+                  Conditions and recovery ({steps.get(row.id)?.actions.length ?? 0})
+                </summary>
+                <p>Possible authored actions; criteria are not evaluated.</p>
+                {!!row.step?.prerequisites.length && (
+                  <p>
+                    Prerequisites:{' '}
+                    {row.step.prerequisites
+                      .map((entry) => `${entry.target.reference} (${entry.target.kind})`)
+                      .join(', ')}
+                  </p>
+                )}
+                {row.step?.sourceBinding.timeout !== undefined && (
+                  <p>Timeout: {JSON.stringify(row.step.sourceBinding.timeout)}</p>
+                )}
+                {row.step?.sourceBinding.correlationId !== undefined && (
+                  <p>Correlation: {JSON.stringify(row.step.sourceBinding.correlationId)}</p>
+                )}
+                <ul>
+                  {steps.get(row.id)?.actions.map(({ action, transfer }) => (
+                    <li
+                      key={`${action.channel}:${action.origin}:${action.authoredIndex}:${action.effectiveIndex}`}
+                    >
+                      <strong>{action.channel === 'onSuccess' ? 'Success' : 'Failure'}</strong> ·{' '}
+                      {action.value.name ?? action.authored.reference ?? 'Authored action'} ·{' '}
+                      {action.value.type ?? action.status}
+                      {action.value.type === 'end' && ' · End'}
+                      {action.target && ` · ${action.target.reference} (${action.target.kind})`}
+                      {transfer?.returnTo === 'source-step' &&
+                        ` · returns to retry ${row.step?.stepId}`}
+                      {action.value.criteria !== undefined &&
+                        ` · criteria ${JSON.stringify(action.value.criteria)}`}
+                      {action.value.retryLimit !== undefined &&
+                        ` · retry limit ${JSON.stringify(action.value.retryLimit)}`}
+                      {action.value.retryAfter !== undefined &&
+                        ` · retry delay ${JSON.stringify(action.value.retryAfter)}`}
+                      <button
+                        aria-label={`Inspect ${action.channel} ${action.value.name ?? action.authored.reference ?? 'action'} position ${action.effectiveIndex + 1}${contextName(row)}`}
+                        onClick={(event) =>
+                          transfer
+                            ? select(transfer, event.currentTarget)
+                            : select(row, event.currentTarget)
+                        }
+                      >
+                        Inspect authored action
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </details>
             )}
             {row.kind === 'call' && row.target?.navigable && (
               <>
                 <button
-                  ref={(element) => {
-                    if (element) controls.current.set(row.id, element);
-                    else controls.current.delete(row.id);
-                  }}
                   aria-label={`${row.expanded ? 'Collapse' : 'Expand'} ${row.workflowId}.${row.step?.stepId} → ${row.target.workflowId}${contextName(row)}`}
                   onClick={(event) => {
                     if (
@@ -300,32 +532,7 @@ export function SequenceView({ workflowId }: { workflowId: string }) {
                 </button>
               </>
             )}
-            {row.kind === 'marker' && row.reason === 'rows' && (
-              <button
-                aria-label={`View complete documentation for ${row.workflowId}${contextName(row)}`}
-                onClick={() => {
-                  if (row.workflowId !== workflowId && row.target) {
-                    session.clearTrail();
-                    navigateToTarget(row.target);
-                  }
-                  session.setView(row.workflowId, 'docs');
-                }}
-              >
-                View complete documentation for {row.workflowId}
-              </button>
-            )}
-            {row.kind === 'marker' &&
-              row.reason !== 'collapsed' &&
-              row.reason !== 'rows' &&
-              row.step &&
-              row.target?.navigable && (
-                <button
-                  aria-label={`Open workflow ${row.target.workflowId}${contextName(row)}`}
-                  onClick={() => session.followCall(workflowId, row)}
-                >
-                  Open workflow {row.target.workflowId}
-                </button>
-              )}
+            {annotations.get(row.id)?.map(renderAnnotation)}
           </li>
         ))}
       </ol>

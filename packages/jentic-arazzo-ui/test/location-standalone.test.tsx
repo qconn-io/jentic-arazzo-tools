@@ -174,6 +174,21 @@ test('standalone defaultLocation controls its initial view', async () => {
   );
   expect(screen.queryByText(/conflicts with explicitly controlled/)).toBeNull();
 });
+test('bare standalone starts in sequence and explicit initialView keeps descriptions', async () => {
+  const change = vi.fn();
+  const { unmount } = render(<ArazzoUIStandalone document={nestedCalls} onViewChange={change} />);
+  expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
+  expect(change).not.toHaveBeenCalled();
+  unmount();
+  render(<ArazzoUIStandalone document={nestedCalls} initialView="docs" />);
+  await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' });
+  expect(screen.queryByRole('region', { name: 'Sequence checkout' })).toBeNull();
+});
+test('a document-only URL does not request a reading representation', async () => {
+  history.replaceState(null, '', '/?document=https%3A%2F%2Fexample.test%2Fdoc.yaml');
+  render(<ArazzoUIStandalone document={nestedCalls} />);
+  expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
+});
 test('unaddressable content retains local Back/Forward locations without claiming shareability', async () => {
   const push = vi.spyOn(history, 'pushState');
   render(<ArazzoUIStandalone document={nestedCalls} />);

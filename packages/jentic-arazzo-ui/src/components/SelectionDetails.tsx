@@ -1,6 +1,6 @@
 import { ScenarioFocusDetails } from './ScenarioPanel';
 import { SystemsDetails } from './SystemsDetails';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, type RefObject } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 import { CopyLocationControl } from '../context/CopyLinkContext';
@@ -8,18 +8,31 @@ import { ReadingDetails } from './ReadingDetails';
 import { ContractPanel } from './ContractPanel';
 import { projectOccurrenceDetails } from '../utils/sequence/occurrenceDetails';
 
-function useCoveringInspector() {
-  const [covering, setCovering] = useState(
-    () => typeof window !== 'undefined' && !!window.matchMedia?.('(max-width: 600px)').matches,
-  );
+function useCoveringInspector(panel: RefObject<HTMLElement>, open: boolean) {
+  const [covering, setCovering] = useState(false);
   useEffect(() => {
-    const media = window.matchMedia?.('(max-width: 600px)');
-    if (!media) return;
-    const update = () => setCovering(media.matches);
+    const element = panel.current;
+    const viewer = element?.closest('.arazzo-viewer-shell') ?? element?.parentElement;
+    if (!open || !element || !viewer) return;
+    const update = () => {
+      const bounds = viewer.getBoundingClientRect();
+      const inspector = element.getBoundingClientRect();
+      const overlap = Math.max(
+        0,
+        Math.min(bounds.right, inspector.right) - Math.max(bounds.left, inspector.left),
+      );
+      setCovering(bounds.width > 0 && bounds.width - overlap < 320);
+    };
     update();
-    media.addEventListener('change', update);
-    return () => media.removeEventListener('change', update);
-  }, []);
+    const observer = typeof ResizeObserver === 'undefined' ? undefined : new ResizeObserver(update);
+    observer?.observe(viewer);
+    observer?.observe(element);
+    window.addEventListener('resize', update);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, [panel, open]);
   return covering;
 }
 function focusableControls(panel: HTMLElement): HTMLElement[] {
@@ -50,7 +63,7 @@ export function SelectionDetails() {
   const selection = session.details;
   const closeControl = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLElement>(null);
-  const covering = useCoveringInspector();
+  const covering = useCoveringInspector(panel, !!selection);
   const latest = useRef(session);
   latest.current = session;
   const open = !!selection;
@@ -65,10 +78,10 @@ export function SelectionDetails() {
     const fallback =
       shell?.querySelector<HTMLElement>('.arazzo-scenario-controls button:not(:disabled)') ??
       shell?.querySelector<HTMLElement>('.arazzo-workflow-navigation select');
-    const background: { element: HTMLElement; inert: boolean; hidden: string | null }[] = [];
+    const background: { element: HTMLElement; inert: string | null; hidden: string | null }[] = [];
     if (covering) {
       let child: HTMLElement = element;
-      while (child !== document.body && child.parentElement) {
+      while (child !== scope && child !== document.body && child.parentElement) {
         for (const sibling of Array.from(child.parentElement.children)) {
           if (
             sibling === child ||
@@ -78,7 +91,7 @@ export function SelectionDetails() {
             continue;
           background.push({
             element: sibling,
-            inert: sibling.hasAttribute('inert'),
+            inert: sibling.getAttribute('inert'),
             hidden: sibling.getAttribute('aria-hidden'),
           });
           sibling.setAttribute('inert', '');
@@ -116,7 +129,8 @@ export function SelectionDetails() {
       document.removeEventListener('keydown', keydown);
       document.removeEventListener('focusin', focusin);
       for (const entry of background) {
-        if (!entry.inert) entry.element.removeAttribute('inert');
+        if (entry.inert === null) entry.element.removeAttribute('inert');
+        else entry.element.setAttribute('inert', entry.inert);
         if (entry.hidden === null) entry.element.removeAttribute('aria-hidden');
         else entry.element.setAttribute('aria-hidden', entry.hidden);
       }
@@ -134,13 +148,16 @@ export function SelectionDetails() {
       aria-modal={covering ? true : undefined}
       aria-label="Selection details"
       className="arazzo-selection-details"
+      data-covering={covering}
     >
       <button ref={closeControl} onClick={session.closeDetails}>
         Close details
       </button>
       <CopyLocationControl />
       <h2>{details.title}</h2>
-      <SystemsDetails />
+      <section aria-label="Supplied system information">
+        <SystemsDetails />
+      </section>
       {session.locationStatus &&
         (session.locationStatus.state !== 'restored' ||
           !!session.locationStatus.notices?.length) && (
@@ -179,10 +196,17 @@ export function SelectionDetails() {
           )}
         </dl>
       </section>
-      <ScenarioFocusDetails />
-      <ReadingDetails sections={details.reading.sections} />
+      <section aria-label="Authored guide">
+        <ScenarioFocusDetails />
+      </section>
+      <section aria-label="Workflow declaration">
+        <h3>Workflow declaration</h3>
+        <ReadingDetails sections={details.reading.sections} />
+      </section>
       {selection?.stepId && (
-        <ContractPanel workflowId={selection.workflowId} stepId={selection.stepId} />
+        <section aria-label="API description">
+          <ContractPanel workflowId={selection.workflowId} stepId={selection.stepId} />
+        </section>
       )}
       <details data-advanced>
         <summary>Advanced authored content and provenance</summary>

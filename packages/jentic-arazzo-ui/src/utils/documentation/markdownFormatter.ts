@@ -7,8 +7,8 @@ import type {
   StepDocumentation,
   WorkflowDocumentation,
 } from '../../types/viewer';
-import type { EffectiveAction } from '../model/viewerModel';
-import type { InspectionDiagnostic, ParameterFact, PlainObject } from '../inspection';
+import type { ApplicableParameter, EffectiveAction } from '../model/viewerModel';
+import type { InspectionDiagnostic, PlainObject } from '../inspection';
 
 export interface FormatOptions {
   includeMetadata?: boolean;
@@ -20,7 +20,7 @@ type InspectionDetails = { authored?: PlainObject; diagnostics?: InspectionDiagn
 type InspectedStep = StepDocumentation &
   InspectionDetails & {
     actionDetails?: Record<'onSuccess' | 'onFailure', EffectiveAction[]>;
-    parameterDetails?: ParameterFact[];
+    parameterDetails?: ApplicableParameter[];
   };
 
 function sourceURL(url: string, documentURL?: string | null): string {
@@ -100,9 +100,9 @@ function prerequisites(entries?: DocumentationPrerequisite[]): string {
   });
   return `<div class="doc-section"><h3>Prerequisites</h3><ul>${rows.join('\n')}</ul></div>`;
 }
-function parameters(values?: PlainObject[]): string {
+function parameters(values?: PlainObject[], facts?: ApplicableParameter[]): string {
   if (!values?.length) return '';
-  return `<details class="step-detail"><summary>Parameters (${values.length})</summary><table><thead><tr><th>Name / reference</th><th>Location</th><th>Authored value</th></tr></thead><tbody>${values.map((parameter) => `<tr><td>${escapeHTML(parameter.name ?? parameter.reference ?? parameter.$ref)}</td><td>${escapeHTML(parameter.in)}</td><td><pre>${escapeHTML(JSON.stringify(parameter.value, null, 2) ?? '')}</pre></td></tr>`).join('')}</tbody></table></details>`;
+  return `<details class="step-detail"><summary>Parameters (${values.length})</summary><table><thead><tr><th>Name / reference</th><th>Location</th><th>Authored value</th><th>Origin</th></tr></thead><tbody>${values.map((parameter, index) => `<tr><td>${escapeHTML(parameter.name ?? parameter.reference ?? parameter.$ref)}</td><td>${escapeHTML(parameter.in)}</td><td><pre>${escapeHTML(JSON.stringify(parameter.value, null, 2) ?? '')}</pre></td><td>${facts?.[index] ? `${escapeHTML(facts[index].origin)}${facts[index].isOverride ? ' · overrides workflow parameter' : ''}` : ''}</td></tr>`).join('')}</tbody></table></details>`;
 }
 function actions(step: InspectedStep, workflow: WorkflowDocumentation): string {
   const channels = ['onSuccess', 'onFailure'] as const;
@@ -192,7 +192,7 @@ export function formatWorkflowAsMarkdown(
   workflow.steps.forEach((plain, index) => {
     const step = plain as InspectedStep;
     sections.push(
-      `<div class="timeline-item" data-workflow-id="${escapeHTML(workflow.workflowId)}" data-step-id="${escapeHTML(step.stepId)}"><div class="timeline-marker">${index + 1}</div><div class="timeline-content"><div class="step-card"><h3>${escapeHTML(step.stepId)}</h3>`,
+      `<div class="timeline-item${index === workflow.steps.length - 1 ? ' timeline-item-last' : ''}" data-workflow-id="${escapeHTML(workflow.workflowId)}" data-step-id="${escapeHTML(step.stepId)}"><div class="timeline-marker"><div class="timeline-dot">${index + 1}</div>${index < workflow.steps.length - 1 ? '<div class="timeline-line"></div>' : ''}</div><div class="timeline-content"><div class="step-card"><h3 data-step-id="${escapeHTML(step.stepId)}">${escapeHTML(step.stepId)}</h3>`,
     );
     if (step.description) sections.push(`<p>${escapeHTML(step.description)}</p>`);
     for (const [key, locator] of Object.entries({
@@ -209,7 +209,7 @@ export function formatWorkflowAsMarkdown(
       );
     sections.push(
       prerequisites(step.prerequisites),
-      options.compact ? '' : parameters(step.parameters),
+      options.compact ? '' : parameters(step.parameters, step.parameterDetails),
       options.compact ? '' : actions(step, workflow),
       warnings(step.diagnostics),
     );

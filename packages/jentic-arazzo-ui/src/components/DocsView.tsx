@@ -1,6 +1,14 @@
 import { MermaidDiagram } from './MermaidDiagram';
-import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
-import ReactMarkdown from 'react-markdown';
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
@@ -20,6 +28,28 @@ type WorkflowViewMode = 'docs' | 'sequence' | 'flowchart';
 
 const markdownPlugins = [remarkGfm];
 const rehypePlugins = [rehypeHighlight, rehypeRaw];
+const StepHeadingContext = createContext<{
+  workflowId: string;
+  stepIds: ReadonlySet<string>;
+  inspect: (workflowId: string, stepId: string, origin?: HTMLElement) => void;
+} | null>(null);
+const StepDescriptionHeading: NonNullable<Components['h3']> = ({ node, children }) => {
+  const context = useContext(StepHeadingContext);
+  const stepId = String(node?.properties?.dataStepId ?? '');
+  if (!context?.stepIds.has(stepId)) return <h3>{children}</h3>;
+  return (
+    <h3>
+      <button
+        className="arazzo-reading-identity"
+        aria-label={`Inspect ${context.workflowId}.${stepId}`}
+        onClick={(event) => context.inspect(context.workflowId, stepId, event.currentTarget)}
+      >
+        {children}
+      </button>
+    </h3>
+  );
+};
+const descriptionComponents: Components = { h3: StepDescriptionHeading };
 
 export const DocsView: React.FC<DocsViewProps> = () => {
   const {
@@ -40,8 +70,8 @@ export const DocsView: React.FC<DocsViewProps> = () => {
   const workflowViews = session.views;
 
   const getWorkflowView = useCallback(
-    (workflowId: string): WorkflowViewMode => workflowViews[workflowId] || 'docs',
-    [workflowViews],
+    (workflowId: string): WorkflowViewMode => workflowViews[workflowId] || session.defaultView,
+    [workflowViews, session.defaultView],
   );
 
   const setWorkflowView = useCallback(
@@ -156,7 +186,11 @@ export const DocsView: React.FC<DocsViewProps> = () => {
   }, [document, model]);
 
   // Handle expand/collapse all button
-  const [allExpanded, setAllExpanded] = useState(false);
+  const [allExpanded, setAllExpanded] = useState(true);
+
+  useEffect(() => {
+    setAllExpanded(true);
+  }, [activeWorkflowId]);
 
   const handleExpandAll = useCallback(() => {
     const container = docsContainerRef.current;
@@ -176,13 +210,6 @@ export const DocsView: React.FC<DocsViewProps> = () => {
       </div>
     );
   }
-
-  const viewModes: WorkflowViewMode[] = ['docs', 'sequence', 'flowchart'];
-  const viewLabels: Record<WorkflowViewMode, string> = {
-    docs: 'Step descriptions',
-    sequence: 'Sequence diagram',
-    flowchart: 'Flowchart',
-  };
 
   return (
     <div
@@ -439,6 +466,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
 
           .timeline-content {
             flex: 1;
+            min-width: 0;
             padding-bottom: 20px;
           }
 
@@ -850,19 +878,30 @@ export const DocsView: React.FC<DocsViewProps> = () => {
             }
           }}
         >
-          {/* Header: title, version, sources */}
-          <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
-            {documentation.headerMarkdown}
-          </ReactMarkdown>
+          <div className="arazzo-document-identity">
+            <strong>{documentation.metadata.title}</strong>
+            {documentation.metadata.summary && <span>{documentation.metadata.summary}</span>}
+          </div>
+          <details className="arazzo-document-information">
+            <summary>Document information</summary>
+            <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
+              {documentation.headerMarkdown}
+            </ReactMarkdown>
+          </details>
 
           {/* Workflows */}
           <div className="workflows-header-row">
             <span className="sources-header" style={{ margin: 0 }}>
               Workflows
             </span>
-            <button className="expand-all-btn" onClick={handleExpandAll}>
-              {allExpanded ? 'Collapse All' : 'Expand All'}
-            </button>
+            {activeWorkflowId !== null &&
+              documentation.workflows.some(
+                (workflow) => workflow.workflowId === activeWorkflowId,
+              ) && (
+                <button className="expand-all-btn" onClick={handleExpandAll}>
+                  {allExpanded ? 'Collapse All' : 'Expand All'}
+                </button>
+              )}
           </div>
 
           {activeWorkflowId === null && <WorkflowOverview />}
@@ -893,43 +932,22 @@ export const DocsView: React.FC<DocsViewProps> = () => {
                     )}
                   </summary>
                   <div className="workflow-details-content">
-                    <div className="workflow-view-toggle" role="group" aria-label="Reading view">
-                      <span className="arazzo-control-scope">Reading view</span>
-                      {viewModes.map((mode) => (
-                        <button
-                          key={mode}
-                          aria-pressed={currentView === mode}
-                          data-reading-view={mode}
-                          className={`workflow-view-btn ${currentView === mode ? 'workflow-view-btn-active' : ''}`}
-                          onClick={() => setWorkflowView(workflow.workflowId, mode)}
-                        >
-                          {viewLabels[mode]}
-                        </button>
-                      ))}
-                    </div>
-
                     <div style={{ display: currentView === 'docs' ? 'block' : 'none' }}>
-                      <div aria-label="Step detail controls">
-                        {workflow.steps.map((step) => (
-                          <button
-                            key={step.stepId}
-                            className="arazzo-detail-action"
-                            aria-label={`View details for ${workflow.workflowId}.${step.stepId}`}
-                            onClick={(event) =>
-                              session.inspectStep(
-                                workflow.workflowId,
-                                step.stepId,
-                                event.currentTarget,
-                              )
-                            }
-                          >
-                            View details · {step.stepId}
-                          </button>
-                        ))}
-                      </div>
-                      <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
-                        {workflowMd}
-                      </ReactMarkdown>
+                      <StepHeadingContext.Provider
+                        value={{
+                          workflowId: workflow.workflowId,
+                          stepIds: new Set(workflow.steps.map((step) => step.stepId)),
+                          inspect: session.inspectStep,
+                        }}
+                      >
+                        <ReactMarkdown
+                          remarkPlugins={markdownPlugins}
+                          rehypePlugins={rehypePlugins}
+                          components={descriptionComponents}
+                        >
+                          {workflowMd}
+                        </ReactMarkdown>
+                      </StepHeadingContext.Provider>
                     </div>
                     {currentView === 'sequence' && (
                       <SequenceView workflowId={workflow.workflowId} />
@@ -946,9 +964,13 @@ export const DocsView: React.FC<DocsViewProps> = () => {
                                 '[data-workflow-id]',
                               ) ?? [],
                             ).find((element) => element.dataset.workflowId === workflow.workflowId);
-                            workflowElement
-                              ?.querySelector<HTMLButtonElement>('[data-reading-view="docs"]')
-                              ?.focus();
+                            if (workflowElement) {
+                              globalThis.document
+                                .querySelector<HTMLButtonElement>(
+                                  '[aria-label="Reading view"] button[aria-pressed="true"]',
+                                )
+                                ?.focus();
+                            }
                           }}
                         />
                       </div>

@@ -1,6 +1,6 @@
 import { actionAddress, rowOccurrence } from '../utils/location/resolve';
 import ReactMarkdown from 'react-markdown';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useScenario } from '../context/ScenarioContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
@@ -12,6 +12,10 @@ export function ScenarioPanel({ props }: { props: ArazzoUIProps }) {
   const viewer = useArazzoViewer();
   const session = useViewerSession();
   const [search, setSearch] = useState('');
+  const [expanded, setExpanded] = useState(Boolean(guide?.selection));
+  useEffect(() => {
+    if (guide?.selection) setExpanded(true);
+  }, [guide?.selection]);
   const source = guide?.source;
   const selection = guide?.selection;
   const manifest = guide?.manifest.manifest;
@@ -34,13 +38,7 @@ export function ScenarioPanel({ props }: { props: ArazzoUIProps }) {
         : undefined,
     [point, viewer.model, viewer.snapshot, source?.document, source?.revision, source?.digest],
   );
-  if (!guide)
-    return (
-      <section role="region" aria-label="Guided walkthroughs" className="arazzo-scenario-panel">
-        <h2>Guided walkthroughs</h2>
-        <p>Follow an author-provided guide through this workflow.</p>
-      </section>
-    );
+  if (!guide) return null;
   const open = (s: AuthoredScenario, w?: ScenarioWaypoint, origin?: HTMLElement) => {
     const waypoint = w ?? {
       id: '',
@@ -76,135 +74,145 @@ export function ScenarioPanel({ props }: { props: ArazzoUIProps }) {
           : undefined);
   return (
     <section role="region" aria-label="Guided walkthroughs" className="arazzo-scenario-panel">
-      <h2>Guided walkthroughs</h2>
-      <p>Follow an author-provided guide through this workflow.</p>
-      <p>
-        <strong>Authored expectations · inspection only</strong>
-      </p>
-      <p>These guides do not execute operations, evaluate criteria, or report test results.</p>
-      <label>
-        Search guides{' '}
-        <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} />
-      </label>
-      {manifest?.scenarios.length === 0 && (
-        <p role="status">This guide file contains no walkthroughs.</p>
-      )}
-      {guide.manifest.diagnostics.map((message, i) => (
-        <p role="status" key={i}>
-          {message}
-        </p>
-      ))}
-      <div className="arazzo-scenario-list">
-        {manifest?.scenarios
-          .filter((s) =>
-            [s.id, s.title, s.expected, s.assumptions, ...(s.tags ?? [])]
-              .join(' ')
-              .toLowerCase()
-              .includes(search.toLowerCase()),
-          )
-          .map((s) => (
-            <button
-              key={s.id}
-              aria-pressed={s.id === scenario?.id}
-              onClick={(e) => open(s, s.waypoints?.[0], e.currentTarget)}
-            >
-              {s.title ?? s.id}
-            </button>
-          ))}
-      </div>
-      {invalid && (
-        <p role="status">{invalid} Choose another walkthrough or return to the workflow.</p>
-      )}
-      {scenario && scenario.document !== source?.document && (
-        <p role="status">
-          This walkthrough refers to another document: {scenario.document}. The current workflow
-          remains readable; choose a compatible guide or request its document.
-        </p>
-      )}
-      {(invalid ||
-        (scenario && scenario.document !== source?.document) ||
-        (resolved && !['restored', 'bounded'].includes(resolved.status.state))) && (
-        <button
-          onClick={() => {
-            guide.select(null);
-            session.closeDetails();
+      <details open={expanded} onToggle={(event) => setExpanded(event.currentTarget.open)}>
+        <summary
+          onClick={(event) => {
+            event.preventDefault();
+            setExpanded((current) => !current);
           }}
         >
-          Return to workflow
-        </button>
-      )}
-      {scenario && (
-        <div className="arazzo-scenario-current">
-          <h3>{scenario.title ?? scenario.id}</h3>
-          {scenario.assumptions !== undefined && (
-            <>
-              <h4>Authored assumptions</h4>
-              <ReactMarkdown>{scenario.assumptions}</ReactMarkdown>
-            </>
-          )}
-          <h4>Expected outcome (authored)</h4>
-          <ReactMarkdown>{scenario.expected}</ReactMarkdown>
-          <h4>Evidence description (authored)</h4>
-          <ReactMarkdown>{scenario.evidence}</ReactMarkdown>
-          {!scenario.waypoints?.length && (
-            <p>No authored waypoints. Only the declared workflow is addressed.</p>
-          )}
-          {point && (
-            <>
-              <h4>
-                Waypoint {index + 1} of {scenario.waypoints?.length}: {point.id}
-              </h4>
-              <ReactMarkdown>{point.narrative}</ReactMarkdown>
-              <p>
-                Address: {point.location.document} · {point.location.root}
-                {point.location.selection
-                  ? ` · ${point.location.selection.workflowId}.${point.location.selection.stepId}`
-                  : ''}
-              </p>
-              {point.focus && (
-                <p>
-                  Authored {point.focus.kind} focus: <code>{point.focus.pointer}</code>
-                </p>
-              )}
-              {resolved && resolved.status.state !== 'restored' && (
-                <p role="status">{resolved.status.message}</p>
-              )}
-            </>
-          )}
-          <div className="arazzo-scenario-controls">
-            <button
-              disabled={index <= 0}
-              onClick={(e) => open(scenario, scenario.waypoints![index - 1], e.currentTarget)}
-            >
-              Previous waypoint
-            </button>
-            <button
-              disabled={index < 0 || index >= (scenario.waypoints?.length ?? 0) - 1}
-              onClick={(e) => open(scenario, scenario.waypoints![index + 1], e.currentTarget)}
-            >
-              Next waypoint
-            </button>
-            <button
-              disabled={
-                !point || !resolved || !['restored', 'bounded'].includes(resolved.status.state)
-              }
-              onClick={(e) => open(scenario, point, e.currentTarget)}
-            >
-              Inspect waypoint details
-            </button>
-            <button onClick={() => session.closeDetails()}>Return to guide</button>
-            <button
-              onClick={() => {
-                guide.select(null);
-                session.closeDetails();
-              }}
-            >
-              Leave guide
-            </button>
-          </div>
+          Guided walkthroughs{manifest ? ` (${manifest.scenarios.length})` : ''}
+        </summary>
+        <h2>Guided walkthroughs</h2>
+        <p>Follow an author-provided guide through this workflow.</p>
+        <p>
+          <strong>Authored expectations · inspection only</strong>
+        </p>
+        <p>These guides do not execute operations, evaluate criteria, or report test results.</p>
+        <label>
+          Search guides{' '}
+          <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} />
+        </label>
+        {manifest?.scenarios.length === 0 && (
+          <p role="status">This guide file contains no walkthroughs.</p>
+        )}
+        {guide.manifest.diagnostics.map((message, i) => (
+          <p role="status" key={i}>
+            {message}
+          </p>
+        ))}
+        <div className="arazzo-scenario-list">
+          {manifest?.scenarios
+            .filter((s) =>
+              [s.id, s.title, s.expected, s.assumptions, ...(s.tags ?? [])]
+                .join(' ')
+                .toLowerCase()
+                .includes(search.toLowerCase()),
+            )
+            .map((s) => (
+              <button
+                key={s.id}
+                aria-pressed={s.id === scenario?.id}
+                onClick={(e) => open(s, s.waypoints?.[0], e.currentTarget)}
+              >
+                {s.title ?? s.id}
+              </button>
+            ))}
         </div>
-      )}
-      {selection && !scenario && <button onClick={() => guide.select(null)}>Leave guide</button>}
+        {invalid && (
+          <p role="status">{invalid} Choose another walkthrough or return to the workflow.</p>
+        )}
+        {scenario && scenario.document !== source?.document && (
+          <p role="status">
+            This walkthrough refers to another document: {scenario.document}. The current workflow
+            remains readable; choose a compatible guide or request its document.
+          </p>
+        )}
+        {(invalid ||
+          (scenario && scenario.document !== source?.document) ||
+          (resolved && !['restored', 'bounded'].includes(resolved.status.state))) && (
+          <button
+            onClick={() => {
+              guide.select(null);
+              session.closeDetails();
+            }}
+          >
+            Return to workflow
+          </button>
+        )}
+        {scenario && (
+          <div className="arazzo-scenario-current">
+            <h3>{scenario.title ?? scenario.id}</h3>
+            {scenario.assumptions !== undefined && (
+              <>
+                <h4>Authored assumptions</h4>
+                <ReactMarkdown>{scenario.assumptions}</ReactMarkdown>
+              </>
+            )}
+            <h4>Expected outcome (authored)</h4>
+            <ReactMarkdown>{scenario.expected}</ReactMarkdown>
+            <h4>Evidence description (authored)</h4>
+            <ReactMarkdown>{scenario.evidence}</ReactMarkdown>
+            {!scenario.waypoints?.length && (
+              <p>No authored waypoints. Only the declared workflow is addressed.</p>
+            )}
+            {point && (
+              <>
+                <h4>
+                  Waypoint {index + 1} of {scenario.waypoints?.length}: {point.id}
+                </h4>
+                <ReactMarkdown>{point.narrative}</ReactMarkdown>
+                <p>
+                  Address: {point.location.document} · {point.location.root}
+                  {point.location.selection
+                    ? ` · ${point.location.selection.workflowId}.${point.location.selection.stepId}`
+                    : ''}
+                </p>
+                {point.focus && (
+                  <p>
+                    Authored {point.focus.kind} focus: <code>{point.focus.pointer}</code>
+                  </p>
+                )}
+                {resolved && resolved.status.state !== 'restored' && (
+                  <p role="status">{resolved.status.message}</p>
+                )}
+              </>
+            )}
+            <div className="arazzo-scenario-controls">
+              <button
+                disabled={index <= 0}
+                onClick={(e) => open(scenario, scenario.waypoints![index - 1], e.currentTarget)}
+              >
+                Previous waypoint
+              </button>
+              <button
+                disabled={index < 0 || index >= (scenario.waypoints?.length ?? 0) - 1}
+                onClick={(e) => open(scenario, scenario.waypoints![index + 1], e.currentTarget)}
+              >
+                Next waypoint
+              </button>
+              <button
+                disabled={
+                  !point || !resolved || !['restored', 'bounded'].includes(resolved.status.state)
+                }
+                onClick={(e) => open(scenario, point, e.currentTarget)}
+              >
+                Inspect waypoint details
+              </button>
+              <button onClick={() => session.closeDetails()}>Return to guide</button>
+              <button
+                onClick={() => {
+                  guide.select(null);
+                  session.closeDetails();
+                }}
+              >
+                Leave guide
+              </button>
+            </div>
+          </div>
+        )}
+        {selection && !scenario && <button onClick={() => guide.select(null)}>Leave guide</button>}
+      </details>
     </section>
   );
 }

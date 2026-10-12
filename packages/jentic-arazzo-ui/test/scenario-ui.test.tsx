@@ -258,19 +258,26 @@ test('guide focus is absent when inspecting a different occurrence of the same a
   const sequence = screen.getByRole('region', { name: 'Sequence checkout' });
   fireEvent.click(within(sequence).getByRole('button', { name: /Expand checkout.firstPayment/ }));
   fireEvent.click(
-    within(sequence).getByRole('button', {
-      name: /View details for payment.charge .*checkout.firstPayment/,
-    }),
+    within(sequence).getAllByRole('button', {
+      name: /Inspect payment.charge .*checkout.firstPayment/,
+    })[0],
   );
   const details = await screen.findByRole('region', { name: 'Selection details' });
   expect(details.textContent).toContain('checkout.firstPayment');
   expect(details.querySelector('[aria-label="Authored guide focus"]')).toBeNull();
 });
 test('narrow guide dismissal returns to an enabled guide control when terminal Next becomes disabled', async () => {
-  vi.stubGlobal(
-    'matchMedia',
-    vi.fn(() => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() })),
-  );
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
+    width: 400,
+    height: 700,
+    left: 0,
+    right: 400,
+    top: 0,
+    bottom: 700,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  });
   const first = manifest.scenarios[0].waypoints![0];
   const local = {
     ...manifest,

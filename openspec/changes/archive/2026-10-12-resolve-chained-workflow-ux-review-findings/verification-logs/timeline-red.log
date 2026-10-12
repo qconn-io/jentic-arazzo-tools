@@ -1,0 +1,50 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-inspector.test.tsx -t connected numbered
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+ ❯ test/reading-inspector.test.tsx (6 tests | 1 failed | 5 skipped) 608ms
+   × step descriptions retain connected numbered markers and exact heading selection 606ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/reading-inspector.test.tsx > step descriptions retain connected numbered markers and exact heading selection
+AssertionError: expected [] to deeply equal [ '1', '2', '3', '4', '5' ]
+
+- Expected
++ Received
+
+- [
+-   "1",
+-   "2",
+-   "3",
+-   "4",
+-   "5",
+- ]
++ []
+
+ ❯ test/reading-inspector.test.tsx:22:89
+     20|   render(<ArazzoUI document={doc} view="docs" />);
+     21|   const first = await screen.findByRole('button', { name: 'Inspect aut…
+     22|   expect([...document.querySelectorAll('.timeline-dot')].map((dot) => …
+       |                                                                                         ^
+     23|   expect(document.querySelectorAll('.timeline-line')).toHaveLength(4);
+     24|   expect(document.querySelectorAll('.timeline-item-last')).toHaveLengt…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  16:21:11
+   Duration  2.30s (tests 28%, environment 25%, import 23%, transform 20%, setup 4%)
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-inspector.test.tsx -t 'connected numbered'

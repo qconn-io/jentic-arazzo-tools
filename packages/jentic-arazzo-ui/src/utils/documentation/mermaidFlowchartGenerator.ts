@@ -65,7 +65,7 @@ export function generateMermaidFlowchart(
     const id = `Step${index}`;
     const next = index + 1 < fact.steps.length ? `Step${index + 1}` : 'End';
     const binding = step.sourceBinding;
-    const label = `${index + 1}. ${step.stepId}; ${step.callTarget ? `${step.callTarget.kind}: ${step.callTarget.reference}` : (binding.intent ?? 'authored operation')}; ${step.parameters.length} parameters`;
+    const label = `${index + 1}. ${step.stepId}; ${step.callTarget ? `${step.callTarget.kind}: ${step.callTarget.reference}` : (binding.intent ?? 'authored operation')}; ${step.applicableParameters.length} parameters`;
     lines.push(`    ${id}["${mermaidLabel(label)}"]`);
     // array order is the inspection spine, independently of prerequisite/action overlays.
     lines.push(`    ${id} --> ${next}`);

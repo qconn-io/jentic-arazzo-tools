@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:961333) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing (1.8s)
+(node:961484) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/production.spec.ts:10:1 › UX installed embed preserves prerequisite order, geometry modality and raw sizing (1.4s)
+
+  2 passed (4.2s)

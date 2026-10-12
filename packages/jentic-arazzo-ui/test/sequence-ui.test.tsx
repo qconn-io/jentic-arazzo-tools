@@ -16,24 +16,21 @@ test('connected sequence expands one occurrence and restores its call focus on c
   render(<ArazzoUI document={nestedCalls} />);
   fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   const scene = screen.getByRole('region', { name: 'Sequence checkout' });
+  const list = within(scene).getByRole('list', { name: 'Ordered interactions' });
   expect(
     within(scene).getAllByRole('button', { name: /^Expand payment\.audit → audit ·/ }),
   ).toHaveLength(2);
   fireEvent.click(
     within(scene).getAllByRole('button', { name: /^Expand payment\.audit → audit ·/ })[0],
   );
-  expect(
-    within(scene).getAllByRole('button', { name: /^View details for audit\.record ·/ }),
-  ).toHaveLength(1);
-  const record = within(scene).getByRole('button', { name: /^View details for audit\.record ·/ });
+  expect(within(list).getAllByRole('button', { name: /^Inspect audit\.record ·/ })).toHaveLength(1);
+  const record = within(list).getByRole('button', { name: /^Inspect audit\.record ·/ });
   fireEvent.click(record);
   const collapse = within(scene).getByRole('button', {
     name: /^Collapse checkout\.firstPayment → payment ·/,
   });
   fireEvent.click(collapse);
-  expect(
-    within(scene).queryByRole('button', { name: /^View details for audit\.record ·/ }),
-  ).toBeNull();
+  expect(within(list).queryByRole('button', { name: /^Inspect audit\.record ·/ })).toBeNull();
   expect(document.activeElement).toBe(
     within(scene).getByRole('button', { name: /^Expand checkout\.firstPayment → payment ·/ }),
   );
@@ -47,9 +44,9 @@ test('call details preserve falsy mappings and return to the exact followed occu
   const callback = vi.fn();
   render(<ArazzoUI document={nestedCalls} onWorkflowSelect={callback} />);
   fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
-  const inspect = screen.getByRole('button', {
-    name: /^View details for checkout\.firstPayment ·/,
-  });
+  const inspect = within(screen.getByRole('list', { name: 'Ordered interactions' }))
+    .getAllByRole('button', { name: /^Inspect checkout\.firstPayment ·/ })
+    .find((button) => button.getAttribute('aria-label')?.includes('· call ·'))!;
   fireEvent.click(inspect);
   const details = screen.getByRole('region', { name: 'Selection details' });
   expect(details.textContent).toContain('Caller-supplied parameters');
@@ -91,8 +88,30 @@ test('controlled call requests commit caller context only after acceptance and c
   expect(screen.getByRole('combobox')).toHaveProperty('value', 'checkout');
   rerender(mount('payment'));
   await screen.findByRole('button', { name: 'Back to caller checkout.secondPayment' });
+  expect(screen.getByRole('region', { name: 'Sequence payment' })).toBeTruthy();
   rerender(mount('client'));
   await waitFor(() => expect(screen.queryByRole('button', { name: /Back to caller/ })).toBeNull());
+});
+
+test('following from sequence overrides an earlier callee descriptions choice after acceptance', async () => {
+  render(<ArazzoUI document={nestedCalls} />);
+  fireEvent.change(await screen.findByRole('combobox', { name: 'Select workflow' }), {
+    target: { value: 'payment' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Step descriptions' }));
+  fireEvent.change(screen.getByRole('combobox', { name: 'Select workflow' }), {
+    target: { value: 'checkout' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram' }));
+  fireEvent.click(
+    screen.getByRole('button', {
+      name: /^Open workflow payment from checkout\.firstPayment ·/,
+    }),
+  );
+  await screen.findByRole('button', { name: 'Back to caller checkout.firstPayment' });
+  expect(screen.getByRole('region', { name: 'Sequence payment' })).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Back to caller checkout.firstPayment' }));
+  await screen.findByRole('region', { name: 'Sequence checkout' });
 });
 
 test('unavailable and recursion markers retain understandable controls without navigating on selection', async () => {
@@ -134,12 +153,12 @@ test('nested caller paths survive mode changes and restore expansion and the exa
   fireEvent.click(screen.getByRole('button', { name: 'Back to caller payment.audit' }));
   await screen.findByRole('region', { name: 'Sequence payment' });
   expect(document.activeElement?.getAttribute('aria-label')).toMatch(
-    /^Collapse payment\.audit → audit ·/,
+    /^Inspect payment\.audit · call ·/,
   );
   fireEvent.click(screen.getByRole('button', { name: 'Back to caller checkout.firstPayment' }));
   await screen.findByRole('region', { name: 'Sequence checkout' });
   expect(document.activeElement?.getAttribute('aria-label')).toMatch(
-    /^Collapse checkout\.firstPayment → payment ·/,
+    /^Inspect checkout\.firstPayment · call ·/,
   );
 });
 
@@ -220,7 +239,7 @@ test('local inspection cancels an unaccepted controlled call even when the host 
 test('workflow prerequisite context is keyboard inspectable and row limits offer complete documentation', async () => {
   const { unmount } = render(<ArazzoUI document={difficultCalls} />);
   fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
-  const context = screen.getAllByRole('button', { name: /^View context details for entry/ })[0];
+  const context = screen.getAllByRole('button', { name: /^Inspect entry/ })[0];
   fireEvent.click(context);
   expect(screen.getByRole('region', { name: 'Selection details' }).textContent).toContain(
     'Prerequisites',
@@ -239,7 +258,7 @@ test('workflow prerequisite context is keyboard inspectable and row limits offer
   fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   fireEvent.click(screen.getByRole('button', { name: /^View complete documentation for large ·/ }));
   expect(screen.queryByRole('region', { name: 'Sequence large' })).toBeNull();
-  expect(screen.getByRole('button', { name: 'View details for large.step209' })).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Inspect large.step209' })).toBeTruthy();
 }, 30000);
 
 test('clearing an already-null controlled selection cancels the pending caller request', () => {
@@ -288,7 +307,7 @@ test('explicit complete contract checks update repeated endpoints without resett
     row.getAttribute('data-sequence-id'),
   );
   const calls = within(scene).getAllByRole('button', {
-    name: /^View details for payment\.charge ·/,
+    name: /^Inspect payment\.charge ·/,
   });
   fireEvent.click(calls[1]);
   expect(load).not.toHaveBeenCalled();
@@ -312,7 +331,9 @@ test('explicit complete contract checks update repeated endpoints without resett
     ),
   ).toEqual(rowsBefore);
   expect(
-    within(scene).getByRole('button', { name: /^View details for audit\.record ·/ }),
+    within(within(scene).getByRole('list', { name: 'Ordered interactions' })).getByRole('button', {
+      name: /^Inspect audit\.record ·/,
+    }),
   ).toBeTruthy();
   expect(scene.textContent).toContain('checkout.secondPayment');
   fireEvent.click(within(details).getByRole('button', { name: 'Close details' }));

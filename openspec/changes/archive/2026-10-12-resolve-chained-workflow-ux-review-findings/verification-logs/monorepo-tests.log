@@ -1,0 +1,1921 @@
+
+> jentic-arazzo-tools@0.0.0-ignore test
+> lerna run test
+
+lerna notice cli v9.0.7
+
+ Lerna (powered by Nx)   Running target test for 5 projects:
+
+- @jentic/arazzo-parser
+- @jentic/arazzo-resolver
+- @jentic/arazzo-runner
+- @jentic/arazzo-ui
+- @jentic/arazzo-validator
+
+
+
+> @jentic/arazzo-parser:test
+
+(node:933756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-parser@1.0.0-alpha.32 test
+> npm run build:es && cross-env BABEL_ENV=es babel test --out-dir test --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward' && cross-env NODE_ENV=test mocha
+
+
+> @jentic/arazzo-parser@1.0.0-alpha.32 build:es
+> cross-env BABEL_ENV=es babel src --out-dir src --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward'
+
+(node:934000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 5 files with Babel (196ms).
+(node:934054) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 8 files with Babel (162ms).
+(node:934071) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[0m[0m
+[0m  parse[0m
+[0m    given plain object[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should not be empty[0m
+[0m    given null[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given undefined[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given number[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given array[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given class instance[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given object with sourceMap option[0m
+    [32m  [32m✔[39m[0m[90m should include source maps when sourceMap is true[0m
+
+[0m  parseOpenAPI[0m
+[0m    given plain object[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should not be empty[0m
+[0m    given inline JSON string[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+[0m    given inline YAML string[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+[0m    given file system path[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should set retrievalURI metadata[0m
+[0m    given null[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given undefined[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+[0m    given object with sourceMap option[0m
+    [32m  [32m✔[39m[0m[90m should include source maps when sourceMap is true[0m
+
+[0m  parse[0m
+[0m    given sourceDescriptions option[0m
+[0m      when sourceDescriptions is false (default)[0m
+      [32m  [32m✔[39m[0m[90m should not parse source descriptions[0m
+[0m      when sourceDescriptions is true[0m
+      [32m  [32m✔[39m[0m[90m should parse all source descriptions[0m
+      [32m  [32m✔[39m[0m[90m should include source description metadata[0m
+      [32m  [32m✔[39m[0m[90m should work with global parserOpts flag[0m
+[0m      when sourceDescriptions is array of names[0m
+      [32m  [32m✔[39m[0m[90m should parse only named source descriptions[0m
+[0m      when source description is of type arazzo[0m
+      [32m  [32m✔[39m[0m[90m should recursively parse arazzo source descriptions[0m
+[0m      when source descriptions have circular references[0m
+      [32m  [32m✔[39m[0m[90m should detect cycles and add warning annotation[0m
+[0m      when sourceDescriptionsMaxDepth is set[0m
+      [32m  [32m✔[39m[0m[90m should limit recursion depth[0m
+      [32m  [32m✔[39m[0m[90m should not parse any source descriptions when maxDepth is 0[0m
+
+[0m  parse[0m
+[0m    given file system path[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+
+[0m  parse[0m
+[0m    given HTTP URL[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+
+[0m  parse[0m
+[0m    given inline Arazzo JSON document[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should not be empty[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should have no errors[0m
+    [32m  [32m✔[39m[0m[90m should match snapshot[0m
+[0m    given inline Arazzo YAML document[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+[0m    given invalid Arazzo document[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+    [32m  [32m✔[39m[0m[90m should include original error as cause[0m
+[0m    given non-Arazzo document[0m
+    [32m  [32m✔[39m[0m[90m should throw ParseError[0m
+    [32m  [32m✔[39m[0m[90m should have descriptive error message[0m
+[0m    given file system path[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should set retrievalURI metadata to file path[0m
+[0m    given options[0m
+    [32m  [32m✔[39m[0m[90m should respect strict option[0m
+    [32m  [32m✔[39m[0m[90m should respect sourceMap option[0m
+
+
+[92m [0m[32m 51 passing[0m[90m (183ms)[0m
+
+
+> @jentic/arazzo-resolver:test
+
+(node:934094) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-resolver@1.0.0-alpha.32 test
+> npm run build:es && cross-env BABEL_ENV=es babel test --out-dir test --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward' && cross-env NODE_ENV=test mocha
+
+
+> @jentic/arazzo-resolver@1.0.0-alpha.32 build:es
+> cross-env BABEL_ENV=es babel src --out-dir src --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward'
+
+(node:934336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 4 files with Babel (96ms).
+(node:934448) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 5 files with Babel (136ms).
+(node:934502) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[0m[0m
+[0m  dereferenceArazzo[0m
+[0m    given file system path to JSON file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m[33m (56ms)[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects[0m
+[0m    given file system path to YAML file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects[0m
+[0m    given HTTP URL to JSON file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects[0m
+[0m    given HTTP URL to YAML file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects[0m
+[0m    given invalid URI[0m
+    [32m  [32m✔[39m[0m[90m should throw DereferenceError[0m
+
+[0m  dereferenceArazzoElement[0m
+[0m    given ParseResultElement with retrievalURI metadata[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain ArazzoSpecification1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects[0m
+[0m    given child element with parseResult in strategyOpts[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects in child element[0m
+[0m    given child element with parseResult without retrievalURI metadata[0m
+    [32m  [32m✔[39m[0m[90m should throw DereferenceError when baseURI not provided[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects when baseURI provided[0m
+[0m    given ParseResultElement without retrievalURI metadata[0m
+    [32m  [32m✔[39m[0m[90m should throw DereferenceError when baseURI not provided[0m
+    [32m  [32m✔[39m[0m[90m should dereference reusable objects when baseURI provided[0m
+
+[0m  dereferenceOpenAPI[0m
+[0m    given file system path to JSON file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref references[0m
+    [32m  [32m✔[39m[0m[90m should set retrievalURI metadata[0m
+[0m    given file system path to YAML file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref references[0m
+[0m    given HTTP URL to JSON file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref references[0m
+[0m    given HTTP URL to YAML file[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref references[0m
+[0m    given invalid URI[0m
+    [32m  [32m✔[39m[0m[90m should throw DereferenceError[0m
+
+[0m  dereferenceOpenAPIElement[0m
+[0m    given ParseResultElement with retrievalURI metadata[0m
+    [32m  [32m✔[39m[0m[90m should return ParseResultElement[0m
+    [32m  [32m✔[39m[0m[90m should contain OpenApi3_1Element as api[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref references[0m
+[0m    given ParseResultElement without retrievalURI metadata[0m
+    [32m  [32m✔[39m[0m[90m should throw DereferenceError when baseURI not provided[0m
+    [32m  [32m✔[39m[0m[90m should dereference when baseURI provided[0m
+
+[0m  dereferenceArazzo[0m
+[0m    given sourceDescriptions option[0m
+[0m      when sourceDescriptions is false (default)[0m
+      [32m  [32m✔[39m[0m[90m should not dereference source descriptions[0m
+[0m      when sourceDescriptions is true[0m
+      [32m  [32m✔[39m[0m[90m should dereference all source descriptions[0m
+      [32m  [32m✔[39m[0m[90m should include source description metadata[0m
+[0m      when sourceDescriptions is array of names[0m
+      [32m  [32m✔[39m[0m[90m should dereference only named source descriptions[0m
+      [32m  [32m✔[39m[0m[90m should dereference multiple named source descriptions[0m
+[0m      when using strategy-specific options[0m
+      [32m  [32m✔[39m[0m[90m should accept arazzo-1 specific options[0m
+[0m      when source description is OpenAPI 2.0 (Swagger)[0m
+      [32m  [32m✔[39m[0m[90m should dereference OpenAPI 2.0 source description[0m
+[0m      when source description is OpenAPI 3.0[0m
+      [32m  [32m✔[39m[0m[90m should dereference OpenAPI 3.0 source description[0m
+[0m      when source description is OpenAPI 3.1[0m
+      [32m  [32m✔[39m[0m[90m should dereference OpenAPI 3.1 source description[0m
+[0m      when source description is Arazzo (nested)[0m
+      [32m  [32m✔[39m[0m[90m should recursively dereference Arazzo source descriptions[0m
+[0m      when source descriptions have circular references[0m
+      [32m  [32m✔[39m[0m[90m should detect cycles and not hang[0m
+[0m      when sourceDescriptionsMaxDepth is set[0m
+      [32m  [32m✔[39m[0m[90m should limit recursion depth[0m
+      [32m  [32m✔[39m[0m[90m should not dereference when maxDepth is 0[0m
+
+
+[92m [0m[32m 53 passing[0m[90m (380ms)[0m
+
+
+> @jentic/arazzo-runner:test
+
+(node:934576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-runner@1.0.0-alpha.13 test
+> npm run build:es && cross-env BABEL_ENV=es babel test --out-dir test --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward' && cross-env NODE_ENV=test mocha
+
+
+> @jentic/arazzo-runner@1.0.0-alpha.13 build:es
+> npm run build:swagger-client && cross-env BABEL_ENV=es babel src --out-dir src --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward'
+
+
+> @jentic/arazzo-runner@1.0.0-alpha.13 build:swagger-client
+> webpack --config config/webpack/swagger-client.config.js --progress
+
+<s> [webpack.Progress] 0% 
+
+<s> [webpack.Progress] 1% setup before run
+<s> [webpack.Progress] 1% setup before run NodeEnvironmentPlugin
+<s> [webpack.Progress] 1% setup before run
+<s> [webpack.Progress] 2% setup run
+<s> [webpack.Progress] 2% setup run webpack-cli
+<s> [webpack.Progress] 2% setup run
+<s> [webpack.Progress] 4% setup normal module factory
+<s> [webpack.Progress] 4% setup normal module factory
+<s> [webpack.Progress] 5% setup context module factory
+<s> [webpack.Progress] 5% setup context module factory
+<s> [webpack.Progress] 6% setup before compile
+<s> [webpack.Progress] 6% setup before compile ProgressPlugin
+<s> [webpack.Progress] 6% setup before compile
+<s> [webpack.Progress] 7% setup compile
+<s> [webpack.Progress] 7% setup compile ExternalsPlugin
+<s> [webpack.Progress] 7% setup compile ExternalsPlugin
+<s> [webpack.Progress] 7% setup compile ExternalsPlugin
+<s> [webpack.Progress] 7% setup compile
+<s> [webpack.Progress] 8% setup compilation
+<s> [webpack.Progress] 8% setup compilation ModuleChunkFormatPlugin
+<s> [webpack.Progress] 8% setup compilation ModuleChunkLoadingPlugin
+<s> [webpack.Progress] 8% setup compilation ModuleLibraryPlugin
+<s> [webpack.Progress] 8% setup compilation ModuleLibraryPlugin
+<s> [webpack.Progress] 8% setup compilation WorkerPlugin
+<s> [webpack.Progress] 8% setup compilation SplitChunksPlugin
+<s> [webpack.Progress] 8% setup compilation ResolverCachePlugin
+<s> [webpack.Progress] 8% setup compilation
+<s> [webpack.Progress] 9% setup compilation
+<s> [webpack.Progress] 9% setup compilation ProgressPlugin
+<s> [webpack.Progress] 9% setup compilation LimitChunkCountPlugin
+<s> [webpack.Progress] 9% setup compilation ExternalsPlugin
+<s> [webpack.Progress] 9% setup compilation ExternalsPlugin
+<s> [webpack.Progress] 9% setup compilation ExternalsPlugin
+<s> [webpack.Progress] 9% setup compilation ChunkPrefetchPreloadPlugin
+<s> [webpack.Progress] 9% setup compilation JavascriptModulesPlugin
+<s> [webpack.Progress] 9% setup compilation JsonModulesPlugin
+<s> [webpack.Progress] 9% setup compilation AssetModulesPlugin
+<s> [webpack.Progress] 9% setup compilation EntryPlugin
+<s> [webpack.Progress] 9% setup compilation RuntimePlugin
+<s> [webpack.Progress] 9% setup compilation InferAsyncModulesPlugin
+<s> [webpack.Progress] 9% setup compilation DataUriPlugin
+<s> [webpack.Progress] 9% setup compilation FileUriPlugin
+<s> [webpack.Progress] 9% setup compilation CompatibilityPlugin
+<s> [webpack.Progress] 9% setup compilation HarmonyModulesPlugin
+<s> [webpack.Progress] 9% setup compilation AMDPlugin
+<s> [webpack.Progress] 9% setup compilation RequireJsStuffPlugin
+<s> [webpack.Progress] 9% setup compilation CommonJsPlugin
+<s> [webpack.Progress] 9% setup compilation LoaderPlugin
+<s> [webpack.Progress] 9% setup compilation LoaderPlugin
+<s> [webpack.Progress] 9% setup compilation NodeStuffPlugin
+<s> [webpack.Progress] 9% setup compilation APIPlugin
+<s> [webpack.Progress] 9% setup compilation ExportsInfoApiPlugin
+<s> [webpack.Progress] 9% setup compilation WebpackIsIncludedPlugin
+<s> [webpack.Progress] 9% setup compilation ConstPlugin
+<s> [webpack.Progress] 9% setup compilation UseStrictPlugin
+<s> [webpack.Progress] 9% setup compilation RequireIncludePlugin
+<s> [webpack.Progress] 9% setup compilation RequireEnsurePlugin
+<s> [webpack.Progress] 9% setup compilation RequireContextPlugin
+<s> [webpack.Progress] 9% setup compilation ImportPlugin
+<s> [webpack.Progress] 9% setup compilation ImportMetaContextPlugin
+<s> [webpack.Progress] 9% setup compilation SystemPlugin
+<s> [webpack.Progress] 9% setup compilation ImportMetaPlugin
+<s> [webpack.Progress] 9% setup compilation URLPlugin
+<s> [webpack.Progress] 9% setup compilation DefaultStatsFactoryPlugin
+<s> [webpack.Progress] 9% setup compilation DefaultStatsPresetPlugin
+<s> [webpack.Progress] 9% setup compilation DefaultStatsPrinterPlugin
+<s> [webpack.Progress] 9% setup compilation JavascriptMetaInfoPlugin
+<s> [webpack.Progress] 9% setup compilation EnsureChunkConditionsPlugin
+<s> [webpack.Progress] 9% setup compilation RemoveEmptyChunksPlugin
+<s> [webpack.Progress] 9% setup compilation MergeDuplicateChunksPlugin
+<s> [webpack.Progress] 9% setup compilation FlagIncludedChunksPlugin
+<s> [webpack.Progress] 9% setup compilation SideEffectsFlagPlugin
+<s> [webpack.Progress] 9% setup compilation FlagDependencyExportsPlugin
+<s> [webpack.Progress] 9% setup compilation FlagDependencyUsagePlugin
+<s> [webpack.Progress] 9% setup compilation InnerGraphPlugin
+<s> [webpack.Progress] 9% setup compilation CircularModulesPlugin
+<s> [webpack.Progress] 9% setup compilation ConstExportsPlugin
+<s> [webpack.Progress] 9% setup compilation MangleExportsPlugin
+<s> [webpack.Progress] 9% setup compilation ModuleConcatenationPlugin
+<s> [webpack.Progress] 9% setup compilation NoEmitOnErrorsPlugin
+<s> [webpack.Progress] 9% setup compilation RealContentHashPlugin
+<s> [webpack.Progress] 9% setup compilation WasmFinalizeExportsPlugin
+<s> [webpack.Progress] 9% setup compilation DeterministicModuleIdsPlugin
+<s> [webpack.Progress] 9% setup compilation DeterministicChunkIdsPlugin
+<s> [webpack.Progress] 9% setup compilation DefinePlugin
+<s> [webpack.Progress] 9% setup compilation TerserPlugin
+<s> [webpack.Progress] 9% setup compilation TemplatedPathPlugin
+<s> [webpack.Progress] 9% setup compilation RecordIdsPlugin
+<s> [webpack.Progress] 9% setup compilation WarnCaseSensitiveModulesPlugin
+<s> [webpack.Progress] 9% setup compilation
+<s> [webpack.Progress] 10% building
+<s> [webpack.Progress] 10% building 0/1 entries 0/0 dependencies 0/0 modules
+(node:934769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+<s> [webpack.Progress] 11% building 0/1 entries 489/500 dependencies 175/240 modules
+<s> [webpack.Progress] 65% building 1/1 entries 950/950 dependencies 425/425 modules
+<s> [webpack.Progress] 65% building
+<s> [webpack.Progress] 69% building finish
+<s> [webpack.Progress] 69% building finish
+<s> [webpack.Progress] 70% sealing finish module graph
+<s> [webpack.Progress] 70% sealing finish module graph ResolverCachePlugin
+<s> [webpack.Progress] 70% sealing finish module graph InferAsyncModulesPlugin
+<s> [webpack.Progress] 70% sealing finish module graph FlagDependencyExportsPlugin
+<s> [webpack.Progress] 70% sealing finish module graph InnerGraphPlugin
+<s> [webpack.Progress] 70% sealing finish module graph WasmFinalizeExportsPlugin
+<s> [webpack.Progress] 70% sealing finish module graph ModuleLibraryPlugin
+<s> [webpack.Progress] 70% sealing finish module graph
+<s> [webpack.Progress] 70% sealing plugins
+<s> [webpack.Progress] 70% sealing plugins WarnCaseSensitiveModulesPlugin
+<s> [webpack.Progress] 70% sealing plugins
+<s> [webpack.Progress] 71% sealing dependencies optimization
+<s> [webpack.Progress] 71% sealing dependencies optimization SideEffectsFlagPlugin
+<s> [webpack.Progress] 71% sealing dependencies optimization FlagDependencyUsagePlugin
+<s> [webpack.Progress] 71% sealing dependencies optimization ConstExportsPlugin
+<s> [webpack.Progress] 71% sealing dependencies optimization
+<s> [webpack.Progress] 71% sealing after dependencies optimization
+<s> [webpack.Progress] 71% sealing after dependencies optimization
+<s> [webpack.Progress] 72% sealing chunk graph
+<s> [webpack.Progress] 72% sealing chunk graph
+<s> [webpack.Progress] 73% sealing after chunk graph
+<s> [webpack.Progress] 73% sealing after chunk graph
+<s> [webpack.Progress] 73% sealing optimizing
+<s> [webpack.Progress] 73% sealing optimizing
+<s> [webpack.Progress] 74% sealing module optimization
+<s> [webpack.Progress] 74% sealing module optimization CircularModulesPlugin
+<s> [webpack.Progress] 74% sealing module optimization
+<s> [webpack.Progress] 75% sealing after module optimization
+<s> [webpack.Progress] 75% sealing after module optimization
+<s> [webpack.Progress] 75% sealing chunk optimization
+<s> [webpack.Progress] 75% sealing chunk optimization EnsureChunkConditionsPlugin
+<s> [webpack.Progress] 75% sealing chunk optimization RemoveEmptyChunksPlugin
+<s> [webpack.Progress] 75% sealing chunk optimization MergeDuplicateChunksPlugin
+<s> [webpack.Progress] 75% sealing chunk optimization SplitChunksPlugin
+<s> [webpack.Progress] 75% sealing chunk optimization LimitChunkCountPlugin
+<s> [webpack.Progress] 75% sealing chunk optimization RemoveEmptyChunksPlugin
+<s> [webpack.Progress] 75% sealing chunk optimization
+<s> [webpack.Progress] 76% sealing after chunk optimization
+<s> [webpack.Progress] 76% sealing after chunk optimization
+<s> [webpack.Progress] 77% sealing module and chunk tree optimization
+<s> [webpack.Progress] 77% sealing module and chunk tree optimization
+<s> [webpack.Progress] 77% sealing after module and chunk tree optimization
+<s> [webpack.Progress] 77% sealing after module and chunk tree optimization
+<s> [webpack.Progress] 78% sealing chunk modules optimization
+<s> [webpack.Progress] 78% sealing chunk modules optimization ModuleConcatenationPlugin
+<s> [webpack.Progress] 78% sealing chunk modules optimization
+<s> [webpack.Progress] 78% sealing after chunk modules optimization
+<s> [webpack.Progress] 78% sealing after chunk modules optimization
+<s> [webpack.Progress] 79% sealing module reviving
+<s> [webpack.Progress] 79% sealing module reviving RecordIdsPlugin
+<s> [webpack.Progress] 79% sealing module reviving
+<s> [webpack.Progress] 80% sealing before module ids
+<s> [webpack.Progress] 80% sealing before module ids
+<s> [webpack.Progress] 80% sealing module ids
+<s> [webpack.Progress] 80% sealing module ids DeterministicModuleIdsPlugin
+<s> [webpack.Progress] 80% sealing module ids
+<s> [webpack.Progress] 81% sealing module id optimization
+<s> [webpack.Progress] 81% sealing module id optimization
+<s> [webpack.Progress] 82% sealing module id optimization
+<s> [webpack.Progress] 82% sealing module id optimization
+<s> [webpack.Progress] 82% sealing chunk reviving
+<s> [webpack.Progress] 82% sealing chunk reviving RecordIdsPlugin
+<s> [webpack.Progress] 82% sealing chunk reviving
+<s> [webpack.Progress] 83% sealing before chunk ids
+<s> [webpack.Progress] 83% sealing before chunk ids
+<s> [webpack.Progress] 84% sealing chunk ids
+<s> [webpack.Progress] 84% sealing chunk ids DeterministicChunkIdsPlugin
+<s> [webpack.Progress] 84% sealing chunk ids
+<s> [webpack.Progress] 84% sealing chunk id optimization
+<s> [webpack.Progress] 84% sealing chunk id optimization FlagIncludedChunksPlugin
+<s> [webpack.Progress] 84% sealing chunk id optimization
+<s> [webpack.Progress] 85% sealing after chunk id optimization
+<s> [webpack.Progress] 85% sealing after chunk id optimization
+<s> [webpack.Progress] 86% sealing record modules
+<s> [webpack.Progress] 86% sealing record modules RecordIdsPlugin
+<s> [webpack.Progress] 86% sealing record modules
+<s> [webpack.Progress] 86% sealing record chunks
+<s> [webpack.Progress] 86% sealing record chunks RecordIdsPlugin
+<s> [webpack.Progress] 86% sealing record chunks
+<s> [webpack.Progress] 87% sealing module hashing
+<s> [webpack.Progress] 87% sealing module hashing
+<s> [webpack.Progress] 87% sealing code generation
+<s> [webpack.Progress] 87% sealing code generation
+<s> [webpack.Progress] 88% sealing runtime requirements
+<s> [webpack.Progress] 88% sealing runtime requirements
+<s> [webpack.Progress] 89% sealing hashing
+<s> [webpack.Progress] 89% sealing hashing
+<s> [webpack.Progress] 89% sealing after hashing
+<s> [webpack.Progress] 89% sealing after hashing
+<s> [webpack.Progress] 90% sealing record hash
+<s> [webpack.Progress] 90% sealing record hash
+<s> [webpack.Progress] 91% sealing module assets processing
+<s> [webpack.Progress] 91% sealing module assets processing
+<s> [webpack.Progress] 91% sealing chunk assets processing
+<s> [webpack.Progress] 91% sealing chunk assets processing
+<s> [webpack.Progress] 92% sealing asset processing
+<s> [webpack.Progress] 92% sealing asset processing TerserPlugin
+<s> [webpack.Progress] 92% sealing asset processing RealContentHashPlugin
+<s> [webpack.Progress] 92% sealing asset processing
+<s> [webpack.Progress] 93% sealing after asset optimization
+<s> [webpack.Progress] 93% sealing after asset optimization
+<s> [webpack.Progress] 93% sealing recording
+<s> [webpack.Progress] 93% sealing recording
+<s> [webpack.Progress] 94% sealing after seal
+<s> [webpack.Progress] 94% sealing after seal
+<s> [webpack.Progress] 95% emitting emit
+<s> [webpack.Progress] 95% emitting emit
+<s> [webpack.Progress] 98% emitting after emit
+<s> [webpack.Progress] 98% emitting after emit SizeLimitsPlugin
+<s> [webpack.Progress] 98% emitting after emit
+<s> [webpack.Progress] 99% done plugins
+<s> [webpack.Progress] 99% done plugins
+<s> [webpack.Progress] 99% 
+
+<s> [webpack.Progress] 99% cache store build dependencies
+<s> [webpack.Progress] 99% cache store build dependencies
+<s> [webpack.Progress] 99% cache begin idle
+<s> [webpack.Progress] 99% cache begin idle
+<s> [webpack.Progress] 100% 
+
+<s> [webpack.Progress] 99% cache shutdown
+<s> [webpack.Progress] 99% cache shutdown
+<s> [webpack.Progress] 100% 
+
+asset swagger-client.mjs 147 KiB [compared for emit] [javascript module] [minimized] (name: main)
+orphan modules 551 KiB [orphan] 354 modules
+runtime modules 1.31 KiB 4 modules
+built modules 454 KiB [built]
+  modules by path ../../node_modules/core-js-pure/internals/*.js 32.2 KiB
+    ../../node_modules/core-js-pure/internals/object-is-prototype-of.js 128 bytes [built] [code generated]
+    + 62 modules
+  modules by path ../../node_modules/core-js-pure/es/ 1.05 KiB
+    ../../node_modules/core-js-pure/es/instance/includes.js 637 bytes [built] [code generated]
+    + 2 modules
+  modules by path ../../node_modules/core-js-pure/modules/*.js 1.86 KiB
+    ../../node_modules/core-js-pure/modules/es.array.includes.js 1.02 KiB [built] [code generated]
+    ../../node_modules/core-js-pure/modules/es.string.includes.js 857 bytes [built] [code generated]
+  ./config/webpack/swagger-client-entry.js + 248 modules 418 KiB [not cacheable] [built] [code generated]
+  ../../node_modules/swagger-client/node_modules/@babel/runtime-corejs3/core-js-st...(truncated) 66 bytes [built] [code generated]
+  ../../node_modules/core-js-pure/stable/instance/includes.js 92 bytes [built] [code generated]
+webpack 5.108.4 compiled successfully in 2408 ms
+(node:935206) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 56 files with Babel (440ms).
+(node:935236) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 34 files with Babel (444ms).
+(node:935258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[0m[0m
+[0m  ActionResolver[0m
+[0m    selection[0m
+    [32m  [32m✔[39m[0m[90m should select the first action whose criteria all pass[0m
+    [32m  [32m✔[39m[0m[90m should require all of an action criteria to pass[0m
+    [32m  [32m✔[39m[0m[90m should treat an action with no criteria as always matching[0m
+    [32m  [32m✔[39m[0m[90m should treat an action with an empty criteria list as matching[0m
+    [32m  [32m✔[39m[0m[90m should return undefined when no action matches[0m
+    [32m  [32m✔[39m[0m[90m should return undefined when the action list is absent[0m
+[0m    selected action element[0m
+    [32m  [32m✔[39m[0m[90m should return the goto action element with its target[0m
+    [32m  [32m✔[39m[0m[90m should return the retry action element with its bounds[0m
+    [32m  [32m✔[39m[0m[90m should return the workflow-transfer action element[0m
+
+[0m  OpenAPI2DocumentAssembler[0m
+[0m    assemble[0m
+    [32m  [32m✔[39m[0m[90m should return an OpenAPIDocument[0m
+    [32m  [32m✔[39m[0m[90m should assemble getPetById operation[0m
+    [32m  [32m✔[39m[0m[90m should assemble placeOrder operation[0m
+
+[0m  OpenAPI30DocumentAssembler[0m
+[0m    assemble[0m
+    [32m  [32m✔[39m[0m[90m should return an OpenAPIDocument[0m
+    [32m  [32m✔[39m[0m[90m should assemble getPetById operation[0m
+    [32m  [32m✔[39m[0m[90m should assemble placeOrder operation[0m
+
+[0m  OpenAPI31DocumentAssembler[0m
+[0m    assemble[0m
+    [32m  [32m✔[39m[0m[90m should return an OpenAPIDocument[0m
+    [32m  [32m✔[39m[0m[90m should assemble getPetById operation[0m
+    [32m  [32m✔[39m[0m[90m should assemble placeOrder operation[0m
+
+[0m  OpenAPIDocumentAssembler[0m
+[0m    assemble[0m
+    [32m  [32m✔[39m[0m[90m should delegate to version-specific assembler[0m
+
+[0m  OpenAPIClientSwagger[0m
+[0m    execute with operationId[0m
+    [32m  [32m✔[39m[0m[90m should build correct URL for findPetsByStatus[0m
+    [32m  [32m✔[39m[0m[90m should build correct URL for getPetById[0m
+    [32m  [32m✔[39m[0m[90m should use correct HTTP method for placeOrder[0m
+    [32m  [32m✔[39m[0m[90m should return OpenAPIOperationResponse[0m
+[0m    execute with operationPath[0m
+    [32m  [32m✔[39m[0m[90m should build correct URL using JSON Pointer[0m
+[0m    non-2xx and transport failures[0m
+    [32m  [32m✔[39m[0m[90m should return a non-2xx response instead of throwing[0m
+    [32m  [32m✔[39m[0m[90m should throw ClientError on a transport failure[0m
+[0m    captured request[0m
+    [32m  [32m✔[39m[0m[90m should expose the sent request on the response[0m
+    [32m  [32m✔[39m[0m[90m should still invoke a caller-supplied requestInterceptor[0m
+    [32m  [32m✔[39m[0m[90m should compose with an async caller requestInterceptor and capture its edits[0m
+    [32m  [32m✔[39m[0m[90m should capture the request even on a non-2xx response[0m
+
+[0m  CriterionEvaluator[0m
+[0m    regex type[0m
+    [32m  [32m✔[39m[0m[90m should evaluate the spec $statusCode regex example to true[0m
+    [32m  [32m✔[39m[0m[90m should evaluate to false when the pattern does not match[0m
+    [32m  [32m✔[39m[0m[90m should match against a resolved response body value[0m
+    [32m  [32m✔[39m[0m[90m should fail when the context runtime expression is unresolvable[0m
+    [32m  [32m✔[39m[0m[90m should read the type from a Criterion Expression Type Object[0m
+    [32m  [32m✔[39m[0m[90m should throw when a regex criterion has no context[0m
+[0m    simple type (default)[0m
+    [32m  [32m✔[39m[0m[90m should evaluate a simple condition when type is omitted[0m
+    [32m  [32m✔[39m[0m[90m should evaluate a false simple condition[0m
+    [32m  [32m✔[39m[0m[90m should not require a context for a simple condition[0m
+[0m    jsonpath type[0m
+    [32m  [32m✔[39m[0m[90m should evaluate a jsonpath query against the resolved context[0m
+    [32m  [32m✔[39m[0m[90m should not be met when the query matches nothing[0m
+    [32m  [32m✔[39m[0m[90m should accept an explicit rfc9535 version[0m
+    [32m  [32m✔[39m[0m[90m should throw for a non-rfc9535 jsonpath version[0m
+    [32m  [32m✔[39m[0m[90m should throw for a present-but-non-string version rather than defaulting[0m
+[0m    xpath type[0m
+    [32m  [32m✔[39m[0m[90m should evaluate an xpath query against the resolved XML context[0m
+    [32m  [32m✔[39m[0m[90m should not be met when the predicate is false[0m
+    [32m  [32m✔[39m[0m[90m should accept an explicit xpath-31 version[0m
+    [32m  [32m✔[39m[0m[90m should throw for a non-xpath-31 version[0m
+[0m    condition and type validation[0m
+    [32m  [32m✔[39m[0m[90m should throw when the condition is missing[0m
+    [32m  [32m✔[39m[0m[90m should throw when the condition is an empty string[0m
+    [32m  [32m✔[39m[0m[90m should throw for a present-but-malformed type rather than defaulting[0m
+    [32m  [32m✔[39m[0m[90m should throw "unknown type" for jsonpointer (a version value, not a type)[0m
+
+[0m  JSONPathCriterionEvaluator[0m
+[0m    evaluate[0m
+    [32m  [32m✔[39m[0m[90m should be met when the query matches a node[0m
+    [32m  [32m✔[39m[0m[90m should not be met when the query matches nothing[0m
+    [32m  [32m✔[39m[0m[90m should evaluate a filter query[0m
+    [32m  [32m✔[39m[0m[90m should query against an array context[0m
+    [32m  [32m✔[39m[0m[90m should fail on a null context (Arazzo 1.1.0)[0m
+    [32m  [32m✔[39m[0m[90m should fail on an undefined context (Arazzo 1.1.0)[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for an invalid JSONPath query[0m
+
+[0m  RegexCriterionEvaluator[0m
+[0m    evaluate[0m
+    [32m  [32m✔[39m[0m[90m should match an anchored pattern against a stringified number[0m
+    [32m  [32m✔[39m[0m[90m should fail when an anchored pattern does not match[0m
+    [32m  [32m✔[39m[0m[90m should match a 2xx range pattern[0m
+    [32m  [32m✔[39m[0m[90m should apply search (not full-match) semantics for an unanchored pattern[0m
+    [32m  [32m✔[39m[0m[90m should be case-sensitive by default[0m
+    [32m  [32m✔[39m[0m[90m should coerce a string context[0m
+    [32m  [32m✔[39m[0m[90m should fail on a null context (Arazzo 1.1.0)[0m
+    [32m  [32m✔[39m[0m[90m should fail on an undefined context (Arazzo 1.1.0)[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for an invalid regular expression[0m
+    [32m  [32m✔[39m[0m[90m should match against a non-scalar context via its JSON serialization[0m
+
+[0m  SimpleCriterionEvaluator[0m
+[0m    evaluate[0m
+    [32m  [32m✔[39m[0m[90m should evaluate an equality comparison[0m
+    [32m  [32m✔[39m[0m[90m should compare strings case-insensitively[0m
+    [32m  [32m✔[39m[0m[90m should evaluate relational operators[0m
+    [32m  [32m✔[39m[0m[90m should navigate member and index access[0m
+    [32m  [32m✔[39m[0m[90m should evaluate logical conjunction of expressions[0m
+    [32m  [32m✔[39m[0m[90m should fail rather than throw when an operand is unresolvable[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for a malformed condition[0m
+
+[0m  XPathCriterionEvaluator[0m
+[0m    evaluate[0m
+    [32m  [32m✔[39m[0m[90m should be met for a true boolean predicate (Effective Boolean Value)[0m
+    [32m  [32m✔[39m[0m[90m should not be met for a false boolean predicate[0m
+    [32m  [32m✔[39m[0m[90m should be met for a non-empty node selection[0m
+    [32m  [32m✔[39m[0m[90m should not be met for an empty node selection[0m
+    [32m  [32m✔[39m[0m[90m should evaluate an XPath 3.1 function[0m
+    [32m  [32m✔[39m[0m[90m should fail on a null context (Arazzo 1.1.0)[0m
+    [32m  [32m✔[39m[0m[90m should fail on an undefined context (Arazzo 1.1.0)[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for an invalid XPath query[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for a non-XML (object) context[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for fatally malformed XML[0m
+    [32m  [32m✔[39m[0m[90m should throw CriterionError for recoverably malformed XML[0m
+    [32m  [32m✔[39m[0m[90m should reject a JSON object that carries a numeric nodeType as non-XML[0m
+
+[0m  APIDocument[0m
+[0m    toJSON[0m
+    [32m  [32m✔[39m[0m[90m should return a JSON-serializable object[0m
+    [32m  [32m✔[39m[0m[90m should work with JSON.stringify[0m
+[0m    toYAML[0m
+    [32m  [32m✔[39m[0m[90m should return a YAML string[0m
+
+[0m  OpenAPIOperationExecutor[0m
+  [32m  [32m✔[39m[0m[90m should execute the located operation and return its response[0m
+  [32m  [32m✔[39m[0m[90m should build the client from an assembled standalone document[0m
+  [32m  [32m✔[39m[0m[90m should force the operation target as the locator JSON Pointer[0m
+  [32m  [32m✔[39m[0m[90m should pass through execute options with the operation target taking precedence[0m
+  [32m  [32m✔[39m[0m[90m should forward an opaque request body and content type untouched[0m
+  [32m  [32m✔[39m[0m[90m should propagate a synchronous extraction failure[0m
+  [32m  [32m✔[39m[0m[90m should propagate an asynchronous normalization failure[0m
+  [32m  [32m✔[39m[0m[90m should run the injected collaborators in extract → normalize → assemble order[0m
+
+[0m  OpenAPIOperationLocatorNormalizer[0m
+[0m    normalizeOperationId[0m
+    [32m  [32m✔[39m[0m[90m should resolve a plain operationId to (document, jsonPointer)[0m
+    [32m  [32m✔[39m[0m[90m should resolve a $sourceDescriptions operationId expression[0m
+    [32m  [32m✔[39m[0m[90m should reject when the operationId is in no OpenAPI source[0m
+[0m    normalizeOperationPath[0m
+    [32m  [32m✔[39m[0m[90m should interpolate the embedded source url and resolve (document, jsonPointer)[0m
+    [32m  [32m✔[39m[0m[90m should resolve a literal (non-expression) source url[0m
+    [32m  [32m✔[39m[0m[90m should decode a percent-encoded JSON Pointer fragment[0m
+    [32m  [32m✔[39m[0m[90m should acquire the source lazily (no pre-load required)[0m
+
+[0m  StepExecutor[0m
+[0m    operation resolution[0m
+    [32m  [32m✔[39m[0m[90m should resolve a plain operationId and execute it[0m
+    [32m  [32m✔[39m[0m[90m should resolve an operationId given as a $sourceDescriptions expression[0m
+    [32m  [32m✔[39m[0m[90m should resolve an operationPath and execute it[0m
+    [32m  [32m✔[39m[0m[90m should throw for an operationId found in no source description[0m
+    [32m  [32m✔[39m[0m[90m should throw ExecutionError for a step with no operation target[0m
+    [32m  [32m✔[39m[0m[90m should throw ExecutionError for a workflowId step[0m
+    [32m  [32m✔[39m[0m[90m should throw ExecutionError when more than one target is declared[0m
+[0m    outcome[0m
+    [32m  [32m✔[39m[0m[90m should forward the resolved request body and content type[0m
+    [32m  [32m✔[39m[0m[90m should be successful when successCriteria pass[0m
+    [32m  [32m✔[39m[0m[90m should expose the sent request via $url / $method / $request[0m
+    [32m  [32m✔[39m[0m[90m should not be successful when a successCriterion fails[0m
+    [32m  [32m✔[39m[0m[90m should select the onFailure action on the failure path[0m
+    [32m  [32m✔[39m[0m[90m should pass through execute options with Arazzo values taking precedence[0m
+
+[0m  WorkflowExecutor[0m
+[0m    linear flow[0m
+    [32m  [32m✔[39m[0m[90m should run steps in list order and flow outputs step to step[0m
+    [32m  [32m✔[39m[0m[90m should complete a workflow with no steps as a no-op[0m
+[0m    goto[0m
+    [32m  [32m✔[39m[0m[90m should jump to the target step, skipping steps in between[0m
+    [32m  [32m✔[39m[0m[90m should throw goto-target-not-found for an unknown target step[0m
+    [32m  [32m✔[39m[0m[90m should bound an infinite goto by the step budget[0m
+[0m    stop conditions[0m
+    [32m  [32m✔[39m[0m[90m should stop early on an end action with status "ended"[0m
+    [32m  [32m✔[39m[0m[90m should break with status "failed" when a step fails and has no onFailure[0m
+[0m    workflow-level default actions[0m
+    [32m  [32m✔[39m[0m[90m should apply workflow failureActions to a step that declares no onFailure[0m
+    [32m  [32m✔[39m[0m[90m should let a step's own onFailure override the workflow failureActions wholesale[0m
+    [32m  [32m✔[39m[0m[90m should apply workflow successActions to a step that declares no onSuccess[0m
+    [32m  [32m✔[39m[0m[90m should let an empty step onSuccess suppress the workflow successActions[0m
+    [32m  [32m✔[39m[0m[90m should fall back to success and failure defaults independently[0m
+[0m    malformed control flow[0m
+    [32m  [32m✔[39m[0m[90m should throw for a goto action naming neither stepId nor workflowId[0m
+    [32m  [32m✔[39m[0m[90m should throw for an action with an unknown type[0m
+    [32m  [32m✔[39m[0m[90m should throw for a present but non-list "steps"[0m
+[0m    retry[0m
+    [32m  [32m✔[39m[0m[90m should retry a failing step until it succeeds[0m
+    [32m  [32m✔[39m[0m[90m should default retryLimit to 1 when unset, without sleeping[0m
+    [32m  [32m✔[39m[0m[90m should proceed to the following step after a retry succeeds[0m
+    [32m  [32m✔[39m[0m[90m should count retry attempts against the step budget[0m
+    [32m  [32m✔[39m[0m[90m should exhaust retries before firing a subsequent failure action[0m
+    [32m  [32m✔[39m[0m[90m should fall to the break-default when retries exhaust with no next action[0m
+    [32m  [32m✔[39m[0m[90m should give each retry in a chain its own independent budget[0m
+    [32m  [32m✔[39m[0m[90m should fall through an exhausted retry to a goto action[0m
+    [32m  [32m✔[39m[0m[90m should re-select against the fresh response each attempt[0m
+[0m    step executor injection[0m
+    [32m  [32m✔[39m[0m[90m should delegate steps to the injected stepExecutor[0m
+[0m    authoring errors[0m
+    [32m  [32m✔[39m[0m[90m should throw workflow-not-found for an unknown workflowId[0m
+[0m    not yet supported[0m
+    [32m  [32m✔[39m[0m[90m should throw for a goto targeting a workflowId[0m
+    [32m  [32m✔[39m[0m[90m should throw for a retry carrying a stepId/workflowId reference[0m
+    [32m  [32m✔[39m[0m[90m should throw for a sub-workflow (workflowId) step[0m
+
+[0m  RuntimeExpressionEvaluator[0m
+[0m    evaluate[0m
+    [32m  [32m✔[39m[0m[90m should resolve $url[0m
+    [32m  [32m✔[39m[0m[90m should resolve $method[0m
+    [32m  [32m✔[39m[0m[90m should resolve $statusCode preserving number type[0m
+    [32m  [32m✔[39m[0m[90m should resolve $request.header case-insensitively[0m
+    [32m  [32m✔[39m[0m[90m should resolve $request.query[0m
+    [32m  [32m✔[39m[0m[90m should resolve $request.path[0m
+    [32m  [32m✔[39m[0m[90m should resolve $request.body[0m
+    [32m  [32m✔[39m[0m[90m should resolve $response.header case-insensitively[0m
+    [32m  [32m✔[39m[0m[90m should resolve $response.body with a JSON Pointer preserving type[0m
+    [32m  [32m✔[39m[0m[90m should resolve $inputs preserving value type[0m
+    [32m  [32m✔[39m[0m[90m should resolve $outputs[0m
+    [32m  [32m✔[39m[0m[90m should resolve $steps outputs[0m
+    [32m  [32m✔[39m[0m[90m should resolve $steps outputs with a JSON Pointer[0m
+    [32m  [32m✔[39m[0m[90m should resolve $workflows outputs[0m
+    [32m  [32m✔[39m[0m[90m should resolve $workflows inputs[0m
+    [32m  [32m✔[39m[0m[90m should resolve a null value rather than treating it as missing[0m
+    [32m  [32m✔[39m[0m[90m should not resolve prototype members[0m
+    [32m  [32m✔[39m[0m[90m should throw for a source on the wrong message side[0m
+    [32m  [32m✔[39m[0m[90m should throw for an unresolvable reference in strict mode[0m
+    [32m  [32m✔[39m[0m[90m should throw for a JSON Pointer miss in strict mode[0m
+    [32m  [32m✔[39m[0m[90m should return undefined for an unresolvable reference in non-strict mode[0m
+    [32m  [32m✔[39m[0m[90m should throw for an invalid expression regardless of strict mode[0m
+    [32m  [32m✔[39m[0m[90m should drill JSON Pointers into an ApiDOM element body[0m
+[0m    interpolate[0m
+    [32m  [32m✔[39m[0m[90m should replace an embedded expression with its string form[0m
+    [32m  [32m✔[39m[0m[90m should stringify a scalar value[0m
+    [32m  [32m✔[39m[0m[90m should JSON-serialize an object value[0m
+    [32m  [32m✔[39m[0m[90m should replace every occurrence of a repeated expression[0m
+    [32m  [32m✔[39m[0m[90m should replace multiple distinct expressions in order[0m
+    [32m  [32m✔[39m[0m[90m should not interpolate any expression when the template is unparseable[0m
+    [32m  [32m✔[39m[0m[90m should not interpret replacement patterns in a resolved value[0m
+    [32m  [32m✔[39m[0m[90m should not re-interpolate a resolved value that looks like an expression[0m
+    [32m  [32m✔[39m[0m[90m should leave a string without embedded expressions unchanged[0m
+    [32m  [32m✔[39m[0m[90m should leave a braced literal that is not an expression unchanged[0m
+    [32m  [32m✔[39m[0m[90m should interpolate a braced body-pointer expression[0m
+    [32m  [32m✔[39m[0m[90m should render an unresolvable reference as empty string in non-strict mode[0m
+[0m    resolve[0m
+    [32m  [32m✔[39m[0m[90m should resolve a bare expression to its typed value[0m
+    [32m  [32m✔[39m[0m[90m should treat a braced expression as string interpolation[0m
+    [32m  [32m✔[39m[0m[90m should interpolate a mixed template to a string[0m
+    [32m  [32m✔[39m[0m[90m should return a literal string unchanged[0m
+[0m    $components[0m
+    [32m  [32m✔[39m[0m[90m should resolve a component from the entry document[0m
+    [32m  [32m✔[39m[0m[90m should return undefined for a missing component in non-strict mode[0m
+    [32m  [32m✔[39m[0m[90m should return undefined when no document is configured[0m
+[0m    $sourceDescriptions[0m
+    [32m  [32m✔[39m[0m[90m should resolve a referenced operation by operationId[0m
+    [32m  [32m✔[39m[0m[90m should return undefined for an unknown source name[0m
+    [32m  [32m✔[39m[0m[90m should return undefined for an unknown reference[0m
+    [32m  [32m✔[39m[0m[90m should resolve the url field to the source URI, resolved to absolute form[0m
+    [32m  [32m✔[39m[0m[90m should resolve the type field to its literal value[0m
+    [32m  [32m✔[39m[0m[90m should return undefined when the referenced document is not loaded[0m
+[0m    criterion context expressions[0m
+    [32m  [32m✔[39m[0m[90m should resolve $statusCode as a number for a simple condition[0m
+    [32m  [32m✔[39m[0m[90m should resolve the $statusCode context of a regex criterion[0m
+    [32m  [32m✔[39m[0m[90m should resolve the $response.body context of a jsonpath criterion[0m
+    [32m  [32m✔[39m[0m[90m should resolve $statusCode for a failure-action condition[0m
+    [32m  [32m✔[39m[0m[90m should resolve $statusCode for a components condition[0m
+    [32m  [32m✔[39m[0m[90m should preserve the number type so a condition compares correctly[0m
+
+[0m  ArazzoStepExtractor[0m
+[0m    extract[0m
+    [32m  [32m✔[39m[0m[90m should extract a step by stepId[0m
+    [32m  [32m✔[39m[0m[90m should extract correct stepId[0m
+    [32m  [32m✔[39m[0m[90m should attach workflowId metadata[0m
+    [32m  [32m✔[39m[0m[90m should extract different steps[0m
+    [32m  [32m✔[39m[0m[90m should throw ExtractionError for unknown stepId[0m
+    [32m  [32m✔[39m[0m[90m should include workflowId in error[0m
+
+[0m  ArazzoWorkflowExtractor[0m
+[0m    extract[0m
+    [32m  [32m✔[39m[0m[90m should extract a workflow by workflowId[0m
+    [32m  [32m✔[39m[0m[90m should extract correct workflowId[0m
+    [32m  [32m✔[39m[0m[90m should throw ExtractionError for unknown workflowId[0m
+    [32m  [32m✔[39m[0m[90m should include workflowId in error[0m
+    [32m  [32m✔[39m[0m[90m should include uri in error[0m
+
+[0m  OpenAPIOperationExtractor[0m
+[0m    extract[0m
+    [32m  [32m✔[39m[0m[90m should extract an operation by operationId[0m
+    [32m  [32m✔[39m[0m[90m should attach pointer metadata[0m
+    [32m  [32m✔[39m[0m[90m should attach http-method metadata[0m
+    [32m  [32m✔[39m[0m[90m should attach path metadata[0m
+    [32m  [32m✔[39m[0m[90m should extract correct operationId[0m
+    [32m  [32m✔[39m[0m[90m should throw ExtractionError for unknown operationId[0m
+[0m    extractByPointer[0m
+    [32m  [32m✔[39m[0m[90m should extract an operation by JSON Pointer[0m
+    [32m  [32m✔[39m[0m[90m should throw for invalid pointer structure[0m
+    [32m  [32m✔[39m[0m[90m should throw for pointer not referencing an operation[0m
+
+[0m  ArazzoStepNormalizer[0m
+[0m    normalize[0m
+    [32m  [32m✔[39m[0m[90m should return a StepElement[0m
+    [32m  [32m✔[39m[0m[90m should preserve stepId[0m
+    [32m  [32m✔[39m[0m[90m should return the same element (identity)[0m
+
+[0m  ArazzoWorkflowNormalizer[0m
+[0m    normalize[0m
+    [32m  [32m✔[39m[0m[90m should return a WorkflowElement[0m
+    [32m  [32m✔[39m[0m[90m should preserve workflowId[0m
+[0m    given Arazzo document with component references[0m
+    [32m  [32m✔[39m[0m[90m should dereference component references[0m
+
+[0m  OpenAPI2OperationNormalizer[0m
+[0m    normalize[0m
+    [32m  [32m✔[39m[0m[90m should return an operation element[0m
+    [32m  [32m✔[39m[0m[90m should preserve operationId[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref in operation subtree[0m
+    [32m  [32m✔[39m[0m[90m should inherit parameters from path item[0m
+    [32m  [32m✔[39m[0m[90m should not have security when operation has none and no root security[0m
+    [32m  [32m✔[39m[0m[90m should keep operation-level security when defined[0m
+[0m    given OpenAPI 2.0 document with circular schema references[0m
+    [32m  [32m✔[39m[0m[90m should not throw on circular schemas[0m
+    [32m  [32m✔[39m[0m[90m should truncate circular reference with x-circular marker[0m
+    [32m  [32m✔[39m[0m[90m should produce a finite tree with no $ref cycles[0m
+
+[0m  OpenAPI30OperationNormalizer[0m
+[0m    normalize[0m
+    [32m  [32m✔[39m[0m[90m should return an operation element[0m
+    [32m  [32m✔[39m[0m[90m should preserve operationId[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref in operation subtree[0m
+    [32m  [32m✔[39m[0m[90m should inherit servers from root[0m
+    [32m  [32m✔[39m[0m[90m should inherit parameters from path item[0m
+    [32m  [32m✔[39m[0m[90m should not have security when neither operation nor root defines it[0m
+    [32m  [32m✔[39m[0m[90m should keep operation-level security when defined[0m
+[0m    given OpenAPI document with circular schema references[0m
+    [32m  [32m✔[39m[0m[90m should not throw on circular schemas[0m
+    [32m  [32m✔[39m[0m[90m should truncate circular reference with x-circular marker[0m
+    [32m  [32m✔[39m[0m[90m should produce a finite tree with no $ref cycles[0m
+
+[0m  OpenAPI31OperationNormalizer[0m
+[0m    normalize[0m
+    [32m  [32m✔[39m[0m[90m should return an operation element[0m
+    [32m  [32m✔[39m[0m[90m should preserve operationId[0m
+    [32m  [32m✔[39m[0m[90m should dereference $ref in operation subtree[0m
+    [32m  [32m✔[39m[0m[90m should inherit servers from root[0m
+    [32m  [32m✔[39m[0m[90m should inherit parameters from path item[0m
+    [32m  [32m✔[39m[0m[90m should not have security when neither operation nor root defines it[0m
+    [32m  [32m✔[39m[0m[90m should keep operation-level security when defined[0m
+[0m    given OpenAPI document with circular schema references[0m
+    [32m  [32m✔[39m[0m[90m should not throw on circular schemas[0m
+    [32m  [32m✔[39m[0m[90m should truncate circular reference with x-circular marker[0m
+    [32m  [32m✔[39m[0m[90m should produce a finite tree with no $ref cycles[0m
+
+[0m  OpenAPIOperationNormalizer[0m
+[0m    normalize[0m
+    [32m  [32m✔[39m[0m[90m should delegate to version-specific normalizer[0m
+
+[0m  DocumentRegistry[0m
+[0m    acquireEntryDocument[0m
+    [32m  [32m✔[39m[0m[90m should acquire and return an ArazzoDocument[0m
+    [32m  [32m✔[39m[0m[90m should mark the document as entry[0m
+    [32m  [32m✔[39m[0m[90m should set the entry document on the registry[0m
+    [32m  [32m✔[39m[0m[90m should contain Arazzo specification in parseResult[0m
+    [32m  [32m✔[39m[0m[90m should build a workflow index[0m
+[0m    acquire[0m
+    [32m  [32m✔[39m[0m[90m should return cached document on second call[0m
+[0m      given entry document with OpenAPI source description[0m
+      [32m  [32m✔[39m[0m[90m should acquire OpenAPI source document[0m
+      [32m  [32m✔[39m[0m[90m should contain OpenAPI specification in parseResult[0m
+      [32m  [32m✔[39m[0m[90m should build an operation index[0m
+[0m    resolveSourceDescriptionURI[0m
+    [32m  [32m✔[39m[0m[90m should resolve known source description to absolute path[0m
+    [32m  [32m✔[39m[0m[90m should return undefined for unknown source description[0m
+[0m    acquireEntryDocument with non-Arazzo document[0m
+    [32m  [32m✔[39m[0m[90m should throw InvalidEntryDocumentError[0m
+[0m    acquire with unsupported document[0m
+    [32m  [32m✔[39m[0m[90m should throw UnmatchedProviderError[0m
+[0m    clear[0m
+    [32m  [32m✔[39m[0m[90m should remove all documents[0m
+[0m    given OpenAPI source with external PathItem $ref[0m
+    [32m  [32m✔[39m[0m[90m should include operations from external path item in operation index[0m
+
+[0m  ArazzoDocumentRegistryProvider[0m
+[0m    provide[0m
+    [32m  [32m✔[39m[0m[90m should provide an Arazzo document[0m
+    [32m  [32m✔[39m[0m[90m should produce a serializable document[0m
+
+[0m  OpenAPIDocumentRegistryProvider[0m
+[0m    provide[0m
+    [32m  [32m✔[39m[0m[90m should provide an OpenAPI document[0m
+    [32m  [32m✔[39m[0m[90m should produce a serializable document[0m
+
+[0m  OutputResolver[0m
+[0m    resolve[0m
+    [32m  [32m✔[39m[0m[90m should resolve each output expression to its typed value[0m
+    [32m  [32m✔[39m[0m[90m should resolve an output referencing a prior step[0m
+    [32m  [32m✔[39m[0m[90m should return an empty object when outputs are absent[0m
+    [32m  [32m✔[39m[0m[90m should resolve an unresolvable output to undefined (lenient)[0m
+    [32m  [32m✔[39m[0m[90m should not interpolate a non-expression string (no embedded expressions in 1.0.1)[0m
+
+[0m  ParameterResolver[0m
+[0m    resolve[0m
+    [32m  [32m✔[39m[0m[90m should resolve a whole runtime expression to its typed value[0m
+    [32m  [32m✔[39m[0m[90m should preserve the referenced type[0m
+    [32m  [32m✔[39m[0m[90m should resolve a step output expression[0m
+    [32m  [32m✔[39m[0m[90m should use a literal string as-is[0m
+    [32m  [32m✔[39m[0m[90m should use a literal number/boolean as-is[0m
+    [32m  [32m✔[39m[0m[90m should not interpolate a non-expression string (no embedded expressions in 1.0.1)[0m
+    [32m  [32m✔[39m[0m[90m should use a literal object value as-is[0m
+    [32m  [32m✔[39m[0m[90m should resolve multiple parameters keyed by name[0m
+    [32m  [32m✔[39m[0m[90m should return an empty object when parameters are absent[0m
+    [32m  [32m✔[39m[0m[90m should return undefined for an unresolvable expression (lenient resolver)[0m
+
+[0m  RequestBodyResolver[0m
+[0m    resolve[0m
+    [32m  [32m✔[39m[0m[90m should return undefined when there is no request body[0m
+    [32m  [32m✔[39m[0m[90m should resolve a whole-expression payload to its typed value[0m
+    [32m  [32m✔[39m[0m[90m should use a literal object payload as-is[0m
+    [32m  [32m✔[39m[0m[90m should include the declared content type[0m
+    [32m  [32m✔[39m[0m[90m should apply a replacement at a JSON Pointer target[0m
+    [32m  [32m✔[39m[0m[90m should apply a replacement at a nested JSON Pointer target[0m
+    [32m  [32m✔[39m[0m[90m should replace the whole payload for an empty pointer target[0m
+    [32m  [32m✔[39m[0m[90m should throw ResolverError for a non-JSON-Pointer (XPath) target[0m
+    [32m  [32m✔[39m[0m[90m should throw ResolverError when the target does not resolve in the payload[0m
+    [32m  [32m✔[39m[0m[90m should not mutate a payload aliased from a runtime expression[0m
+    [32m  [32m✔[39m[0m[90m should reject a prototype-polluting target[0m
+
+[0m  WorkflowExecutionState[0m
+[0m    toContext[0m
+    [32m  [32m✔[39m[0m[90m should expose inputs[0m
+    [32m  [32m✔[39m[0m[90m should default inputs to an empty object[0m
+    [32m  [32m✔[39m[0m[90m should expose accumulated step outputs under their stepId[0m
+    [32m  [32m✔[39m[0m[90m should expose workflow outputs and inputs under their workflowId[0m
+    [32m  [32m✔[39m[0m[90m should expose the workflow's own outputs[0m
+    [32m  [32m✔[39m[0m[90m should layer the current step request and response onto the context[0m
+    [32m  [32m✔[39m[0m[90m should omit request and response when not provided[0m
+[0m    accumulation across a run (write → read loop)[0m
+    [32m  [32m✔[39m[0m[90m should let a later step read an earlier step output via $steps[0m
+    [32m  [32m✔[39m[0m[90m should read the current response only for the step being evaluated[0m
+[0m    outputs getter[0m
+    [32m  [32m✔[39m[0m[90m should expose the accumulated workflow outputs[0m
+
+
+[92m [0m[32m 313 passing[0m[90m (1s)[0m
+
+
+> @jentic/arazzo-validator:test
+
+(node:934099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-validator@1.0.0-alpha.32 test
+> npm run build:es && cross-env BABEL_ENV=es babel test --out-dir test --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward' && cross-env NODE_ENV=test mocha
+
+
+> @jentic/arazzo-validator@1.0.0-alpha.32 build:es
+> cross-env BABEL_ENV=es babel src --out-dir src --extensions '.ts' --out-file-extension '.mjs' --root-mode 'upward'
+
+(node:934385) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 205 files with Babel (905ms).
+(node:934527) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Successfully compiled 7 files with Babel (121ms).
+(node:934549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[0m[0m
+[0m  bin[0m
+[0m    --help[0m
+(node:934887) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+    [32m  [32m✔[39m[0m[90m should display help information[0m[31m (1016ms)[0m
+[0m    --version[0m
+(node:935017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+    [32m  [32m✔[39m[0m[90m should display version[0m[31m (1383ms)[0m
+[0m    valid file[0m
+    [32m  [32m✔[39m[0m[90m should exit with code 0 and show success message[0m[31m (1613ms)[0m
+[0m    --format json[0m
+    [32m  [32m✔[39m[0m[90m should output valid JSON[0m[31m (1548ms)[0m
+[0m    --format github-actions[0m
+    [32m  [32m✔[39m[0m[90m should output GitHub Actions format[0m[31m (1538ms)[0m
+[0m    --format codeframe[0m
+    [32m  [32m✔[39m[0m[90m should show success message for valid file[0m[31m (1441ms)[0m
+[0m    --quiet[0m
+    [32m  [32m✔[39m[0m[90m should suppress output[0m[31m (1472ms)[0m
+[0m    --verbose[0m
+    [32m  [32m✔[39m[0m[90m should show additional information to stderr[0m[31m (927ms)[0m
+[0m    short options[0m
+    [32m  [32m✔[39m[0m[90m -f should work as --format[0m[31m (1507ms)[0m
+    [32m  [32m✔[39m[0m[90m -q should work as --quiet[0m[31m (1506ms)[0m
+    [32m  [32m✔[39m[0m[90m -v should work as --verbose[0m[31m (1461ms)[0m
+[0m    option combinations[0m
+    [32m  [32m✔[39m[0m[90m --verbose --format json should work together[0m[31m (1308ms)[0m
+    [32m  [32m✔[39m[0m[90m --quiet --format json should suppress stdout[0m[31m (1349ms)[0m
+[0m    --fail-severity[0m
+    [32m  [32m✔[39m[0m[90m should show success message with error level[0m[31m (1232ms)[0m
+    [32m  [32m✔[39m[0m[90m should show success message with warning level[0m[31m (825ms)[0m
+    [32m  [32m✔[39m[0m[90m should show success message with info level[0m[31m (1205ms)[0m
+    [32m  [32m✔[39m[0m[90m should show success message with hint level[0m[31m (1207ms)[0m
+[0m    invalid options[0m
+    [32m  [32m✔[39m[0m[90m should reject invalid format[0m[31m (1001ms)[0m
+    [32m  [32m✔[39m[0m[90m should reject invalid fail-severity[0m[31m (1023ms)[0m
+[0m    missing file[0m
+    [32m  [32m✔[39m[0m[90m should exit with code 2[0m[31m (1012ms)[0m
+[0m    no input[0m
+    [32m  [32m✔[39m[0m[90m should exit with code 2[0m[31m (1003ms)[0m
+
+[0m  codeframe[0m
+  [32m  [32m✔[39m[0m[90m should format diagnostics with code snippets[0m
+  [32m  [32m✔[39m[0m[90m should show context lines around the error[0m
+  [32m  [32m✔[39m[0m[90m should work without source content (fallback to no snippets)[0m
+  [32m  [32m✔[39m[0m[90m should return empty string for no diagnostics[0m
+  [32m  [32m✔[39m[0m[90m should respect maxProblems option[0m
+
+[0m  github-actions[0m
+  [32m  [32m✔[39m[0m[90m should format diagnostics as GitHub Actions commands[0m
+  [32m  [32m✔[39m[0m[90m should return empty string for no diagnostics[0m
+
+[0m  json[0m
+  [32m  [32m✔[39m[0m[90m should format diagnostics as JSON[0m
+  [32m  [32m✔[39m[0m[90m should truncate with maxProblems[0m
+
+[0m  stylish[0m
+  [32m  [32m✔[39m[0m[90m should format diagnostics in stylish format[0m
+  [32m  [32m✔[39m[0m[90m should return empty string for no diagnostics[0m
+  [32m  [32m✔[39m[0m[90m should respect maxProblems option[0m
+
+[0m  cli[0m
+[0m    severityMap[0m
+    [32m  [32m✔[39m[0m[90m should map error to DiagnosticSeverity.Error[0m
+    [32m  [32m✔[39m[0m[90m should map warning to DiagnosticSeverity.Warning[0m
+    [32m  [32m✔[39m[0m[90m should map info to DiagnosticSeverity.Information[0m
+    [32m  [32m✔[39m[0m[90m should map hint to DiagnosticSeverity.Hint[0m
+[0m    hasFailures[0m
+    [32m  [32m✔[39m[0m[90m should return true when errors exist and fail-severity is error[0m
+    [32m  [32m✔[39m[0m[90m should return false when only warnings exist and fail-severity is error[0m
+    [32m  [32m✔[39m[0m[90m should return true when warnings exist and fail-severity is warning[0m
+    [32m  [32m✔[39m[0m[90m should return true when errors exist and fail-severity is warning[0m
+    [32m  [32m✔[39m[0m[90m should return false when only hints exist and fail-severity is warning[0m
+    [32m  [32m✔[39m[0m[90m should return false for empty diagnostics[0m
+[0m    formatDiagnostics[0m
+    [32m  [32m✔[39m[0m[90m should use stylish formatter by default[0m
+    [32m  [32m✔[39m[0m[90m should use json formatter when specified[0m
+    [32m  [32m✔[39m[0m[90m should use github-actions formatter when specified[0m
+    [32m  [32m✔[39m[0m[90m should use codeframe formatter when specified[0m
+
+[0m  validate[0m
+[0m    given valid Arazzo document[0m
+    [32m  [32m✔[39m[0m[90m should return no errors[0m[31m (260ms)[0m
+[0m    given valid Arazzo document from file[0m
+    [32m  [32m✔[39m[0m[90m should not return errors[0m[33m (46ms)[0m
+[0m    given invalid Arazzo document from file[0m
+    [32m  [32m✔[39m[0m[90m should return errors[0m
+[0m    given Arazzo document missing required title in info[0m
+    [32m  [32m✔[39m[0m[90m should return ARAZZO_INFO_FIELD_TITLE_REQUIRED error[0m[33m (65ms)[0m
+[0m    given valid YAML represented as array[0m
+    [32m  [32m✔[39m[0m[90m should return ARAZZO_NOT_DETECTED error[0m
+[0m    given valid JSON represented as array[0m
+    [32m  [32m✔[39m[0m[90m should return ARAZZO_NOT_DETECTED error[0m
+[0m    given invalid YAML syntax[0m
+    [32m  [32m✔[39m[0m[90m should return errors[0m
+[0m    given invalid JSON syntax[0m
+    [32m  [32m✔[39m[0m[90m should return errors[0m
+[0m    given OpenAPI document instead of Arazzo[0m
+    [32m  [32m✔[39m[0m[90m should return ARAZZO_NOT_DETECTED error[0m
+
+
+[92m [0m[32m 56 passing[0m[90m (27s)[0m
+
+
+> @jentic/arazzo-ui:test
+
+(node:934574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4}
+
+(node:934725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+(node:934806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:934805) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935318) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935516) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935583) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ test/scenario-ui.test.tsx (7 tests | 1 failed) 3683ms
+   × narrow guide dismissal returns to an enabled guide control when terminal Next becomes disabled 1084ms
+(node:935734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935795) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935824) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:935946) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936006) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936103) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936169) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936176) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936209) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ test/optional-tools.test.tsx (4 tests | 1 failed) 1976ms
+   × covering details excludes advanced setup from background interaction and returns guide focus on Escape 1178ms
+(node:936253) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936285) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936394) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936406) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936414) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936449) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936461) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936485) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936513) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936566) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936590) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936642) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936654) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936681) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936693) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936859) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936867) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936912) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936941) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936964) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936971) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936983) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:936991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937007) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937023) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937031) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937047) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937054) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937065) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937076) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937084) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937103) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937110) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937126) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937135) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937146) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937174) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937191) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937199) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937206) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937213) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937220) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937227) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937234) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937241) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937264) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937278) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937285) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937299) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937306) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937324) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937330) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937338) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937345) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937352) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:937359) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/optional-tools.test.tsx > covering details excludes advanced setup from background interaction and returns guide focus on Escape
+TestingLibraryElementError: Unable to find role="dialog" and name "Selection details"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui-standalone "[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; width: 100%; height: 100%; position: relative;"[39m
+    [36m>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m".yaml,.yml,.json,.arazzo"[39m
+        [33mstyle[39m=[32m"display: none;"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-ui-toolbar"[39m
+        [33mstyle[39m=[32m"position: relative; min-height: 60px; flex-shrink: 0; padding: 0px 16px; border-bottom: 1px solid rgb(51, 51, 51); background: rgb(27, 27, 27);"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"arazzo-toolbar-logo"[39m
+          [33mhref[39m=[32m"https://jentic.com"[39m
+          [33mrel[39m=[32m"noopener noreferrer"[39m
+          [33mtarget[39m=[32m"_blank"[39m
+          [33mtitle[39m=[32m"Supported by Jentic"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mstyle[39m=[32m"height: 36px;"[39m
+            [33mviewBox[39m=[32m"0 0 1200 400"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<rect[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"400"[39m
+              [33mrx[39m=[32m"16"[39m
+              [33mry[39m=[32m"16"[39m
+              [33mwidth[39m=[32m"1200"[39m
+            [36m/>[39m
+            [36m<g>[39m
+              [36m<g>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M362.5,78c-8.8-1.2-18.9,11.2-27.7,33.4-10.1,25.8-20.3,51.6-31.1,76.6v.2c-.1,0-6.1,14.2-6.1,14.2h0s-.2.5-.2.5c-4.5,10.6-19.3,45.4-24,56.6-3.2,7.5-6.6,14.7-10.2,21.5,0,0,0,0,0,0h0s0,0,0,.1c-2.5,4.8-5.3,9.2-8.3,13.1-20.6,26.7-48.3,33.8-68.6,35-30.4.5-70.8-11.8-87.6-57.3-8-20.6-9.9-45.6-9.3-69.6h140.1s-5.6,13-5.6,13l-1.2,2.6-11.8.3c-10.2.3-20.2.1-30.6.6-9.2.4-17.8-.3-25,7.9-2.9,3.2-4.8,7.2-5.7,11.4-1.4,5.8-.6,10.1,2.3,17.2,5.9,13,17.9,20.8,32.1,20.8s.9,0,1.3,0c8.1-.3,16.5-3.1,23.4-8.3,6.1-4.6,10.7-11.6,14.3-19.5l9-22.5,57.3-135.2h0s0,0,0,0c1.5-3.7,2.9-7.4,4.4-11.1,0,0,0,0,0-.1,2.6-6.4,5.6-6.4,5.6-6.4,0,0,9.5-2.4,29.6-2.4s30.5,1.6,31.1,2c.5.4,2.6.6,2.5,5.3h0Z"[39m
+                  [33mfill[39m=[32m"#fff"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M404,202.5h-.1l-7.5-23.9v-.2c0,0-8-25.1-8-25.1h0s-14.8-46.9-14.8-46.9c-2.8-8.3-5.2-16.9-12-15.5-12,2.6-18.9,22.6-24.6,38.3-1.4,3.7-2.8,7.8-3.6,12.2l1.8,2.2,47.8,58.8.5.6h-74.2c0,0-.1.2-.1.2l-5.4,12.5-1.2,2.7h106.6l-5.1-15.9h0ZM388.2,213.5h0s0,0,0,0h0Z"[39m
+                  [33mfill[39m=[32m"#fff"[39m
+                [36m/>[39m
+              [36m</g>[39m
+              [36m<g>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M963.6,166.7c-6.2,0-10.7-1.6-13.7-4.8-3-3.2-4.4-7.3-4.4-12.2s1.5-9.2,4.4-12.5c3-3.2,7.5-4.8,13.7-4.8s10.7,1.6,13.7,4.8c3,3.2,4.4,7.4,4.4,12.5s-1.5,9-4.4,12.2c-3,3.2-7.5,4.8-13.7,4.8Z"[39m
+                  [33mfill[39m=[32m"#fff"[39m
+                [36m/>[39m
+                [36m<g>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M682.6,182.1c-8.3-5.4-18.5-8.1-30.6-8.1s-17.4,1.6-24.6,4.8c-7.2,3.2-13.2,7.6-18.1,13.1-4.9,5.5-8.6,11.7-11.1,18.6-2.5,6.9-3.8,14.2-3.8,21.7v4.1c0,7.3,1.3,14.4,3.8,21.3s6.3,13.2,11.2,18.8c4.9,5.6,11.1,10.1,18.4,13.4,7.3,3.3,15.8,4.9,25.4,4.9s17.8-1.7,25.1-5c7.3-3.4,13.3-8,18.1-13.9,4.8-5.9,8-12.6,9.7-20.2h-30.3c-1.4,3.4-4,6.3-7.8,8.6-3.8,2.3-8.8,3.5-14.8,3.5s-11.9-1.4-16.1-4.1c-4.1-2.7-7.1-6.6-9.1-11.6-1.1-2.8-1.8-5.9-2.3-9.2h82.4v-11.1c0-10.3-2.2-19.8-6.6-28.5-4.4-8.7-10.7-15.8-19-21.2h0ZM628.4,216.1c2.1-5,5.1-8.8,9.1-11.3,4-2.5,8.8-3.8,14.6-3.8s10.3,1.3,14.1,3.8c3.8,2.5,6.6,6.2,8.4,10.9,1,2.5,1.7,5.4,2.2,8.5h-50.7c.5-3,1.3-5.7,2.3-8.1h0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M791.6,174.4h-1.4c-8.7,0-16,1.9-22,5.8-6,3.8-10.5,9.6-13.5,17.3-1,2.7-1.9,5.7-2.6,8.9v-28.5h-26.3v112.8h33.2v-65.7c0-6.3,1.9-11.4,5.7-15.2,3.8-3.8,8.8-5.8,14.9-5.8s10.8,1.9,14.3,5.7c3.5,3.8,5.2,8.7,5.2,14.7v66.3h33.2v-64.4c0-17.4-3.5-30.4-10.4-39-6.9-8.6-17-12.9-30.2-12.9h0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M890.3,147.4h-30.7v30.5h-17.3v24.3h17.2v44.5c0,11.4,1.6,20.4,4.8,27.1,3.3,6.7,8.4,11.4,15.4,14.3,7,2.9,16.2,4.3,27.6,4.3h15.8v-28h-16.7c-5.2,0-9.2-1.4-12-4.2-2.8-2.8-4.2-6.9-4.2-12.2v-45.7h32.9v-24.3h-32.9v-30.5h0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<polygon[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                    [33mpoints[39m=[32m"983.8 177.9 950.6 177.9 950.6 177.9 943.5 177.9 935.7 202.3 950.6 202.3 950.6 290.7 983.8 290.7 983.8 202.4 983.8 202.4 983.8 177.9 983.8 177.9 983.8 177.9"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M1078.7,247.7c-.6,3.7-1.7,7-3.5,9.8-1.8,2.8-4.2,5-7.3,6.6-3.1,1.6-6.8,2.4-11.2,2.4s-10.7-1.3-14.3-4c-3.6-2.7-6.3-6.5-7.9-11.3s-2.5-10.3-2.5-16.4.9-12.1,2.7-17c1.8-4.9,4.5-8.7,8.1-11.4,3.6-2.7,8.2-4.1,13.7-4.1s11.5,1.8,15,5.2c3.6,3.5,5.6,7.9,6.2,13.1h32.3c-.6-9.2-3.2-17.3-7.8-24.3-4.7-7-10.9-12.5-18.7-16.4-7.8-3.9-16.8-5.9-27-5.9s-17.6,1.6-24.8,4.7c-7.2,3.2-13.2,7.5-18.1,13s-8.5,11.8-11,18.8c-2.5,7.1-3.7,14.4-3.7,22.1v3.9c0,7.4,1.2,14.6,3.6,21.5,2.4,6.9,6,13.1,10.8,18.6,4.8,5.5,10.8,9.9,17.9,13.2,7.1,3.3,15.7,4.9,25.5,4.9s19.2-2,27.2-6c8-4,14.3-9.5,19.2-16.6,4.8-7.1,7.4-15.3,7.8-24.6h-32.1,0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M508.7,138l-9.8,30.6h43.8l.7.5c1.2.9,1.7,1.7,1.7,3.2,0,9.5-.1,19.1-.2,27.5-.2,11.7-.3,25-.1,37.6v.3c-1.6,17.5-16.8,27-30.2,27s-19.8-5.9-24.2-15.7c-4.8-10.6-1.3-20,2.2-26.9l1.5-3h-33l-.5,1.3c-5.2,13.1-5.1,27.6.4,41,5.9,14.5,17.6,26,32,31.4,7,2.6,14.3,4,21.6,4,15.8,0,31.1-6.2,43.1-17.4,12.1-11.4,19.4-26.6,20.6-43h0c0,0,0-98.4,0-98.4h-69.5,0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                [36m</g>[39m
+              [36m</g>[39m
+            [36m</g>[39m
+          [36m</svg>[39m
+        [36m</a>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-toolbar-source-disclosure"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mLoad document[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"arazzo-toolbar-source"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maria-label[39m=[32m"Arazzo document URL"[39m
+         ...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui-standalone "[39m
+      [33mstyle[39m=[32m"display: flex; flex-direction: column; width: 100%; height: 100%; position: relative;"[39m
+    [36m>[39m
+      [36m<input[39m
+        [33maccept[39m=[32m".yaml,.yml,.json,.arazzo"[39m
+        [33mstyle[39m=[32m"display: none;"[39m
+        [33mtype[39m=[32m"file"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-ui-toolbar"[39m
+        [33mstyle[39m=[32m"position: relative; min-height: 60px; flex-shrink: 0; padding: 0px 16px; border-bottom: 1px solid rgb(51, 51, 51); background: rgb(27, 27, 27);"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mclass[39m=[32m"arazzo-toolbar-logo"[39m
+          [33mhref[39m=[32m"https://jentic.com"[39m
+          [33mrel[39m=[32m"noopener noreferrer"[39m
+          [33mtarget[39m=[32m"_blank"[39m
+          [33mtitle[39m=[32m"Supported by Jentic"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33mstyle[39m=[32m"height: 36px;"[39m
+            [33mviewBox[39m=[32m"0 0 1200 400"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<rect[39m
+              [33mfill[39m=[32m"none"[39m
+              [33mheight[39m=[32m"400"[39m
+              [33mrx[39m=[32m"16"[39m
+              [33mry[39m=[32m"16"[39m
+              [33mwidth[39m=[32m"1200"[39m
+            [36m/>[39m
+            [36m<g>[39m
+              [36m<g>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M362.5,78c-8.8-1.2-18.9,11.2-27.7,33.4-10.1,25.8-20.3,51.6-31.1,76.6v.2c-.1,0-6.1,14.2-6.1,14.2h0s-.2.5-.2.5c-4.5,10.6-19.3,45.4-24,56.6-3.2,7.5-6.6,14.7-10.2,21.5,0,0,0,0,0,0h0s0,0,0,.1c-2.5,4.8-5.3,9.2-8.3,13.1-20.6,26.7-48.3,33.8-68.6,35-30.4.5-70.8-11.8-87.6-57.3-8-20.6-9.9-45.6-9.3-69.6h140.1s-5.6,13-5.6,13l-1.2,2.6-11.8.3c-10.2.3-20.2.1-30.6.6-9.2.4-17.8-.3-25,7.9-2.9,3.2-4.8,7.2-5.7,11.4-1.4,5.8-.6,10.1,2.3,17.2,5.9,13,17.9,20.8,32.1,20.8s.9,0,1.3,0c8.1-.3,16.5-3.1,23.4-8.3,6.1-4.6,10.7-11.6,14.3-19.5l9-22.5,57.3-135.2h0s0,0,0,0c1.5-3.7,2.9-7.4,4.4-11.1,0,0,0,0,0-.1,2.6-6.4,5.6-6.4,5.6-6.4,0,0,9.5-2.4,29.6-2.4s30.5,1.6,31.1,2c.5.4,2.6.6,2.5,5.3h0Z"[39m
+                  [33mfill[39m=[32m"#fff"[39m
+                [36m/>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M404,202.5h-.1l-7.5-23.9v-.2c0,0-8-25.1-8-25.1h0s-14.8-46.9-14.8-46.9c-2.8-8.3-5.2-16.9-12-15.5-12,2.6-18.9,22.6-24.6,38.3-1.4,3.7-2.8,7.8-3.6,12.2l1.8,2.2,47.8,58.8.5.6h-74.2c0,0-.1.2-.1.2l-5.4,12.5-1.2,2.7h106.6l-5.1-15.9h0ZM388.2,213.5h0s0,0,0,0h0Z"[39m
+                  [33mfill[39m=[32m"#fff"[39m
+                [36m/>[39m
+              [36m</g>[39m
+              [36m<g>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M963.6,166.7c-6.2,0-10.7-1.6-13.7-4.8-3-3.2-4.4-7.3-4.4-12.2s1.5-9.2,4.4-12.5c3-3.2,7.5-4.8,13.7-4.8s10.7,1.6,13.7,4.8c3,3.2,4.4,7.4,4.4,12.5s-1.5,9-4.4,12.2c-3,3.2-7.5,4.8-13.7,4.8Z"[39m
+                  [33mfill[39m=[32m"#fff"[39m
+                [36m/>[39m
+                [36m<g>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M682.6,182.1c-8.3-5.4-18.5-8.1-30.6-8.1s-17.4,1.6-24.6,4.8c-7.2,3.2-13.2,7.6-18.1,13.1-4.9,5.5-8.6,11.7-11.1,18.6-2.5,6.9-3.8,14.2-3.8,21.7v4.1c0,7.3,1.3,14.4,3.8,21.3s6.3,13.2,11.2,18.8c4.9,5.6,11.1,10.1,18.4,13.4,7.3,3.3,15.8,4.9,25.4,4.9s17.8-1.7,25.1-5c7.3-3.4,13.3-8,18.1-13.9,4.8-5.9,8-12.6,9.7-20.2h-30.3c-1.4,3.4-4,6.3-7.8,8.6-3.8,2.3-8.8,3.5-14.8,3.5s-11.9-1.4-16.1-4.1c-4.1-2.7-7.1-6.6-9.1-11.6-1.1-2.8-1.8-5.9-2.3-9.2h82.4v-11.1c0-10.3-2.2-19.8-6.6-28.5-4.4-8.7-10.7-15.8-19-21.2h0ZM628.4,216.1c2.1-5,5.1-8.8,9.1-11.3,4-2.5,8.8-3.8,14.6-3.8s10.3,1.3,14.1,3.8c3.8,2.5,6.6,6.2,8.4,10.9,1,2.5,1.7,5.4,2.2,8.5h-50.7c.5-3,1.3-5.7,2.3-8.1h0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M791.6,174.4h-1.4c-8.7,0-16,1.9-22,5.8-6,3.8-10.5,9.6-13.5,17.3-1,2.7-1.9,5.7-2.6,8.9v-28.5h-26.3v112.8h33.2v-65.7c0-6.3,1.9-11.4,5.7-15.2,3.8-3.8,8.8-5.8,14.9-5.8s10.8,1.9,14.3,5.7c3.5,3.8,5.2,8.7,5.2,14.7v66.3h33.2v-64.4c0-17.4-3.5-30.4-10.4-39-6.9-8.6-17-12.9-30.2-12.9h0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M890.3,147.4h-30.7v30.5h-17.3v24.3h17.2v44.5c0,11.4,1.6,20.4,4.8,27.1,3.3,6.7,8.4,11.4,15.4,14.3,7,2.9,16.2,4.3,27.6,4.3h15.8v-28h-16.7c-5.2,0-9.2-1.4-12-4.2-2.8-2.8-4.2-6.9-4.2-12.2v-45.7h32.9v-24.3h-32.9v-30.5h0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<polygon[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                    [33mpoints[39m=[32m"983.8 177.9 950.6 177.9 950.6 177.9 943.5 177.9 935.7 202.3 950.6 202.3 950.6 290.7 983.8 290.7 983.8 202.4 983.8 202.4 983.8 177.9 983.8 177.9 983.8 177.9"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M1078.7,247.7c-.6,3.7-1.7,7-3.5,9.8-1.8,2.8-4.2,5-7.3,6.6-3.1,1.6-6.8,2.4-11.2,2.4s-10.7-1.3-14.3-4c-3.6-2.7-6.3-6.5-7.9-11.3s-2.5-10.3-2.5-16.4.9-12.1,2.7-17c1.8-4.9,4.5-8.7,8.1-11.4,3.6-2.7,8.2-4.1,13.7-4.1s11.5,1.8,15,5.2c3.6,3.5,5.6,7.9,6.2,13.1h32.3c-.6-9.2-3.2-17.3-7.8-24.3-4.7-7-10.9-12.5-18.7-16.4-7.8-3.9-16.8-5.9-27-5.9s-17.6,1.6-24.8,4.7c-7.2,3.2-13.2,7.5-18.1,13s-8.5,11.8-11,18.8c-2.5,7.1-3.7,14.4-3.7,22.1v3.9c0,7.4,1.2,14.6,3.6,21.5,2.4,6.9,6,13.1,10.8,18.6,4.8,5.5,10.8,9.9,17.9,13.2,7.1,3.3,15.7,4.9,25.5,4.9s19.2-2,27.2-6c8-4,14.3-9.5,19.2-16.6,4.8-7.1,7.4-15.3,7.8-24.6h-32.1,0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M508.7,138l-9.8,30.6h43.8l.7.5c1.2.9,1.7,1.7,1.7,3.2,0,9.5-.1,19.1-.2,27.5-.2,11.7-.3,25-.1,37.6v.3c-1.6,17.5-16.8,27-30.2,27s-19.8-5.9-24.2-15.7c-4.8-10.6-1.3-20,2.2-26.9l1.5-3h-33l-.5,1.3c-5.2,13.1-5.1,27.6.4,41,5.9,14.5,17.6,26,32,31.4,7,2.6,14.3,4,21.6,4,15.8,0,31.1-6.2,43.1-17.4,12.1-11.4,19.4-26.6,20.6-43h0c0,0,0-98.4,0-98.4h-69.5,0Z"[39m
+                    [33mfill[39m=[32m"#fff"[39m
+                  [36m/>[39m
+                [36m</g>[39m
+              [36m</g>[39m
+            [36m</g>[39m
+          [36m</svg>[39m
+        [36m</a>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-toolbar-source-disclosure"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mLoad document[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"arazzo-toolbar-source"[39m
+          [36m>[39m
+            [36m<input[39m
+              [33maria-label[39m=[32m"Arazzo document URL"[39m
+         ...
+ ❯ waitForWrapper ../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ test/optional-tools.test.tsx:151:31
+    149|   const origin = await screen.findByRole('button', { name: 'inspect-ch…
+    150|   fireEvent.click(origin);
+    151|   const dialog = await screen.findByRole('dialog', { name: 'Selection …
+       |                               ^
+    152|   const close = screen.getByRole('button', { name: 'Close details' });
+    153|   expect(document.activeElement).toBe(close);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  test/scenario-ui.test.tsx > narrow guide dismissal returns to an enabled guide control when terminal Next becomes disabled
+TestingLibraryElementError: Unable to find role="dialog" and name "Selection details"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui "[39m
+      [33mstyle[39m=[32m"width: 100%; height: 100%; display: flex;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-viewer-shell"[39m
+      [36m>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Workflows"[39m
+          [33mclass[39m=[32m"arazzo-workflow-navigation"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+          [36m>[39m
+            [0mAll workflows[0m
+          [36m</button>[39m
+          [36m<label>[39m
+            [0mSelect workflow[0m
+            [36m<select>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mAll workflows[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"checkout"[39m
+                [33mvalue[39m=[32m"checkout"[39m
+              [36m>[39m
+                [0mcheckout[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"payment"[39m
+                [33mvalue[39m=[32m"payment"[39m
+              [36m>[39m
+                [0mpayment[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"audit"[39m
+                [33mvalue[39m=[32m"audit"[39m
+              [36m>[39m
+                [0maudit[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"client"[39m
+                [33mvalue[39m=[32m"client"[39m
+              [36m>[39m
+                [0mclient[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-search-disclosure"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mSearch workflows and steps[0m
+            [36m</summary>[39m
+            [36m<label>[39m
+              [0mSearch workflows and steps[0m
+              [36m<input[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+          [36m</details>[39m
+          [36m<span[39m
+            [33mtitle[39m=[32m"checkout"[39m
+          [36m>[39m
+            [0mcheckout[0m
+            [0m · [0m
+            [0m0[0m
+            [0m incoming · [0m
+            [0m2[0m
+            [0m outgoing[0m
+          [36m</span>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"arazzo-reading-controls"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Reading view"[39m
+            [33mclass[39m=[32m"workflow-view-toggle"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"arazzo-control-scope"[39m
+            [36m>[39m
+              [0mReading view[0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+            [36m>[39m
+              [0mSequence diagram[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+            [36m>[39m
+              [0mStep descriptions[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-more-views"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mMore views[0m
+            [36m</summary>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"More views"[39m
+              [33mrole[39m=[32m"group"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mWorkflow diagram[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mFlowchart[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mSide by side[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</details>[39m
+        [36m</div>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-reader-help"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mHelp and optional views[0m
+          [36m</summary>[39m
+          [36m<p>[39m
+            [0mSequence diagrams and step descriptions show authored workflow declarations; they do not run operations.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mThis document has no supplied system participant information. Systems view requires a supplied profile or configured adapter.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mGuided walkthroughs use separately supplied author descriptions and require deliberate loading in the standalone viewer.[0m
+          [36m</p>[39m
+        [36m</details>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-inspection-status"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mInspection status[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Inspection status details"[39m
+            [33mrole[39m=[32m"region"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0mAPI descriptions have not been loaded, so their operations and versions have not been checked. This does not mean they are invalid or inaccessible. Declared source names remain available.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mInspection scope: Arazzo [0m
+              [0m1.1.0[0m
+              [0m, profile [0m
+              [0m1.1[0m
+              [0m. These views do not establish schema validation or execution support.[0m
+            [36m</p>[39m
+            [36m<ul>[39m
+              [36m<li>[39m
+                [0mSelected Arazzo 1.1 inspection; full 1.1 conformance is not established.[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<p>[39m
+              [0mReference expansion bypassed: unavailable base URI. Authored references are preserved.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mUnderstood local workflow calls remain inspectable. Missing and ambiguous targets are marked at their occurrences; external content is not expanded.[0m
+            [36m</p>[39m
+          [36m</div>[39m
+        [36m</details>[39m
+        [36m<section[39m
+          [33maria-label[39m=...
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"arazzo-ui "[39m
+      [33mstyle[39m=[32m"width: 100%; height: 100%; display: flex;"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"arazzo-viewer-shell"[39m
+      [36m>[39m
+        [36m<nav[39m
+          [33maria-label[39m=[32m"Workflows"[39m
+          [33mclass[39m=[32m"arazzo-workflow-navigation"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33maria-pressed[39m=[32m"false"[39m
+          [36m>[39m
+            [0mAll workflows[0m
+          [36m</button>[39m
+          [36m<label>[39m
+            [0mSelect workflow[0m
+            [36m<select>[39m
+              [36m<option[39m
+                [33mvalue[39m=[32m""[39m
+              [36m>[39m
+                [0mAll workflows[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"checkout"[39m
+                [33mvalue[39m=[32m"checkout"[39m
+              [36m>[39m
+                [0mcheckout[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"payment"[39m
+                [33mvalue[39m=[32m"payment"[39m
+              [36m>[39m
+                [0mpayment[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"audit"[39m
+                [33mvalue[39m=[32m"audit"[39m
+              [36m>[39m
+                [0maudit[0m
+              [36m</option>[39m
+              [36m<option[39m
+                [33mtitle[39m=[32m"client"[39m
+                [33mvalue[39m=[32m"client"[39m
+              [36m>[39m
+                [0mclient[0m
+              [36m</option>[39m
+            [36m</select>[39m
+          [36m</label>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-search-disclosure"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mSearch workflows and steps[0m
+            [36m</summary>[39m
+            [36m<label>[39m
+              [0mSearch workflows and steps[0m
+              [36m<input[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+          [36m</details>[39m
+          [36m<span[39m
+            [33mtitle[39m=[32m"checkout"[39m
+          [36m>[39m
+            [0mcheckout[0m
+            [0m · [0m
+            [0m0[0m
+            [0m incoming · [0m
+            [0m2[0m
+            [0m outgoing[0m
+          [36m</span>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"arazzo-reading-controls"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Reading view"[39m
+            [33mclass[39m=[32m"workflow-view-toggle"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"arazzo-control-scope"[39m
+            [36m>[39m
+              [0mReading view[0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+            [36m>[39m
+              [0mSequence diagram[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+            [36m>[39m
+              [0mStep descriptions[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<details[39m
+            [33mclass[39m=[32m"arazzo-more-views"[39m
+          [36m>[39m
+            [36m<summary>[39m
+              [0mMore views[0m
+            [36m</summary>[39m
+            [36m<div[39m
+              [33maria-label[39m=[32m"More views"[39m
+              [33mrole[39m=[32m"group"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mWorkflow diagram[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mFlowchart[0m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+              [36m>[39m
+                [0mSide by side[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</details>[39m
+        [36m</div>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-reader-help"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mHelp and optional views[0m
+          [36m</summary>[39m
+          [36m<p>[39m
+            [0mSequence diagrams and step descriptions show authored workflow declarations; they do not run operations.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mThis document has no supplied system participant information. Systems view requires a supplied profile or configured adapter.[0m
+          [36m</p>[39m
+          [36m<p>[39m
+            [0mGuided walkthroughs use separately supplied author descriptions and require deliberate loading in the standalone viewer.[0m
+          [36m</p>[39m
+        [36m</details>[39m
+        [36m<details[39m
+          [33mclass[39m=[32m"arazzo-inspection-status"[39m
+        [36m>[39m
+          [36m<summary>[39m
+            [0mInspection status[0m
+          [36m</summary>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"Inspection status details"[39m
+            [33mrole[39m=[32m"region"[39m
+          [36m>[39m
+            [36m<p>[39m
+              [0mAPI descriptions have not been loaded, so their operations and versions have not been checked. This does not mean they are invalid or inaccessible. Declared source names remain available.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mInspection scope: Arazzo [0m
+              [0m1.1.0[0m
+              [0m, profile [0m
+              [0m1.1[0m
+              [0m. These views do not establish schema validation or execution support.[0m
+            [36m</p>[39m
+            [36m<ul>[39m
+              [36m<li>[39m
+                [0mSelected Arazzo 1.1 inspection; full 1.1 conformance is not established.[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<p>[39m
+              [0mReference expansion bypassed: unavailable base URI. Authored references are preserved.[0m
+            [36m</p>[39m
+            [36m<p>[39m
+              [0mUnderstood local workflow calls remain inspectable. Missing and ambiguous targets are marked at their occurrences; external content is not expanded.[0m
+            [36m</p>[39m
+          [36m</div>[39m
+        [36m</details>[39m
+        [36m<section[39m
+          [33maria-label[39m=...
+ ❯ waitForWrapper ../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ test/scenario-ui.test.tsx:288:16
+    286|   const origin = within(panel).getByRole('button', { name: 'second-cha…
+    287|   fireEvent.click(origin);
+    288|   await screen.findByRole('dialog', { name: 'Selection details' });
+       |                ^
+    289|   fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    290|   expect(document.activeElement).toBe(origin);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 97 passed (99)
+      Tests  2 failed | 635 passed (637)
+   Start at  16:27:10
+   Duration  59.53s (tests 50%, import 25%, environment 16%, setup 5%, transform 3%)
+
+     Import  279 modules were evaluated 4108 times · 27.86s total, 25% of tracked time
+             ~12.40s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4}
+
+
+
+ Lerna (powered by Nx)   Running target test for 5 projects failed
+
+Failed tasks:
+
+- @jentic/arazzo-ui:test
+

@@ -113,9 +113,11 @@ export function generateDocumentation(
       authored: step.authored,
       diagnostics: step.diagnostics,
       actionDetails: step.effectiveActions,
-      parameterDetails: step.parameters,
+      parameterDetails: step.applicableParameters,
       prerequisites: step.prerequisites.map((fact) => prerequisite(fact.target, fact)),
-      parameters: step.parameters.map((parameter) => parameter.value as Parameter | ReusableObject),
+      parameters: step.applicableParameters.map(
+        (parameter) => parameter.value as Parameter | ReusableObject,
+      ),
       onSuccess: step.effectiveActions.onSuccess.map(
         (action) => action.value as SuccessAction | ReusableObject,
       ),

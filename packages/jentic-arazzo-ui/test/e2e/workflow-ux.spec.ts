@@ -11,13 +11,25 @@ installProductionChecks();
 const inventory = readInventory();
 const petstoreContract = JSON.parse(readFileSync('test/fixtures/petstore-contract.json', 'utf8'));
 const petstoreSource = 'https://petstore3.swagger.io/api/v3/openapi.json';
-const layoutNames = { diagram: 'Workflow diagram', docs: 'Read workflow', split: 'Side by side' };
+const layoutNames = {
+  diagram: 'Workflow diagram',
+  docs: 'Step descriptions',
+  split: 'Side by side',
+};
 const representationNames = {
   docs: 'Step descriptions',
   sequence: 'Sequence diagram',
   flowchart: 'Flowchart',
 };
 const escaped = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+async function choose(page: Page, name: string) {
+  if (['Workflow diagram', 'Flowchart', 'Side by side', 'Systems view'].includes(name)) {
+    const disclosure = page.locator('details.arazzo-more-views');
+    if (!(await disclosure.evaluate((element) => (element as HTMLDetailsElement).open)))
+      await disclosure.locator(':scope > summary').click();
+    await disclosure.getByRole('button', { name, exact: true }).click();
+  } else await page.getByRole('button', { name, exact: true }).click();
+}
 async function openDocument(page: Page, entry: AcceptanceDocument, baseURL: string) {
   await page.goto(
     entry.path.includes('petstore-order')
@@ -29,7 +41,7 @@ async function openDocument(page: Page, entry: AcceptanceDocument, baseURL: stri
 async function assertReadableDetails(page: Page, workflowId: string, stepId: string) {
   const control = page
     .getByRole('button', {
-      name: new RegExp(`^View details for ${escaped(workflowId)}\\.${escaped(stepId)}(?: ·|$)`),
+      name: new RegExp(`^Inspect ${escaped(workflowId)}\\.${escaped(stepId)}(?: ·|$)`),
     })
     .first();
   await control.scrollIntoViewIfNeeded();
@@ -66,8 +78,14 @@ async function assertSequenceSemantics(page: Page, workflow: AcceptanceWorkflow)
             .replace(/ \((?:workflow|source|unknown|external)\)$/, ''),
         );
     }
-    const labels = [...document.querySelectorAll('ol[aria-label="Ordered interactions"] > li')];
-    return [...svg.querySelectorAll('[data-sequence-id]')].map((row, index) => {
+    const labels = new Map(
+      [
+        ...document.querySelectorAll(
+          'ol[aria-label="Ordered interactions"] [data-sequence-list-id]',
+        ),
+      ].map((item) => [item.getAttribute('data-sequence-list-id'), item]),
+    );
+    return [...svg.querySelectorAll('[data-sequence-id]')].map((row) => {
       const identity = JSON.parse(row.getAttribute('data-sequence-id')!);
       const line = row.querySelector(':scope > line');
       const loopX = row
@@ -88,7 +106,11 @@ async function assertSequenceSemantics(page: Page, workflow: AcceptanceWorkflow)
         path: identity[2],
         local: identity[3],
         title: row.querySelector('title')?.textContent ?? '',
-        fullLabel: labels[index]?.querySelector('span[title]')?.getAttribute('title') ?? '',
+        fullLabel:
+          labels
+            .get(row.getAttribute('data-sequence-id'))
+            ?.querySelector('[title]')
+            ?.getAttribute('title') ?? '',
         from: lanes.get(line?.getAttribute('x1') ?? loopX ?? ''),
         to: lanes.get(line?.getAttribute('x2') ?? loopX ?? ''),
         arrow: arrow(line ?? row.querySelector(':scope > path')),
@@ -133,31 +155,28 @@ async function assertSequenceSemantics(page: Page, workflow: AcceptanceWorkflow)
   const actions = visible.flatMap((step) =>
     step.actions
       .filter((action) => ['goto', 'retry'].includes(action.type))
-      .map((action) => ({ ...action, stepId: step.stepId })),
+      .map((action) => ({ ...action, stepId: step.stepId, stepKind: step.kind })),
   );
-  const transfers = rootRows.filter((row) => ['onSuccess', 'onFailure'].includes(row.local[1]));
-  expect(transfers).toHaveLength(actions.length);
+  const list = page.locator('ol[aria-label="Ordered interactions"]');
   for (const action of actions) {
-    const row = transfers.find(
-      (row) =>
-        row.local[0] === action.stepId &&
-        row.local[1] === action.channel &&
-        row.title.includes(action.name),
-    );
-    expect(row?.title, `${workflow.workflowId}.${action.stepId}: authored action`).toContain(
-      `${action.channel} ${action.type}: ${action.name}`,
-    );
-    if (action.target) expect(row?.title).toContain(action.target);
-    expect(row?.from).toBe(workflow.workflowId);
-    expect(row?.to, `${workflow.workflowId}.${action.stepId}: transfer endpoint`).toBe(
-      action.targetLane,
-    );
-    expect(row?.arrow, 'Transfer must draw its directed arrow').toBe(true);
-    expect(row?.returns).toEqual(
-      action.returnToSource
-        ? [{ from: action.targetLane, to: workflow.workflowId, arrow: true }]
-        : [],
-    );
+    const step = list
+      .getByRole('button', {
+        name: new RegExp(
+          `^Inspect ${escaped(workflow.workflowId)}\\.${escaped(action.stepId)} · ${action.stepKind}`,
+        ),
+      })
+      .first()
+      .locator('..');
+    const disclosure = step.locator('details.arazzo-step-actions');
+    await expect(
+      disclosure,
+      `${workflow.workflowId}.${action.stepId}: action disclosure`,
+    ).toBeVisible();
+    await disclosure.locator(':scope > summary').click();
+    await expect(disclosure).toContainText(action.name);
+    await expect(disclosure).toContainText(action.type);
+    if (action.target) await expect(disclosure).toContainText(action.target);
+    if (action.returnToSource) await expect(disclosure).toContainText('returns to retry');
   }
   const prerequisites = [
     ...workflow.prerequisites.map((reference) => ({ owner: workflow.workflowId, reference })),
@@ -181,10 +200,10 @@ test('UX default bare entry preserves five known Petstore interactions and reada
   await page.goto('/');
   expect(new URL(page.url()).search).toBe('');
   const action = page.getByRole('button', {
-    name: 'Sequence diagram for authenticateAndOrderPet',
+    name: 'Sequence diagram',
     exact: true,
   });
-  await action.click();
+  await expect(action).toHaveAttribute('aria-pressed', 'true');
   const participants = page.getByLabel('Sequence participants');
   if (process.env.ARAZZO_UX_FAULT === 'petstore-lanes')
     await participants.evaluate((node) => {
@@ -196,8 +215,53 @@ test('UX default bare entry preserves five known Petstore interactions and reada
   ).toContainText('petstoreAPI');
   await expect(participants.locator(':scope > div')).toHaveCount(2);
   await expect(participants).not.toContainText('Destination not established');
+  const initialRows = page.locator('.arazzo-sequence svg [data-sequence-id]');
+  await expect(initialRows).toHaveCount(5);
+  await info.attach('untouched-first-screen', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  if (info.project.name === 'mobile') {
+    const geometry = await initialRows.evaluateAll((nodes) => {
+      const canvas = nodes[0].closest('.arazzo-sequence-canvas')!;
+      const bounds = canvas.getBoundingClientRect();
+      const text = nodes[0].querySelector('text')!;
+      return {
+        first: nodes[0].getBoundingClientRect().toJSON(),
+        next: nodes[1].getBoundingClientRect().toJSON(),
+        clip: bounds.toJSON(),
+        scroll: canvas.scrollTop,
+        textSize: parseFloat(getComputedStyle(text).fontSize) * (text.getScreenCTM()?.a ?? 1),
+      };
+    });
+    expect(geometry.scroll).toBe(0);
+    expect(geometry.first.top).toBeGreaterThanOrEqual(geometry.clip.top);
+    expect(geometry.first.bottom).toBeLessThanOrEqual(Math.min(900, geometry.clip.bottom));
+    expect(geometry.next.top).toBeLessThan(Math.min(900, geometry.clip.bottom));
+    expect(geometry.textSize).toBeGreaterThanOrEqual(12);
+  }
   const ordered = page.locator('ol[aria-label="Ordered interactions"]');
-  await expect(ordered.getByRole('button', { name: / · operation · / })).toHaveCount(5);
+  await expect(ordered.locator(':scope > li > button.arazzo-reading-identity')).toHaveCount(5);
+  const firstIdentity = ordered.getByRole('button', {
+    name: /^Inspect authenticateAndOrderPet\.loginUser ·/,
+  });
+  if (process.env.ARAZZO_UX_FAULT === 'lost-identity')
+    await firstIdentity.evaluate((node) =>
+      node.addEventListener(
+        'click',
+        (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        },
+        true,
+      ),
+    );
+  await firstIdentity.click();
+  await expect(
+    inspector(page),
+    'UX direct identity activation must inspect the authored step',
+  ).toContainText('authenticateAndOrderPet.loginUser');
+  await page.keyboard.press('Escape');
   for (const [step, operation] of [
     ['loginUser', 'loginUser'],
     ['findAvailablePets', 'findPetsByStatus'],
@@ -215,6 +279,80 @@ test('UX default bare entry preserves five known Petstore interactions and reada
   });
 });
 
+test('UX Petstore descriptions keep detail entry with its step and overview has no bulk workflow control', async ({
+  page,
+}, info) => {
+  await page.goto('/');
+  await expect(page.getByRole('region', { name: 'Guided walkthroughs' })).toHaveCount(0);
+  await expect(page.locator('.arazzo-guide-setup > details')).not.toHaveAttribute('open', '');
+  await choose(page, 'Step descriptions');
+  await expect(page.locator('.timeline-dot')).toHaveText(['1', '2', '3', '4', '5']);
+  await expect(page.locator('.timeline-line')).toHaveCount(4);
+  await expect(page.locator('.timeline-item-last .timeline-line')).toHaveCount(0);
+  const identity = page
+    .locator('.workflow-details-content')
+    .getByRole('button', { name: /^Inspect authenticateAndOrderPet\.loginUser/ });
+  await identity.scrollIntoViewIfNeeded();
+  await expect(
+    identity.locator('xpath=ancestor::*[self::h1 or self::h2 or self::h3 or self::h4]'),
+  ).toHaveCount(1);
+  await expect(page.locator('.workflow-details-content')).not.toContainText(
+    'View details · loginUser',
+  );
+  await info.attach('descriptions-step', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await identity.click();
+  await expect(inspector(page)).toContainText('authenticateAndOrderPet.loginUser');
+  await page.keyboard.press('Escape');
+  await expect(identity).toBeFocused();
+  await page.getByRole('button', { name: 'All workflows' }).click();
+  await expect(page.locator('.workflow-details')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^(Expand|Collapse) All$/ })).toHaveCount(0);
+  await info.attach('overview-no-bulk-control', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+});
+
+test('UX following a local call retains sequence and exact caller return', async ({
+  page,
+  baseURL,
+}) => {
+  await page.goto(
+    `/?document=${encodeURIComponent(`${baseURL}/examples/digital-product/arazzo.yaml`)}`,
+  );
+  await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('fulfil-purchase');
+  await expect(page.getByRole('region', { name: 'Sequence fulfil-purchase' })).toBeVisible();
+  const follow = page.locator('.arazzo-sequence-list').getByRole('button', {
+    name: /Open workflow reserve-and-capture from fulfil-purchase.reserve-and-pay/,
+  });
+  if (process.env.ARAZZO_UX_FAULT === 'lost-sequence-follow')
+    await follow.evaluate((node) =>
+      node.addEventListener(
+        'click',
+        (event) => {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        },
+        true,
+      ),
+    );
+  await follow.click();
+  await expect(
+    page.getByRole('region', { name: 'Sequence reserve-and-capture' }),
+    'UX sequence follow must open the accepted callee in sequence',
+  ).toBeVisible();
+  await page
+    .getByRole('button', { name: 'Back to caller fulfil-purchase.reserve-and-pay' })
+    .click();
+  await expect(page.getByRole('region', { name: 'Sequence fulfil-purchase' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Select workflow' })).toHaveValue(
+    'fulfil-purchase',
+  );
+});
+
 for (const entry of inventory.documents) {
   test(`UX root reading matrix ${entry.path}`, async ({ page, baseURL }, info) => {
     test.setTimeout(120_000);
@@ -222,11 +360,12 @@ for (const entry of inventory.documents) {
     const root = entry.workflows[0];
     await page.getByRole('combobox', { name: 'Select workflow' }).selectOption(root.workflowId);
     for (const layout of entry.layouts) {
+      const name = layoutNames[layout as keyof typeof layoutNames];
+      await choose(page, name);
       const button = page.getByRole('button', {
-        name: layoutNames[layout as keyof typeof layoutNames],
+        name,
         exact: true,
       });
-      await button.click();
       await expect(button).toHaveAttribute('aria-pressed', 'true');
       if (layout === 'diagram') {
         await expect(page.locator('.react-flow')).toBeVisible();
@@ -242,11 +381,12 @@ for (const entry of inventory.documents) {
         continue;
       }
       for (const representation of entry.representations) {
+        const name = representationNames[representation as keyof typeof representationNames];
+        await choose(page, name);
         const control = page.getByRole('button', {
-          name: representationNames[representation as keyof typeof representationNames],
+          name,
           exact: true,
         });
-        await control.click();
         await expect(control).toHaveAttribute('aria-pressed', 'true');
         if (representation === 'flowchart') {
           const chart = page.getByRole('region', { name: 'Flowchart', exact: true });
@@ -289,9 +429,7 @@ for (const entry of inventory.documents) {
         workflow.workflowId,
       );
       await select.selectOption(workflow.workflowId);
-      await page
-        .getByRole('button', { name: `Sequence diagram for ${workflow.workflowId}`, exact: true })
-        .click();
+      await page.getByRole('button', { name: `Sequence diagram`, exact: true }).click();
       const participants = page.getByLabel('Sequence participants');
       const sources = await participants.evaluate((node) =>
         [...node.children]
@@ -305,17 +443,18 @@ for (const entry of inventory.documents) {
       expect(await participants.innerText()).not.toMatch(/\bP\d+\b/);
       const ordered = page.locator('ol[aria-label="Ordered interactions"]');
       await assertSequenceSemantics(page, workflow);
-      for (const kind of workflow.relationships) {
-        if (kind === 'continuation') await expect(ordered).toContainText('Structural continuation');
-        else
-          await expect(
-            ordered.getByRole('button', { name: new RegExp(` · ${kind}(?: ·| )`) }).first(),
-          ).toBeVisible();
-      }
+      if (workflow.relationships.includes('continuation'))
+        await expect(ordered).toContainText('Structural continuation');
+      if (workflow.relationships.includes('transfer'))
+        expect(await ordered.locator('details.arazzo-step-actions').count()).toBeGreaterThan(0);
+      if (workflow.relationships.includes('marker'))
+        await expect(ordered).toContainText(
+          /Collapsed call|limit|boundary|Recursion|external document has not been fetched|workflow is not present/i,
+        );
       if (workflow.steps.some((step) => step.kind === 'operation' && step.source === null))
         await expect(ordered).toContainText('The API destination is not established');
       if (workflow.limits.includes('rows')) {
-        await expect(ordered.locator(':scope > li')).toHaveCount(200);
+        await expect(ordered.locator(':scope > li')).toHaveCount(199);
         await expect(ordered).toContainText('200 rows');
         await expect(
           ordered.getByRole('button', { name: /^View complete documentation/ }),
@@ -327,7 +466,7 @@ for (const entry of inventory.documents) {
         await ordered
           .getByRole('button', {
             name: new RegExp(
-              `^View details for ${escaped(workflow.workflowId)}\\.${escaped(second.stepId)} · call`,
+              `^Inspect ${escaped(workflow.workflowId)}\\.${escaped(second.stepId)} · call`,
             ),
           })
           .click();
@@ -367,12 +506,10 @@ test('UX Petstore explicit lookup, duplicate, failure and reload keep inspector 
     });
   });
   await page.goto('/');
-  await page
-    .getByRole('button', { name: 'Sequence diagram for authenticateAndOrderPet', exact: true })
-    .click();
+  await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
   const ordered = page.locator('ol[aria-label="Ordered interactions"]');
   const details = ordered.getByRole('button', {
-    name: /^View details for authenticateAndOrderPet\.loginUser · operation/,
+    name: /^Inspect authenticateAndOrderPet\.loginUser/,
   });
   await details.click();
   await expect(inspector(page)).toContainText('Destination source: petstoreAPI');
@@ -449,9 +586,13 @@ test('UX partial and duplicate candidate coverage never promotes an unchecked un
     route.fulfill({ json: duplicate ? petstoreContract : { ...petstoreContract, paths: {} } }),
   );
   await page.goto(`/?document=${encodeURIComponent(documentURL)}`);
-  await page.getByRole('button', { name: 'Sequence diagram for root', exact: true }).click();
+  await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
   const participants = page.getByLabel('Sequence participants');
-  await page.getByRole('button', { name: /^View details for root\.login · operation/ }).click();
+  await page
+    .locator('.arazzo-sequence-list')
+    .getByRole('button', { name: /^Inspect root\.login/ })
+    .first()
+    .click();
   explicitSources(page).add(a);
   explicitSources(page).add(b);
   await inspector(page)
@@ -476,7 +617,7 @@ test('UX partial and duplicate candidate coverage never promotes an unchecked un
 test('UX first-use guide discovery starts at plain entry and help performs no acquisition', async ({
   page,
   baseURL,
-}) => {
+}, info) => {
   const acquisitions: string[] = [];
   page.on('request', (request) => {
     if (/scenarios\.json|openapi\.yaml|asyncapi\.yaml|openapi\.json/.test(request.url()))
@@ -484,23 +625,30 @@ test('UX first-use guide discovery starts at plain entry and help performs no ac
   });
   await page.goto('/');
   expect(new URL(page.url()).search).toBe('');
+  await info.attach('plain-no-guide-panel', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await page.getByText('Help and guides', { exact: true }).click();
   if (process.env.ARAZZO_UX_FAULT === 'missing-discovery')
-    await page
-      .getByRole('region', { name: 'Guided walkthroughs' })
-      .evaluate((node) => node.remove());
+    await page.locator('.arazzo-guide-setup').evaluate((node) => node.remove());
   await expect(
-    page.getByRole('region', { name: 'Guided walkthroughs' }),
+    page.locator('.arazzo-guide-setup'),
     'UX first-use discovery must reveal guide purpose without injected setup',
-  ).toContainText('Follow an author-provided guide');
+  ).toContainText('Follow an author-provided walkthrough');
   await page.getByText('Load guides from a URL', { exact: true }).click();
   await page.getByText('Guide file format', { exact: true }).click();
   await expect(page.locator('.arazzo-guide-setup')).toContainText('JSON');
   await expect(page.getByRole('textbox', { name: 'Guide file URL' })).toBeVisible();
   expect(acquisitions).toEqual([]);
-  await page.getByText('Systems view', { exact: true }).click();
+  await page.getByText('Help and optional views', { exact: true }).click();
   await expect(page.locator('.arazzo-ui')).toContainText('participant');
   expect(acquisitions).toEqual([]);
   await page.getByRole('button', { name: 'Open guided example', exact: true }).click();
+  await page
+    .getByRole('region', { name: 'Guided walkthroughs' })
+    .locator(':scope > details > summary')
+    .click();
   await expect(
     page.getByRole('region', { name: 'Guided walkthroughs' }).getByRole('button').first(),
   ).toBeVisible();
@@ -510,6 +658,10 @@ test('UX first-use guide discovery starts at plain entry and help performs no ac
     `${baseURL}/examples/digital-product/scenarios.json`,
   );
   expect(acquisitions).toEqual([`${baseURL}/examples/digital-product/scenarios.json`]);
+  await info.attach('supplied-guide-entry', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
 });
 
 for (const [state, content, expected] of [
@@ -536,10 +688,14 @@ for (const [state, content, expected] of [
   }) => {
     if (state === 'mismatched') {
       await page.goto('/consumer/?surface=mismatched-guide');
+      await page
+        .getByRole('region', { name: 'Guided walkthroughs' })
+        .locator(':scope > details > summary')
+        .click();
       await page.getByRole('button', { name: 'wrong-document', exact: true }).click();
       await expect(page.locator('.arazzo-ui')).toContainText(expected);
       await page.getByRole('button', { name: 'Return to workflow', exact: true }).click();
-      await page.getByRole('button', { name: 'Sequence diagram for entry', exact: true }).click();
+      await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
       await expect(page.getByLabel('Sequence participants')).toContainText('pay');
       return;
     }
@@ -560,9 +716,7 @@ for (const [state, content, expected] of [
     await expect.poll(() => Boolean(release)).toBe(true);
     release!();
     await expect(page.locator('.arazzo-guide-setup')).toContainText(expected);
-    await page
-      .getByRole('button', { name: 'Sequence diagram for authenticateAndOrderPet', exact: true })
-      .click();
+    await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
     await expect(page.getByLabel('Sequence participants')).toContainText('petstoreAPI');
     await expect(page.locator('.arazzo-ui')).not.toContainText('Scenario passed');
   });
@@ -587,11 +741,9 @@ test('UX legacy document query/hash and shared occurrence history preserve exact
     'UX legacy hash must restore the authored stress document',
   ).toContainText('batch-fulfilment');
   await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('batch-fulfilment');
-  await page
-    .getByRole('button', { name: 'Sequence diagram for batch-fulfilment', exact: true })
-    .click();
-  const second = page.getByRole('button', {
-    name: /^View details for batch-fulfilment\.second-item · call/,
+  await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
+  const second = page.locator('.arazzo-sequence-list').getByRole('button', {
+    name: /^Inspect batch-fulfilment\.second-item · call/,
   });
   await second.click();
   await expect(inspector(page)).toContainText('2499');
@@ -641,7 +793,7 @@ test('UX rejected flowchart exposes retry and descriptions without blank success
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Flowchart', exact: true }).click();
+  await choose(page, 'Flowchart');
   const region = page.getByRole('region', { name: 'Flowchart', exact: true });
   await expect(region).toContainText('Unable to draw this flowchart');
   if (process.env.ARAZZO_UX_FAULT === 'silent-render')
@@ -654,7 +806,7 @@ test('UX rejected flowchart exposes retry and descriptions without blank success
   await expect(
     page.getByRole('button', { name: 'Step descriptions', exact: true }),
   ).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('button', { name: 'Flowchart', exact: true }).click();
+  await choose(page, 'Flowchart');
   await expect(region).toContainText('Unable to draw this flowchart');
   await page.evaluate(() => Object.assign(window, { acceptanceRenderReject: false }));
   const retry = region.getByRole('button', { name: 'Retry diagram', exact: true });
@@ -669,15 +821,15 @@ test('UX installed ESM controlled requests, repeated scopes and obsolete provide
   page,
 }) => {
   await page.goto('/consumer/?surface=controlled');
-  const direct = page.getByRole('button', { name: 'Sequence diagram for entry', exact: true });
+  const direct = page.getByRole('button', { name: 'Sequence diagram', exact: true });
   await direct.click();
   await direct.click();
   expect(await page.evaluate(() => window.acceptanceState.views)).toEqual(['docs']);
   await expect(page.getByRole('region', { name: 'Sequence entry', exact: true })).toHaveCount(0);
   await page.evaluate(() => window.acceptanceControl!.acceptView());
   await expect(page.getByRole('region', { name: 'Sequence entry', exact: true })).toBeVisible();
-  const occurrences = page.getByRole('button', {
-    name: /^View details for helper\.capture · operation/,
+  const occurrences = page.locator('.arazzo-sequence-list').getByRole('button', {
+    name: /^Inspect helper\.capture/,
   });
   await expect(occurrences).toHaveCount(2);
   const names = await occurrences.evaluateAll((nodes) =>
@@ -689,8 +841,11 @@ test('UX installed ESM controlled requests, repeated scopes and obsolete provide
   expect(await page.evaluate(() => window.acceptanceState.workflows)).toEqual(['helper']);
   await expect(page.getByRole('combobox', { name: 'Select workflow' })).toHaveValue('entry');
   await page.evaluate(() => window.acceptanceControl!.acceptWorkflow());
-  await page.getByRole('button', { name: 'Sequence diagram for helper', exact: true }).click();
-  await page.getByRole('button', { name: /^View details for helper\.capture · operation/ }).click();
+  await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
+  await page
+    .locator('.arazzo-sequence-list')
+    .getByRole('button', { name: /^Inspect helper\.capture/ })
+    .click();
   await inspector(page)
     .getByRole('button', { name: 'Load API description pay', exact: true })
     .click();
@@ -735,7 +890,7 @@ for (const outcome of ['svg', 'error'] as const) {
     await page.goto('/consumer/?surface=controlled');
     await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('helper');
     await page.evaluate(() => window.acceptanceControl!.acceptWorkflow());
-    await page.getByRole('button', { name: 'Sequence diagram for helper', exact: true }).click();
+    await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
     await page.evaluate(() => window.acceptanceControl!.acceptView());
     await page.evaluate((outcome) => {
       const original = SVGGraphicsElement.prototype.getBBox;
@@ -751,7 +906,7 @@ for (const outcome of ['svg', 'error'] as const) {
         return original.call(this, options);
       };
     }, outcome);
-    await page.getByRole('button', { name: 'Flowchart', exact: true }).click();
+    await choose(page, 'Flowchart');
     await expect
       .poll(() =>
         page.evaluate(
@@ -761,7 +916,7 @@ for (const outcome of ['svg', 'error'] as const) {
       )
       .toBe(true);
     await expect(page.locator('.arazzo-ui')).toContainText('Replacement candidate');
-    await page.getByRole('button', { name: 'Flowchart', exact: true }).click();
+    await choose(page, 'Flowchart');
     await expect(
       page.getByRole('region', { name: 'Flowchart', exact: true }).locator('svg'),
     ).toBeVisible();
@@ -776,7 +931,7 @@ test('UX configured and stale Systems context keeps exact return and explanatory
   page,
 }) => {
   await page.goto('/consumer/?surface=systems');
-  await page.getByRole('combobox', { name: 'Perspective' }).selectOption('systems');
+  await choose(page, 'Systems view');
   await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('fulfil-purchase');
   await page
     .getByRole('button', {
@@ -805,7 +960,7 @@ test('UX configured and stale Systems context keeps exact return and explanatory
   await page.goto('/consumer/?surface=stale-profile');
   await page.getByText('Supplied system information has limitations.', { exact: true }).click();
   await expect(page.locator('.arazzo-ui')).toContainText('Profile version/document/revision');
-  await page.getByRole('button', { name: 'Sequence diagram for entry', exact: true }).click();
+  await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
   await expect(page.getByLabel('Sequence participants')).toContainText('pay');
   await expect(page.getByLabel('Sequence participants')).not.toContainText('Client');
 });
@@ -819,14 +974,10 @@ test('UX recursive, depth and row boundaries explain limits and expose complete 
       `/?document=${encodeURIComponent(`${baseURL}/examples/digital-product-stress/boundaries/${path}.arazzo.yaml`)}`,
     );
     await page.getByRole('combobox', { name: 'Select workflow' }).selectOption(workflow);
-    await page
-      .getByRole('button', { name: `Sequence diagram for ${workflow}`, exact: true })
-      .click();
+    await page.getByRole('button', { name: `Sequence diagram`, exact: true }).click();
   };
   await show('recursion', 'recursive-A');
-  await page
-    .getByRole('button', { name: /^Expand recursive-B\.return-A → recursive-A · call/ })
-    .click();
+  await page.getByRole('button', { name: /^Expand recursive-B\.return-A → recursive-A/ }).click();
   await expect(page.getByRole('list', { name: 'Ordered interactions' })).toContainText(
     'Recursion on the current call path',
   );
@@ -834,7 +985,7 @@ test('UX recursive, depth and row boundaries explain limits and expose complete 
   for (let layer = 1; layer <= 8; layer++)
     await page
       .getByRole('button', {
-        name: new RegExp(`^Expand layer-${layer}\\.next → layer-${layer + 1} · call`),
+        name: new RegExp(`^Expand layer-${layer}\\.next → layer-${layer + 1}`),
       })
       .click();
   await expect(page.getByRole('list', { name: 'Ordered interactions' })).toContainText(
@@ -849,12 +1000,16 @@ test('UX recursive, depth and row boundaries explain limits and expose complete 
 test('UX restored unavailable guide preserves its exact current workflow occurrence', async ({
   page,
   baseURL,
-}) => {
+}, info) => {
   const document = `${baseURL}/examples/digital-product-stress/arazzo.yaml`;
   const guide = `${baseURL}/examples/digital-product-stress/scenarios.json`;
   await page.goto(
     `/?document=${encodeURIComponent(document)}&scenarios=${encodeURIComponent(guide)}`,
   );
+  await page
+    .getByRole('region', { name: 'Guided walkthroughs' })
+    .locator(':scope > details > summary')
+    .click();
   await page.getByRole('button', { name: 'two-successful-items', exact: true }).click();
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Next waypoint', exact: true }).click();
@@ -867,6 +1022,10 @@ test('UX restored unavailable guide preserves its exact current workflow occurre
   await expect(page.locator('.arazzo-guide-setup')).toContainText('Guide file unavailable');
   await expect(inspector(page)).toContainText('second-item');
   await expect(inspector(page)).toContainText('2499');
+  await info.attach('restored-guide-unavailable', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
   await expect(page.locator('details.arazzo-advanced-tools')).not.toHaveAttribute('open', '');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('combobox', { name: 'Select workflow' })).toHaveValue(

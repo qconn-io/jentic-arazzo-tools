@@ -99,7 +99,7 @@ import type { WorkflowLocation } from './types/location';
 import { ArazzoUI } from './ArazzoUI';
 import { JenticLogo } from './components/JenticLogo';
 import { UploadIcon } from './components/UploadIcon';
-import { ViewModeControl } from './components/ViewModeControl';
+import { ReadingIntentContext } from './context/ReadingIntentContext';
 import { GuideSetup } from './components/AdvancedTools';
 import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 import type { ArazzoDocument } from './types/arazzo';
@@ -679,66 +679,68 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
               >
                 <JenticLogo style={{ height: '36px' }} />
               </a>
-              <div className="arazzo-toolbar-source">
-                <input
-                  type="text"
-                  aria-label="Arazzo document URL"
-                  value={urlInput}
-                  onChange={(e) => setUrlInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Enter Arazzo document URL..."
-                  style={{
-                    flex: 1,
-                    minWidth: 0,
-                    padding: '6px 12px',
-                    border: '1px solid #444',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    background: '#2a2a2a',
-                    color: '#fff',
-                  }}
-                />
-                <button
-                  onClick={handleExplore}
-                  style={{
-                    padding: '6px 16px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    background: '#94C83D',
-                    color: '#fff',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    fontWeight: 500,
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  Explore
-                </button>
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  aria-label="Upload Arazzo document"
-                  title="Upload Arazzo document"
-                  style={{
-                    padding: '6px',
-                    border: '1px solid #444',
-                    borderRadius: '6px',
-                    background: '#2a2a2a',
-                    color: '#fff',
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '32px',
-                    height: '32px',
-                  }}
-                >
-                  <UploadIcon size={16} />
-                </button>
-              </div>
+              <details className="arazzo-toolbar-source-disclosure">
+                <summary>Load document</summary>
+                <div className="arazzo-toolbar-source">
+                  <input
+                    type="text"
+                    aria-label="Arazzo document URL"
+                    value={urlInput}
+                    onChange={(e) => setUrlInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Enter Arazzo document URL..."
+                    style={{
+                      flex: 1,
+                      minWidth: 0,
+                      padding: '6px 12px',
+                      border: '1px solid #444',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      background: '#2a2a2a',
+                      color: '#fff',
+                    }}
+                  />
+                  <button
+                    onClick={handleExplore}
+                    style={{
+                      padding: '6px 16px',
+                      border: 'none',
+                      borderRadius: '6px',
+                      background: '#94C83D',
+                      color: '#fff',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      fontWeight: 500,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Explore
+                  </button>
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    aria-label="Upload Arazzo document"
+                    title="Upload Arazzo document"
+                    style={{
+                      padding: '6px',
+                      border: '1px solid #444',
+                      borderRadius: '6px',
+                      background: '#2a2a2a',
+                      color: '#fff',
+                      fontSize: '13px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '32px',
+                      height: '32px',
+                    }}
+                  >
+                    <UploadIcon size={16} />
+                  </button>
+                </div>
+              </details>
               <div className="arazzo-toolbar-mode">
                 <CopyLocationControl />
-                <ViewModeControl value={view} onChange={handleViewChange} />
               </div>
             </div>
             {hydration.error && <p role="status">{hydration.error}</p>}
@@ -838,66 +840,79 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
               }
             >
               <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
-                <ArazzoUI
-                  key={hydration.epoch}
-                  ref={ref}
-                  {...rest}
-                  documentIdentity={documentIdentity}
-                  documentRevision={documentRevision}
-                  defaultLocation={hydration.location}
-                  onLocationChange={props.onLocationChange}
-                  sourceProvider={props.sourceProvider ?? browserProvider}
-                  baseURI={externalSource?.uri ?? props.baseURI}
-                  activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
-                  onExternalNavigation={async (request) => {
-                    if (props.onExternalNavigation) {
-                      props.onExternalNavigation(request);
-                      return;
-                    }
-                    navigationController.current?.abort();
-                    navigationRegistry.cancelAll();
-                    const controller = new AbortController();
-                    navigationController.current = controller;
-                    const generation = ++sourceGeneration.current;
-                    setNavigationError('');
-                    try {
-                      const acquired = await navigationRegistry.acquire(
-                        request.documentUri,
-                        request.revision,
-                      );
-                      if (controller.signal.aborted || generation !== sourceGeneration.current)
+                <ReadingIntentContext.Provider
+                  value={
+                    props.initialView === undefined &&
+                    props.location === undefined &&
+                    hydration.location === undefined
+                  }
+                >
+                  <ArazzoUI
+                    key={hydration.epoch}
+                    ref={ref}
+                    {...rest}
+                    documentIdentity={documentIdentity}
+                    documentRevision={documentRevision}
+                    defaultLocation={hydration.location}
+                    onLocationChange={props.onLocationChange}
+                    sourceProvider={props.sourceProvider ?? browserProvider}
+                    baseURI={externalSource?.uri ?? props.baseURI}
+                    activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
+                    onExternalNavigation={async (request) => {
+                      if (props.onExternalNavigation) {
+                        props.onExternalNavigation(request);
                         return;
-                      if (request.revision !== undefined && acquired.revision !== request.revision)
-                        throw new Error(
-                          `Revision mismatch: requested ${request.revision}, got ${acquired.revision ?? 'no revision'}`,
+                      }
+                      navigationController.current?.abort();
+                      navigationRegistry.cancelAll();
+                      const controller = new AbortController();
+                      navigationController.current = controller;
+                      const generation = ++sourceGeneration.current;
+                      setNavigationError('');
+                      try {
+                        const acquired = await navigationRegistry.acquire(
+                          request.documentUri,
+                          request.revision,
                         );
-                      commitSource(
-                        typeof acquired.content === 'string'
-                          ? acquired.content
-                          : JSON.stringify(acquired.content),
-                        {
-                          uri: acquired.retrievalURI,
-                          revision: acquired.revision,
-                          root: request.workflowId,
-                        },
-                      );
-                      setUrlInput(acquired.retrievalURI);
-                    } catch (error) {
-                      if (!controller.signal.aborted && generation === sourceGeneration.current)
-                        setNavigationError(error instanceof Error ? error.message : String(error));
-                    }
-                  }}
-                  scenarioManifest={guides.manifest}
-                  scenarioManifestURI={guides.uri}
-                  scenarioSelection={guides.selection}
-                  onScenarioSelectionChange={guides.setSelection}
-                  onScenarioLocationRequest={navigateScenarioLocation}
-                  document={documentSource}
-                  view={view}
-                  onViewChange={handleViewChange}
-                  className={undefined}
-                  style={undefined}
-                />
+                        if (controller.signal.aborted || generation !== sourceGeneration.current)
+                          return;
+                        if (
+                          request.revision !== undefined &&
+                          acquired.revision !== request.revision
+                        )
+                          throw new Error(
+                            `Revision mismatch: requested ${request.revision}, got ${acquired.revision ?? 'no revision'}`,
+                          );
+                        commitSource(
+                          typeof acquired.content === 'string'
+                            ? acquired.content
+                            : JSON.stringify(acquired.content),
+                          {
+                            uri: acquired.retrievalURI,
+                            revision: acquired.revision,
+                            root: request.workflowId,
+                          },
+                        );
+                        setUrlInput(acquired.retrievalURI);
+                      } catch (error) {
+                        if (!controller.signal.aborted && generation === sourceGeneration.current)
+                          setNavigationError(
+                            error instanceof Error ? error.message : String(error),
+                          );
+                      }
+                    }}
+                    scenarioManifest={guides.manifest}
+                    scenarioManifestURI={guides.uri}
+                    scenarioSelection={guides.selection}
+                    onScenarioSelectionChange={guides.setSelection}
+                    onScenarioLocationRequest={navigateScenarioLocation}
+                    document={documentSource}
+                    view={view}
+                    onViewChange={handleViewChange}
+                    className={undefined}
+                    style={undefined}
+                  />
+                </ReadingIntentContext.Provider>
               </div>
             </GuideSetup>
             {dragging && (

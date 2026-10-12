@@ -13,6 +13,59 @@ vi.mock('mermaid', () => ({
   default: { initialize: vi.fn(), render: vi.fn(async () => ({ svg: '<svg />' })) },
 }));
 Element.prototype.scrollIntoView = vi.fn();
+
+test('raw unsupported replacement preserves public class, dimensions and ref document', async () => {
+  const { ArazzoUI } = await import('../src/ArazzoUI');
+  const { nestedCalls } = await import('./fixtures/connected');
+  const ref = React.createRef<import('../src/ArazzoUI').ArazzoUIRef>();
+  const unsupported = { ...nestedCalls, arazzo: '1.2.0' };
+  const mount = (doc: typeof nestedCalls) => (
+    <ArazzoUI
+      ref={ref}
+      document={doc}
+      className="host-viewer"
+      style={{ width: 400, height: 700 }}
+    />
+  );
+  const { rerender, container } = render(mount(nestedCalls));
+  await screen.findByRole('region', { name: 'Sequence checkout' });
+  rerender(mount(unsupported));
+  await screen.findByText(/has no semantic inspection profile/);
+  const root = container.querySelector<HTMLElement>('.arazzo-ui')!;
+  expect(root.classList.contains('host-viewer')).toBe(true);
+  expect(root.style.width).toBe('400px');
+  expect(root.style.height).toBe('700px');
+  expect(root.querySelector('pre')?.textContent).toContain('1.2.0');
+  expect(container.querySelector('.arazzo-sequence')).toBeNull();
+  expect(ref.current?.getDocument()).toEqual(unsupported);
+  rerender(mount(nestedCalls));
+  await screen.findByRole('region', { name: 'Sequence checkout' });
+  expect(container.querySelector<HTMLElement>('.host-viewer')?.style.height).toBe('700px');
+});
+
+test('step descriptions retain connected numbered markers and exact heading selection', async () => {
+  const { ArazzoUI } = await import('../src/ArazzoUI');
+  const doc = (
+    await loadDocument(readFileSync('public/petstore-order-workflow.arazzo.yaml', 'utf8'))
+  ).document;
+  render(<ArazzoUI document={doc} view="docs" />);
+  const first = await screen.findByRole('button', {
+    name: 'Inspect authenticateAndOrderPet.loginUser',
+  });
+  expect([...document.querySelectorAll('.timeline-dot')].map((dot) => dot.textContent)).toEqual([
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+  ]);
+  expect(document.querySelectorAll('.timeline-line')).toHaveLength(4);
+  expect(document.querySelectorAll('.timeline-item-last')).toHaveLength(1);
+  expect(first.closest('h3')).toBeTruthy();
+  fireEvent.click(first);
+  fireEvent.click(screen.getByRole('button', { name: 'Close details' }));
+  expect(document.activeElement).toBe(first);
+});
 function Probe({ workflow, step }: { workflow: string; step: string }) {
   const session = useViewerSession();
   return (
@@ -90,9 +143,8 @@ test('default documentation links to shared details without repeating full proje
     <ArazzoUI document={nestedCalls} view={view} />
   );
   const { rerender } = render(mountUI('docs'));
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'View details for checkout.firstPayment' }),
-  );
+  fireEvent.click(await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' }));
+  await screen.findByRole('region', { name: 'Selection details' });
   const projection = () =>
     screen
       .getByRole('region', { name: 'Selection details' })

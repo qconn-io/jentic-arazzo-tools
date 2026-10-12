@@ -1,0 +1,37 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-sequence.test.tsx -t prerequisites precede
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+ ❯ test/reading-sequence.test.tsx (5 tests | 1 failed | 4 skipped) 442ms
+   × prerequisites precede their exact root, step and repeated callee occurrences 441ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  test/reading-sequence.test.tsx > prerequisites precede their exact root, step and repeated callee occurrences
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ test/reading-sequence.test.tsx:64:101
+     62|   expect(details.textContent).toContain('checkout.secondPayment');
+     63|   expect(details.textContent).toContain('Prerequisites');
+     64|   expect(details.querySelector('[data-reading-section="Caller-supplied…
+       |                                                                                                     ^
+     65|   fireEvent.click(within(details).getByRole('button', { name: 'Close d…
+     66|   expect(document.activeElement).toBe(prerequisites[1]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  16:32:46
+   Duration  2.31s (transform 30%, import 28%, tests 20%, environment 19%, setup 3%)
+
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error workspace @jentic/arazzo-ui@1.0.0-alpha.32
+npm error location /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+npm error command failed
+npm error command sh -c vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} --run test/reading-sequence.test.tsx -t 'prerequisites precede'

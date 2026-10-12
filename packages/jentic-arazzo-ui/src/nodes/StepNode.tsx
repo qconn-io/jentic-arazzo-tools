@@ -54,22 +54,22 @@ export function InspectionStepCard({
         className="arazzo-step-card-header"
         style={{ padding: '12px 14px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}
       >
-        <strong tabIndex={0} title={data.step.stepId}>
-          {data.step.stepId}
-        </strong>{' '}
-        <span>{data.type === 'workflowRef' ? 'WORKFLOW CALL' : binding?.sourceType || 'STEP'}</span>
-        {owner && (
+        {owner ? (
           <button
-            className="arazzo-detail-action nodrag nopan"
-            aria-label={`View details for ${owner}.${data.step.stepId}`}
+            className="arazzo-reading-identity nodrag nopan"
+            aria-label={`Inspect ${owner}.${data.step.stepId}`}
+            title={data.step.stepId}
             onClick={(event) => {
               event.stopPropagation();
               session.inspectStep(owner, data.step.stepId, event.currentTarget);
             }}
           >
-            View details
+            {data.step.stepId}
           </button>
-        )}
+        ) : (
+          <strong title={data.step.stepId}>{data.step.stepId}</strong>
+        )}{' '}
+        <span>{data.type === 'workflowRef' ? 'WORKFLOW CALL' : binding?.sourceType || 'STEP'}</span>
       </div>
       <div style={{ padding: '10px 14px' }}>
         {binding?.sourceName && <div style={rowStyle}>Source: {binding.sourceName}</div>}
@@ -111,8 +111,8 @@ export function InspectionStepCard({
           </div>
         ))}
         <div>
-          {fact?.parameters.length ?? 0} parameters · {Object.keys(data.step.outputs ?? {}).length}{' '}
-          output mappings
+          {fact?.applicableParameters.length ?? 0} parameters ·{' '}
+          {Object.keys(data.step.outputs ?? {}).length} output mappings
         </div>
         <div>Viewer inspection order</div>
         {(['onSuccess', 'onFailure'] as const).map((channel) =>

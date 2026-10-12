@@ -1,7 +1,7 @@
 import type { ArazzoViewerModel } from '../model/viewerModel';
 import type { SequenceRow } from './sequenceModel';
 import type { ClassifiedTarget, ParameterFact, PrerequisiteFact } from '../inspection';
-import type { EffectiveAction } from '../model/viewerModel';
+import type { ApplicableParameter, EffectiveAction } from '../model/viewerModel';
 
 interface PresentValue {
   present: boolean;
@@ -11,6 +11,10 @@ interface ValueRow extends PresentValue {
   label: string;
   location?: string;
   status?: ParameterFact['status'];
+  origin?: ApplicableParameter['origin'];
+  isOverride?: boolean;
+  path?: ParameterFact['path'];
+  declarationPath?: ParameterFact['declarationPath'];
 }
 interface RecoveryCard {
   name: string;
@@ -37,11 +41,14 @@ const property = (object: Record<string, unknown> | undefined, key: string): Pre
   present: !!object && Object.prototype.hasOwnProperty.call(object, key),
   value: object?.[key],
 });
-const parameterRows = (parameters: ParameterFact[]): ValueRow[] =>
+const parameterRows = (parameters: (ParameterFact | ApplicableParameter)[]): ValueRow[] =>
   parameters.map((p) => ({
     label: String(p.value.name ?? p.authored.reference ?? p.authored.$ref ?? 'Unnamed parameter'),
     location: p.value.in,
     status: p.status,
+    ...('origin' in p ? { origin: p.origin, isOverride: p.isOverride } : {}),
+    path: p.path,
+    declarationPath: p.declarationPath,
     ...property(p.value, 'value'),
   }));
 const outputRows = (object: Record<string, unknown> | undefined): ValueRow[] =>
@@ -109,12 +116,29 @@ export function projectOccurrenceDetails(
   if (!workflow) return undefined;
   if (!step) {
     if (stepId) return undefined;
+    const [callerWorkflow, callerStep] = row?.path.at(-1) ?? [];
+    const caller =
+      callerWorkflow && callerStep
+        ? model.stepsByWorkflow.get(callerWorkflow)?.get(callerStep)
+        : undefined;
+    const mappings: ReadingSection[] =
+      row?.kind === 'prerequisite' && caller?.callTarget?.workflowId === workflowId
+        ? [
+            {
+              kind: 'values',
+              title: 'Caller-supplied parameters',
+              ...property(caller.value, 'parameters'),
+              rows: parameterRows(caller.parameters),
+            },
+          ]
+        : [];
     return {
       title: workflowId,
       reading: {
         context: { owningWorkflow: workflowId, callPath: row?.path ?? [], occurrence: row?.label },
         sections: [
           { kind: 'prerequisites', title: 'Prerequisites', entries: workflow.prerequisites },
+          ...mappings,
           { kind: 'tree', title: 'Declared inputs', ...property(workflow.value, 'inputs') },
           {
             kind: 'values',
@@ -173,10 +197,12 @@ export function projectOccurrenceDetails(
     },
     {
       title: step.callTarget ? 'Caller-supplied parameters' : 'Parameters',
-      value: step.parameters.length
-        ? step.parameters.map((p) => ({
+      value: step.applicableParameters.length
+        ? step.applicableParameters.map((p) => ({
             ...p.value,
             status: p.status,
+            origin: p.origin,
+            isOverride: p.isOverride,
             authored: p.authored,
             path: p.path,
             declarationPath: p.declarationPath,
@@ -238,7 +264,7 @@ export function projectOccurrenceDetails(
         kind: 'values',
         title: step.callTarget ? 'Caller-supplied parameters' : 'Parameters',
         ...property(step.value, 'parameters'),
-        rows: parameterRows(step.parameters),
+        rows: parameterRows(step.applicableParameters),
       },
       {
         kind: 'tree',
