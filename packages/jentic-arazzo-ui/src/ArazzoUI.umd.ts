@@ -2,17 +2,19 @@ import React, { createRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
 import { ArazzoUI as ArazzoUIComponent } from './ArazzoUI';
-import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
+import type {
+  ArazzoUIProps,
+  ArazzoUIRef,
+  ViewerMode,
+  WorkflowLocationProps,
+  WorkflowPerspectiveProps,
+} from './types/index';
 import type { ArazzoDocument } from './types/arazzo';
 
-export interface ArazzoUIConfig {
+export interface ArazzoUIConfig extends WorkflowLocationProps, WorkflowPerspectiveProps {
   dom_id?: string;
   domNode?: HTMLElement;
   document: ArazzoDocument | string;
-  viewProfile?: ArazzoUIProps['viewProfile'];
-  viewProfileAdapter?: ArazzoUIProps['viewProfileAdapter'];
-  perspective?: ArazzoUIProps['perspective'];
-  onPerspectiveChange?: ArazzoUIProps['onPerspectiveChange'];
   view?: ViewerMode;
   activeWorkflowId?: string | null;
   selectedNodeId?: string | null;
@@ -20,13 +22,6 @@ export interface ArazzoUIConfig {
   onEdgeSelect?: ArazzoUIProps['onEdgeSelect'];
   onWorkflowSelect?: ArazzoUIProps['onWorkflowSelect'];
   onViewChange?: ArazzoUIProps['onViewChange'];
-  location?: ArazzoUIProps['location'];
-  defaultLocation?: ArazzoUIProps['defaultLocation'];
-  onLocationChange?: ArazzoUIProps['onLocationChange'];
-  onLocationStatus?: ArazzoUIProps['onLocationStatus'];
-  documentIdentity?: ArazzoUIProps['documentIdentity'];
-  documentRevision?: ArazzoUIProps['documentRevision'];
-  locationAdapters?: ArazzoUIProps['locationAdapters'];
 }
 
 export interface ArazzoUIInstance {

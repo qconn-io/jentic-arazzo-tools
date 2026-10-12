@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+
 import { useArazzoViewer } from './ArazzoViewerContext';
 import type { SequenceRow } from '../utils/sequence/sequenceModel';
-
 import type { WorkflowLocationStatus } from '../types/location';
 import type { ResolvedLocation } from '../utils/location/resolve';
 
@@ -55,6 +55,26 @@ export const useViewerSession = () => {
   if (!session) throw new Error('Viewer session is unavailable');
   return session;
 };
+
+function isFocusableDetailOrigin(control: HTMLElement | SVGElement | undefined): boolean {
+  if (!control?.isConnected) return false;
+  let ancestor: Element | null = control;
+  while (ancestor) {
+    if (
+      (ancestor instanceof HTMLElement && ancestor.hidden) ||
+      ancestor.hasAttribute('inert') ||
+      ancestor.matches(':disabled') ||
+      (ancestor.tagName === 'DETAILS' &&
+        !ancestor.hasAttribute('open') &&
+        !(control.tagName === 'SUMMARY' && control.parentElement === ancestor)) ||
+      getComputedStyle(ancestor).display === 'none' ||
+      getComputedStyle(ancestor).visibility === 'hidden'
+    )
+      return false;
+    ancestor = ancestor.parentElement;
+  }
+  return true;
+}
 
 export function ViewerSessionProvider({
   children,
@@ -140,100 +160,125 @@ export function ViewerSessionProvider({
   };
   const previous = useRef({ active: activeWorkflowId, selection: selectedNodeId });
 
-  useEffect(() => {
-    const prior = previous.current;
-    previous.current = { active: activeWorkflowId, selection: selectedNodeId };
-    if (restoration.current && activeWorkflowId === restoration.current.result.root) {
-      const request = restoration.current;
-      restoration.current = undefined;
-      applyLocation(request.result, request.view, request.callers);
-      return;
-    }
+  const completePendingRestoration = () => {
+    if (!restoration.current || activeWorkflowId !== restoration.current.result.root) return false;
+    const request = restoration.current;
+    restoration.current = undefined;
+    applyLocation(request.result, request.view, request.callers);
+    return true;
+  };
+
+  const completeAuthoredStepRequest = (prior: {
+    active: string | null;
+    selection: string | null;
+  }) => {
     const authored = authoredRequest.current;
-    if (authored) {
-      if (
-        authored.version !== viewer.selectionRequestVersion ||
-        (prior.selection !== selectedNodeId &&
-          (activeWorkflowId !== authored.workflowId ||
-            (selectedNodeId != null &&
-              selectedNodeId !== model.nodeIds.get(authored.workflowId)?.get(authored.stepId)))) ||
-        (prior.active !== activeWorkflowId && activeWorkflowId !== authored.workflowId)
-      ) {
-        authoredRequest.current = undefined;
-      } else if (activeWorkflowId === authored.workflowId) {
-        authoredRequest.current = undefined;
-        inspectStep(authored.workflowId, authored.stepId, authored.control);
-        return;
-      }
+    if (!authored) return false;
+    const targetNodeId = model.nodeIds.get(authored.workflowId)?.get(authored.stepId);
+    const supersededBySelection =
+      prior.selection !== selectedNodeId &&
+      (activeWorkflowId !== authored.workflowId ||
+        (selectedNodeId != null && selectedNodeId !== targetNodeId));
+    const supersededByWorkflow =
+      prior.active !== activeWorkflowId && activeWorkflowId !== authored.workflowId;
+    if (
+      authored.version !== viewer.selectionRequestVersion ||
+      supersededBySelection ||
+      supersededByWorkflow
+    ) {
+      authoredRequest.current = undefined;
+      return false;
     }
+    if (activeWorkflowId !== authored.workflowId) return false;
+    authoredRequest.current = undefined;
+    inspectStep(authored.workflowId, authored.stepId, authored.control);
+    return true;
+  };
+
+  const completePendingCallTransition = (prior: {
+    active: string | null;
+    selection: string | null;
+  }) => {
     if (
       pending.current &&
       pending.current.selectionRequestVersion !== viewer.selectionRequestVersion
     )
       pending.current = undefined;
     const request = pending.current;
-    if (request && activeWorkflowId === request.destination) {
-      if (
-        prior.selection !== selectedNodeId &&
-        selectedNodeId !== null &&
-        selectedNodeId !== undefined &&
-        !Array.from(model.nodeIds.get(request.destination)?.values() ?? []).includes(selectedNodeId)
-      ) {
-        pending.current = undefined;
-        setTrail([]);
-        return;
-      }
+    if (!request || activeWorkflowId !== request.destination) return false;
+    const destinationNodes = Array.from(model.nodeIds.get(request.destination)?.values() ?? []);
+    if (
+      prior.selection !== selectedNodeId &&
+      selectedNodeId !== null &&
+      !destinationNodes.includes(selectedNodeId)
+    ) {
       pending.current = undefined;
-      if (request.back) {
-        setTrail((frames) => frames.slice(0, -1));
-        setExpansions((value) => ({ ...value, [request.frame.root]: request.frame.expansion }));
-        setViews((value) => ({ ...value, [request.frame.root]: request.frame.view }));
-        setSelectedRow(request.frame.row);
-        setFocusRowId(request.frame.row.id);
-        const stepId =
-          request.frame.row.workflowId === request.frame.root
-            ? request.frame.row.step?.stepId
-            : request.frame.row.path[0]?.[1];
-        requestedSelection.current = stepId
-          ? model.nodeIds.get(request.frame.root)?.get(stepId)
-          : undefined;
-        viewer.navigateToTarget({
-          kind: 'local-step',
-          role: 'call',
-          reference: stepId ?? request.frame.root,
-          workflowId: request.frame.root,
-          stepId,
-          navigable: true,
-        });
-      } else {
-        if (request.carrySequence)
-          setViews((current) => ({ ...current, [request.destination]: 'sequence' }));
-        setTrail((frames) => [...frames, request.frame]);
+      setTrail([]);
+      return true;
+    }
+    pending.current = undefined;
+    if (request.back) {
+      setTrail((frames) => frames.slice(0, -1));
+      setExpansions((value) => ({ ...value, [request.frame.root]: request.frame.expansion }));
+      setViews((value) => ({ ...value, [request.frame.root]: request.frame.view }));
+      setSelectedRow(request.frame.row);
+      setFocusRowId(request.frame.row.id);
+      const stepId =
+        request.frame.row.workflowId === request.frame.root
+          ? request.frame.row.step?.stepId
+          : request.frame.row.path[0]?.[1];
+      requestedSelection.current = stepId
+        ? model.nodeIds.get(request.frame.root)?.get(stepId)
+        : undefined;
+      viewer.navigateToTarget({
+        kind: 'local-step',
+        role: 'call',
+        reference: stepId ?? request.frame.root,
+        workflowId: request.frame.root,
+        stepId,
+        navigable: true,
+      });
+    } else {
+      if (request.carrySequence)
+        setViews((current) => ({ ...current, [request.destination]: 'sequence' }));
+      setTrail((frames) => [...frames, request.frame]);
+      setSelectedRow(undefined);
+      setDetails(null);
+    }
+    return true;
+  };
+
+  const syncExternalSelectionChange = () => {
+    if (pending.current) {
+      pending.current = undefined;
+      setTrail([]);
+    }
+    const node = viewer.nodes.find((n) => n.id === selectedNodeId);
+    const owner = node && viewer.getNodeOwner(node);
+    if (owner && node && (node.data.type === 'step' || node.data.type === 'workflowRef')) {
+      if (selectedNodeId !== requestedSelection.current) {
+        origin.current =
+          document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
         setSelectedRow(undefined);
-        setDetails(null);
+        setDetails({ workflowId: owner, stepId: node.data.step.stepId });
       }
-    } else if (prior.active !== activeWorkflowId) {
+    } else if (!selectedNodeId) setDetails(null);
+  };
+
+  useEffect(() => {
+    const prior = previous.current;
+    previous.current = { active: activeWorkflowId, selection: selectedNodeId };
+    if (completePendingRestoration()) return;
+    if (completeAuthoredStepRequest(prior)) return;
+    if (completePendingCallTransition(prior)) return;
+    if (prior.active !== activeWorkflowId) {
       pending.current = undefined;
       setTrail([]);
       setSelectedRow(undefined);
       setDetails(null);
       setFocusRowId(undefined);
     } else if (prior.selection !== selectedNodeId) {
-      if (request) {
-        pending.current = undefined;
-        setTrail([]);
-      }
-      const node = viewer.nodes.find((n) => n.id === selectedNodeId);
-      const owner = node && viewer.getNodeOwner(node);
-      if (owner && node && (node.data.type === 'step' || node.data.type === 'workflowRef')) {
-        const stepId = node.data.step.stepId;
-        if (selectedNodeId !== requestedSelection.current) {
-          origin.current =
-            document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
-          setSelectedRow(undefined);
-          setDetails({ workflowId: owner, stepId });
-        }
-      } else if (!selectedNodeId) setDetails(null);
+      syncExternalSelectionChange();
     }
   }, [activeWorkflowId, selectedNodeId, model, viewer.selectionRequestVersion]);
 
@@ -324,27 +369,7 @@ export function ViewerSessionProvider({
       setDetails(null);
     },
     restoreDetailsFocus: (fallback) => {
-      let control = origin.current;
-      if (control?.isConnected) {
-        let ancestor: Element | null = control;
-        while (ancestor) {
-          if (
-            (ancestor instanceof HTMLElement && ancestor.hidden) ||
-            ancestor.hasAttribute('inert') ||
-            ancestor.matches(':disabled') ||
-            (ancestor.tagName === 'DETAILS' &&
-              !ancestor.hasAttribute('open') &&
-              !(control.tagName === 'SUMMARY' && control.parentElement === ancestor)) ||
-            getComputedStyle(ancestor).display === 'none' ||
-            getComputedStyle(ancestor).visibility === 'hidden'
-          ) {
-            control = undefined;
-            break;
-          }
-          ancestor = ancestor.parentElement;
-        }
-      } else control = undefined;
-      (control ?? fallback)?.focus();
+      (isFocusableDetailOrigin(origin.current) ? origin.current : fallback)?.focus();
     },
     clearTrail: () => {
       pending.current = undefined;

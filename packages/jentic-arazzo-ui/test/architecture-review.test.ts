@@ -1,3 +1,5 @@
+import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { expect, test } from 'vitest';
 import type { JSONSchema } from '../src/types/arazzo';
 import { loadDocument } from '../src/utils/loading/loadDocument';
@@ -128,4 +130,38 @@ test('recognized dialects and boolean subschemas permit ordinary reference expan
   expect(loaded.document.workflows[0].inputs).toMatchObject({
     properties: { p: { type: 'string' } },
   });
+});
+
+test('repository hygiene excludes tracked test-results and uppercase added line comments', () => {
+  const repoRoot = resolve(import.meta.dirname, '../../..');
+  const trackedTestResults = execFileSync(
+    'git',
+    ['ls-files', 'packages/jentic-arazzo-ui/test-results'],
+    { cwd: repoRoot, encoding: 'utf8' },
+  ).trim();
+  expect(trackedTestResults).toBe('');
+
+  const diff = execFileSync(
+    'git',
+    ['diff', 'main', '--', 'packages/jentic-arazzo-ui/src', 'packages/jentic-arazzo-ui/test'],
+    { cwd: repoRoot, encoding: 'utf8', maxBuffer: 50 * 1024 * 1024 },
+  );
+  const uppercaseComments = diff
+    .split('\n')
+    .filter((line) => !line.startsWith('+++') && /^\+.*(^|[^:])\/\/\s*[A-Z]/.test(line));
+  expect(uppercaseComments).toEqual([]);
+
+  const commits = execFileSync(
+    'git',
+    ['log', 'main..HEAD', '--format=%H%x09%s%x09%(trailers:key=Signed-off-by,valueonly)'],
+    { cwd: repoRoot, encoding: 'utf8' },
+  )
+    .trim()
+    .split('\n')
+    .filter(Boolean);
+  for (const line of commits) {
+    const [sha, subject = '', signedOffBy = ''] = line.split('\t');
+    expect(subject.length, `${sha}: ${subject}`).toBeLessThanOrEqual(69);
+    expect(signedOffBy.trim(), `${sha}: missing Signed-off-by`).not.toBe('');
+  }
 });

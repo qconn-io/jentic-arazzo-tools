@@ -22,12 +22,9 @@ workflows:
     expect(model.inspection.snapshot.baseURI).toBe('http://test/commerce.yaml');
     expect(model.workflowsById.get('fulfil-item')).toBeDefined();
 
-    // Original external call classification remains unchanged
     const target = model.inspection.classifyTarget('$workflows.fulfil-item', { role: 'call' });
     expect(target.kind).toBe('local-workflow');
 
-    // In a primary document, it would be 'external-workflow' pointing to 'commerce'
-    // Let's create a primary document that refers to commerce
     const primaryContent = `
 arazzo: 1.1.0
 info:

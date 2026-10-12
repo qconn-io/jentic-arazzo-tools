@@ -2,22 +2,39 @@ import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import type {
   ArazzoDocument,
+  CatalogCoverageReport,
+  CatalogSelection,
   DocumentationMetadata,
   DocumentationPrerequisite,
   DocumentationSourceBinding,
   DocumentationSupport,
+  ExternalNavigationRequest,
+  ExternalWorkflowNavigationRequest,
   Parameter,
+  ProvidedSourceProvenance,
   ReusableObject,
+  SourceProvenance,
   StepDocumentation,
+  WorkflowCatalogCoverage,
+  WorkflowCatalogSelection,
   WorkflowDocumentation,
+  WorkflowLocationJSON,
   WorkflowRefNodeData,
+  WorkflowReviewResult,
+  WorkflowReviewValue,
+  WorkflowRevisionComparison,
 } from '../src/ArazzoUI';
 import type {
   ArazzoDocument as StandaloneDocument,
+  CatalogCoverageReport as StandaloneCatalogCoverageReport,
+  CatalogSelection as StandaloneCatalogSelection,
   DocumentationPrerequisite as StandalonePrerequisite,
   DocumentationSourceBinding as StandaloneSourceBinding,
   DocumentationSupport as StandaloneSupport,
+  ExternalWorkflowNavigationRequest as StandaloneExternalWorkflowNavigationRequest,
+  SourceProvenance as StandaloneSourceProvenance,
   WorkflowRefNodeData as StandaloneWorkflowRefNodeData,
+  WorkflowRevisionComparison as StandaloneWorkflowRevisionComparison,
 } from '../src/ArazzoUIStandalone';
 
 // these annotations compile as consumers of the public entry points.
@@ -98,11 +115,22 @@ describe('public type compatibility', () => {
     expectTypeOf<ReusableObject['value']>().toEqualTypeOf<Parameter['value']>();
   });
 
-  it('exports identical public contracts from both entries', () => {
+  it('exports identical public contracts and spec-documented aliases from both entries', () => {
     expectTypeOf<StandaloneDocument>().toEqualTypeOf<ArazzoDocument>();
     expectTypeOf<StandaloneWorkflowRefNodeData>().toEqualTypeOf<WorkflowRefNodeData>();
     expectTypeOf<StandaloneSupport>().toEqualTypeOf<DocumentationSupport>();
     expectTypeOf<StandaloneSourceBinding>().toEqualTypeOf<DocumentationSourceBinding>();
     expectTypeOf<StandalonePrerequisite>().toEqualTypeOf<DocumentationPrerequisite>();
+    expectTypeOf<WorkflowReviewValue>().toEqualTypeOf<WorkflowLocationJSON>();
+    expectTypeOf<SourceProvenance>().toEqualTypeOf<ProvidedSourceProvenance>();
+    expectTypeOf<StandaloneSourceProvenance>().toEqualTypeOf<ProvidedSourceProvenance>();
+    expectTypeOf<ExternalWorkflowNavigationRequest>().toEqualTypeOf<ExternalNavigationRequest>();
+    expectTypeOf<StandaloneExternalWorkflowNavigationRequest>().toEqualTypeOf<ExternalNavigationRequest>();
+    expectTypeOf<CatalogSelection>().toEqualTypeOf<WorkflowCatalogSelection>();
+    expectTypeOf<StandaloneCatalogSelection>().toEqualTypeOf<WorkflowCatalogSelection>();
+    expectTypeOf<CatalogCoverageReport>().toEqualTypeOf<WorkflowCatalogCoverage>();
+    expectTypeOf<StandaloneCatalogCoverageReport>().toEqualTypeOf<WorkflowCatalogCoverage>();
+    expectTypeOf<WorkflowRevisionComparison>().toEqualTypeOf<WorkflowReviewResult>();
+    expectTypeOf<StandaloneWorkflowRevisionComparison>().toEqualTypeOf<WorkflowReviewResult>();
   });
 });

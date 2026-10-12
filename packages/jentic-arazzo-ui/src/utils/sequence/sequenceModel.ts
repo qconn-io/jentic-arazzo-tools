@@ -43,8 +43,8 @@ export interface SequenceScene {
 export const destinationKey = (model: ArazzoViewerModel, step: ViewerStep): string =>
   JSON.stringify([model.documentId, step.workflowId, step.stepId]);
 
-// This is a display scene over inspected facts, never a trace or expression evaluator.
-// Full tuple identities distinguish repeated calls. Limits count every visible row,
+// this is a display scene over inspected facts, never a trace or expression evaluator.
+// full tuple identities distinguish repeated calls. Limits count every visible row,
 // including annotations and markers, and reserve the last row for omitted content.
 export function buildSequence(
   model: ArazzoViewerModel,
@@ -290,13 +290,13 @@ export function buildSequence(
     return true;
   };
   visit(root, [], [rootWorkflowId]);
-  // Building a rejected row may have registered a destination; only visible lanes survive.
+  // building a rejected row may have registered a destination; only visible lanes survive.
   const visible = new Set(scene.rows.flatMap((row) => [row.from, row.to]));
   scene.participants = scene.participants.filter((p) => visible.has(p.id));
   return scene;
 }
 
-// A graph call uses the same root occurrence identity without rendering preceding rows.
+// a graph call uses the same root occurrence identity without rendering preceding rows.
 export function rootCallOccurrence(
   model: ArazzoViewerModel,
   workflowId: string,

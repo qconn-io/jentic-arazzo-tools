@@ -51,7 +51,7 @@ export interface SystemSceneOptions {
   expansion?: Readonly<Record<string, boolean>>;
   contracts?: Readonly<Record<string, OperationSourceCandidate>>;
 }
-// This projection never evaluates expressions, chooses responses, or acquires sources.
+// this projection never evaluates expressions, chooses responses, or acquires sources.
 export function buildSystemScene(
   model: ArazzoViewerModel,
   root: string,

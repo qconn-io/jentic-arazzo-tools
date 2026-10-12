@@ -151,7 +151,7 @@ export function authoredDifferences(
       b = candidate.documents.find((d) => d.definition.id === id);
     const kind = (a ?? b)!.definition.kind ?? 'arazzo';
     const contract = kind !== 'arazzo';
-    // Missing bytes are unknown, not evidence that the historic contract had no declarations.
+    // missing bytes are unknown, not evidence that the historic contract had no declarations.
     if (contract && (!a || !b)) continue;
     const ev = (
       p: ReviewProjection,
@@ -208,7 +208,7 @@ export function authoredDifferences(
             sb,
           );
       } else if (Array.isArray(x) && Array.isArray(y)) {
-        // Index comparison preserves sequence order and exact falsy payload leaves.
+        // index comparison preserves sequence order and exact falsy payload leaves.
         for (let i = 0; i < Math.max(x.length, y.length); i++)
           diff(x[i], y[i], [...pa, i], [...pb, i], i < x.length, i < y.length, wa, wb, sa, sb);
       } else emit(cat, before(), after());
@@ -225,7 +225,7 @@ export function authoredDifferences(
       next = Array.isArray(b.raw.workflows) ? b.raw.workflows : [];
     const matchList = options.matches ?? [];
     const paired = new Set<number>();
-    // Explicit matches reserve destinations; ordinary ID matching cannot steal them.
+    // explicit matches reserve destinations; ordinary ID matching cannot steal them.
     const workflowMatches = matchList.filter((m) => m.before.documentId === id && !m.before.stepId);
     for (const match of workflowMatches) {
       const implicit = old.some(

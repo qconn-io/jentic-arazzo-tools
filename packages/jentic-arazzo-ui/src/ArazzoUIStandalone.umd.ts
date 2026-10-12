@@ -2,18 +2,20 @@ import React, { createRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
 import { ArazzoUIStandalone as ArazzoUIStandaloneComponent } from './ArazzoUIStandalone';
-import type { ArazzoUIRef, ArazzoUIProps, ViewerMode } from './types/index';
+import type {
+  ArazzoUIRef,
+  ArazzoUIProps,
+  ViewerMode,
+  WorkflowLocationProps,
+  WorkflowPerspectiveProps,
+} from './types/index';
 import type { ArazzoUIStandaloneProps } from './ArazzoUIStandalone';
 import type { ArazzoDocument } from './types/arazzo';
 
-export interface ArazzoUIStandaloneConfig {
+export interface ArazzoUIStandaloneConfig extends WorkflowLocationProps, WorkflowPerspectiveProps {
   dom_id?: string;
   domNode?: HTMLElement;
   document: ArazzoDocument | string;
-  viewProfile?: ArazzoUIProps['viewProfile'];
-  viewProfileAdapter?: ArazzoUIProps['viewProfileAdapter'];
-  perspective?: ArazzoUIProps['perspective'];
-  onPerspectiveChange?: ArazzoUIProps['onPerspectiveChange'];
   initialView?: ViewerMode;
   catalog?: ArazzoUIStandaloneProps['catalog'];
   catalogURI?: ArazzoUIStandaloneProps['catalogURI'];
@@ -22,17 +24,10 @@ export interface ArazzoUIStandaloneConfig {
   sourceProvider?: ArazzoUIProps['sourceProvider'];
   activeWorkflowId?: string | null;
   selectedNodeId?: string | null;
-  onNodeSelect?: (nodeId: string, node: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
-  onEdgeSelect?: (edgeId: string, edge: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
+  onNodeSelect?: ArazzoUIProps['onNodeSelect'];
+  onEdgeSelect?: ArazzoUIProps['onEdgeSelect'];
   onWorkflowSelect?: (workflowId: string) => void;
   onViewChange?: (view: ViewerMode) => void;
-  location?: ArazzoUIProps['location'];
-  defaultLocation?: ArazzoUIProps['defaultLocation'];
-  onLocationChange?: ArazzoUIProps['onLocationChange'];
-  onLocationStatus?: ArazzoUIProps['onLocationStatus'];
-  documentIdentity?: ArazzoUIProps['documentIdentity'];
-  documentRevision?: ArazzoUIProps['documentRevision'];
-  locationAdapters?: ArazzoUIProps['locationAdapters'];
 }
 
 export interface ArazzoUIStandaloneInstance {

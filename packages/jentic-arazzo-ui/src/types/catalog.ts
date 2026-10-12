@@ -70,10 +70,14 @@ export interface WorkflowCatalogCoverage {
   state: 'loaded' | 'pending' | 'failed' | 'unsupported';
   message?: string;
 }
+/** @public */
+export type CatalogCoverageReport = WorkflowCatalogCoverage;
 /** Selected authored destination with optional step/action occurrence. @public */
 export interface WorkflowCatalogSelection extends WorkflowCatalogIdentity {
   location?: WorkflowLocation;
 }
+/** @public */
+export type CatalogSelection = WorkflowCatalogSelection;
 /** Optional embedded catalog; callbacks do not mutate host history. @public */
 export interface ArazzoCatalogProps {
   manifest: WorkflowCatalogManifest;

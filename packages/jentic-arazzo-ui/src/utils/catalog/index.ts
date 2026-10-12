@@ -61,9 +61,13 @@ export interface CatalogIndex {
   complete: boolean;
   coverageMessage: string;
 }
-export function buildCatalogIndex(loaded: CatalogLoadResult): CatalogIndex {
+export function buildCatalogIndex(
+  loaded: CatalogLoadResult,
+  options?: { includeCatalogExtension?: boolean },
+): CatalogIndex {
+  const includeCatalogExtension = options?.includeCatalogExtension ?? true;
   const entries: CatalogEntry[] = [];
-  // Dynamic contract sources can carry explicitly declared external workflow facts.
+  // dynamic contract sources can carry explicitly declared external workflow facts.
   const documents = new Map<string, CatalogLoadedDocument>();
   const include = (doc: CatalogLoadedDocument) => {
     const key = JSON.stringify([doc.definition.id, doc.definition.revision]);
@@ -87,14 +91,18 @@ export function buildCatalogIndex(loaded: CatalogLoadResult): CatalogIndex {
         root: identity.workflowId,
         view: 'docs',
         subview: 'docs',
-        extensions: {
-          [CATALOG_NAMESPACE]: {
-            catalogId: loaded.manifest.id,
-            catalogRevision: loaded.manifest.revision,
-            documentId: identity.documentId,
-            revision: identity.revision,
-          },
-        },
+        ...(includeCatalogExtension
+          ? {
+              extensions: {
+                [CATALOG_NAMESPACE]: {
+                  catalogId: loaded.manifest.id,
+                  catalogRevision: loaded.manifest.revision,
+                  documentId: identity.documentId,
+                  revision: identity.revision,
+                },
+              },
+            }
+          : {}),
       };
       entries.push({
         ...identity,

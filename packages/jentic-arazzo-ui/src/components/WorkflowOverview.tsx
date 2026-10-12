@@ -1,5 +1,6 @@
-import { workflowReadingLabel } from '../utils/readingLabels';
 import React, { useState } from 'react';
+
+import { workflowReadingLabel } from '../utils/readingLabels';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import type { WorkflowRelationship } from '../utils/model/viewerModel';
 

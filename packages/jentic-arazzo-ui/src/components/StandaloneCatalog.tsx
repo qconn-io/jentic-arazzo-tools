@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+
 import { ArazzoCatalog } from '../ArazzoCatalog';
 import { BrowserFetchProvider } from '../utils/source/BrowserFetchProvider';
 import { normalizeCatalogManifest } from '../utils/catalog/manifest';
@@ -7,6 +8,18 @@ import { readLocationURL, writeLocationURL } from '../utils/location/codec';
 import type { WorkflowCatalogManifest, WorkflowCatalogSelection } from '../types/catalog';
 import type { ArazzoUIStandaloneProps } from '../ArazzoUIStandalone';
 import type { WorkflowLocation } from '../types/location';
+
+export function useStandaloneCatalogInput(
+  props: ArazzoUIStandaloneProps,
+): WorkflowCatalogManifest | string | null {
+  const [href, setHref] = useState(globalThis.location.href);
+  useEffect(() => {
+    const pop = () => setHref(globalThis.location.href);
+    globalThis.addEventListener('popstate', pop);
+    return () => globalThis.removeEventListener('popstate', pop);
+  }, []);
+  return props.catalog ?? new URL(href).searchParams.get('catalog');
+}
 
 export function StandaloneCatalog({
   props,

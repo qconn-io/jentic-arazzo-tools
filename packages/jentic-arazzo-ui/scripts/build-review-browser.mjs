@@ -3,7 +3,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writeFile, readdir } from 'node:fs/promises';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-// Bundle the installed ESM entry as a downstream browser consumer for acceptance.
+// bundle the installed ESM entry as a downstream browser consumer for acceptance.
 await build({
   root,
   configFile: resolve(root, 'config/vite/vite.config.ts'),

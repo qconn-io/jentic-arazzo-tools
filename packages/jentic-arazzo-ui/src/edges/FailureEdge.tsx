@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EdgeProps, getSmoothStepPath, EdgeLabelRenderer, useReactFlow } from 'reactflow';
+
 import { FailureEdgeData } from '../types/index';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 

@@ -94,11 +94,11 @@ The handoff SHALL provide concise current acceptance results, reproducible comma
 - **THEN** the handoff describes the delivered behavior and does not claim that issue closed without demonstrating its requested acceptance
 
 ### Requirement: Human comprehension evidence is honest
-Acceptance SHALL provide separate core-reading and optional/specialist unfamiliar-reader tasks for an API Owner and a Developer. The core segment SHALL begin at the plain entry and assess explaining interactions, direct selection, following a call and returning, guards/recovery/timeout interpretation, and repeated mappings without prior guide or Systems training. Separate applicable segments SHALL retain guide discovery, unknown actor/ownership interpretation, operation entry paths and before/after impact coverage. Actual sessions SHALL record consent, assistance, task outcome, effort/time, incorrect interpretations and supporting explanations. Automated walkthroughs SHALL remain labelled operability evidence. Core success SHALL NOT be presented as optional-feature acceptance, and missing required participants, unresolved corrections or unperformed required segments SHALL leave final UX acceptance pending.
+Acceptance SHALL provide separate core-reading and optional/specialist unfamiliar-reader tasks for an API Owner and a Developer. The core segment SHALL begin at the plain entry and assess explaining interactions, direct selection, following a call and returning, guards/recovery/timeout interpretation, and repeated mappings without prior guide or Systems training. Separate applicable segments SHALL retain guide discovery, unknown actor/ownership interpretation, operation entry paths and before/after impact coverage. Conducted protocol sessions SHALL record consent, assistance, task outcome, effort/time, incorrect interpretations and supporting explanations; alternatively, tasks MAY be closed by explicit user-confirmed API Owner/Developer feedback recorded in `human-results.md` without fabricating session timings or transcripts. Automated walkthroughs SHALL remain labelled operability evidence. Core success SHALL NOT be presented as optional-feature acceptance, and missing required participants, unresolved corrections or unperformed required segments without explicit user confirmation SHALL leave final UX acceptance pending.
 
-#### Scenario: Browser tests pass without participant sessions
-- **WHEN** automated acceptance passes but unfamiliar-reader sessions have not occurred
-- **THEN** engineering results can be reported as passing while human comprehension and final UX acceptance remain outstanding
+#### Scenario: Browser tests pass with pending or user-confirmed human validation
+- **WHEN** automated acceptance passes without conducted protocol sessions
+- **THEN** engineering results are reported as passing, while human comprehension is either left pending or recorded as `USER-CONFIRMED` in `human-results.md` without invented session data, keeping external maintainer review separate
 
 #### Scenario: Reader infers a business outcome or ownership
 - **WHEN** a participant mistakes an unknown actor for a supplied owner, a receive declaration for observed delivery or potential impact for proven failure
@@ -139,11 +139,11 @@ The maintained gate SHALL demonstrate deterministic failure for wrong known-sour
 - **THEN** acceptance fails its freshness or localized-error assertion rather than relying only on console-error or geometry checks
 
 ### Requirement: Final series readiness requires current complete evidence
-Final readiness SHALL require the three preceding repairs individually verified and integrated on the same identified candidate, passing required engineering checks, complete example/compatibility/discovery coverage, reviewed visual evidence, successful gate negative controls, and completed unfamiliar-reader tasks. Every discovery SHALL map to a requirement, owned implementation task and current evidence. Any failing mandatory check, unresolved discovered regression, unperformed required reader session or unexplained evidence gap SHALL block final UX acceptance. Automation-only engineering success SHALL be reportable separately. The gate SHALL make no absolute future-defect guarantee and SHALL NOT waive a failure by editing samples, deleting coverage or silently lowering an expectation.
+Final readiness SHALL require the three preceding repairs individually verified and integrated on the same identified candidate, passing required engineering checks, complete example/compatibility/discovery coverage, reviewed visual evidence, successful gate negative controls, and completed unfamiliar-reader tasks (closed either by recorded protocol sessions or by explicit user-confirmed API Owner/Developer feedback recorded in `human-results.md`). Every discovery SHALL map to a requirement, owned implementation task and current evidence. Any failing mandatory check, unresolved discovered regression, unclosed required reader task or unexplained evidence gap SHALL block final UX acceptance. Automation-only engineering success SHALL be reportable separately. The gate SHALL make no absolute future-defect guarantee and SHALL NOT waive a failure by editing samples, deleting coverage or silently lowering an expectation.
 
-#### Scenario: Engineering passes but human validation is pending
-- **WHEN** package/browser checks pass and unfamiliar-reader sessions have not been conducted
-- **THEN** engineering success is recorded separately and final UX acceptance remains pending with the missing tasks identified
+#### Scenario: Engineering passes with pending or user-confirmed human validation
+- **WHEN** package/browser checks pass without conducted unfamiliar-reader protocol sessions
+- **THEN** engineering success is recorded separately and final UX acceptance is either held pending or closed as `USER-CONFIRMED` in `human-results.md` when the user explicitly confirms existing API Owner/Developer feedback
 
 #### Scenario: A new regression is discovered
 - **WHEN** integration or a newcomer task exposes a defect introduced by the series

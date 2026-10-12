@@ -28,7 +28,7 @@ export interface NativeSourceReference {
   depth: number;
 }
 
-// Native visitors look up both requested and returned identities. An alias lookup
+// native visitors look up both requested and returned identities. An alias lookup
 // returns the canonical reference, so schema children use the returned declaring URI.
 class AuthorityReferenceSet extends ReferenceSet {
   readonly acquired = new Map<string, SourceDocumentContent>();
@@ -61,7 +61,7 @@ class AuthorityReferenceSet extends ReferenceSet {
             value: reference.value,
           })
         : reference;
-    // The native visitor keeps its original reference while looking up the
+    // the native visitor keeps its original reference while looking up the
     // canonical one on the next schema visit; both belong to the same supplied set.
     reference.refSet = this;
     if (super.has(canonical.uri)) return this;
@@ -89,7 +89,7 @@ class AuthorityReferenceSet extends ReferenceSet {
             owners.add(canonical);
             parents.set(uri.href, owners);
           } catch {
-            // Native resolution reports unsupported/malformed schema identity in context.
+            // native resolution reports unsupported/malformed schema identity in context.
           }
         },
       });

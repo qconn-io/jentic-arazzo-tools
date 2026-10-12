@@ -15,7 +15,7 @@ export class BrowserFetchProvider implements SourceDocumentProvider {
     try {
       const response = await fetch(uri, {
         signal,
-        credentials: 'omit', // No implicit authorization forwarding
+        credentials: 'omit', // no implicit authorization forwarding
       });
 
       if (!response.ok) {
@@ -25,13 +25,12 @@ export class BrowserFetchProvider implements SourceDocumentProvider {
       const text = await response.text();
       let content: string | object = text;
 
-      // Try to parse JSON if applicable
       try {
         if (text.trim().startsWith('{') || text.trim().startsWith('[')) {
           content = JSON.parse(text);
         }
       } catch {
-        // Ignore parse error, return as string
+        // leave unparseable text as raw string content
       }
 
       return {
@@ -42,7 +41,6 @@ export class BrowserFetchProvider implements SourceDocumentProvider {
       if (err.name === 'AbortError') {
         throw err;
       }
-      // Useful CORS/failure feedback
       const message = err.message || String(err);
       throw new Error(
         `Fetch failed for ${uri}: ${message}. Check CORS policies or network connectivity.`,

@@ -1,4 +1,3 @@
-import { MermaidDiagram } from './MermaidDiagram';
 import React, {
   createContext,
   useContext,
@@ -13,6 +12,8 @@ import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
+
+import { MermaidDiagram } from './MermaidDiagram';
 import { WorkflowOverview } from './WorkflowOverview';
 import { SequenceView } from './SequenceView';
 import { useViewerSession } from '../context/ViewerSessionContext';

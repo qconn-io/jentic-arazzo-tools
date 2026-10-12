@@ -1,6 +1,6 @@
 import React from 'react';
 
-// URL setup is independent of supplied guides and Systems reading navigation.
+// guide URL setup is independent of supplied guides and Systems reading navigation.
 export function GuideSetup({
   status,
   setup,

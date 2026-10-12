@@ -1,3 +1,9 @@
+/**
+ * Viewer-specific types for \@jentic/arazzo-ui
+ */
+
+import { Node, Edge } from 'reactflow';
+
 import type { ScenarioControls } from './scenario';
 import type {
   WorkflowViewProfile,
@@ -5,11 +11,6 @@ import type {
   WorkflowPerspective,
 } from './profile';
 import type { WorkflowLocation, WorkflowLocationStatus, WorkflowLocationAdapter } from './location';
-/**
- * Viewer-specific types for \@jentic/arazzo-ui
- */
-
-import { Node, Edge } from 'reactflow';
 import {
   Step,
   Workflow,
@@ -43,15 +44,7 @@ export interface ViewerEvents {
 // ============================================================================
 
 /** @public */
-export interface ArazzoUIProps extends ScenarioControls {
-  document: ArazzoDocument | string;
-  viewProfile?: WorkflowViewProfile;
-  viewProfileAdapter?: WorkflowViewProfileAdapter;
-  perspective?: WorkflowPerspective;
-  onPerspectiveChange?: (perspective: WorkflowPerspective) => void;
-  view?: ViewerMode;
-  activeWorkflowId?: string | null;
-  selectedNodeId?: string | null;
+export interface WorkflowLocationProps {
   /** explicit host identity for supplied/inline content */
   documentIdentity?: string;
   documentRevision?: string;
@@ -60,6 +53,23 @@ export interface ArazzoUIProps extends ScenarioControls {
   onLocationChange?: (location: WorkflowLocation) => void;
   onLocationStatus?: (status: WorkflowLocationStatus) => void;
   locationAdapters?: readonly WorkflowLocationAdapter[];
+}
+
+/** @public */
+export interface WorkflowPerspectiveProps {
+  viewProfile?: WorkflowViewProfile;
+  viewProfileAdapter?: WorkflowViewProfileAdapter;
+  perspective?: WorkflowPerspective;
+  onPerspectiveChange?: (perspective: WorkflowPerspective) => void;
+}
+
+/** @public */
+export interface ArazzoUIProps
+  extends ScenarioControls, WorkflowLocationProps, WorkflowPerspectiveProps {
+  document: ArazzoDocument | string;
+  view?: ViewerMode;
+  activeWorkflowId?: string | null;
+  selectedNodeId?: string | null;
   diagramType?: DiagramType | 'none';
   className?: string;
   style?: React.CSSProperties;
@@ -89,6 +99,7 @@ export interface ArazzoUIRef {
 // Context
 // ============================================================================
 
+/** @public */
 export interface ArazzoViewerContextValue {
   document: ArazzoDocument;
   documentURL: string | null;

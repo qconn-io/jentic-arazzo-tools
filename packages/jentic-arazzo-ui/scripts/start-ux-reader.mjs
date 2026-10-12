@@ -4,7 +4,7 @@ import { createInterface } from 'node:readline/promises';
 import { chromium } from '@playwright/test';
 import { root, output, verifyIdentity } from './production-artifacts.mjs';
 
-// Facilitator utility; never supplies optional setup or fabricates reader results.
+// facilitator utility; never supplies optional setup or fabricates reader results.
 const identity = await verifyIdentity();
 const width = Number(process.argv[2] ?? 1440);
 if (![1440, 480].includes(width)) throw new Error('Use an accepted viewport width: 1440 or 480');

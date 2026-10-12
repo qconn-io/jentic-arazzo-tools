@@ -1,6 +1,7 @@
-import { actionAddress, rowOccurrence } from '../utils/location/resolve';
 import ReactMarkdown from 'react-markdown';
 import React, { useEffect, useMemo, useState } from 'react';
+
+import { actionAddress, rowOccurrence } from '../utils/location/resolve';
 import { useScenario } from '../context/ScenarioContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';

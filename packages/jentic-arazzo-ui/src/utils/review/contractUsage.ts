@@ -14,7 +14,7 @@ import type { WorkflowReviewEvidence } from '../../types/review';
 import type { ReviewDocument, ReviewProjection } from './inputs';
 const overlap = (a: string[], b: string[]) =>
   a.slice(0, Math.min(a.length, b.length)).every((v, i) => v === b[i]);
-// Follow authored declaration references, rather than inferring ownership from an operation URI.
+// follow authored declaration references, rather than inferring ownership from an operation URI.
 export function contractDeclarationUser(
   p: ReviewProjection,
   usage: CatalogAPIUsage,
@@ -101,8 +101,7 @@ export function contractDeclarationUser(
   };
   type Seed = { doc: ReviewDocument; value: unknown; path: string[]; role?: ContractRole };
   const seeds: Seed[] = [];
-  const follow = (seed: Seed): Seed => {
-    const seen = new Set<string>();
+  const follow = (seed: Seed, seen = new Set<string>(), recordSeed = true): Seed => {
     for (let depth = 0; typeof object(seed.value).$ref === 'string'; depth++) {
       if (depth >= 32) {
         bounded = true;
@@ -123,8 +122,13 @@ export function contractDeclarationUser(
           bounded = true;
           break;
         }
-        // Keep each reference's own authored occurrence as evidence without expanding unrelated fields.
-        seeds.push({ doc: seed.doc, value: object(seed.value).$ref, path: [...seed.path, '$ref'] });
+        // keep each reference's own authored occurrence as evidence without expanding unrelated fields.
+        if (recordSeed)
+          seeds.push({
+            doc: seed.doc,
+            value: object(seed.value).$ref,
+            path: [...seed.path, '$ref'],
+          });
         seed = {
           doc: targets[0],
           value: readPointer(targets[0].raw, ref.tokens),
@@ -177,10 +181,7 @@ export function contractDeclarationUser(
           path: [...itemSeed.path, 'parameters', String(i)],
           role: 'parameter' as const,
         };
-        // Resolve identities for precedence without adding a shadowed declaration as a usage seed.
-        const saved = seeds.length;
-        const value = object(follow(seed).value);
-        seeds.length = saved;
+        const value = object(follow(seed, new Set(), false).value);
         if (
           !own.some((p) => p.name === value.name && p.in === value.in && value.name !== undefined)
         )

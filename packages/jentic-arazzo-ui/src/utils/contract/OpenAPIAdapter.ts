@@ -47,7 +47,7 @@ export async function projectOpenAPI(
     );
     return facts;
   }
-  // The object path cannot be interpreted as a URI; only the parser's memory resolver is enabled.
+  // the object path cannot be interpreted as a URI; only the parser's memory resolver is enabled.
   const parsed = await parseOpenAPI(api, {
     resolve: {
       resolvers: defaultParseOpenAPIOptions.resolve?.resolvers?.filter(

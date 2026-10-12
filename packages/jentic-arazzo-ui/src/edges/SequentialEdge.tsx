@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EdgeProps, getSmoothStepPath } from 'reactflow';
+
 import { SequentialEdgeData } from '../types/index';
 
 export const SequentialEdge: React.FC<EdgeProps<SequentialEdgeData>> = ({

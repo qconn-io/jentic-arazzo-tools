@@ -58,7 +58,7 @@ function safeDescriptionMarkdown(value: string): string {
     node.children?.forEach(visit);
   };
   visit(descriptionParser.parse(value));
-  // Escape only parsed HTML, preserving CommonMark autolinks, code and authored formatting.
+  // escape only parsed HTML, preserving CommonMark autolinks, code and authored formatting.
   for (const { start, end } of htmlSpans.sort((a, b) => b.start - a.start))
     value = value.slice(0, start) + escapeHTML(value.slice(start, end)) + value.slice(end);
   return value;
@@ -140,7 +140,7 @@ export function formatHeaderAsMarkdown(
       `<a href="${safeURL(metadata.documentURL)}">${escapeHTML(metadata.documentURL)}</a>`,
     );
   if (metadata.summary) sections.push(`<p>${escapeHTML(metadata.summary)}</p>`);
-  // Keep CommonMark outside generated HTML blocks; authored HTML remains literal data.
+  // keep CommonMark outside generated HTML blocks; authored HTML remains literal data.
   if (metadata.description) sections.push(`\n${safeDescriptionMarkdown(metadata.description)}\n`);
   if (metadata.support && options.includeStatus !== false)
     sections.push(

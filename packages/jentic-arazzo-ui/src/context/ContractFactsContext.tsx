@@ -1,4 +1,3 @@
-import { SourceRevisionContext } from './SourceRevisionContext';
 import React, {
   createContext,
   useContext,
@@ -8,6 +7,7 @@ import React, {
   useSyncExternalStore,
 } from 'react';
 
+import { SourceRevisionContext } from './SourceRevisionContext';
 import { useArazzoViewer } from './ArazzoViewerContext';
 import type { ContractDocumentFacts } from '../utils/contract/types';
 import type { SourceDocumentContent } from '../types/source';
@@ -79,7 +79,7 @@ export function ContractFactsProvider({ children }: { children: React.ReactNode 
     let acquired: SourceDocumentContent | undefined;
     try {
       const acquisition = sourceRegistry.acquire(source.url, revision, scope.baseURI);
-      // Reserve the requested pin before capture; returned-provenance fallback
+      // reserve the requested pin before capture; returned-provenance fallback
       // must not attach a new pinned projection to an older unpinned entry.
       validity = sourceRegistry.captureValidity(resolvedURI, revision);
       setLoaded((old) => ({

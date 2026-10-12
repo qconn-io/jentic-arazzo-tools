@@ -31,6 +31,16 @@ export function rowOccurrence(row: SequenceRow): CallPath {
     ? row.path.slice(0, -1)
     : row.path;
 }
+export interface StandaloneExternalSource {
+  uri: string;
+  revision?: string;
+  root?: string;
+}
+export interface LocationSourceState {
+  document: string;
+  revision?: string;
+  digest?: string;
+}
 export interface ResolvedLocation {
   root: string | null;
   authoredOnly?: boolean;
@@ -43,7 +53,7 @@ export interface ResolvedLocation {
 export function resolveLocation(
   model: ArazzoViewerModel,
   location: WorkflowLocation,
-  source: { document: string; revision?: string; digest?: string },
+  source: LocationSourceState,
 ): ResolvedLocation {
   const result: ResolvedLocation = {
     root: location.root,

@@ -1,13 +1,20 @@
+import React, { useEffect, useRef, useState, useContext } from 'react';
+
 import { useScenario } from '../context/ScenarioContext';
 import { SCENARIO_NAMESPACE, resolveScenarioWaypoint } from '../utils/scenario/manifest';
 import { useSystems, SYSTEMS_NAMESPACE } from '../context/SystemsContext';
-import React, { useEffect, useRef, useState, useContext } from 'react';
 import type { ArazzoUIProps, ViewerMode, WorkflowLocation, WorkflowLocationStatus } from '../types';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { LocationHistoryContext } from '../context/LocationHistoryContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 import { authoredDigest, encodeLocation } from '../utils/location/codec';
-import { actionAddress, resolveLocation, rowOccurrence } from '../utils/location/resolve';
+import {
+  actionAddress,
+  resolveLocation,
+  rowOccurrence,
+  type LocationSourceState,
+  type ResolvedLocation,
+} from '../utils/location/resolve';
 
 const selectionKey = (value: WorkflowLocation['selection']) =>
   JSON.stringify(
@@ -28,6 +35,81 @@ const selectionKey = (value: WorkflowLocation['selection']) =>
         : null,
     ],
   );
+
+function detectControlledLocationConflict(
+  props: ArazzoUIProps,
+  request: WorkflowLocation,
+  result: ResolvedLocation,
+  viewerModel: ReturnType<typeof useArazzoViewer>['model'],
+): WorkflowLocationStatus | undefined {
+  const requestedSystems = request.extensions?.[SYSTEMS_NAMESPACE];
+  if (
+    props.perspective !== undefined &&
+    requestedSystems &&
+    typeof requestedSystems === 'object' &&
+    !Array.isArray(requestedSystems) &&
+    requestedSystems.perspective !== props.perspective
+  )
+    return {
+      state: 'conflict',
+      location: request,
+      message: 'Systems location conflicts with explicitly controlled perspective.',
+    };
+  const publicStep =
+    result.row &&
+    (result.row.workflowId === result.root ? result.row.step?.stepId : result.row.path[0]?.[1]);
+  const nodeId =
+    result.root && publicStep ? viewerModel.nodeIds.get(result.root)?.get(publicStep) : undefined;
+  if (
+    (props.activeWorkflowId !== undefined && props.activeWorkflowId !== result.root) ||
+    (props.selectedNodeId !== undefined && props.selectedNodeId !== (nodeId ?? null)) ||
+    (props.view !== undefined && props.view !== request.view)
+  )
+    return {
+      state: 'conflict',
+      location: request,
+      message:
+        'Workflow location conflicts with explicitly controlled workflow, node or view props.',
+    };
+  return undefined;
+}
+
+function restoreLocationExtensions({
+  request,
+  props,
+  guide,
+  systems,
+}: {
+  request: WorkflowLocation;
+  props: ArazzoUIProps;
+  guide: ReturnType<typeof useScenario>;
+  systems: ReturnType<typeof useSystems>;
+}): string[] {
+  const notices: string[] = [];
+  if (
+    systems?.enabled &&
+    props.perspective === undefined &&
+    !Object.hasOwn(request.extensions ?? {}, SYSTEMS_NAMESPACE)
+  )
+    systems.restore(null);
+  for (const [namespace, value] of Object.entries(request.extensions ?? {})) {
+    const adapter = props.locationAdapters?.find((a) => a.namespace === namespace);
+    try {
+      if (
+        !(namespace === SCENARIO_NAMESPACE
+          ? guide?.restore(value)
+          : namespace === SYSTEMS_NAMESPACE
+            ? systems?.restore(value)
+            : adapter?.restore(value))
+      )
+        notices.push(`Unavailable location extension: ${namespace}`);
+    } catch {
+      notices.push(`Unavailable location extension: ${namespace}`);
+    }
+  }
+  return notices;
+}
+
 export function WorkflowLocationBridge({
   props,
   view,
@@ -101,8 +183,65 @@ export function WorkflowLocationBridge({
     invalid = String(error);
   }
   const readyDigest = digest?.snapshot === viewer.snapshot ? digest.value : undefined;
+  const sourceState: (LocationSourceState & { digest: string }) | undefined = readyDigest
+    ? { document: source, revision: props.documentRevision, digest: readyDigest }
+    : undefined;
+
+  const buildCurrentExtensions = () =>
+    extensions.current || systems?.extension || guide
+      ? {
+          extensions: {
+            ...guideExtensions(extensions.current),
+            ...(systems?.extension ? { [SYSTEMS_NAMESPACE]: systems.extension } : {}),
+          },
+        }
+      : {};
+
+  const buildCurrentLocation = (digestValue: string): WorkflowLocation => {
+    const selected = session.details;
+    const detail =
+      selected &&
+      (selected.row
+        ? (selected.workflowId === viewer.activeWorkflowId &&
+            rowOccurrence(selected.row).length === 0) ||
+          rowOccurrence(selected.row)[0]?.[0] === viewer.activeWorkflowId
+        : selected.workflowId === viewer.activeWorkflowId)
+        ? selected
+        : null;
+    const row = detail?.row;
+    return {
+      version: 1,
+      document: source,
+      ...(props.documentRevision ? { revision: props.documentRevision } : {}),
+      digest: digestValue,
+      root: viewer.activeWorkflowId,
+      view,
+      subview: session.views[viewer.activeWorkflowId ?? ''] ?? session.defaultView,
+      ...buildCurrentExtensions(),
+      ...(detail?.stepId && systems?.perspective !== 'systems'
+        ? {
+            selection: {
+              workflowId: detail.workflowId,
+              stepId: detail.stepId,
+              ...(row && !detail.authoredOnly
+                ? {
+                    occurrence: rowOccurrence(row).map(([workflowId, stepId]) => ({
+                      workflowId,
+                      stepId,
+                    })),
+                  }
+                : {}),
+              ...(row?.action
+                ? { kind: 'action' as const, action: actionAddress(row.action, source) }
+                : { kind: 'step' as const }),
+            },
+          }
+        : {}),
+    };
+  };
+
   useEffect(() => {
-    if (!readyDigest) return;
+    if (!sourceState) return;
     const key = JSON.stringify([
       requestKey,
       guide?.request?.id,
@@ -131,7 +270,6 @@ export function WorkflowLocationBridge({
     const point = guide?.manifest.manifest?.scenarios
       .find((s) => s.id === guide.selection?.scenarioId)
       ?.waypoints?.find((w) => w.id === guide.selection?.waypointId);
-    const sourceState = { document: source, revision: props.documentRevision, digest: readyDigest };
     const result =
       point && guide?.request?.location === request
         ? resolveScenarioWaypoint(
@@ -147,65 +285,18 @@ export function WorkflowLocationBridge({
       emitStatus(result.status);
       return;
     }
-    const requestedSystems = request.extensions?.[SYSTEMS_NAMESPACE];
-    if (
-      props.perspective !== undefined &&
-      requestedSystems &&
-      typeof requestedSystems === 'object' &&
-      !Array.isArray(requestedSystems) &&
-      requestedSystems.perspective !== props.perspective
-    ) {
+    const conflict = detectControlledLocationConflict(props, request, result, viewer.model);
+    if (conflict) {
       suspended.current = true;
-      emitStatus({
-        state: 'conflict',
-        location: request,
-        message: 'Systems location conflicts with explicitly controlled perspective.',
-      });
+      emitStatus(conflict);
       return;
     }
-    const publicStep =
-      result.row &&
-      (result.row.workflowId === result.root ? result.row.step?.stepId : result.row.path[0]?.[1]);
-    const nodeId =
-      result.root && publicStep
-        ? viewer.model.nodeIds.get(result.root)?.get(publicStep)
-        : undefined;
-    if (
-      (props.activeWorkflowId !== undefined && props.activeWorkflowId !== result.root) ||
-      (props.selectedNodeId !== undefined && props.selectedNodeId !== (nodeId ?? null)) ||
-      (props.view !== undefined && props.view !== request.view)
-    ) {
-      suspended.current = true;
-      emitStatus({
-        state: 'conflict',
-        location: request,
-        message:
-          'Workflow location conflicts with explicitly controlled workflow, node or view props.',
-      });
-      return;
-    }
-    const notices: string[] = [];
-    if (
-      systems?.enabled &&
-      props.perspective === undefined &&
-      !Object.hasOwn(request.extensions ?? {}, SYSTEMS_NAMESPACE)
-    )
-      systems.restore(null);
-    for (const [namespace, value] of Object.entries(request.extensions ?? {})) {
-      const adapter = latest.current.props.locationAdapters?.find((a) => a.namespace === namespace);
-      try {
-        if (
-          !(namespace === SCENARIO_NAMESPACE
-            ? guide?.restore(value)
-            : namespace === SYSTEMS_NAMESPACE
-              ? systems?.restore(value)
-              : adapter?.restore(value))
-        )
-          notices.push(`Unavailable location extension: ${namespace}`);
-      } catch {
-        notices.push(`Unavailable location extension: ${namespace}`);
-      }
-    }
+    const notices = restoreLocationExtensions({
+      request,
+      props: latest.current.props,
+      guide,
+      systems,
+    });
     extensions.current = request.extensions;
     expected.current = {
       ...request,
@@ -213,11 +304,7 @@ export function WorkflowLocationBridge({
       ...(result.row ? {} : { selection: undefined }),
     };
     const callers = (history?.callers ?? []).map((caller) =>
-      resolveLocation(viewer.model, caller, {
-        document: source,
-        revision: props.documentRevision,
-        digest: readyDigest,
-      }),
+      resolveLocation(viewer.model, caller, sourceState),
     );
     for (const caller of callers)
       if (caller.status.state !== 'restored')
@@ -252,7 +339,7 @@ export function WorkflowLocationBridge({
   const handledWorkflowRequest = useRef<number>();
   useEffect(() => {
     if (
-      !readyDigest ||
+      !sourceState ||
       !workflowRequest ||
       invalid ||
       props.activeWorkflowId === undefined ||
@@ -264,19 +351,12 @@ export function WorkflowLocationBridge({
     const requested: WorkflowLocation = {
       version: 1,
       document: source,
-      digest: readyDigest,
+      digest: sourceState.digest,
       ...(props.documentRevision ? { revision: props.documentRevision } : {}),
       root: workflowRequest.root,
       view,
       subview: session.views[workflowRequest.root ?? ''] ?? session.defaultView,
-      ...(extensions.current || systems?.extension || guide
-        ? {
-            extensions: {
-              ...guideExtensions(extensions.current),
-              ...(systems?.extension ? { [SYSTEMS_NAMESPACE]: systems.extension } : {}),
-            },
-          }
-        : {}),
+      ...buildCurrentExtensions(),
     };
     lastRequested.current = encodeLocation(requested);
     latest.current.props.onLocationChange?.(requested);
@@ -285,11 +365,7 @@ export function WorkflowLocationBridge({
       props.location.document === source &&
       props.location.root === props.activeWorkflowId
     ) {
-      const result = resolveLocation(viewer.model, props.location, {
-        document: source,
-        revision: props.documentRevision,
-        digest: readyDigest,
-      });
+      const result = resolveLocation(viewer.model, props.location, sourceState);
       expected.current = {
         ...props.location,
         root: result.root,
@@ -309,54 +385,8 @@ export function WorkflowLocationBridge({
   ]);
 
   useEffect(() => {
-    if (!readyDigest || suspended.current) return;
-    const selected = session.details;
-    const detail =
-      selected &&
-      (selected.row
-        ? (selected.workflowId === viewer.activeWorkflowId &&
-            rowOccurrence(selected.row).length === 0) ||
-          rowOccurrence(selected.row)[0]?.[0] === viewer.activeWorkflowId
-        : selected.workflowId === viewer.activeWorkflowId)
-        ? selected
-        : null;
-    const row = detail?.row;
-    const current: WorkflowLocation = {
-      version: 1,
-      document: source,
-      ...(props.documentRevision ? { revision: props.documentRevision } : {}),
-      digest: readyDigest,
-      root: viewer.activeWorkflowId,
-      view,
-      subview: session.views[viewer.activeWorkflowId ?? ''] ?? session.defaultView,
-      ...(extensions.current || systems?.extension || guide
-        ? {
-            extensions: {
-              ...guideExtensions(extensions.current),
-              ...(systems?.extension ? { [SYSTEMS_NAMESPACE]: systems.extension } : {}),
-            },
-          }
-        : {}),
-      ...(detail?.stepId && systems?.perspective !== 'systems'
-        ? {
-            selection: {
-              workflowId: detail.workflowId,
-              stepId: detail.stepId,
-              ...(row && !detail.authoredOnly
-                ? {
-                    occurrence: rowOccurrence(row).map(([workflowId, stepId]) => ({
-                      workflowId,
-                      stepId,
-                    })),
-                  }
-                : {}),
-              ...(row?.action
-                ? { kind: 'action' as const, action: actionAddress(row.action, source) }
-                : { kind: 'step' as const }),
-            },
-          }
-        : {}),
-    };
+    if (!sourceState || suspended.current) return;
+    const current = buildCurrentLocation(sourceState.digest);
     const wanted = expected.current;
     if (wanted) {
       if (
@@ -404,11 +434,7 @@ export function WorkflowLocationBridge({
         (systems?.enabled && !systems.matches(request.extensions?.[SYSTEMS_NAMESPACE])))
     ) {
       // location remains authoritative until the host accepts a navigation request.
-      const result = resolveLocation(viewer.model, request, {
-        document: source,
-        revision: props.documentRevision,
-        digest: readyDigest,
-      });
+      const result = resolveLocation(viewer.model, request, sourceState);
       emitted.current = encodeLocation({
         ...current,
         root: result.root,

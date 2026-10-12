@@ -11,7 +11,7 @@ export interface StepOperationResult extends OperationLookupResult {
   basis?: 'explicit-locator' | 'single-source' | 'contract-lookup';
 }
 
-// Pure projection over current, source-name-keyed facts. Retrieval URI aliases
+// pure projection over current, source-name-keyed facts. Retrieval URI aliases
 // never select a declaration; coverage counts each relevant authored source.
 export function resolveStepOperation(
   model: ArazzoViewerModel,

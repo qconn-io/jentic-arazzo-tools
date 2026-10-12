@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
+
 import type { ArazzoUIProps } from '../types/viewer';
 import type { ScenarioSelection, ScenarioWaypoint } from '../types/scenario';
 import type { WorkflowLocation, WorkflowLocationJSON } from '../types/location';
@@ -110,7 +111,7 @@ export function ScenarioProvider({
     )
       setRequest({ location: point.location, id: ++counter.current });
   };
-  // Accepted controlled state and initial guide links use an authored reading address.
+  // accepted controlled state and initial guide links use an authored reading address.
   const selectionKey = scenarioSelectionKey(selection);
   useEffect(() => {
     if (!selection) {

@@ -5,17 +5,17 @@ Prepared 2026-10-12 from the current checkout; no history or publication changed
 ## Pinned comparison
 
 - Branch: `feature/visualize-chained-workflows`.
-- HEAD: `db98e5b87ecac6a6619056c9567c8adfdf798962`.
+- Base HEAD before final review-remediation commit: `291829e2cc9bb29a1883abb0ef6a52273de4ca56` (following `89e7b21`, `e4b0dfa`, and `eb94300`; normalized from `eb5e16151c1f1a383ed9305bc200452a1cd22c47`).
 - Locally pinned `upstream/main` and merge base: `49dd8ef814637b481c0a1998f586ce2785812f5d`.
 - Upstream: `https://github.com/jentic/jentic-arazzo-tools.git`; fork:
   `https://github.com/qconn-io/jentic-arazzo-tools.git`.
-- Committed comparison: 22 commits, 715 files, 91,491 insertions and 3,728
-  deletions. This includes large historical evidence sets and is not a focused
+- Committed comparison: 26 commits (25 feature/repair commits through `291829e` plus the top review-remediation commit), 821 files, 188,763 insertions and 3,751
+  deletions through `291829e`. This includes large historical evidence sets and is not a focused
   PR-sized patch. The upstream ref was not refreshed during this implementation.
-- Additional working-tree changes already existed on entry, including the
-  sequence-first implementation, inspection semantics, archives and historical
-  log edits. This repair layers on that candidate; it does not own or discard them.
-  `verification-logs/branch-commits.json` records the pinned commit audit.
+- Additional review remediation (public `.d.ts` alias
+  re-exports, component decomposition, refreshed bundle/spec documentation, and
+  human-feedback status reconciliation) is layered on top of `291829e`.
+  `verification-logs/branch-commits.json` records the earlier `db98e5b` commit audit.
 
 ## One goal and review order
 
@@ -24,14 +24,14 @@ workflow/step occurrence without inferring execution, ownership or source result
 
 | Slice | Dependency and purpose | Existing branch commits / candidate areas |
 | --- | --- | --- |
-| Inspection and provider foundations | First: stable semantic facts, source authority, bounded references and diagnostics | `73799de`, `47043e0`, `b5fd788`, `503c214`, `6f74975`; model, inspection, source registry, contract adapters |
-| Chained sequence and navigation | Builds on facts: repeated occurrence expansion, caller return and exact details | `87f272b`, `b64ed67`; sequence, viewer/session context, connected navigation |
-| Reading and this UX repair | Builds on sequence: implicit sequence default, descriptions, prerequisites, timeline, focus, host sizing | `b208f7a`, `08cfba6`, `db98e5b`; current dirty UI and this change |
-| Shareable locations | Builds on occurrence identity and navigation | `856c84c`; location codec, history bridge, host control |
-| API contract inspection | Builds on provider/facts: explicit lookup and provenance | `503c214`, `3fa43b2`, `6f74975`; source lifecycle, contract UI and adapters |
-| Optional descriptive Systems and guides | Builds on reading/locations/provider; authored metadata only | `3fa43b2`, `181cb0f`; system profile and scenario manifest |
-| Optional catalog and revision review | Builds on stable source identity/inspection; cross-document uses and immutable revision facts | `ae44276`, `a0d0847`; catalog and review exports |
-| Acceptance and documentation | Accompanies each owning slice rather than one unrelated final dump | `e91d44c`, `a8c563a`, `6f74975`, `db98e5b`; README, declarations, consumers, browser gates, CI |
+| Inspection and provider foundations | First: stable semantic facts, source authority, bounded references and diagnostics | `cabf103`, `663b31c`, `3e6a89b`, `a3ec552`, `1de5120`; model, inspection, source registry, contract adapters |
+| Chained sequence and navigation | Builds on facts: repeated occurrence expansion, caller return and exact details | `7141128`, `f03a4d7`; sequence, viewer/session context, connected navigation |
+| Reading and this UX repair | Builds on sequence: implicit sequence default, descriptions, prerequisites, timeline, focus, host sizing, overview styling | `9628f64`, `7afb98d`, `89e7b21`, `e4b0dfa`, `eb94300`; review-remediation commit |
+| Shareable locations | Builds on occurrence identity and navigation | `3c0286a`; location codec, history bridge, host control |
+| API contract inspection | Builds on provider/facts: explicit lookup and provenance | `a3ec552`, `086e175`, `1de5120`; source lifecycle, contract UI and adapters |
+| Optional descriptive Systems and guides | Builds on reading/locations/provider; authored metadata only | `086e175`, `a9f1463`; system profile and scenario manifest |
+| Optional catalog and revision review | Builds on stable source identity/inspection; cross-document uses and immutable revision facts | `08f5bbd`, `60166cc`; catalog and review exports |
+| Acceptance and documentation | Accompanies each owning slice rather than one unrelated final dump | `0cb33d5`, `ef5f806`, `1de5120`, `89e7b21`, `291829e`; README, declarations, consumers, browser gates, CI |
 
 All extension slices relate to reading/inspecting workflows, but Systems, guides,
 catalog and revision review are not prerequisites for the initial sequence. Their
@@ -46,9 +46,14 @@ Existing viewer props/callbacks and explicit view choices remain supported. The
 branch adds relationship/external navigation, source-provider contracts, occurrence
 locations, supplied metadata, catalog and revision-review exports. `./catalog` is
 an ESM-only subpath; normal viewer and standalone retain ESM/CommonJS entrypoints.
-This repair changes no public type or dependency: raw fallback now honors existing
-`className`/`style` and ref behavior. Implicit first-use presentation changes to
-sequence, while explicit/restored intent wins.
+This repair changes no breaking public type or dependency: raw fallback honors existing
+`className`/`style` and ref behavior, and public `.d.ts` rollups export both canonical
+and spec-alias type names (`SourceProvenance` / `ProvidedSourceProvenance`,
+`ExternalWorkflowNavigationRequest` / `ExternalNavigationRequest`,
+`CatalogSelection` / `WorkflowCatalogSelection`,
+`CatalogCoverageReport` / `WorkflowCatalogCoverage`,
+`WorkflowRevisionComparison` / `WorkflowReviewResult`). Implicit first-use presentation
+changes to sequence, while explicit/restored intent wins.
 
 The full branch adds ApiDOM datamodel/YAML/reference/traverse runtime dependencies,
 `remark-parse` and `unified`; test tooling adds Vitest, Testing Library, jsdom and
@@ -66,14 +71,17 @@ acceptance slices, and must be visible to reviewers.
 - Preserve the historical OpenSpec archives, binary captures, logs and local
   roadmap in this workspace. Propose only a concise current evidence record and
   selected explanatory captures upstream, not the entire historic log corpus.
-  Do not delete or rewrite any archived evidence to reduce the current checkout.
 - Keep unrelated changes to archived logs outside this repair's intended commit.
   The pre-existing archive moves and spec syncs require their own coherent scope.
 - `CONTRIBUTING.md` requires atomic Conventional Commits with DCO sign-off and a
-  feature-prefixed branch. 20 of 22 pinned commits have `Signed-off-by`; `73799de`
-  and `503c214` do not. DCO is not a cryptographic signature audit. Any submission
-  preparation that repairs historical commits or creates fresh signed-off slices
-  is a separate authorized Git operation; none occurred here.
-- No issue, PR, commit, push, merge, archive or spec sync is performed by this
+  feature-prefixed branch. All 26 commits in `main..HEAD` on
+  `feature/visualize-chained-workflows` now carry `Signed-off-by` trailers and
+  commit subjects `<= 69` characters (adding `Signed-off-by` to the 4 commits that
+  originally lacked it—`73799de` -> `cabf103`, `503c214` -> `a3ec552`, `3fd9802` ->
+  `eb94300`, `eb5e161` -> `291829e`—and shortening the two long commit subjects on
+  `eb94300` and `291829e`), while `feature/arazzo-ui-source-preserved-20261009`
+  remains untouched at `a0d08472050d44f2079232f1535c9a6ac326af57`. DCO is not a
+  cryptographic signature audit.
+- No issue, PR, push or merge is performed by this
   handoff. Feature issue feedback remains pending; the user closed the human tasks based
   on existing API Owner/Developer feedback.

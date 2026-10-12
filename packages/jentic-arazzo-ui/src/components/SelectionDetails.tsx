@@ -1,6 +1,7 @@
+import React, { useEffect, useRef, useState, type RefObject } from 'react';
+
 import { ScenarioFocusDetails } from './ScenarioPanel';
 import { SystemsDetails } from './SystemsDetails';
-import React, { useEffect, useRef, useState, type RefObject } from 'react';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 import { CopyLocationControl } from '../context/CopyLinkContext';

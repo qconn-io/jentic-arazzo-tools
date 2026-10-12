@@ -75,7 +75,6 @@ paths:
     `;
     const facts = await projectOpenAPI(content, 'http://test/api.yaml', registry);
     expect(facts.dialect).toBe('openapi');
-    // It should parse without throwing, just parameters might be empty or missing
   });
 
   it('does not make external network calls through default parser', async () => {
@@ -92,13 +91,12 @@ paths:
         - $ref: 'http://example.com/external.yaml#/components/parameters/Limit'
     `;
 
-    // We mock acquire to throw to prove it goes through registry
     vi.spyOn(registry, 'acquire').mockRejectedValue(new Error('Network disabled'));
 
     try {
       await projectOpenAPI(content, 'http://test/api.yaml', registry);
     } catch {
-      // It should throw because we mocked acquire to reject.
+      // expected rejection when registry acquisition is disabled
     }
 
     expect(registry.acquire).toHaveBeenCalledWith(

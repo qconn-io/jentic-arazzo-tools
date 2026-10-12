@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
-// Compile a downstream consumer of each rolled entry, rather than source types.
+// compile a downstream consumer of each rolled entry, rather than source types.
 const installedRoot = process.argv[2];
 const directory = await mkdtemp(join(installedRoot ?? tmpdir(), 'arazzo-public-declarations-'));
 try {

@@ -11,45 +11,42 @@ unassisted-success measurements were supplied or invented. This records existing
 human feedback, not sessions conducted by the assistant or a measured protocol
 pass. Engineering evidence and maintainer approval remain separate.
 
-The older tables below are retained as historical, unfilled protocol records;
-they do not override the user-confirmed task completion above.
+The protocol tables below record `USER-CONFIRMED (2026-10-12)` per the user's
+confirmation above, while keeping automated engineering verification and
+external maintainer review distinct.
 
-# Historical implementation-run record: PENDING
+## Protocol task status (user-confirmed 2026-10-12)
 
-No reader session has been conducted or consent recorded by this implementation
-run. The user can arrange one unfamiliar API Owner. A Developer reader has not
-been arranged. Scheduling capability is not participation, consent or success.
-
-Use [acceptance-protocol.md](acceptance-protocol.md) and its result template with
-the identified final candidate. Record actual timings, assistance, explanations,
-wrong interpretations and observations for both roles at both widths. Do not
-populate results from automated navigation or the implementer's walkthrough.
+No assistant-run reader session was conducted during this implementation run;
+closure is recorded from the user's existing API Owner and Developer feedback.
+Use [acceptance-protocol.md](acceptance-protocol.md) if additional formal reader
+sessions are run in the future. Do not populate session timings or transcripts
+from automated navigation or the implementer's walkthrough.
 
 | Core task | API Owner 1440 / 480 | Developer 1440 / 480 |
 | --- | --- | --- |
-| C1 Petstore sequence and operation identity | PENDING / PENDING | PENDING / PENDING |
-| C4 Explicit source inspection without execution/validity claims | PENDING / PENDING | PENDING / PENDING |
-| C5 Small purchase, capture guard, chain and return | PENDING / PENDING | PENDING / PENDING |
-| C6 Exact second-item mapping 2499 | PENDING / PENDING | PENDING / PENDING |
-| C7 Timeout fallback and coverage boundary | PENDING / PENDING | PENDING / PENDING |
-| C8 Localized error recognition and recovery | PENDING / PENDING | PENDING / PENDING |
-| C9 Exact shared occurrence and browser history | PENDING / PENDING | PENDING / PENDING |
+| C1 Petstore sequence and operation identity | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C4 Explicit source inspection without execution/validity claims | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C5 Small purchase, capture guard, chain and return | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C6 Exact second-item mapping 2499 | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C7 Timeout fallback and coverage boundary | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C8 Localized error recognition and recovery | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C9 Exact shared occurrence and browser history | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
 
 | Optional discovery task | API Owner 1440 / 480 | Developer 1440 / 480 |
 | --- | --- | --- |
-| C2 Plain-entry guide purpose, help and explicit example | PENDING / PENDING | PENDING / PENDING |
-| C3 Systems availability and normal reading | PENDING / PENDING | PENDING / PENDING |
+| C2 Plain-entry guide purpose, help and explicit example | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
+| C3 Systems availability and normal reading | USER-CONFIRMED (2026-10-12) | USER-CONFIRMED (2026-10-12) |
 
-Final UX acceptance: **PENDING**. Engineering checks and capture review are
-recorded separately. Only unassisted completion of every core task in the final
-round can pass core reading acceptance; optional feature claims require their
-separately scored C2/C3 results. Missing sessions, assisted outcomes, relevant
-candidate changes or unresolved reader-discovered defects leave tasks 5.3 and
-final evidence/closure unchecked.
+Final UX acceptance: **USER-CONFIRMED (2026-10-12)**. Automated engineering gates
+and capture reviews are recorded separately in
+[repair verification](../../resolve-chained-workflow-ux-review-findings/verification.md),
+and external upstream maintainer review remains an independent decision.
 
 ## Candidate follow-up (2026-10-12)
 
-No new reader consent, session or outcome was recorded during the chained UX
-repair. All table cells and final UX acceptance remain PENDING. Use the final
-build in [repair verification](../../resolve-chained-workflow-ux-review-findings/verification.md);
-the archived pending checkboxes have been restored to agree with these results.
+Human feedback tasks (`5.3` here and `3.5` in
+`resolve-chained-workflow-ux-review-findings`) and dependent closure tasks are
+marked complete per the user's 2026-10-12 confirmation that this change embodies
+their API Owner/Developer feedback, without inventing session transcripts or
+timings.

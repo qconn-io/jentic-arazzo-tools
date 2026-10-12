@@ -501,7 +501,7 @@ const sourceProvider: SourceDocumentProvider = {
 />;
 ```
 
-A loaded Arazzo source exposes the referenced external workflow. **Open workflow <id>** issues `onExternalNavigation` with the retrieved document URI, revision and workflow ID, allowing the host to choose how to open it. It does not silently switch the current document or treat external workflow steps as local operations.
+A loaded Arazzo source exposes the referenced external workflow. **Open workflow <id>** issues `onExternalNavigation` with the retrieved document URI, revision and workflow ID (`ExternalNavigationRequest`, also exported as `ExternalWorkflowNavigationRequest`), allowing the host to choose how to open it; provider-backed source provenance uses `ProvidedSourceProvenance` (also exported as `SourceProvenance`). It does not silently switch the current document or treat external workflow steps as local operations.
 
 ### Optional Systems perspective
 
@@ -615,9 +615,10 @@ business outcomes or execution coverage.
 The optional `ArazzoCatalog` export (also available from the ESM-only `@jentic/arazzo-ui/catalog` subpath) discovers
 workflows across explicitly supplied document revisions. It accepts a version-one
 `WorkflowCatalogManifest`, an optional `manifestURI` for relative sources, a
-`SourceDocumentProvider`, and controlled `selection`/`onSelectionChange` callbacks.
+`SourceDocumentProvider`, and controlled `selection`/`onSelectionChange` callbacks
+(`WorkflowCatalogSelection`, also exported as `CatalogSelection`).
 It does not write browser history. `onLocationChange` reports authored viewer addresses;
-`onCoverageChange` reports the acquired scope. The ordinary `ArazzoUI` viewer requires no catalog.
+`onCoverageChange` reports the acquired scope (`WorkflowCatalogCoverage`, also exported as `CatalogCoverageReport`). The ordinary `ArazzoUI` viewer requires no catalog.
 
 ```tsx
 import { ArazzoCatalog, type WorkflowCatalogManifest } from '@jentic/arazzo-ui/catalog';
@@ -733,7 +734,7 @@ import '@jentic/arazzo-ui/styles.css';
   candidate={candidate}
   onLocationRequest={(side, location) => inspectRevision(side, location)}
 />;
-const review = await compareWorkflowRevisions(baseline, candidate);
+const review = await compareWorkflowRevisions(baseline, candidate); // returns WorkflowReviewResult (also exported as WorkflowRevisionComparison)
 const json = exportWorkflowReview(review, 'json');
 const markdown = exportWorkflowReview(review, 'markdown');
 ```

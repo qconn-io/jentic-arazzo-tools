@@ -56,12 +56,9 @@ describe('SourceRegistry', () => {
     );
 
     const acquirePromise = registry.acquire('http://example.com/api.yaml');
-    await Promise.resolve(); // Let semaphore resolve and load be called
+    await Promise.resolve();
 
-    // Replace provider
     registry.setProvider({ load: vi.fn() } as unknown as SourceDocumentProvider);
-
-    // Resolve first load
     resolveFirstLoad!({ content: 'test', retrievalURI: 'http://example.com/api.yaml' });
 
     await expect(acquirePromise).rejects.toThrow('Provider replaced during acquisition');
@@ -103,8 +100,8 @@ describe('SourceRegistry', () => {
     const p1 = registry.acquire('http://example.com/api.yaml');
     const p2 = registry.acquire('http://example.com/api.yaml');
 
-    expect(p1).toBe(p2); // Should return the exact same promise
-    await Promise.resolve(); // Let semaphore resolve
+    expect(p1).toBe(p2);
+    await Promise.resolve();
     expect(mockProvider.load).toHaveBeenCalledTimes(1);
 
     resolveLoad!({ content: 'test', retrievalURI: 'http://example.com/api.yaml' });
@@ -134,7 +131,7 @@ describe('SourceRegistry', () => {
 
     const pending = registry.acquire('http://example.com/api.yaml');
     const rejection = expect(pending).rejects.toThrow('Aborted');
-    await Promise.resolve(); // Let semaphore resolve
+    await Promise.resolve();
     registry.reload('http://example.com/api.yaml');
 
     expect(abortSignal!.aborted).toBe(true);
@@ -193,7 +190,7 @@ describe('SourceRegistry', () => {
       const p1 = registry.acquire('http://example.com/1');
       const p2 = registry.acquire('http://example.com/2');
 
-      await Promise.resolve(); // Let semaphore resolve
+      await Promise.resolve();
 
       // p2 should be queued
       expect(mockProvider.load).toHaveBeenCalledTimes(1);

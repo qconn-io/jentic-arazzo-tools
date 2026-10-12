@@ -1,5 +1,6 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
+
 import { WorkflowNodeData } from '../types/index';
 import { OVERVIEW_WIDTH, OVERVIEW_HEIGHT } from '../utils/model/graphLayout';
 

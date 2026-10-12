@@ -72,6 +72,6 @@ export function digitalProductProfile(
           provenance: provenance([...path, 'x-example-implementation']),
         });
     }
-  // Event packs supply explicit participant/binding/association metadata in their manifest profile.
+  // event packs supply explicit participant/binding/association metadata in their manifest profile.
   return profile;
 }

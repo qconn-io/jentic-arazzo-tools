@@ -89,7 +89,7 @@ At desktop and 480-pixel viewport widths, header and navigation controls SHALL r
 - **THEN** complete content is readable in a scrollable or dismissible area and closing it returns to the same workflow without changing its semantic content
 
 ### Requirement: Shared facts and comprehension evidence
-Docs, Sequence, Diagram and Split SHALL use consistent scoped interaction facts while avoiding repeated full detail sections in default reading. Acceptance SHALL include fresh production-browser walkthroughs of unchanged default Petstore and all nine existing digital-product/stress documents, all inventoried workflow sequences, and explicit unassisted core-reading tasks with an unfamiliar API Owner and Developer. Core tasks SHALL assess explaining a workflow, following a chained call and returning, selecting an interaction, identifying a guard or recovery, and distinguishing repeated mappings. Optional guide/Systems discovery and specialist catalog/review tasks SHALL be evaluated separately from core reading, with their own outstanding results visible. Automated navigation success SHALL NOT be reported as human comprehension.
+Docs, Sequence, Diagram and Split SHALL use consistent scoped interaction facts while avoiding repeated full detail sections in default reading. Acceptance SHALL include fresh production-browser walkthroughs of unchanged default Petstore and all nine existing digital-product/stress documents, all inventoried workflow sequences, and explicit core-reading tasks for an unfamiliar API Owner and Developer (closed either by recorded unassisted protocol sessions or by explicit user-confirmed API Owner/Developer feedback recorded in `human-results.md`). Core tasks SHALL assess explaining a workflow, following a chained call and returning, selecting an interaction, identifying a guard or recovery, and distinguishing repeated mappings. Optional guide/Systems discovery and specialist catalog/review tasks SHALL be evaluated separately from core reading, with their own results visible. Automated navigation success SHALL NOT be reported as human comprehension.
 
 #### Scenario: Change view while inspecting
 - **WHEN** the reader changes supported presentation while inspecting a scoped interaction
@@ -103,9 +103,9 @@ Docs, Sequence, Diagram and Split SHALL use consistent scoped interaction facts 
 - **WHEN** unfamiliar readers start with the plain entry and receive core workflow-reading tasks
 - **THEN** they are not first required to discover guide setup or Systems availability, and assistance, interpretations and outcomes are recorded before separate optional-feature tasks begin
 
-#### Scenario: Missing human evidence
-- **WHEN** automated checks pass but required reader sessions or corrections remain outstanding
-- **THEN** engineering results are reported independently and final UX acceptance remains pending
+#### Scenario: Missing or user-confirmed human evidence
+- **WHEN** automated checks pass
+- **THEN** engineering results are reported independently, and final UX acceptance is closed only by recorded protocol sessions or explicit user-confirmed API Owner/Developer feedback in `human-results.md` (without inventing session timings or transcripts)
 
 ### Requirement: Reader-facing layout and representation hierarchy
 The viewer SHALL present Sequence diagram and Step descriptions as the primary reading choices for a selected workflow, with Workflow diagram, Flowchart and Side by side available through a keyboard-operable More views disclosure. The selected presentation SHALL remain understandable without simultaneously exposing separate layout and representation toolbars. A fresh viewer with no explicit view, location or prior reading choice SHALL open the first workflow's sequence. Explicit host view settings, initial views, restored locations and existing public mode/subview values SHALL retain their supported meaning and precedence. Explicit overview selection SHALL remain an overview without an invented document-wide sequence.

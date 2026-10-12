@@ -1,4 +1,5 @@
 import React from 'react';
+
 import type { ReadingSection } from '../utils/sequence/occurrenceDetails';
 
 // preserve types and exact expressions, including empty containers and falsy leaves.

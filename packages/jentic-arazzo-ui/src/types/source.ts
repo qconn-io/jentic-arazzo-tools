@@ -29,8 +29,14 @@ export interface ProvidedSourceProvenance {
 }
 
 /** @public */
+export type SourceProvenance = ProvidedSourceProvenance;
+
+/** @public */
 export interface ExternalNavigationRequest {
   documentUri: string;
   revision?: string;
   workflowId?: string;
 }
+
+/** @public */
+export type ExternalWorkflowNavigationRequest = ExternalNavigationRequest;

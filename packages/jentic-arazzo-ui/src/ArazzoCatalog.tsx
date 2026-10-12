@@ -1,5 +1,6 @@
-import { SourceRevisionContext } from './context/SourceRevisionContext';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+
+import { SourceRevisionContext } from './context/SourceRevisionContext';
 import { ArazzoUI } from './ArazzoUI';
 import type { ArazzoCatalogProps, WorkflowCatalogSelection } from './types/catalog';
 import type { WorkflowLocation } from './types/location';
@@ -21,6 +22,8 @@ import {
 import { readCatalogLocation } from './utils/catalog/location';
 import { CATALOG_NAMESPACE, catalogKey } from './utils/catalog/manifest';
 import './styles/index.css';
+
+export type * from './types/catalog';
 
 /** Optional portfolio discovery and authored reverse usage. Host history is never mutated. @public */
 export function ArazzoCatalog(props: ArazzoCatalogProps) {

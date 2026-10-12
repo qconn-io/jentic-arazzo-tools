@@ -66,7 +66,7 @@ function validateIdentities(document: ArazzoDocument): void {
   }
 }
 
-// Traverse known schema locations only. Map keys are authored names; literal and
+// traverse known schema locations only. Map keys are authored names; literal and
 // extension payloads (including unknown vocabulary) are not schema locations.
 function hasCustomDialect(value: unknown): boolean {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
@@ -93,7 +93,7 @@ function hasCustomDialect(value: unknown): boolean {
     )
       return true;
   }
-  // Draft 4–7 dependencies can contain schemas or arrays of property names.
+  // draft 4–7 dependencies can contain schemas or arrays of property names.
   const dependencies = schema.dependencies;
   if (
     dependencies &&
@@ -106,7 +106,7 @@ function hasCustomDialect(value: unknown): boolean {
     const schemas = schema[keyword];
     if (Array.isArray(schemas) && schemas.some(hasCustomDialect)) return true;
   }
-  // Older drafts permit tuple items; newer drafts use a single schema.
+  // older drafts permit tuple items; newer drafts use a single schema.
   if (
     Array.isArray(schema.items)
       ? schema.items.some(hasCustomDialect)
@@ -182,9 +182,7 @@ export async function loadDocument(
     >();
     const missingPaths = new Map<string, string>();
     for (const occurrence of occurrences) {
-      const match = parseReusableReference(occurrence.reference);
-      if (!match)
-        throw new Error(`Resolution: malformed reusable reference ${occurrence.reference}`);
+      const match = parseReusableReference(occurrence.reference)!;
       const bucket = authoredDocument.components?.[match.bucket];
       if (!bucket || !Object.prototype.hasOwnProperty.call(bucket, match.key))
         missingPaths.set(JSON.stringify(occurrence.path), crypto.randomUUID());
@@ -203,8 +201,8 @@ export async function loadDocument(
         path.skip();
       },
     });
-    // Native resolution can read the supplied root, but has no independent transport.
-    // Only the explicitly enabled secondary projection may acquire dependencies.
+    // native resolution can read the supplied root, but has no independent transport.
+    // only the explicitly enabled secondary projection may acquire dependencies.
     const rootURI = new URL(baseURI!).href;
     const registry = options.secondaryRegistry;
     const authority = createNativeAuthority(
@@ -242,7 +240,7 @@ export async function loadDocument(
           };
           const rootHop = context.trace?.find((hop) => hop.uri === rootURI);
           const reference = rootHop?.refFieldValue ?? context.refFieldValue;
-          // Supported local schema errors retain the existing fatal-load contract.
+          // supported local schema errors retain the existing fatal-load contract.
           if (!reference || new URL(reference, rootURI).href.split('#')[0] === rootURI) throw error;
           const tokens = (rootHop?.location ?? context.location ?? '')
             .replace(/^#?\//, '')

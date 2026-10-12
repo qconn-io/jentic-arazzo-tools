@@ -7,7 +7,7 @@ import type {
 import type { WorkflowLocation, WorkflowLocationJSON } from '../../types/location';
 import type { ArazzoViewerModel } from '../model/viewerModel';
 import { encodeLocation, decodeLocation } from '../location/codec';
-import { resolveLocation } from '../location/resolve';
+import { resolveLocation, type LocationSourceState } from '../location/resolve';
 import { decodePointer, readPointer } from '../contract/pointer';
 export const SCENARIO_NAMESPACE = 'arazzo.scenario';
 const object = (value: unknown): value is Record<string, unknown> =>
@@ -214,7 +214,7 @@ export function resolveScenarioWaypoint(
   model: ArazzoViewerModel,
   document: unknown,
   waypoint: ScenarioWaypoint,
-  source: { document: string; revision?: string; digest?: string },
+  source: LocationSourceState,
 ) {
   const result = resolveLocation(model, waypoint.location, source);
   let focusValue: unknown;

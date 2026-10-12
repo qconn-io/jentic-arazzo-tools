@@ -4,3 +4,5 @@ export * from './viewer';
 export * from './location';
 export * from './source';
 export * from './profile';
+export * from './catalog';
+export * from './review';

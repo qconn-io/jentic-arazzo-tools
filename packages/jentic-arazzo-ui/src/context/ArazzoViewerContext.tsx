@@ -7,6 +7,7 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
+
 import type {
   ArazzoDocument,
   ArazzoNode,
@@ -84,6 +85,119 @@ function ownerLookup(
   );
   return legacy.length === 1 ? legacy[0].workflowId : undefined;
 }
+function usePendingTargetNavigation({
+  model,
+  activeWorkflowId,
+  controlledWorkflowId,
+  controlledSelectedNodeId,
+  nodes,
+  onActivateWorkflow,
+  onResolvePendingNode,
+}: {
+  model: ArazzoViewerModel;
+  activeWorkflowId: string | null;
+  controlledWorkflowId: string | null | undefined;
+  controlledSelectedNodeId: string | null | undefined;
+  nodes: ArazzoNode[];
+  onActivateWorkflow: (workflowId: string) => void;
+  onResolvePendingNode: (node: ArazzoNode) => void;
+}) {
+  const [pending, setPending] = useState<PendingSelection | null>(null);
+  const [selectionRequestVersion, setSelectionRequestVersion] = useState(0);
+  const [navigationDiagnostic, setDiagnostic] = useState<string | null>(null);
+  const requestId = useRef(0);
+  const cancelledRequest = useRef<number | null>(null);
+  const previousControlledWorkflow = useRef(controlledWorkflowId);
+  const previousControlledSelection = useRef(controlledSelectedNodeId);
+  const latestCallbacks = useRef({ onActivateWorkflow, onResolvePendingNode });
+  latestCallbacks.current = { onActivateWorkflow, onResolvePendingNode };
+
+  useEffect(() => {
+    if (previousControlledWorkflow.current !== controlledWorkflowId) {
+      previousControlledWorkflow.current = controlledWorkflowId;
+      if (pending && controlledWorkflowId !== pending.workflowId) {
+        cancelledRequest.current = pending.requestId;
+        setPending(null);
+      }
+    }
+    if (previousControlledSelection.current !== controlledSelectedNodeId) {
+      previousControlledSelection.current = controlledSelectedNodeId;
+      if (
+        pending &&
+        controlledSelectedNodeId !== model.nodeIds.get(pending.workflowId)?.get(pending.stepId)
+      ) {
+        cancelledRequest.current = pending.requestId;
+        setPending(null);
+      }
+    }
+  }, [controlledWorkflowId, controlledSelectedNodeId, pending, model]);
+
+  useEffect(() => {
+    if (
+      !pending ||
+      cancelledRequest.current === pending.requestId ||
+      pending.documentId !== model.documentId
+    ) {
+      if (pending && pending.documentId !== model.documentId) setPending(null);
+      return;
+    }
+    if (pending.workflowId !== activeWorkflowId) return;
+    const targetId = model.nodeIds.get(pending.workflowId)?.get(pending.stepId);
+    if (!targetId) {
+      setDiagnostic(`Missing step: ${pending.workflowId}.${pending.stepId}`);
+      setPending(null);
+      return;
+    }
+    const node = nodes.find((n) => n.id === targetId);
+    if (!node) return;
+    setPending(null);
+    latestCallbacks.current.onResolvePendingNode(node);
+  }, [pending, model, activeWorkflowId, nodes]);
+
+  const navigateToTarget = useCallback(
+    (target: ClassifiedTarget) => {
+      setPending(null);
+      if (!target.navigable || !target.workflowId || !model.workflowsById.has(target.workflowId)) {
+        setDiagnostic(target.reason || `Unavailable target: ${target.reference}`);
+        return;
+      }
+      if (target.stepId && !model.stepsByWorkflow.get(target.workflowId)?.has(target.stepId)) {
+        setDiagnostic(`Missing step: ${target.workflowId}.${target.stepId}`);
+        return;
+      }
+      setDiagnostic(null);
+      if (target.stepId)
+        setPending({
+          documentId: model.documentId,
+          requestId: ++requestId.current,
+          workflowId: target.workflowId,
+          stepId: target.stepId,
+        });
+      latestCallbacks.current.onActivateWorkflow(target.workflowId);
+    },
+    [model],
+  );
+
+  const beginManualSelection = useCallback(() => {
+    setSelectionRequestVersion((version) => version + 1);
+    setPending(null);
+  }, []);
+
+  const clearPendingNavigation = useCallback((clearDiagnostic = false) => {
+    setPending(null);
+    if (clearDiagnostic) setDiagnostic(null);
+  }, []);
+
+  return {
+    navigationDiagnostic,
+    setDiagnostic,
+    selectionRequestVersion,
+    navigateToTarget,
+    beginManualSelection,
+    clearPendingNavigation,
+  };
+}
+
 function InjectedProvider({
   value,
   children,
@@ -98,73 +212,35 @@ function InjectedProvider({
   );
   const inspection = useMemo(() => inspect(snapshot), [snapshot]);
   const model = useMemo(() => buildViewerModel(inspection), [inspection]);
-  const [selectionRequestVersion, setSelectionRequestVersion] = useState(0);
-  const [navigationDiagnostic, setDiagnostic] = useState<string | null>(null);
-  const [pending, setPending] = useState<PendingSelection | null>(null);
-  const requestId = useRef(0);
-  const cancelledRequest = useRef<number | null>(null);
-  const previousControlled = useRef({
-    workflow: value.activeWorkflowId,
-    selection: value.selectedNodeId,
-  });
-  useEffect(() => {
-    const previous = previousControlled.current;
-    previousControlled.current = {
-      workflow: value.activeWorkflowId,
-      selection: value.selectedNodeId,
-    };
-    if (!pending) return;
-    if (
-      (previous.workflow !== value.activeWorkflowId &&
-        value.activeWorkflowId !== pending.workflowId) ||
-      (previous.selection !== value.selectedNodeId &&
-        value.selectedNodeId !== model.nodeIds.get(pending.workflowId)?.get(pending.stepId))
-    ) {
-      cancelledRequest.current = pending.requestId;
-      setPending(null);
-    }
-  }, [value.activeWorkflowId, value.selectedNodeId, pending, model]);
-  useEffect(() => {
-    if (!pending || cancelledRequest.current === pending.requestId) return;
-    if (pending.documentId !== model.documentId) {
-      setPending(null);
-      return;
-    }
-    if (value.activeWorkflowId !== pending.workflowId) return;
-    const nodeId = model.nodeIds.get(pending.workflowId)?.get(pending.stepId);
-    const node = value.nodes.find((n) => n.id === nodeId);
-    if (node) {
+  const {
+    navigationDiagnostic,
+    selectionRequestVersion,
+    navigateToTarget,
+    beginManualSelection,
+    clearPendingNavigation,
+  } = usePendingTargetNavigation({
+    model,
+    activeWorkflowId: value.activeWorkflowId,
+    controlledWorkflowId: value.activeWorkflowId,
+    controlledSelectedNodeId: value.selectedNodeId,
+    nodes: value.nodes,
+    onActivateWorkflow: (workflowId) => {
+      if (workflowId !== value.activeWorkflowId) value.setActiveWorkflow(workflowId);
+    },
+    onResolvePendingNode: (node) => {
       value.setSelectedNode(node.id);
-      setPending(null);
-    }
-  }, [model, pending, value]);
-  const navigateToTarget = (target: ClassifiedTarget) => {
-    setPending(null);
-    if (!target.navigable || !target.workflowId) {
-      setDiagnostic(target.reason || `Unavailable target: ${target.reference}`);
-      return;
-    }
-    setDiagnostic(null);
-    if (target.stepId)
-      setPending({
-        documentId: model.documentId,
-        requestId: ++requestId.current,
-        workflowId: target.workflowId,
-        stepId: target.stepId,
-      });
-    if (target.workflowId !== value.activeWorkflowId) value.setActiveWorkflow(target.workflowId);
-  };
+    },
+  });
   return (
     <ArazzoViewerContext.Provider
       value={{
         ...value,
         setSelectedNode: (id) => {
-          setSelectionRequestVersion((version) => version + 1);
-          setPending(null);
+          beginManualSelection();
           value.setSelectedNode(id);
         },
         setActiveWorkflow: (id) => {
-          setPending(null);
+          clearPendingNavigation();
           value.setActiveWorkflow(id);
         },
         snapshot,
@@ -226,14 +302,45 @@ function StandaloneProvider({
   const [localSelected, setLocalSelected] = useState<string | null>(initialSelectedNodeId ?? null);
   const selectedNodeId =
     initialSelectedNodeId === undefined ? localSelected : initialSelectedNodeId;
-  const [pending, setPending] = useState<PendingSelection | null>(null);
-  const [selectionRequestVersion, setSelectionRequestVersion] = useState(0);
-  const [navigationDiagnostic, setDiagnostic] = useState<string | null>(null);
-  const requestId = useRef(0);
-  const cancelledRequest = useRef<number | null>(null);
   const previousModel = useRef(model);
-  const previousControlledWorkflow = useRef(initialActiveWorkflowId);
-  const previousControlledSelection = useRef(initialSelectedNodeId);
+
+  const graph = useMemo(() => {
+    if (model.support.semanticInspection === 'unsupported') return { nodes: [], edges: [] };
+    if (!activeWorkflow) return convertDocumentToFlow(document, { model });
+    const converted = convertWorkflowToFlow(activeWorkflow, {}, document, model);
+    return applySequentialLayout(converted.nodes, converted.edges);
+  }, [model, document, activeWorkflow]);
+  const [overrides, setOverrides] = useState<{
+    graph: typeof graph;
+    nodes: ArazzoNode[];
+    edges: ArazzoEdge[];
+  } | null>(null);
+  const baseNodes = overrides?.graph === graph ? overrides.nodes : graph.nodes;
+
+  const {
+    navigationDiagnostic,
+    setDiagnostic,
+    selectionRequestVersion,
+    navigateToTarget,
+    beginManualSelection,
+    clearPendingNavigation,
+  } = usePendingTargetNavigation({
+    model,
+    activeWorkflowId,
+    controlledWorkflowId: initialActiveWorkflowId,
+    controlledSelectedNodeId: initialSelectedNodeId,
+    nodes: baseNodes,
+    onActivateWorkflow: (id) => {
+      if (id === activeWorkflowId) return;
+      if (initialActiveWorkflowId === undefined) setLocalWorkflow(id);
+      if (initialSelectedNodeId === undefined) setLocalSelected(null);
+      events?.onWorkflowSelect?.(id);
+    },
+    onResolvePendingNode: (node) => {
+      if (initialSelectedNodeId === undefined) setLocalSelected(node.id);
+      events?.onNodeSelect?.(node.id, node);
+    },
+  });
 
   const requestWorkflow = useCallback(
     (id: string | null) => {
@@ -246,45 +353,22 @@ function StandaloneProvider({
       if (initialSelectedNodeId === undefined) setLocalSelected(null);
       events?.onWorkflowSelect?.(id ?? '');
     },
-    [model, activeWorkflowId, initialActiveWorkflowId, initialSelectedNodeId, events],
+    [
+      model,
+      activeWorkflowId,
+      initialActiveWorkflowId,
+      initialSelectedNodeId,
+      events,
+      setDiagnostic,
+    ],
   );
   const setActiveWorkflow = useCallback(
     (id: string | null) => {
-      setPending(null);
-      setDiagnostic(null);
+      clearPendingNavigation(true);
       requestWorkflow(id);
     },
-    [requestWorkflow],
+    [clearPendingNavigation, requestWorkflow],
   );
-  const navigateToTarget = useCallback(
-    (target: ClassifiedTarget) => {
-      setPending(null);
-      if (!target.navigable || !target.workflowId || !model.workflowsById.has(target.workflowId)) {
-        setDiagnostic(target.reason || `Unavailable target: ${target.reference}`);
-        return;
-      }
-      if (target.stepId && !model.stepsByWorkflow.get(target.workflowId)?.has(target.stepId)) {
-        setDiagnostic(`Missing step: ${target.workflowId}.${target.stepId}`);
-        return;
-      }
-      setDiagnostic(null);
-      if (target.stepId)
-        setPending({
-          documentId: model.documentId,
-          requestId: ++requestId.current,
-          workflowId: target.workflowId,
-          stepId: target.stepId,
-        });
-      requestWorkflow(target.workflowId);
-    },
-    [model, requestWorkflow],
-  );
-  const graph = useMemo(() => {
-    if (model.support.semanticInspection === 'unsupported') return { nodes: [], edges: [] };
-    if (!activeWorkflow) return convertDocumentToFlow(document, { model });
-    const converted = convertWorkflowToFlow(activeWorkflow, {}, document, model);
-    return applySequentialLayout(converted.nodes, converted.edges);
-  }, [model, document, activeWorkflow]);
   const wiredGraph = useMemo(
     () => ({
       ...graph,
@@ -308,39 +392,32 @@ function StandaloneProvider({
     }),
     [graph, navigateToTarget, inspection, activeWorkflowId],
   );
-  const [overrides, setOverrides] = useState<{
-    graph: typeof wiredGraph;
-    nodes: ArazzoNode[];
-    edges: ArazzoEdge[];
-  } | null>(null);
-  const nodes = overrides?.graph === wiredGraph ? overrides.nodes : wiredGraph.nodes;
-  const edges = overrides?.graph === wiredGraph ? overrides.edges : wiredGraph.edges;
+  const nodes = overrides?.graph === graph ? overrides.nodes : wiredGraph.nodes;
+  const edges = overrides?.graph === graph ? overrides.edges : wiredGraph.edges;
   const setNodes = useCallback(
-    (next: ArazzoNode[]) => setOverrides({ graph: wiredGraph, nodes: next, edges }),
-    [wiredGraph, edges],
+    (next: ArazzoNode[]) => setOverrides({ graph, nodes: next, edges }),
+    [graph, edges],
   );
   const setEdges = useCallback(
-    (next: ArazzoEdge[]) => setOverrides({ graph: wiredGraph, nodes, edges: next }),
-    [wiredGraph, nodes],
+    (next: ArazzoEdge[]) => setOverrides({ graph, nodes, edges: next }),
+    [graph, nodes],
   );
   const setSelectedNode = useCallback(
     (id: string | null) => {
-      setSelectionRequestVersion((version) => version + 1);
-      setPending(null);
+      beginManualSelection();
       if (initialSelectedNodeId === undefined) setLocalSelected(id);
       if (id) {
         const node = nodes.find((n) => n.id === id);
         if (node) events?.onNodeSelect?.(id, node);
       }
     },
-    [nodes, events, initialSelectedNodeId],
+    [beginManualSelection, nodes, events, initialSelectedNodeId],
   );
 
   useEffect(() => {
     if (previousModel.current !== model) {
       previousModel.current = model;
-      setPending(null);
-      setDiagnostic(null);
+      clearPendingNavigation(true);
       if (initialSelectedNodeId === undefined) setLocalSelected(null);
       if (
         initialActiveWorkflowId === undefined &&
@@ -349,46 +426,14 @@ function StandaloneProvider({
       )
         setLocalWorkflow(model.workflows[0]?.workflowId ?? null);
     }
-  }, [model, initialActiveWorkflowId, initialSelectedNodeId, activeWorkflowId]);
-  useEffect(() => {
-    if (previousControlledWorkflow.current !== initialActiveWorkflowId) {
-      previousControlledWorkflow.current = initialActiveWorkflowId;
-      if (pending && initialActiveWorkflowId !== pending.workflowId) {
-        cancelledRequest.current = pending.requestId;
-        setPending(null);
-      }
-    }
-    if (previousControlledSelection.current !== initialSelectedNodeId) {
-      previousControlledSelection.current = initialSelectedNodeId;
-      if (
-        pending &&
-        initialSelectedNodeId !== model.nodeIds.get(pending.workflowId)?.get(pending.stepId)
-      ) {
-        cancelledRequest.current = pending.requestId;
-        setPending(null);
-      }
-    }
-  }, [initialActiveWorkflowId, initialSelectedNodeId, pending, model]);
-  useEffect(() => {
-    if (
-      !pending ||
-      cancelledRequest.current === pending.requestId ||
-      pending.documentId !== model.documentId ||
-      pending.workflowId !== activeWorkflowId
-    )
-      return;
-    const targetId = model.nodeIds.get(pending.workflowId)?.get(pending.stepId);
-    if (!targetId) {
-      setDiagnostic(`Missing step: ${pending.workflowId}.${pending.stepId}`);
-      setPending(null);
-      return;
-    }
-    const node = nodes.find((n) => n.id === targetId);
-    if (!node) return;
-    setPending(null);
-    if (initialSelectedNodeId === undefined) setLocalSelected(node.id);
-    events?.onNodeSelect?.(node.id, node);
-  }, [pending, model, activeWorkflowId, nodes, initialSelectedNodeId, events]);
+  }, [
+    model,
+    initialActiveWorkflowId,
+    initialSelectedNodeId,
+    activeWorkflowId,
+    clearPendingNavigation,
+  ]);
+
   const value: InternalContext = {
     document,
     documentURL,

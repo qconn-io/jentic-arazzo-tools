@@ -1,5 +1,6 @@
-import { workflowReadingLabel } from '../utils/readingLabels';
 import React, { useEffect, useMemo, useState } from 'react';
+
+import { workflowReadingLabel } from '../utils/readingLabels';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { useViewerSession } from '../context/ViewerSessionContext';
 

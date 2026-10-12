@@ -1,166 +1,46 @@
-export { ArazzoWorkflowReview } from './ArazzoWorkflowReview';
-export { compareWorkflowRevisions, exportWorkflowReview } from './utils/review';
-export type {
-  WorkflowReviewSnapshot,
-  WorkflowReviewAddress,
-  WorkflowReviewMatch,
-  WorkflowReviewOptions,
-  WorkflowReviewValue,
-  WorkflowReviewCategory,
-  WorkflowReviewEvidence,
-  WorkflowReviewRelationship,
-  WorkflowReviewImpactPath,
-  WorkflowReviewImpact,
-  WorkflowReviewEffect,
-  WorkflowReviewFinding,
-  WorkflowReviewIdentity,
-  WorkflowReviewResult,
-  ArazzoWorkflowReviewProps,
-} from './types/review';
-import { StandaloneCatalog } from './components/StandaloneCatalog';
-export { ArazzoCatalog } from './ArazzoCatalog';
-export type {
-  WorkflowCatalogLabel,
-  WorkflowCatalogIdentity,
-  WorkflowCatalogMetadata,
-  WorkflowCatalogDocument,
-  WorkflowCatalogAssociation,
-  WorkflowCatalogManifest,
-  WorkflowCatalogCoverage,
-  WorkflowCatalogSelection,
-  ArazzoCatalogProps,
-} from './types/catalog';
-export { normalizeCatalogManifest } from './utils/catalog/manifest';
-import { useStandaloneScenarios } from './utils/scenario/useStandaloneScenarios';
+import React, { forwardRef, useState, useCallback, useRef, useEffect } from 'react';
+
+import { StandaloneCatalog, useStandaloneCatalogInput } from './components/StandaloneCatalog';
 import {
-  SCENARIO_NAMESPACE,
-  normalizeScenarioManifest,
-  scenarioWaypoint,
-} from './utils/scenario/manifest';
-export type {
-  ScenarioFocus,
-  ScenarioWaypoint,
-  AuthoredScenario,
-  ScenarioManifest,
-  ScenarioSelection,
-  ScenarioControls,
-} from './types/scenario';
-export type {
-  WorkflowProfileProvenance,
-  WorkflowSystemParticipant,
-  WorkflowActorBinding,
-  WorkflowSourceOwnerBinding,
-  WorkflowImplementationAssociation,
-  WorkflowContractIdentity,
-  WorkflowEventAssociation,
-  WorkflowViewProfile,
-  WorkflowPerspective,
-  WorkflowViewProfileAdapter,
-} from './types/profile';
-export { digitalProductProfile } from './utils/systems/digitalProductProfile';
+  StandaloneShell,
+  commitBrowserHistoryLocation,
+  copyStandaloneShareLink,
+  createLocalDocumentIdentity,
+  isHttpUrl,
+  pushBrowserSourceHistory,
+  readBrowserPopState,
+  readInitialStandaloneDocument,
+} from './components/StandaloneShell';
+import { useStandaloneScenarios } from './utils/scenario/useStandaloneScenarios';
+import { normalizeScenarioManifest, scenarioWaypoint } from './utils/scenario/manifest';
 import { BrowserFetchProvider } from './utils/source/BrowserFetchProvider';
 import { useSourceRegistry } from './utils/source/useSourceRegistry';
-export type {
-  WorkflowLocation,
-  WorkflowLocationSelection,
-  WorkflowCallSite,
-  WorkflowActionAddress,
-  WorkflowLocationJSON,
-  WorkflowLocationStatus,
-  WorkflowLocationAdapter,
-  WorkflowLocationDecodeResult,
-} from './types/location';
-export type {
-  SourceDocumentRequest,
-  SourceDocumentContent,
-  SourceDocumentProvider,
-  ProvidedSourceProvenance,
-  ExternalNavigationRequest,
-} from './types/source';
+import { readLocationURL, encodeLocation } from './utils/location/codec';
+import type { StandaloneExternalSource } from './utils/location/resolve';
+import { LocationHistoryContext } from './context/LocationHistoryContext';
+import { CopyLinkContext } from './context/CopyLinkContext';
+import type { WorkflowLocation } from './types/location';
+import { ArazzoUI } from './ArazzoUI';
+import { ReadingIntentContext } from './context/ReadingIntentContext';
+import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
+import type { ArazzoDocument } from './types/arazzo';
+import './styles/index.css';
+
 export {
+  ArazzoWorkflowReview,
+  compareWorkflowRevisions,
+  exportWorkflowReview,
+  ArazzoCatalog,
+  normalizeCatalogManifest,
+  digitalProductProfile,
   encodeLocation,
   decodeLocation,
   readLocationURL,
   writeLocationURL,
   authoredDigest,
   createLocationAdapter,
-} from './utils/location/codec';
-import React, { forwardRef, useState, useCallback, useRef, useEffect } from 'react';
-
-import {
-  readLocationURL,
-  writeLocationURL,
-  encodeLocation,
-  decodeLocation,
-} from './utils/location/codec';
-import { LocationHistoryContext } from './context/LocationHistoryContext';
-import { CopyLinkContext, CopyLocationControl } from './context/CopyLinkContext';
-import type { WorkflowLocation } from './types/location';
-import { ArazzoUI } from './ArazzoUI';
-import { JenticLogo } from './components/JenticLogo';
-import { UploadIcon } from './components/UploadIcon';
-import { ReadingIntentContext } from './context/ReadingIntentContext';
-import { GuideSetup } from './components/AdvancedTools';
-import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
-import type { ArazzoDocument } from './types/arazzo';
-
-import './styles/index.css';
-
-export type {
-  ArazzoUIProps,
-  ArazzoUIRef,
-  ViewerMode,
-  DiagramType,
-  ViewerEvents,
-  DocsViewConfig,
-  DocumentationMetadata,
-  WorkflowDocumentation,
-  StepDocumentation,
-  DocumentationSection,
-  DocumentationSupport,
-  DocumentationProvenance,
-  DocumentationSourceBinding,
-  DocumentationPrerequisite,
-  ArazzoNodeType,
-  ArazzoEdgeType,
-  ConversionOptions,
-  ArazzoNode,
-  ArazzoNodeData,
-  StepNodeData,
-  WorkflowRefNodeData,
-  StartNodeData,
-  EndNodeData,
-  WorkflowNodeData,
-  ExternalWorkflowNodeData,
-  ArazzoEdge,
-  ArazzoEdgeData,
-  RelationshipEdgeData,
-  SequentialEdgeData,
-  SuccessEdgeData,
-  FailureEdgeData,
-  RetryEdgeData,
-  BundledSuccessEdgeData,
-  BundledFailureEdgeData,
-  BundledRetryEdgeData,
-  ValidationError,
-} from './types/index';
-export type {
-  ArazzoDocument,
-  InfoObject,
-  SourceDescription,
-  Workflow,
-  Step,
-  Parameter,
-  RequestBody,
-  PayloadReplacement,
-  SuccessAction,
-  FailureAction,
-  Criterion,
-  CriterionExpressionType,
-  ReusableObject,
-  ComponentsObject,
-  JSONSchema,
-} from './types/arazzo';
+} from './ArazzoUI';
+export type * from './types/index';
 
 /** @public */
 export type ArazzoUIStandaloneProps = Omit<ArazzoUIProps, 'view'> & {
@@ -183,30 +63,14 @@ export type ArazzoUIStandaloneProps = Omit<ArazzoUIProps, 'view'> & {
  * @public
  */
 const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
-  function ArazzoUIStandalone(props, ref) {
+  function DocumentStandalone(props, ref) {
     const { initialView = 'docs', onViewChange, ...rest } = props;
     const guides = useStandaloneScenarios(props);
-    const guideHelpId = React.useId();
     const browserProvider = React.useMemo(() => new BrowserFetchProvider(), []);
-    const [externalSource, setExternalSource] = useState<{
-      uri: string;
-      revision?: string;
-      root?: string;
-    }>();
+    const [externalSource, setExternalSource] = useState<StandaloneExternalSource>();
     const [navigationError, setNavigationError] = useState('');
     const navigationController = useRef<AbortController>();
     const hostScenarioLocation = useRef<WorkflowLocation>();
-    useEffect(() => {
-      sourceGeneration.current += 1;
-      navigationController.current?.abort();
-      navigationRegistry.cancelAll();
-    }, [guides.manifest]);
-    useEffect(() => {
-      if (guides.selection !== null) return;
-      sourceGeneration.current += 1;
-      navigationController.current?.abort();
-      navigationRegistry.cancelAll();
-    }, [guides.selection]);
     const initialURL = useRef(readLocationURL(new URL(globalThis.location.href)));
     const [view, setView] = useState<ViewerMode>(
       props.location?.view ??
@@ -214,34 +78,19 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
         props.defaultLocation?.view ??
         initialView,
     );
-
     useEffect(() => {
       if (props.location) setView(props.location.view);
     }, [props.location?.view]);
 
-    // ?document= query param takes precedence, #document= hash used for large inline content
-    const queryParam = new URLSearchParams(globalThis.location.search).get('document');
-    const hashParam = new URLSearchParams(globalThis.location.hash.slice(1)).get('document');
-    const initialDocument =
-      (queryParam || hashParam) === props.documentIdentity
-        ? props.document
-        : queryParam || hashParam || props.document;
-
-    const [urlInput, setUrlInput] = useState(
-      typeof initialDocument === 'string' && /^https?:\/\//i.test(initialDocument)
-        ? initialDocument
-        : '',
-    );
+    const initialDocument = readInitialStandaloneDocument(props.document, props.documentIdentity);
+    const [urlInput, setUrlInput] = useState(isHttpUrl(initialDocument) ? initialDocument : '');
     const [documentSource, setDocumentSource] = useState<ArazzoDocument | string>(initialDocument);
     const navigationRegistry = useSourceRegistry(
       props.sourceProvider ?? browserProvider,
       undefined,
       documentSource,
     );
-    const [localIdentity, setLocalIdentity] = useState(
-      () =>
-        `urn:arazzo-ui:local:${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`,
-    );
+    const [localIdentity, setLocalIdentity] = useState(createLocalDocumentIdentity);
     const inlineSource =
       typeof documentSource !== 'string' ||
       /[\r\n]|^\s*[{[]|^\s*(?:arazzo|info|sourceDescriptions):/.test(documentSource);
@@ -251,9 +100,6 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
       externalSource?.uri ?? suppliedIdentity ?? (inlineSource ? localIdentity : undefined);
     const documentRevision =
       externalSource?.revision ?? (hostSource ? props.documentRevision : undefined);
-    const [dragging, setDragging] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const dragCounter = useRef(0);
     const [hydration, setHydration] = useState({
       epoch: 0,
       location: initialURL.current.location ?? props.defaultLocation,
@@ -269,122 +115,72 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
     const hostDocumentRef = useRef(props.document);
     const sourceRef = useRef(documentSource);
     sourceRef.current = documentSource;
-    useEffect(() => {
+
+    const cancelPendingNavigation = useCallback(() => {
       sourceGeneration.current += 1;
       navigationController.current?.abort();
       navigationRegistry.cancelAll();
-      return () => {
-        sourceGeneration.current += 1;
-        navigationController.current?.abort();
-        navigationRegistry.cancelAll();
-      };
+    }, [navigationRegistry]);
+
+    useEffect(() => cancelPendingNavigation(), [guides.manifest]);
+    useEffect(() => {
+      if (guides.selection === null) cancelPendingNavigation();
+    }, [guides.selection]);
+    useEffect(() => {
+      cancelPendingNavigation();
+      return cancelPendingNavigation;
     }, [props.sourceProvider, props.document]);
+
     const addressable = (value: WorkflowLocation) =>
-      !!suppliedIdentity || /^https?:\/\//i.test(value.document);
+      !!suppliedIdentity || isHttpUrl(value.document);
     const copy = async () => {
       const current = currentLocation.current;
-      if (guides.selection && (!guides.uri || !/^https?:\/\//i.test(guides.uri))) {
-        setShareMessage(
-          'Publish the scenario manifest at an addressable URI before sharing this guide.',
-        );
-        return;
-      }
-      if (!current || !addressable(current)) {
-        setShareMessage(
-          'This content must be supplied again or published at an addressable source before a shareable link can reproduce it.',
-        );
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(
-          writeLocationURL(globalThis.location.href, current).href,
-        );
-        setShareMessage('Link copied.');
-      } catch {
-        setShareMessage('Could not copy the link. Clipboard access is unavailable.');
-      }
+      setShareMessage(
+        await copyStandaloneShareLink({
+          current,
+          addressable: !!current && addressable(current),
+          guides,
+        }),
+      );
     };
+
     const commitLocation = (value: WorkflowLocation) => {
       currentLocation.current = value;
-      const url = addressable(value)
-        ? writeLocationURL(globalThis.location.href, value)
-        : new URL(globalThis.location.href);
-      const guideState = value.extensions?.[SCENARIO_NAMESPACE];
-      if (
-        guideState &&
-        typeof guideState === 'object' &&
-        !Array.isArray(guideState) &&
-        typeof guideState.manifestURI === 'string'
-      )
-        url.searchParams.set('scenarios', guideState.manifestURI);
-      const previousLocation = globalThis.history.state?.arazzoLocation;
-      const state = {
-        ...globalThis.history.state,
-        arazzoDocument: sourceRef.current,
-        arazzoCallers: callerLocations.current,
-        arazzoIdentity: documentIdentity,
-        arazzoExternalSource: externalSource,
-        arazzoLocation: value,
-      };
-      if (replaceNext.current) {
-        replaceNext.current = false;
-        globalThis.history.replaceState(state, '', url);
-      } else if (
-        url.href !== globalThis.location.href ||
-        JSON.stringify(previousLocation) !== JSON.stringify(value)
-      )
-        globalThis.history.pushState(state, '', url);
+      commitBrowserHistoryLocation({
+        location: value,
+        addressable: addressable(value),
+        source: sourceRef.current,
+        callers: callerLocations.current,
+        documentIdentity,
+        externalSource,
+        replaceNext,
+      });
     };
+
     useEffect(() => {
       const restore = (event: PopStateEvent) => {
-        sourceGeneration.current += 1;
-        navigationController.current?.abort();
-        navigationRegistry.cancelAll();
+        cancelPendingNavigation();
         setNavigationError('');
-        const url = new URL(globalThis.location.href);
-        guides.restore(url);
-        let decoded = readLocationURL(url);
-        if (!decoded.location && !decoded.error && event.state?.arazzoLocation) {
-          try {
-            decoded = decodeLocation(encodeLocation(event.state.arazzoLocation));
-          } catch {
-            decoded = { error: 'Invalid workflow location in browser history.' };
-          }
-        }
-        const source =
-          url.searchParams.get('document') ||
-          new URLSearchParams(url.hash.slice(1)).get('document');
-        const document =
-          source === props.documentIdentity
-            ? props.document
-            : (source ?? event.state?.arazzoDocument ?? props.document);
+        const snapshot = readBrowserPopState(event, props.document, props.documentIdentity);
+        guides.restore(snapshot.url);
         replaceNext.current = true;
         currentLocation.current = undefined;
         setShareMessage('');
-        if (typeof event.state?.arazzoIdentity === 'string')
-          setLocalIdentity(event.state.arazzoIdentity);
-        setExternalSource(event.state?.arazzoExternalSource);
+        if (snapshot.identity) setLocalIdentity(snapshot.identity);
+        setExternalSource(snapshot.externalSource);
         setDocumentSource(
-          event.state?.arazzoExternalSource ? event.state.arazzoDocument : document,
+          snapshot.externalSource && snapshot.externalDocument !== undefined
+            ? snapshot.externalDocument
+            : snapshot.document,
         );
-        setUrlInput(typeof document === 'string' && /^https?:\/\//i.test(document) ? document : '');
-        setView(decoded.location?.view ?? initialView);
-        const callers: WorkflowLocation[] = [];
-        if (Array.isArray(event.state?.arazzoCallers))
-          for (const caller of event.state.arazzoCallers.slice(0, 32)) {
-            try {
-              const decoded = decodeLocation(encodeLocation(caller));
-              if (decoded.location) callers.push(decoded.location);
-            } catch {
-              /* invalid history addresses are ignored */
-            }
-          }
-        callerLocations.current = callers;
+        setUrlInput(isHttpUrl(snapshot.document) ? snapshot.document : '');
+        setView(snapshot.decoded.location?.view ?? initialView);
+        callerLocations.current = snapshot.callers;
         setHydration((current) => ({
           epoch: current.epoch + 1,
-          location: decoded.location,
-          error: decoded.error,
-          callers,
+          location: snapshot.decoded.location,
+          error: snapshot.decoded.error,
+          callers: snapshot.callers,
         }));
       };
       globalThis.addEventListener('popstate', restore);
@@ -393,43 +189,20 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
         globalThis.removeEventListener('popstate', restore);
       };
     }, [props.document, props.documentIdentity, initialView]);
-    useEffect(() => {
-      if (hostDocumentRef.current === props.document) return;
-      hostDocumentRef.current = props.document;
-      const pending = hostScenarioLocation.current;
-      const supplied =
-        props.documentIdentity ??
-        (typeof props.document === 'string' && /^https?:\/\//i.test(props.document)
-          ? props.document
-          : undefined);
-      commitSource(
-        props.document,
-        undefined,
-        guides.selection && pending?.document === supplied ? pending : undefined,
-      );
-      hostScenarioLocation.current = undefined;
-      setUrlInput(
-        typeof props.document === 'string' && /^https?:\/\//i.test(props.document)
-          ? props.document
-          : '',
-      );
-    }, [props.document]);
 
     const commitSource = (
       source: ArazzoDocument | string,
-      provenance?: { uri: string; revision?: string; root?: string },
+      provenance?: StandaloneExternalSource,
       guideLocation?: WorkflowLocation,
     ) => {
-      sourceGeneration.current += 1;
-      navigationController.current?.abort();
-      navigationRegistry.cancelAll();
+      cancelPendingNavigation();
       setNavigationError('');
       if (!guideLocation) guides.setSelection(null);
       setExternalSource(provenance);
       currentLocation.current = undefined;
       replaceNext.current = true;
       setShareMessage('');
-      const identity = `urn:arazzo-ui:local:${globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
+      const identity = createLocalDocumentIdentity();
       setLocalIdentity(identity);
       setDocumentSource(source);
       setHydration((current) => ({
@@ -438,30 +211,23 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
         error: undefined,
         callers: undefined,
       }));
-      const url = new URL(globalThis.location.href);
-      url.searchParams.delete('location');
-      if (typeof source === 'string' && /^https?:\/\//i.test(source))
-        url.searchParams.set('document', source);
-      else url.searchParams.delete('document');
-      const hash = new URLSearchParams(url.hash.slice(1));
-      if (hash.has('document') || hash.has('location')) {
-        hash.delete('document');
-        hash.delete('location');
-        url.hash = hash.toString();
-      }
-      globalThis.history.pushState(
-        {
-          ...globalThis.history.state,
-          arazzoDocument: source,
-          arazzoIdentity: provenance?.uri ?? identity,
-          arazzoExternalSource: provenance,
-          arazzoLocation: undefined,
-          arazzoCallers: [],
-        },
-        '',
-        url,
-      );
+      pushBrowserSourceHistory(source, identity, provenance);
     };
+
+    useEffect(() => {
+      if (hostDocumentRef.current === props.document) return;
+      hostDocumentRef.current = props.document;
+      const pending = hostScenarioLocation.current;
+      const supplied =
+        props.documentIdentity ?? (isHttpUrl(props.document) ? props.document : undefined);
+      commitSource(
+        props.document,
+        undefined,
+        guides.selection && pending?.document === supplied ? pending : undefined,
+      );
+      hostScenarioLocation.current = undefined;
+      setUrlInput(isHttpUrl(props.document) ? props.document : '');
+    }, [props.document]);
 
     const handleViewChange = useCallback(
       (v: ViewerMode) => {
@@ -473,22 +239,6 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
         onViewChange?.(v);
       },
       [onViewChange, props.location, props.onLocationChange],
-    );
-
-    const handleExplore = useCallback(() => {
-      const trimmed = urlInput.trim();
-      if (trimmed) {
-        commitSource(trimmed);
-      }
-    }, [urlInput]);
-
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-          handleExplore();
-        }
-      },
-      [handleExplore],
     );
 
     const loadFile = (file: File) => {
@@ -505,56 +255,46 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
       reader.readAsText(file);
     };
 
-    const handleFileChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-          loadFile(file);
-        }
-        // reset so the same file can be re-selected
-        e.target.value = '';
+    const acquireExternalDocument = async (
+      uri: string,
+      revision: string | undefined,
+      options: {
+        root?: string;
+        guideLocation?: WorkflowLocation;
+        mismatchMessage: (actual?: string) => string;
+        formatError: (message: string) => string;
       },
-      [loadFile],
-    );
-
-    const handleDragEnter = useCallback((e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const types = Array.from(e.dataTransfer.types);
-      if (!types.includes('Files')) return;
-      dragCounter.current += 1;
-      if (dragCounter.current === 1) {
-        setDragging(true);
+    ) => {
+      navigationController.current?.abort();
+      navigationRegistry.cancelAll();
+      const controller = new AbortController();
+      navigationController.current = controller;
+      const generation = ++sourceGeneration.current;
+      setNavigationError('');
+      try {
+        const acquired = await navigationRegistry.acquire(uri, revision);
+        if (controller.signal.aborted || generation !== sourceGeneration.current) return;
+        if (revision !== undefined && acquired.revision !== revision)
+          throw new Error(options.mismatchMessage(acquired.revision));
+        commitSource(
+          typeof acquired.content === 'string'
+            ? acquired.content
+            : JSON.stringify(acquired.content),
+          {
+            uri: acquired.retrievalURI,
+            revision: acquired.revision,
+            ...(options.root ? { root: options.root } : {}),
+          },
+          options.guideLocation,
+        );
+        setUrlInput(acquired.retrievalURI);
+      } catch (error) {
+        if (!controller.signal.aborted && generation === sourceGeneration.current)
+          setNavigationError(
+            options.formatError(error instanceof Error ? error.message : String(error)),
+          );
       }
-    }, []);
-
-    const handleDragLeave = useCallback((e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dragCounter.current = Math.max(0, dragCounter.current - 1);
-      if (dragCounter.current === 0) {
-        setDragging(false);
-      }
-    }, []);
-
-    const handleDragOver = useCallback((e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-    }, []);
-
-    const handleDrop = useCallback(
-      (e: React.DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        dragCounter.current = 0;
-        setDragging(false);
-        const file = e.dataTransfer.files?.[0];
-        if (file) {
-          loadFile(file);
-        }
-      },
-      [loadFile],
-    );
+    };
 
     const navigateScenarioLocation: NonNullable<
       ArazzoUIProps['onScenarioLocationRequest']
@@ -569,37 +309,18 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
       if (!accepted || encodeLocation(accepted.location) !== encodeLocation(location)) return;
       setView(location.view);
       const currentIdentity =
-        documentIdentity ??
-        (typeof documentSource === 'string' && /^https?:\/\//i.test(documentSource)
-          ? documentSource
-          : undefined);
-      navigationController.current?.abort();
-      navigationRegistry.cancelAll();
-      const generation = ++sourceGeneration.current;
-      if (location.document === currentIdentity) return;
-      const controller = new AbortController();
-      navigationController.current = controller;
-      setNavigationError('');
-      try {
-        const acquired = await navigationRegistry.acquire(location.document, location.revision);
-        if (controller.signal.aborted || generation !== sourceGeneration.current) return;
-        if (location.revision !== undefined && acquired.revision !== location.revision)
-          throw new Error('Scenario document revision mismatch.');
-        commitSource(
-          typeof acquired.content === 'string'
-            ? acquired.content
-            : JSON.stringify(acquired.content),
-          { uri: acquired.retrievalURI, revision: acquired.revision },
-          location,
-        );
-        setUrlInput(acquired.retrievalURI);
-      } catch (error) {
-        if (!controller.signal.aborted && generation === sourceGeneration.current)
-          setNavigationError(
-            `Guide document unavailable: ${error instanceof Error ? error.message : String(error)}`,
-          );
+        documentIdentity ?? (isHttpUrl(documentSource) ? documentSource : undefined);
+      if (location.document === currentIdentity) {
+        cancelPendingNavigation();
+        return;
       }
+      await acquireExternalDocument(location.document, location.revision, {
+        guideLocation: location,
+        mismatchMessage: () => 'Scenario document revision mismatch.',
+        formatError: (message) => `Guide document unavailable: ${message}`,
+      });
     };
+
     const guideSelectionKey = JSON.stringify(guides.selection);
     useEffect(() => {
       if (props.onScenarioLocationRequest || !guides.selection) return;
@@ -637,314 +358,79 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
         }}
       >
         <CopyLinkContext.Provider value={{ copy, message: shareMessage }}>
-          <div
-            className={`arazzo-ui-standalone ${props.className ?? ''}`}
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              height: '100%',
-              position: 'relative',
-              ...props.style,
+          <StandaloneShell
+            className={props.className}
+            style={props.style}
+            urlInput={urlInput}
+            onUrlInputChange={setUrlInput}
+            onExplore={() => {
+              const trimmed = urlInput.trim();
+              if (trimmed) commitSource(trimmed);
             }}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
+            onLoadFile={loadFile}
+            hydrationError={hydration.error}
+            navigationError={navigationError}
+            guides={guides}
+            onOpenGuidedExample={() => {
+              const documentURL = new URL(
+                'examples/digital-product/arazzo.yaml',
+                globalThis.location.href,
+              ).href;
+              const guideURL = new URL(
+                'examples/digital-product/scenarios.json',
+                globalThis.location.href,
+              ).href;
+              commitSource(documentURL);
+              setUrlInput(documentURL);
+              guides.loadExample(guideURL);
+              const target = new URL(globalThis.location.href);
+              target.searchParams.set('scenarios', guideURL);
+              globalThis.history.replaceState(globalThis.history.state, '', target);
+            }}
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".yaml,.yml,.json,.arazzo"
-              onChange={handleFileChange}
-              style={{ display: 'none' }}
-            />
-            <div
-              className="arazzo-ui-toolbar"
-              style={{
-                position: 'relative',
-                minHeight: '60px',
-                flexShrink: 0,
-                padding: '0 16px',
-                borderBottom: '1px solid #333',
-                background: '#1B1B1B',
-              }}
-            >
-              <a
-                href="https://jentic.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Supported by Jentic"
-                className="arazzo-toolbar-logo"
-              >
-                <JenticLogo style={{ height: '36px' }} />
-              </a>
-              <details className="arazzo-toolbar-source-disclosure">
-                <summary>Load document</summary>
-                <div className="arazzo-toolbar-source">
-                  <input
-                    type="text"
-                    aria-label="Arazzo document URL"
-                    value={urlInput}
-                    onChange={(e) => setUrlInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Enter Arazzo document URL..."
-                    style={{
-                      flex: 1,
-                      minWidth: 0,
-                      padding: '6px 12px',
-                      border: '1px solid #444',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      background: '#2a2a2a',
-                      color: '#fff',
-                    }}
-                  />
-                  <button
-                    onClick={handleExplore}
-                    style={{
-                      padding: '6px 16px',
-                      border: 'none',
-                      borderRadius: '6px',
-                      background: '#94C83D',
-                      color: '#fff',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      fontWeight: 500,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Explore
-                  </button>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    aria-label="Upload Arazzo document"
-                    title="Upload Arazzo document"
-                    style={{
-                      padding: '6px',
-                      border: '1px solid #444',
-                      borderRadius: '6px',
-                      background: '#2a2a2a',
-                      color: '#fff',
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: '32px',
-                      height: '32px',
-                    }}
-                  >
-                    <UploadIcon size={16} />
-                  </button>
-                </div>
-              </details>
-              <div className="arazzo-toolbar-mode">
-                <CopyLocationControl />
-              </div>
-            </div>
-            {hydration.error && <p role="status">{hydration.error}</p>}
-            {navigationError && <p role="status">{navigationError}</p>}
-            <GuideSetup
-              status={
-                guides.message && (
-                  <div className="arazzo-guide-status">
-                    <p role="status">{guides.message}</p>
-                    {guides.failed && <button onClick={guides.retry}>Retry guide loading</button>}
-                  </div>
-                )
-              }
-              setup={
-                <form
-                  className="arazzo-scenario-loader"
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    guides.load();
-                  }}
-                >
-                  <label>
-                    Guide file URL{' '}
-                    <input
-                      type="url"
-                      aria-label="Guide file URL"
-                      aria-describedby={guideHelpId}
-                      value={guides.input}
-                      onChange={(event) => guides.setInput(event.target.value)}
-                      placeholder="Guide file URL"
-                    />
-                  </label>
-                  <p id={guideHelpId}>
-                    A guide file is a separate JSON document containing walkthrough descriptions and
-                    links to workflow steps.
-                  </p>
-                  <p>Reading a guide does not run the workflow.</p>
-                  <details className="arazzo-guide-format">
-                    <summary>Guide file format</summary>
-                    <pre data-testid="guide-format-example">
-                      {JSON.stringify(
-                        {
-                          version: 1,
-                          id: 'reading-guide',
-                          scenarios: [
-                            {
-                              id: 'read-workflow',
-                              document: 'arazzo.yaml',
-                              workflow: 'client-journey',
-                              expected: 'Read the authored purchase exchange.',
-                              evidence: 'Author-provided description; inspection only.',
-                            },
-                          ],
-                        },
-                        null,
-                        2,
-                      )}
-                    </pre>
-                    <p>
-                      Legacy arrays of scenarios are also accepted, using the same scenario fields
-                      without the versioned envelope. Relative document links resolve against the
-                      guide file URL.
-                    </p>
-                    <a href="https://github.com/jentic/jentic-arazzo-tools/blob/main/packages/jentic-arazzo-ui/README.md#authored-scenario-guides">
-                      Developer guide schema
-                    </a>
-                    <p>
-                      The guided example opens the digital-product workflow and its separate guide
-                      file.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const documentURL = new URL(
-                          'examples/digital-product/arazzo.yaml',
-                          globalThis.location.href,
-                        ).href;
-                        const guideURL = new URL(
-                          'examples/digital-product/scenarios.json',
-                          globalThis.location.href,
-                        ).href;
-                        commitSource(documentURL);
-                        setUrlInput(documentURL);
-                        guides.loadExample(guideURL);
-                        const target = new URL(globalThis.location.href);
-                        target.searchParams.set('scenarios', guideURL);
-                        globalThis.history.replaceState(globalThis.history.state, '', target);
-                      }}
-                    >
-                      Open guided example
-                    </button>
-                  </details>
-                  <button type="submit" disabled={!guides.input.trim()}>
-                    Load guides
-                  </button>
-                </form>
+            <ReadingIntentContext.Provider
+              value={
+                props.initialView === undefined &&
+                props.location === undefined &&
+                hydration.location === undefined
               }
             >
-              <div style={{ flex: 1, minHeight: 0, minWidth: 0 }}>
-                <ReadingIntentContext.Provider
-                  value={
-                    props.initialView === undefined &&
-                    props.location === undefined &&
-                    hydration.location === undefined
+              <ArazzoUI
+                key={hydration.epoch}
+                ref={ref}
+                {...rest}
+                documentIdentity={documentIdentity}
+                documentRevision={documentRevision}
+                defaultLocation={hydration.location}
+                onLocationChange={props.onLocationChange}
+                sourceProvider={props.sourceProvider ?? browserProvider}
+                baseURI={externalSource?.uri ?? props.baseURI}
+                activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
+                onExternalNavigation={async (request) => {
+                  if (props.onExternalNavigation) {
+                    props.onExternalNavigation(request);
+                    return;
                   }
-                >
-                  <ArazzoUI
-                    key={hydration.epoch}
-                    ref={ref}
-                    {...rest}
-                    documentIdentity={documentIdentity}
-                    documentRevision={documentRevision}
-                    defaultLocation={hydration.location}
-                    onLocationChange={props.onLocationChange}
-                    sourceProvider={props.sourceProvider ?? browserProvider}
-                    baseURI={externalSource?.uri ?? props.baseURI}
-                    activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
-                    onExternalNavigation={async (request) => {
-                      if (props.onExternalNavigation) {
-                        props.onExternalNavigation(request);
-                        return;
-                      }
-                      navigationController.current?.abort();
-                      navigationRegistry.cancelAll();
-                      const controller = new AbortController();
-                      navigationController.current = controller;
-                      const generation = ++sourceGeneration.current;
-                      setNavigationError('');
-                      try {
-                        const acquired = await navigationRegistry.acquire(
-                          request.documentUri,
-                          request.revision,
-                        );
-                        if (controller.signal.aborted || generation !== sourceGeneration.current)
-                          return;
-                        if (
-                          request.revision !== undefined &&
-                          acquired.revision !== request.revision
-                        )
-                          throw new Error(
-                            `Revision mismatch: requested ${request.revision}, got ${acquired.revision ?? 'no revision'}`,
-                          );
-                        commitSource(
-                          typeof acquired.content === 'string'
-                            ? acquired.content
-                            : JSON.stringify(acquired.content),
-                          {
-                            uri: acquired.retrievalURI,
-                            revision: acquired.revision,
-                            root: request.workflowId,
-                          },
-                        );
-                        setUrlInput(acquired.retrievalURI);
-                      } catch (error) {
-                        if (!controller.signal.aborted && generation === sourceGeneration.current)
-                          setNavigationError(
-                            error instanceof Error ? error.message : String(error),
-                          );
-                      }
-                    }}
-                    scenarioManifest={guides.manifest}
-                    scenarioManifestURI={guides.uri}
-                    scenarioSelection={guides.selection}
-                    onScenarioSelectionChange={guides.setSelection}
-                    onScenarioLocationRequest={navigateScenarioLocation}
-                    document={documentSource}
-                    view={view}
-                    onViewChange={handleViewChange}
-                    className={undefined}
-                    style={undefined}
-                  />
-                </ReadingIntentContext.Provider>
-              </div>
-            </GuideSetup>
-            {dragging && (
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'rgba(148, 200, 61, 0.1)',
-                  border: '2px dashed #94C83D',
-                  borderRadius: '8px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 1000,
-                  pointerEvents: 'none',
+                  await acquireExternalDocument(request.documentUri, request.revision, {
+                    root: request.workflowId,
+                    mismatchMessage: (actual) =>
+                      `Revision mismatch: requested ${request.revision}, got ${actual ?? 'no revision'}`,
+                    formatError: (message) => message,
+                  });
                 }}
-              >
-                <div
-                  style={{
-                    background: '#1B1B1B',
-                    color: '#94C83D',
-                    padding: '16px 32px',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                  }}
-                >
-                  Drop Arazzo document here
-                </div>
-              </div>
-            )}
-          </div>
+                scenarioManifest={guides.manifest}
+                scenarioManifestURI={guides.uri}
+                scenarioSelection={guides.selection}
+                onScenarioSelectionChange={guides.setSelection}
+                onScenarioLocationRequest={navigateScenarioLocation}
+                document={documentSource}
+                view={view}
+                onViewChange={handleViewChange}
+                className={undefined}
+                style={undefined}
+              />
+            </ReadingIntentContext.Provider>
+          </StandaloneShell>
         </CopyLinkContext.Provider>
       </LocationHistoryContext.Provider>
     );
@@ -954,13 +440,7 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
 /** Self-contained document viewer or opt-in supplied catalog. @public */
 export const ArazzoUIStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
   function ArazzoUIStandalone(props, ref) {
-    const [href, setHref] = useState(globalThis.location.href);
-    useEffect(() => {
-      const pop = () => setHref(globalThis.location.href);
-      globalThis.addEventListener('popstate', pop);
-      return () => globalThis.removeEventListener('popstate', pop);
-    }, []);
-    const input = props.catalog ?? new URL(href).searchParams.get('catalog');
+    const input = useStandaloneCatalogInput(props);
     return input ? (
       <StandaloneCatalog
         key={typeof input === 'string' ? input : undefined}

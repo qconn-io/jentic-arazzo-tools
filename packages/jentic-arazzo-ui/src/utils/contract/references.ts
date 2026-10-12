@@ -167,7 +167,7 @@ export function createReferenceProjector(
       diagnose(limitation);
       return;
     }
-    // AsyncAPI Multi Format Schema Objects contain a schema in a supported declared format.
+    // multi-format AsyncAPI Schema Objects contain a schema in a supported declared format.
     if (typeof value.schemaFormat === 'string') {
       await inspectSchema(value.schema, base, depth, links, [...location, 'schema'], nesting + 1);
       return;
@@ -294,7 +294,7 @@ export function createReferenceProjector(
           role,
           decodePointer(target.pointer),
         );
-        // OpenAPI 3.1 Reference Objects permit summary/description overrides, not schema merging.
+        // in OpenAPI 3.1, Reference Objects permit summary/description overrides, not schema merging.
         if (!profile.openapi31) return projected;
         return {
           ...object(projected),

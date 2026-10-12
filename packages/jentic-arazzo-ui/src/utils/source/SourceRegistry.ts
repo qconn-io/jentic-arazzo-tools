@@ -81,7 +81,7 @@ export class SourceRegistry {
     if (this.provider !== provider) {
       this.provider = provider;
       this.providerGeneration++;
-      this.cancelAll(); // On provider replacement, cancel inflight requests
+      this.cancelAll();
     }
   }
 
@@ -106,7 +106,7 @@ export class SourceRegistry {
 
   public captureValidity(uri: string, revision?: string): SourceValidityToken {
     let key = this.resolveKey(uri, revision);
-    // Adapters receive returned provenance, which need not have been a requested pin.
+    // adapters receive returned provenance, which need not have been a requested pin.
     if (!this.entries.has(key)) {
       const unpinned = this.resolveKey(uri);
       if (this.entries.has(unpinned)) key = unpinned;
@@ -140,7 +140,6 @@ export class SourceRegistry {
       url.hash = '';
       return { resolvedUri: url.href };
     } catch {
-      // Relative URI
       if (!baseUri) {
         return { resolvedUri: uri, error: 'Relative URI provided without a base URI' };
       }
@@ -260,7 +259,7 @@ export class SourceRegistry {
       await this.acquireSemaphore(controller.signal);
       try {
         if (controller.signal.aborted) throw new Error('Aborted');
-        // Keep the physical slot until load settles, even if the provider ignores abort.
+        // keep the physical slot until load settles, even if the provider ignores abort.
         const content = await currentProvider.load({
           uri: resolvedUri,
           revision,
@@ -327,7 +326,7 @@ export class SourceRegistry {
       for (const child of this.dependencies.get(key) ?? []) visit(child);
     };
     visit(root);
-    // Invalidate ancestors' facts too, without discarding their unrelated dependencies.
+    // invalidate ancestors' facts too, without discarding their unrelated dependencies.
     let changed = true;
     while (changed) {
       changed = false;
@@ -350,7 +349,7 @@ export class SourceRegistry {
       for (const key of invalidated) aliases.delete(key);
       if (!aliases.size) this.aliases.delete(uri);
     }
-    // Existing validity tokens keep their original key; aliases are only for live content.
+    // existing validity tokens keep their original key; aliases are only for live content.
     this.notify();
   }
 

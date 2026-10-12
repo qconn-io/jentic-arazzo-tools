@@ -7,9 +7,9 @@ ignored `test-output/package-consumer/`.
 ## Measurement method
 
 The upstream source is pinned to `49dd8ef814637b481c0a1998f586ce2785812f5d`.
-The repaired source is the uncommitted repair working tree based on
-`a0d08472050d44f2079232f1535c9a6ac326af57`; this HEAD alone does not identify
-the repaired bytes. Each run records the actual repaired/baseline tarball SHA-256,
+The repaired source is the working tree based on
+`291829e2cc9bb29a1883abb0ef6a52273de4ca56`; this HEAD alone does not identify
+uncommitted working-tree bytes. Each run records the actual repaired/baseline tarball SHA-256,
 installed dependency graph hash and toolchain in `bundle-comparison.json`.
 The upstream checkout is detached and temporary; measurement does not rewrite
 the source branch or baseline.
@@ -31,7 +31,7 @@ retained for each fresh probe. Successful projection does not imply every native
 parser detection attempt is exception-free or prove arbitrary future releases.
 
 Consumer builds use production minification, an ES2022 target, React 19.2.7,
-Vite 8.1.5, TypeScript 5.9.3 and Node 26.3.1. Sizes use Node `gzipSync` defaults
+Vite 8.1.5, TypeScript 5.9.3 and Node 22.22.2. Sizes use Node `gzipSync` defaults
 for every file in both runs. Initial JS is the entry plus its static chunk import
 closure; deferred JS is the remaining emitted chunks. Numbers sum individually
 gzipped files and exclude source maps and CSS. CSS is shown separately. Deferred
@@ -67,44 +67,46 @@ inspection, Systems/scenario support, Mermaid, ReactFlow, and native parsing
 remain real costs; passing the retention assertion is not a claim that all
 optional features are independently lazy.
 
-## Measured repaired package snapshot, 2026-10-09
+## Measured repaired package snapshot, 2026-10-12
 
-This run includes the mobile catalog layout and control styling repairs. The
-client session date is 2026-10-09; generated reports retain the tool environment's
-own timestamps. Bytes are exact gzip byte counts, not rounded kB.
+This run includes the sequence-first reading repairs, prerequisite ordering,
+Step descriptions timeline, container-aware inspector modality, overview visual
+hierarchy updates, and review remediation. The client session date is 2026-10-12;
+generated reports retain the tool environment's own timestamps. Bytes are exact
+gzip byte counts, not rounded kB.
 
 | Installed consumer workload | Baseline initial JS | Repaired initial JS | Baseline deferred JS | Repaired deferred JS | Baseline CSS, all emitted | Repaired CSS, all emitted |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Minimal embedded viewer | 1,373,961 | 1,413,217 | 780,436 | 790,011 | 2,277 | 4,678 |
-| Direct standalone | 1,377,388 | 1,428,389 | 780,407 | 789,980 | 2,277 | 4,678 |
-| Deferred standalone | 60,245 | 60,245 | 2,097,771 | 2,160,477 | 3,791 | 6,176 |
-| Deferred catalog/review | unavailable | 60,251 | unavailable | 2,160,906 | unavailable | 6,176 |
+| --------------------------- | ------------------: | ------------------: | -------------------: | -------------------: | ------------------------: | ------------------------: |
+| Minimal embedded viewer     |           1,373,942 |           1,418,350 |              780,434 |              790,009 |                     2,277 |                     5,765 |
+| Direct standalone           |           1,377,369 |           1,434,783 |              780,406 |              789,974 |                     2,277 |                     5,765 |
+| Deferred standalone         |              60,248 |              60,249 |            2,097,753 |            2,166,983 |                     3,791 |                     7,281 |
+| Deferred catalog/review     |         unavailable |              60,252 |          unavailable |            2,166,199 |               unavailable |                     7,281 |
 
-The comparable minimal viewer's initial JS adds 39,256 gzip bytes (about 2.9%).
-Direct standalone adds 51,001 bytes (about 3.7%). These costs include shared
+The comparable minimal viewer's initial JS adds 44,408 gzip bytes (about 3.2%).
+Direct standalone adds 57,414 bytes (about 4.2%). These costs include shared
 integrity/model/rendering changes; optional-only catalog/review code remains
 absent from the minimal viewer, and the module report distinguishes retained
 initial code from deferred format adapters. No percentage target is asserted.
 
 | Whole emitted library entry file | Baseline raw bytes | Repaired raw bytes | Baseline gzip bytes | Repaired gzip bytes |
 | -------------------------------- | -----------------: | -----------------: | ------------------: | ------------------: |
-| Main ESM entry                   |            177,815 |            405,199 |              28,011 |              89,680 |
-| Main browser UMD                 |          7,725,626 |          8,022,256 |           1,798,621 |           1,869,082 |
-| Standalone ESM entry             |            190,747 |            442,514 |              32,019 |              99,322 |
-| Standalone browser UMD           |          7,735,514 |          8,083,580 |           1,802,110 |           1,886,623 |
+| Main ESM entry                   |            177,815 |            434,877 |              28,011 |              96,561 |
+| Main browser UMD                 |          7,725,626 |          8,044,116 |           1,798,596 |           1,873,065 |
+| Standalone ESM entry             |            190,747 |            475,898 |              32,019 |             107,460 |
+| Standalone browser UMD           |          7,735,514 |          8,109,220 |           1,802,079 |           1,890,799 |
 
 ESM entries also have shared/deferred sibling files; their entry-file sizes alone
 are neither total package size nor downstream initial download.
 
 Snapshot identities:
 
-- Baseline UI tarball SHA-256: `e786aa7450c6c5929cfaa939b41393f88f410877c692fb51a806a0833ff1acaa`.
-- Repaired UI tarball SHA-256: `88b868335ee7223588a2f76246083d22d3e6e91ecb717b48c90d31fbe3f5802f`.
-- Identical installed dependency graph SHA-256 (excluding the substituted UI record): `1f984051ce449fa91dd6ddda67195ab35a0c4a7adc7ede3078166e4a108fcbad`.
+- Baseline UI tarball SHA-256: `57d6fc3b5187ac1df23145f59d13e81fb34b2af80874f3f625fca23ff2ce89ff`.
+- Repaired UI tarball SHA-256: `5fc9781e87ec766bba17eedba31bc2b31bfffdb19f3bff38a6d26229a34789d8`.
+- Identical installed dependency graph SHA-256 (excluding the substituted UI record): `e13d3fd8bd5bcf7d6d50e0e2c14154a9e8730f290d4d11e023fb4653d334d8b6`.
 
 The baseline/repaired dependency equality assertions, retained source-region
 checks, full package acceptance, strict rolled/installed declaration consumers,
-both browser UMD entries and the 14 focused catalog/authority tests passed for
+both browser UMD entries and the focused catalog/authority tests passed for
 this snapshot. Production browser acceptance records its own final source and
 artifact identities separately; these measurements do not substitute for that
 gate.

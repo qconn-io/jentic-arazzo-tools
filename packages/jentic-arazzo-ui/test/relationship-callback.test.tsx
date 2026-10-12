@@ -102,7 +102,7 @@ test.each(['overview', 'action', 'prerequisite'] as const)(
     expect(selected.data).not.toHaveProperty('relationship');
     expect(selected.data).not.toHaveProperty('provenance.target');
     expect(selected.data).not.toHaveProperty('lane');
-    // Projection must not strip the private details used for the selected-edge panel.
+    // projection must not strip the private details used for the selected-edge panel.
     expect(edge.data).toHaveProperty('lane');
   },
 );

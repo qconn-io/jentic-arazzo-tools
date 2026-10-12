@@ -87,7 +87,7 @@ function pair() {
 it('canonicalizes whitespace and object keys but preserves falsy edits and sequence order', async () => {
   const { a, b } = pair();
   b.documents[0].content = JSON.stringify(flow, Object.keys(flow).reverse());
-  // Use recursive key reversal; JSON replacer arrays would drop nested authored keys.
+  // use recursive key reversal; JSON replacer arrays would drop nested authored keys.
   const reverse = (v: unknown): unknown =>
     Array.isArray(v)
       ? v.map(reverse)

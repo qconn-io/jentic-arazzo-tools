@@ -117,7 +117,7 @@ test.describe('API Contract Inspection', () => {
   });
 });
 
-// Exercise the public embedded component with host providers rather than the standalone fetch default.
+// exercise the public embedded component with host providers rather than the standalone fetch default.
 async function mountHost(page: Page, kind: 'replacement' | 'external' | 'unavailable') {
   await page.goto('/');
   const main = await (await page.request.get('/main.tsx')).text();

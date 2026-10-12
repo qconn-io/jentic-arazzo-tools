@@ -1,7 +1,7 @@
 import type { OccurrencePath, Owner, PlainObject, ReusableOccurrence } from './types';
 
 export function parseReusableReference(reference: string) {
-  // Match the resolver's component-name identifier grammar, including dotted names.
+  // match the resolver's component-name identifier grammar, including dotted names.
   const match =
     /^\$components\.(parameters|successActions|failureActions)\.([A-Za-z0-9._-]+)$/.exec(reference);
   return match && match[0] === reference

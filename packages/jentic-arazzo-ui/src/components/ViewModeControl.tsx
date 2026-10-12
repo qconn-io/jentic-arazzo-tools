@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ViewerMode } from '../types/index';
 
 const views: ViewerMode[] = ['diagram', 'docs', 'split'];

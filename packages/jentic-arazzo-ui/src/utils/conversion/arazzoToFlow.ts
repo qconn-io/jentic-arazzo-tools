@@ -31,7 +31,7 @@ export function actionHandle(action: EffectiveAction): string {
 /** create nodes in authored order and overlay declared transitions without predicting execution. */
 export function convertWorkflowToFlow(
   workflow: Workflow,
-  options?: ConversionOptions,
+  _options: ConversionOptions = {},
   document?: ArazzoDocument,
   suppliedModel?: ArazzoViewerModel,
 ): { nodes: ArazzoNode[]; edges: ArazzoEdge[] } {
@@ -258,7 +258,5 @@ export function convertWorkflowToFlow(
       });
     });
   });
-  // positions are owned by sequentialLayout; options are retained for caller compatibility.
-  void options;
   return { nodes, edges };
 }

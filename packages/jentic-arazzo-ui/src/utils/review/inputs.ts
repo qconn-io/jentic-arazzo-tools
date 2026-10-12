@@ -66,7 +66,7 @@ async function project(snapshot: WorkflowReviewSnapshot): Promise<ReviewProjecti
     if ((definition.kind ?? 'arazzo') === 'arazzo') checkIDs(raw, definition.id);
     documents.push({ definition, raw, digest });
   }
-  // A rejecting provider prevents any reference from acquiring today's mutable bytes.
+  // a rejecting provider prevents any reference from acquiring today's mutable bytes.
   const loaded = await loadCatalog(snapshot, {
     provider: {
       async load() {
@@ -85,10 +85,7 @@ async function project(snapshot: WorkflowReviewSnapshot): Promise<ReviewProjecti
         message: diagnostics.join('; '),
       });
   }
-  const index = buildCatalogIndex(loaded);
-  // Review locations carry revision provenance without a normal catalog session adapter.
-  for (const item of [...index.entries, ...index.relationships, ...index.apiUsages])
-    delete item.location.extensions;
+  const index = buildCatalogIndex(loaded, { includeCatalogExtension: false });
   const coverage = [...loaded.coverage].sort((a, b) =>
     a.key < b.key ? -1 : a.key > b.key ? 1 : 0,
   );
@@ -111,7 +108,7 @@ export async function prepareWorkflowReview(
   candidate: WorkflowReviewSnapshot,
   options: WorkflowReviewOptions = {},
 ) {
-  // Capture both sides synchronously before parsing/hashing yields to caller mutations.
+  // capture both sides synchronously before parsing/hashing yields to caller mutations.
   const a = normalizeCatalogManifest(JSON.parse(JSON.stringify(baseline)));
   const b = normalizeCatalogManifest(JSON.parse(JSON.stringify(candidate)));
   if (a.id !== b.id) throw new Error('Incompatible logical snapshot identity');

@@ -158,6 +158,7 @@
   background: white;
 }
 .arazzo-sequence-list {
+  list-style: none;
   padding: 16px 24px;
 }
 .arazzo-sequence-list li {

@@ -1,83 +1,3 @@
-export { ArazzoWorkflowReview } from './ArazzoWorkflowReview';
-export { compareWorkflowRevisions, exportWorkflowReview } from './utils/review';
-export type {
-  WorkflowReviewSnapshot,
-  WorkflowReviewAddress,
-  WorkflowReviewMatch,
-  WorkflowReviewOptions,
-  WorkflowReviewValue,
-  WorkflowReviewCategory,
-  WorkflowReviewEvidence,
-  WorkflowReviewRelationship,
-  WorkflowReviewImpactPath,
-  WorkflowReviewImpact,
-  WorkflowReviewEffect,
-  WorkflowReviewFinding,
-  WorkflowReviewIdentity,
-  WorkflowReviewResult,
-  ArazzoWorkflowReviewProps,
-} from './types/review';
-export { ArazzoCatalog } from './ArazzoCatalog';
-export type {
-  WorkflowCatalogLabel,
-  WorkflowCatalogIdentity,
-  WorkflowCatalogMetadata,
-  WorkflowCatalogDocument,
-  WorkflowCatalogAssociation,
-  WorkflowCatalogManifest,
-  WorkflowCatalogCoverage,
-  WorkflowCatalogSelection,
-  ArazzoCatalogProps,
-} from './types/catalog';
-export { normalizeCatalogManifest } from './utils/catalog/manifest';
-import { ScenarioProvider } from './context/ScenarioContext';
-import { ScenarioPanel } from './components/ScenarioPanel';
-export type {
-  ScenarioFocus,
-  ScenarioWaypoint,
-  AuthoredScenario,
-  ScenarioManifest,
-  ScenarioSelection,
-  ScenarioControls,
-} from './types/scenario';
-export type {
-  WorkflowProfileProvenance,
-  WorkflowSystemParticipant,
-  WorkflowActorBinding,
-  WorkflowSourceOwnerBinding,
-  WorkflowImplementationAssociation,
-  WorkflowContractIdentity,
-  WorkflowEventAssociation,
-  WorkflowViewProfile,
-  WorkflowPerspective,
-  WorkflowViewProfileAdapter,
-} from './types/profile';
-export { digitalProductProfile } from './utils/systems/digitalProductProfile';
-export type {
-  WorkflowLocation,
-  WorkflowLocationSelection,
-  WorkflowCallSite,
-  WorkflowActionAddress,
-  WorkflowLocationJSON,
-  WorkflowLocationStatus,
-  WorkflowLocationAdapter,
-  WorkflowLocationDecodeResult,
-} from './types/location';
-export type {
-  SourceDocumentRequest,
-  SourceDocumentContent,
-  SourceDocumentProvider,
-  ProvidedSourceProvenance,
-  ExternalNavigationRequest,
-} from './types/source';
-export {
-  encodeLocation,
-  decodeLocation,
-  readLocationURL,
-  writeLocationURL,
-  authoredDigest,
-  createLocationAdapter,
-} from './utils/location/codec';
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -88,10 +8,12 @@ import React, {
   useContext,
 } from 'react';
 import { ReactFlowProvider } from 'reactflow';
+
+import { ScenarioProvider } from './context/ScenarioContext';
+import { ScenarioPanel } from './components/ScenarioPanel';
 import { loadDocument } from './utils/loading/loadDocument';
 import { inspect } from './utils/inspection';
 import type { DocumentSnapshot } from './utils/inspection/types';
-
 import { ArazzoViewerProvider, useArazzoViewer } from './context/ArazzoViewerContext';
 import { DiagramView, DiagramViewRef } from './components/DiagramView';
 import { DocsView } from './components/DocsView';
@@ -102,67 +24,25 @@ import { SelectionDetails } from './components/SelectionDetails';
 import { WorkflowLocationBridge } from './components/WorkflowLocationBridge';
 import { InspectionStatus } from './components/InspectionStatus';
 import { ReadingIntentContext } from './context/ReadingIntentContext';
-import type { ArazzoDocument, ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
-
-export type {
-  ArazzoUIProps,
-  ArazzoUIRef,
-  ViewerMode,
-  DiagramType,
-  ViewerEvents,
-  DocsViewConfig,
-  DocumentationMetadata,
-  WorkflowDocumentation,
-  StepDocumentation,
-  DocumentationSection,
-  DocumentationSupport,
-  DocumentationProvenance,
-  DocumentationSourceBinding,
-  DocumentationPrerequisite,
-  ArazzoNodeType,
-  ArazzoEdgeType,
-  ConversionOptions,
-  ArazzoNode,
-  ArazzoNodeData,
-  StepNodeData,
-  WorkflowRefNodeData,
-  StartNodeData,
-  EndNodeData,
-  WorkflowNodeData,
-  ExternalWorkflowNodeData,
-  ArazzoEdge,
-  ArazzoEdgeData,
-  RelationshipEdgeData,
-  SequentialEdgeData,
-  SuccessEdgeData,
-  FailureEdgeData,
-  RetryEdgeData,
-  BundledSuccessEdgeData,
-  BundledFailureEdgeData,
-  BundledRetryEdgeData,
-  ValidationError,
-} from './types/index';
-export type {
-  ArazzoDocument,
-  InfoObject,
-  SourceDescription,
-  Workflow,
-  Step,
-  Parameter,
-  RequestBody,
-  PayloadReplacement,
-  SuccessAction,
-  FailureAction,
-  Criterion,
-  CriterionExpressionType,
-  ReusableObject,
-  ComponentsObject,
-  JSONSchema,
-} from './types/arazzo';
-
 import { SystemsProvider, useSystems } from './context/SystemsContext';
 import { SystemsView } from './components/SystemsView';
+import type { ArazzoDocument, ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
 import './styles/index.css';
+
+export { ArazzoWorkflowReview } from './ArazzoWorkflowReview';
+export { compareWorkflowRevisions, exportWorkflowReview } from './utils/review';
+export { ArazzoCatalog } from './ArazzoCatalog';
+export { normalizeCatalogManifest } from './utils/catalog/manifest';
+export { digitalProductProfile } from './utils/systems/digitalProductProfile';
+export {
+  encodeLocation,
+  decodeLocation,
+  readLocationURL,
+  writeLocationURL,
+  authoredDigest,
+  createLocationAdapter,
+} from './utils/location/codec';
+export type * from './types/index';
 
 function detectUrl(value: ArazzoDocument | string): string | null {
   return typeof value === 'string' && /^https?:\/\//i.test(value.trim()) ? value.trim() : null;

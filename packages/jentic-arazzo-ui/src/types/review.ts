@@ -3,7 +3,7 @@ import type {
   WorkflowCatalogIdentity,
   WorkflowCatalogCoverage,
 } from './catalog';
-import type { WorkflowLocation } from './location';
+import type { WorkflowLocation, WorkflowLocationJSON } from './location';
 
 /** Immutable supplied catalog revision; missing source bytes remain unavailable. @public */
 export interface WorkflowReviewSnapshot extends WorkflowCatalogManifest {}
@@ -26,8 +26,7 @@ export interface WorkflowReviewOptions {
   maxDepth?: number;
 }
 /** Authored JSON values, including falsy leaves. @public */
-export type WorkflowReviewValue =
-  null | boolean | number | string | WorkflowReviewValue[] | { [key: string]: WorkflowReviewValue };
+export type WorkflowReviewValue = WorkflowLocationJSON;
 /** Authored difference classification; no category implies compatibility. @public */
 export type WorkflowReviewCategory =
   | 'structure'
@@ -110,6 +109,8 @@ export interface WorkflowReviewResult {
   findings: WorkflowReviewFinding[];
   runtimeEffect: 'undetermined';
 }
+/** Deterministic authored review export alias matching spec documentation. @public */
+export type WorkflowRevisionComparison = WorkflowReviewResult;
 /** Optional review UI independent of normal viewer selection and host history. @public */
 export interface ArazzoWorkflowReviewProps {
   baseline: WorkflowReviewSnapshot;

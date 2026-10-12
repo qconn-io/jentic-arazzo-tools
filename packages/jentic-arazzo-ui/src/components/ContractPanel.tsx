@@ -1,7 +1,7 @@
-import { contractReadingStatus } from '../utils/contract/readingStatus';
 import React from 'react';
-import { useContractFacts } from '../context/ContractFactsContext';
 
+import { contractReadingStatus } from '../utils/contract/readingStatus';
+import { useContractFacts } from '../context/ContractFactsContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { resolveStepOperation } from '../utils/contract/stepOperation';
 

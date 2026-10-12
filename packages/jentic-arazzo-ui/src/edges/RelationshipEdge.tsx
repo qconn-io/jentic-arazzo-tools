@@ -1,5 +1,6 @@
 import React from 'react';
 import { EdgeProps } from 'reactflow';
+
 import type {
   ArazzoEdge,
   RelationshipEdgeData as PublicRelationshipEdgeData,
@@ -15,7 +16,7 @@ export interface RelationshipEdgeData extends PublicRelationshipEdgeData {
   relationship?: WorkflowRelationship;
 }
 
-// Keep the event contract independent of private renderer/model extensions.
+// keep the event contract independent of private renderer/model extensions.
 export function publicEdgeSelection(edge: ArazzoEdge): ArazzoEdge {
   if (edge.data?.type !== 'relationship') return edge;
   const { type, kind, label, warning, channel, actionType } = edge.data;

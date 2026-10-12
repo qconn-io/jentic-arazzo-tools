@@ -62,7 +62,7 @@ export interface TransferSemantics {
   returnTo?: 'source-step' | 'next-step';
 }
 
-// Understood transfers are inspection overlays, not predictions of criteria or execution.
+// understood transfers are inspection overlays, not predictions of criteria or execution.
 export function transferSemantics(
   step: StepFact,
   action?: ActionFact,

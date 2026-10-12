@@ -10,32 +10,34 @@ All existing entry points (`@jentic/arazzo-ui`, `@jentic/arazzo-ui/standalone`, 
 
 ### 1. Core Viewer Enhancements (Zero-Config)
 
-| Capability | What It Delivers |
-| :--- | :--- |
-| **Chained Workflow Visualization** | **All workflows** overview across `docs`, `diagram`, and `split` modes with on-demand relationship disclosures (`call`, `prerequisite`, `goto`, `retry`) alongside the relationship graph. Inline sequence expansion for chained local calls with per-occurrence state, **Open workflow** drill-down, and **Back to caller** return navigation. |
+| Capability                             | What It Delivers                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| :------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Chained Workflow Visualization**     | **All workflows** overview across `docs`, `diagram`, and `split` modes with on-demand relationship disclosures (`call`, `prerequisite`, `goto`, `retry`) alongside the relationship graph. Inline sequence expansion for chained local calls with per-occurrence state, **Open workflow** drill-down, and **Back to caller** return navigation.                                                                                                                                |
 | **Sequence-First Reading & Inspector** | Bare viewer entry opens the first workflow's **Sequence diagram** immediately (retaining $\ge 60\%$ viewport height for reading at both `1440×1000` and `480×900`). **Sequence diagram** and **Step descriptions** (with the connected numbered Jentic timeline) are primary controls; **Workflow diagram**, **Flowchart**, and **Side by side** live under **More views**. Activating any step, operation, or call identity opens its scoped **Selection Details** inspector. |
-| **Exact Locations & Deep Links** | Versioned `WorkflowLocation` contract and URL codec that address the document, optional revision/SHA-256 authored digest, root workflow or overview, view/subview, and exact call-path occurrence (`[{ workflowId, stepId }, ...]`) or action declaration/use pointer. Supports standalone **Copy link** and browser `Back`/`Forward` history without mutating history in embedded hosts. |
+| **Exact Locations & Deep Links**       | Versioned `WorkflowLocation` contract and URL codec that address the document, optional revision/SHA-256 authored digest, root workflow or overview, view/subview, and exact call-path occurrence (`[{ workflowId, stepId }, ...]`) or action declaration/use pointer. Supports standalone **Copy link** and browser `Back`/`Forward` history without mutating history in embedded hosts.                                                                                      |
 
 ### 2. Opt-In Host & Portfolio Capabilities
 
-| Capability | Activation | What It Delivers |
-| :--- | :--- | :--- |
-| **API Contract Inspection** | Explicit **Load API description** action (via standalone `fetch` or host `sourceProvider`) | Resolves step operation locators against OpenAPI 3.0/3.1, AsyncAPI 3.0, and external Arazzo sources. Displays HTTP parameters, request schemas, response alternatives, and security, or AsyncAPI send/receive direction, channels, message payloads, and correlation rules beside the step. |
-| **Systems Perspective** | `viewProfile` prop, `viewProfileAdapter="digital-product"`, or `?profile=` / `?systemsProfile=` | Renders interactions across explicitly declared business participants, separating **workflow/step actors**, **API source owners**, and **organizational owners**. Supports descriptive operation-to-workflow implementation nesting and verified producer/consumer event links. |
-| **Authored Scenario Guides** | `scenarioManifest` prop, `?scenarios=`, or **Help and guides → Load guides** | Turns authored scenario manifests into step-by-step **Guided walkthroughs** with assumptions, expected outcomes, and ordered `WorkflowLocation` waypoints with JSON Pointer focus (`parameter`, `payload`, `output`, `criterion`, `action`). |
-| **Workflow Capability Catalog** | `ArazzoCatalog` component (`@jentic/arazzo-ui/catalog`) or `?catalog=` | Indexes a supplied multi-document `WorkflowCatalogManifest` across pinned revisions. Supports filtering by capability, product, workflow role (`entry`, `helper`, `diagnostic`), team owner, lifecycle, and API operation, plus reverse usage and classified entry-point paths. |
-| **Workflow Revision Review** | `ArazzoWorkflowReview` component, `compareWorkflowRevisions()`, `exportWorkflowReview()` | Compares two immutable `WorkflowReviewSnapshot` bundles offline. Reports semantic before/after differences across workflows, steps, mappings, recovery policies, and referenced contract schemas, traces shared default action changes to effective step users, and exports deterministic JSON or Markdown reports. |
+| Capability                      | Activation                                                                                      | What It Delivers                                                                                                                                                                                                                                                                                                    |
+| :------------------------------ | :---------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **API Contract Inspection**     | Explicit **Load API description** action (via standalone `fetch` or host `sourceProvider`)      | Resolves step operation locators against OpenAPI 3.0/3.1, AsyncAPI 3.0, and external Arazzo sources. Displays HTTP parameters, request schemas, response alternatives, and security, or AsyncAPI send/receive direction, channels, message payloads, and correlation rules beside the step.                         |
+| **Systems Perspective**         | `viewProfile` prop, `viewProfileAdapter="digital-product"`, or `?profile=` / `?systemsProfile=` | Renders interactions across explicitly declared business participants, separating **workflow/step actors**, **API source owners**, and **organizational owners**. Supports descriptive operation-to-workflow implementation nesting and verified producer/consumer event links.                                     |
+| **Authored Scenario Guides**    | `scenarioManifest` prop, `?scenarios=`, or **Help and guides → Load guides**                    | Turns authored scenario manifests into step-by-step **Guided walkthroughs** with assumptions, expected outcomes, and ordered `WorkflowLocation` waypoints with JSON Pointer focus (`parameter`, `payload`, `output`, `criterion`, `action`).                                                                        |
+| **Workflow Capability Catalog** | `ArazzoCatalog` component (`@jentic/arazzo-ui/catalog`) or `?catalog=`                          | Indexes a supplied multi-document `WorkflowCatalogManifest` across pinned revisions. Supports filtering by capability, product, workflow role (`entry`, `helper`, `diagnostic`), team owner, lifecycle, and API operation, plus reverse usage and classified entry-point paths.                                     |
+| **Workflow Revision Review**    | `ArazzoWorkflowReview` component, `compareWorkflowRevisions()`, `exportWorkflowReview()`        | Compares two immutable `WorkflowReviewSnapshot` bundles offline. Reports semantic before/after differences across workflows, steps, mappings, recovery policies, and referenced contract schemas, traces shared default action changes to effective step users, and exports deterministic JSON or Markdown reports. |
 
 ---
 
 ## Core User Experience & Behavioral Details
 
 ### Sequence-First Reading & Progressive Disclosure
+
 - **Immediate first interaction:** Opening an Arazzo document with no explicit `view`/`initialView` or location opens the first workflow's **Sequence diagram**. Unchanged single-source documents (such as the default Arazzo 1.0.1 Petstore workflow) bind their operations to the declared API source (`petstoreAPI`) without fetching external contracts and render the first interaction immediately without scrolling past document metadata.
 - **Explicit precedence:** Supplying `view`, `initialView`, or a restored `WorkflowLocation` honors the requested representation (`docs` opens **Step descriptions**).
 - **Clean default chrome:** Document metadata, source declarations, search, and standalone document loading are on-demand disclosures. When no `scenarioManifest` or `viewProfile` is configured, no empty guide banner or disabled Systems promotion occupies reading space; optional capabilities are explained inside **Help and guides** / **More views**.
 
 ### Occurrence-Scoped Chaining & Details
+
 - **Distinct repeated calls:** When a workflow calls the same helper workflow multiple times (e.g., `batch-fulfilment` calling `fulfil-item` at `first-item` and `second-item`), each call occurrence maintains its own expansion state, caller-to-callee input/output mappings, and location address.
 - **Prerequisites and numbered steps:** Sequence reading places workflow prerequisites before step `1` and step prerequisites immediately before their owning step as unnumbered dependency annotations. Conditional recovery and retry actions appear as subordinate disclosures beneath their owning numbered step rather than extra numbered operations.
 - **Viewer inspection order for actions:** Success and failure actions are separated by channel and listed in **viewer inspection order**: step-level actions in authored order, followed by unmatched workflow-level default actions (matched by action `name` and `type` within the same channel). Inherited and overridden provenance is labeled explicitly without predicting runtime runner branch selection.
@@ -63,13 +65,13 @@ flowchart TB
     M --> K
 ```
 
-| Internal Seam | Responsibility |
-| :--- | :--- |
-| **Acquisition (`src/utils/loading`, `src/utils/source`)** | Enforces a single source authority (`SourceDocumentProvider`) across Arazzo, OpenAPI, AsyncAPI, catalog indexing, and pinned revision review. Tracks revision provenance, concurrency/byte/depth budgets, cancellation, and dependency invalidation. |
-| **Inspection (`src/utils/contract`, `src/utils/model`)** | Preserves authored values (`0`, `false`, `null`, `""`, unevaluated expressions, unknown fields, `x-` extensions). Recovers gracefully from missing reusable `$components` references and distinguishes structural contract `$ref` edges from literal `$ref` data inside examples, defaults, or extensions. |
-| **Shared Facts (`src/context`, `src/utils/model`)** | Computes occurrence-scoped step identities, effective action inheritance, and unique operation destinations when all candidate API sources have been checked. |
-| **Presentation (`src/components`, `src/nodes`, `src/edges`)** | Renders finite, accessible views (12px minimum diagram text, contained scroll regions, localized flowchart error recovery) over unchanged authored documents. |
-| **Catalog & Review (`src/utils/catalog`, `src/utils/review`)** | Indexes each supplied document revision independently, computes bounded entry-point reachability paths, and diffs baseline vs. candidate snapshots offline. |
+| Internal Seam                                                  | Responsibility                                                                                                                                                                                                                                                                                             |
+| :------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Acquisition (`src/utils/loading`, `src/utils/source`)**      | Enforces a single source authority (`SourceDocumentProvider`) across Arazzo, OpenAPI, AsyncAPI, catalog indexing, and pinned revision review. Tracks revision provenance, concurrency/byte/depth budgets, cancellation, and dependency invalidation.                                                       |
+| **Inspection (`src/utils/contract`, `src/utils/model`)**       | Preserves authored values (`0`, `false`, `null`, `""`, unevaluated expressions, unknown fields, `x-` extensions). Recovers gracefully from missing reusable `$components` references and distinguishes structural contract `$ref` edges from literal `$ref` data inside examples, defaults, or extensions. |
+| **Shared Facts (`src/context`, `src/utils/model`)**            | Computes occurrence-scoped step identities, effective action inheritance, and unique operation destinations when all candidate API sources have been checked.                                                                                                                                              |
+| **Presentation (`src/components`, `src/nodes`, `src/edges`)**  | Renders finite, accessible views (12px minimum diagram text, contained scroll regions, localized flowchart error recovery) over unchanged authored documents.                                                                                                                                              |
+| **Catalog & Review (`src/utils/catalog`, `src/utils/review`)** | Indexes each supplied document revision independently, computes bounded entry-point reachability paths, and diffs baseline vs. candidate snapshots offline.                                                                                                                                                |
 
 Internal inspection models, native ApiDOM snapshots, source registries, scene graphs, and catalog indexes remain strictly private and are excluded from generated `.d.ts` rollup declarations.
 
@@ -100,6 +102,7 @@ Internal inspection models, native ApiDOM snapshots, source registries, scene gr
 ## Public Interface Summary
 
 ### Package Exports & Dependencies
+
 - **Entry points (`package.json`):**
   - `@jentic/arazzo-ui` (ESM + CJS/UMD + `./types/arazzo-ui.d.ts`)
   - `@jentic/arazzo-ui/standalone` (ESM + CJS/UMD + `./types/arazzo-ui-standalone.d.ts`)
@@ -111,15 +114,15 @@ Internal inspection models, native ApiDOM snapshots, source registries, scene gr
 
 ### Additive Props, Components & Utilities
 
-| Surface | Exported Symbols / Props |
-| :--- | :--- |
-| **Viewer Navigation & Edges** | `activeWorkflowId={null}` selects **All workflows** (`onWorkflowSelect` emits `''` for overview); `selectedNodeId={null}` / `ref.clearSelection()` clears selection; `onEdgeSelect` adds the `relationship` edge variant (`RelationshipEdgeData` with `kind: 'prerequisite' \| 'call' \| 'action'`). |
-| **Locations (`WorkflowLocation`)** | Props: `location`, `defaultLocation`, `onLocationChange`, `onLocationStatus`, `documentIdentity`, `documentRevision`, `locationAdapters`. Utilities: `encodeLocation`, `decodeLocation`, `readLocationURL`, `writeLocationURL`, `authoredDigest`, `createLocationAdapter`. |
-| **Contract Inspection** | Props: `sourceProvider` (`SourceDocumentProvider`), `onExternalNavigation`. Types: `SourceDocumentRequest`, `SourceDocumentContent`, `SourceProvenance`, `ExternalWorkflowNavigationRequest`. |
-| **Systems Perspective** | Props: `viewProfile` (`WorkflowViewProfile`), `viewProfileAdapter` (`'digital-product'`), `perspective` (`'workflow' \| 'systems'`), `onPerspectiveChange`. Helper: `digitalProductProfile()`. |
-| **Scenario Guides** | Props: `scenarioManifest` (`ScenarioManifest`), `scenarioManifestURI`, `scenarioSelection`, `onScenarioSelectionChange`, `onScenarioLocationRequest`. |
-| **Capability Catalog** | Component: `ArazzoCatalog`. Standalone prop: `catalog`, `catalogSelection`, `onCatalogSelectionChange`. Utility: `normalizeCatalogManifest`. Types: `WorkflowCatalogManifest`, `CatalogSelection`, `CatalogCoverageReport`, etc. |
-| **Revision Review** | Component: `ArazzoWorkflowReview`. Utilities: `compareWorkflowRevisions`, `exportWorkflowReview`. Types: `WorkflowReviewSnapshot`, `WorkflowRevisionComparison`, `WorkflowReviewOptions`, etc. |
+| Surface                            | Exported Symbols / Props                                                                                                                                                                                                                                                                             |
+| :--------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Viewer Navigation & Edges**      | `activeWorkflowId={null}` selects **All workflows** (`onWorkflowSelect` emits `''` for overview); `selectedNodeId={null}` / `ref.clearSelection()` clears selection; `onEdgeSelect` adds the `relationship` edge variant (`RelationshipEdgeData` with `kind: 'prerequisite' \| 'call' \| 'action'`). |
+| **Locations (`WorkflowLocation`)** | Props: `location`, `defaultLocation`, `onLocationChange`, `onLocationStatus`, `documentIdentity`, `documentRevision`, `locationAdapters`. Utilities: `encodeLocation`, `decodeLocation`, `readLocationURL`, `writeLocationURL`, `authoredDigest`, `createLocationAdapter`.                           |
+| **Contract Inspection**            | Props: `sourceProvider` (`SourceDocumentProvider`), `onExternalNavigation`. Types: `SourceDocumentRequest`, `SourceDocumentContent`, `SourceProvenance` (`ProvidedSourceProvenance`), `ExternalWorkflowNavigationRequest` (`ExternalNavigationRequest`).                                             |
+| **Systems Perspective**            | Props: `viewProfile` (`WorkflowViewProfile`), `viewProfileAdapter` (`'digital-product'`), `perspective` (`'workflow' \| 'systems'`), `onPerspectiveChange`. Helper: `digitalProductProfile()`.                                                                                                       |
+| **Scenario Guides**                | Props: `scenarioManifest` (`ScenarioManifest`), `scenarioManifestURI`, `scenarioSelection`, `onScenarioSelectionChange`, `onScenarioLocationRequest`.                                                                                                                                                |
+| **Capability Catalog**             | Component: `ArazzoCatalog`. Standalone prop: `catalog`, `catalogSelection`, `onCatalogSelectionChange`. Utility: `normalizeCatalogManifest`. Types: `WorkflowCatalogManifest`, `CatalogSelection` (`WorkflowCatalogSelection`), `CatalogCoverageReport` (`WorkflowCatalogCoverage`), etc.            |
+| **Revision Review**                | Component: `ArazzoWorkflowReview`. Utilities: `compareWorkflowRevisions`, `exportWorkflowReview`. Types: `WorkflowReviewSnapshot`, `WorkflowRevisionComparison` (`WorkflowReviewResult`), `WorkflowReviewOptions`, etc.                                                                              |
 
 Full prop tables and copy-pasteable usage examples are documented in [`packages/jentic-arazzo-ui/README.md`](../../packages/jentic-arazzo-ui/README.md).
 
@@ -127,13 +130,13 @@ Full prop tables and copy-pasteable usage examples are documented in [`packages/
 
 ## Bundle Cost & Downstream Tree-Shaking
 
-Detailed methodology and tarball hashes are recorded in [`packages/jentic-arazzo-ui/docs/package-cost.md`](../../packages/jentic-arazzo-ui/docs/package-cost.md). Using an identical downstream Vite + React 19 production consumer graph against the upstream baseline (`49dd8ef8`):
+Detailed methodology and tarball hashes are recorded in [`packages/jentic-arazzo-ui/docs/package-cost.md`](../../packages/jentic-arazzo-ui/docs/package-cost.md) (measured `2026-10-12`). Using an identical downstream Vite + React 19 production consumer graph against the upstream baseline (`49dd8ef8`):
 
-| Installed Consumer Workload | Baseline Initial JS (gzip) | Current Initial JS (gzip) | Delta | Initial CSS (gzip) |
-| :--- | ---: | ---: | ---: | ---: |
-| **Minimal embedded viewer (`ArazzoUI` only)** | 1,373,961 B | 1,413,217 B | **+39,256 B (+2.9%)** | 4,678 B |
-| **Direct standalone (`ArazzoUIStandalone`)** | 1,377,388 B | 1,428,389 B | **+51,001 B (+3.7%)** | 4,678 B |
-| **Deferred standalone (`React.lazy`)** | 60,245 B | 60,245 B | **0 B (0.0%)** | 6,176 B |
+| Installed Consumer Workload                   | Baseline Initial JS (gzip) | Current Initial JS (gzip) |                 Delta | Initial CSS (gzip) |
+| :-------------------------------------------- | -------------------------: | ------------------------: | --------------------: | -----------------: |
+| **Minimal embedded viewer (`ArazzoUI` only)** |                1,373,942 B |               1,418,350 B | **+44,408 B (+3.2%)** |            5,765 B |
+| **Direct standalone (`ArazzoUIStandalone`)**  |                1,377,369 B |               1,434,783 B | **+57,414 B (+4.2%)** |            5,765 B |
+| **Deferred standalone (`React.lazy`)**        |                   60,248 B |                  60,249 B |       **+1 B (0.0%)** |            7,281 B |
 
 - **Zero catalog/review retention in minimal consumers:** `ArazzoCatalog`, `ArazzoWorkflowReview`, `compareWorkflowRevisions`, `buildCatalogIndex`, and `loadCatalog` are completely tree-shaken out of minimal `ArazzoUI` consumers, and OpenAPI/AsyncAPI contract adapters remain in deferred chunks until source inspection is used.
 

@@ -132,7 +132,7 @@ export function extractFacts(
     array(values).map((value, index) => {
       const original = object(array(originals)[index] ?? value);
       const occurrencePath = [...path, index];
-      // Resolved native occurrences are authoritative; only remaining references expand here.
+      // resolved native occurrences are authoritative; only remaining references expand here.
       const resolved = reusable(object(value), occurrencePath, owner, 'parameters');
       const reference = parseReusableReference(original.reference);
       if (!resolved.declarationPath && reference?.bucket === 'parameters')

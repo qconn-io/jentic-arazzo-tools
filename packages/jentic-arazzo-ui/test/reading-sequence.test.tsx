@@ -69,6 +69,9 @@ test('prerequisites precede their exact root, step and repeated callee occurrenc
 });
 
 test('ordered interaction items are authored steps, with annotations and repeated nested calls scoped to their owners', async () => {
+  expect(readFileSync('src/styles/index.css', 'utf8')).toMatch(
+    /\.arazzo-sequence-list\s*\{[^}]*list-style:\s*none;/,
+  );
   const petstore = (
     await loadDocument(readFileSync('public/petstore-order-workflow.arazzo.yaml', 'utf8'))
   ).document;
@@ -83,7 +86,7 @@ test('ordered interaction items are authored steps, with annotations and repeate
   expect(petstoreList.querySelectorAll(':scope > li.arazzo-sequence-annotation')).toHaveLength(0);
   first.unmount();
 
-  render(<ArazzoUI document={nestedCalls} />);
+  const second = render(<ArazzoUI document={nestedCalls} />);
   const list = await screen.findByRole('list', { name: 'Ordered interactions' });
   const calls = within(list).getAllByRole('button', {
     name: /^Inspect checkout\.(firstPayment|secondPayment) · call/,
@@ -103,6 +106,23 @@ test('ordered interaction items are authored steps, with annotations and repeate
       ),
     ),
   ).toBe(true);
+  second.unmount();
+
+  const callFirstDoc = structuredClone(nestedCalls);
+  callFirstDoc.workflows[0].steps = [
+    { stepId: 'firstPayment', workflowId: 'payment' },
+    { stepId: 'prepare', operationId: '$sourceDescriptions.store.api.prepare' },
+  ];
+  callFirstDoc.workflows[1].steps = [callFirstDoc.workflows[1].steps[0]];
+  render(<ArazzoUI document={callFirstDoc} />);
+  const callFirstList = await screen.findByRole('list', { name: 'Ordered interactions' });
+  expect(callFirstList.classList.contains('arazzo-sequence-list')).toBe(true);
+  expect(
+    [...callFirstList.querySelectorAll(':scope > li')].map(
+      (item) =>
+        item.querySelector('.arazzo-reading-identity')?.textContent?.match(/^\d+(?:\.\d+)*\./)?.[0],
+    ),
+  ).toEqual(['1.', '1.1.', '2.']);
 });
 
 test('expanded stress sequence retains participant context and gives every occurrence control a distinct name', async () => {

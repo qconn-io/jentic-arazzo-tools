@@ -13,7 +13,7 @@ import {
   string,
 } from './references';
 
-// AsyncAPI 3 Multi Format Schema Objects; other formats remain authored data.
+// supports AsyncAPI 3 Multi Format Schema Objects; other formats remain authored data.
 function supportsSchemaFormat(format: string): boolean {
   const normalized = format.replace(/\s+/g, '').toLowerCase();
   return (
@@ -133,7 +133,7 @@ export async function projectAsyncAPI(
       try {
         channelName = resolvePointer(channelRef, followed.base).tokens.slice(1).join('/');
       } catch {
-        /* Reference projection already retained and diagnosed the malformed pointer. */
+        /* reference projection already retained and diagnosed the malformed pointer. */
       }
     }
     const channel = object(rawOperation.channel);
