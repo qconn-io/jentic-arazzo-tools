@@ -13,6 +13,7 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
 
+import { SourceDescriptions } from './SourceDescriptions';
 import { MermaidDiagram } from './MermaidDiagram';
 import { WorkflowOverview } from './WorkflowOverview';
 import { SequenceView } from './SequenceView';
@@ -167,7 +168,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
     if (!document) return null;
     return generateDocumentation(document, {
       compact: true,
-      includeMetadata: true,
+      includeMetadata: false,
       includeDiagrams: false,
       includeStatus: false,
       documentURL,
@@ -885,6 +886,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
           </div>
           <details className="arazzo-document-information">
             <summary>Document information</summary>
+            <SourceDescriptions />
             <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
               {documentation.headerMarkdown}
             </ReactMarkdown>

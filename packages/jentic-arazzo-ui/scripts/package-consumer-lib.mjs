@@ -283,7 +283,7 @@ export const minimalSource = `import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArazzoUI } from '@jentic/arazzo-ui';
 import '@jentic/arazzo-ui/styles.css';
-createRoot(document.getElementById('root')!).render(React.createElement(ArazzoUI, { document: {arazzo:'1.0.1', info:{title:'Package consumer',version:'1'}, sourceDescriptions:[], workflows:[{workflowId:'flow', steps:[{stepId:'read',operationId:'read'}]}]}, view:'docs'}));`;
+createRoot(document.getElementById('root')!).render(React.createElement(ArazzoUI, { document: {arazzo:'1.0.1', info:{title:'Package consumer',version:'1'}, sourceDescriptions:[], workflows:[{workflowId:'flow', steps:[{stepId:'read',operationId:'read'}]}]}, apiDescriptionLoading:'manual', view:'docs'}));`;
 export const optionalSource = `import React from 'react';
 import { createRoot } from 'react-dom/client';
 import '@jentic/arazzo-ui/styles.css';

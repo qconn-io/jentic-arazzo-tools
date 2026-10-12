@@ -122,21 +122,17 @@ it('opens old mappings with old contracts and new mappings with new contracts', 
   fireEvent.click(screen.getByRole('button', { name: 'Open before location' }));
   const before = screen.getByRole('region', { name: 'Before · old' });
   fireEvent.click(
-    await within(before).findByRole(
-      'button',
-      { name: 'Load API description pay' },
-      { timeout: 5000 },
-    ),
+    await within(
+      await within(before).findByRole('region', { name: 'Selection details' }),
+    ).findByRole('button', { name: 'Load API description pay' }, { timeout: 5000 }),
   );
   await waitFor(() => expect(before.textContent).toContain('old declaration'), { timeout: 5000 });
   fireEvent.click(screen.getByRole('button', { name: 'Open after location' }));
   const after = screen.getByRole('region', { name: 'After · new' });
   fireEvent.click(
-    await within(after).findByRole(
-      'button',
-      { name: 'Load API description pay' },
-      { timeout: 5000 },
-    ),
+    await within(
+      await within(after).findByRole('region', { name: 'Selection details' }),
+    ).findByRole('button', { name: 'Load API description pay' }, { timeout: 5000 }),
   );
   await waitFor(() => expect(after.textContent).toContain('new declaration'), { timeout: 5000 });
   expect(after.textContent).not.toContain('old declaration');

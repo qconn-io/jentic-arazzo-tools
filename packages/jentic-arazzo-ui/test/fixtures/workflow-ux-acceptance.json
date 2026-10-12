@@ -4007,7 +4007,8 @@
               "locator": "getLicenseByKey",
               "source": null,
               "prerequisites": [],
-              "actions": []
+              "actions": [],
+              "locatedSource": "license"
             }
           ],
           "sources": [

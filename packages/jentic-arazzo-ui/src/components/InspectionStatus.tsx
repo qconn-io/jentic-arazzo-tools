@@ -1,75 +1,64 @@
 import React from 'react';
 
+import { useContractFacts } from '../context/ContractFactsContext';
+import { SourceDescriptions, sourceAvailability } from './SourceDescriptions';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 
 export function InspectionStatus() {
-  const { model, sourceRegistry } = useArazzoViewer();
-  const sources = (model.document.sourceDescriptions ?? []).map((source) => {
-    const { resolvedUri } = sourceRegistry.resolveUri(
-      source.url,
-      model.inspection.snapshot.baseURI,
-    );
-    return { name: source.name, entry: sourceRegistry.getEntry(resolvedUri) };
-  });
-  const checked = sources.some((source) => source.entry);
+  const { model, sourceProvider } = useArazzoViewer();
+  const { loaded, eligibility } = useContractFacts();
+  const sources = (model.document.sourceDescriptions ?? []).filter(
+    (source) => source.type !== 'arazzo',
+  );
+  const states = sources.map((source) =>
+    sourceAvailability(loaded[source.name], eligibility(source), !!sourceProvider),
+  );
+  const counts = ['Loading', 'Failed', 'Unsupported', 'Loading unavailable']
+    .map((status) => {
+      const count = states.filter((state) => state === status).length;
+      return count ? ` · ${count} ${status.toLowerCase()}` : '';
+    })
+    .join('');
   return (
     <details className="arazzo-inspection-status">
-      <summary>Inspection status</summary>
+      <summary>
+        {sources.length
+          ? `API descriptions · ${states.filter((state) => state === 'Loaded').length} of ${sources.length} loaded${counts}`
+          : 'Inspection status'}
+      </summary>
       <div role="region" aria-label="Inspection status details">
-        {checked ? (
+        {sources.length > 0 && (
           <>
+            <SourceDescriptions />
             <p>
-              API-description availability is shown below. View step details to check an operation.
-              Loading a description does not establish contract validity.
+              Loading a description does not establish contract validity. View step details to check
+              an operation.
             </p>
-            <ul>
-              {sources.map(({ name, entry }) => (
-                <li key={name}>
-                  {name}:{' '}
-                  {entry?.state === 'located'
-                    ? 'API description loaded; operations can be checked in details'
-                    : entry?.state === 'loading'
-                      ? 'Checking API description'
-                      : !entry
-                        ? 'API description not loaded'
-                        : 'API description unavailable'}
-                  {entry && (
-                    <details>
-                      <summary>Technical acquisition details</summary>
-                      <p>Acquisition state: {entry.state}</p>
-                    </details>
-                  )}
-                </li>
-              ))}
-            </ul>
           </>
-        ) : (
-          <p>
-            API descriptions have not been loaded, so their operations and versions have not been
-            checked. This does not mean they are invalid or inaccessible. Declared source names
-            remain available.
-          </p>
         )}
-        <p>
-          Inspection scope: Arazzo {model.support.exactVersion}, profile {model.support.profile}.
-          These views do not establish schema validation or execution support.
-        </p>
-        <ul>
-          {model.support.limitations
-            .filter((limit) => !/source documents|schema validation/i.test(limit))
-            .map((limit) => (
-              <li key={limit}>{limit}</li>
+        <details>
+          <summary>Inspection scope</summary>
+          <p>
+            Inspection scope: Arazzo {model.support.exactVersion}, profile {model.support.profile}.
+            These views do not establish schema validation or execution support.
+          </p>
+          <ul>
+            {model.support.limitations
+              .filter((limit) => !/source documents|schema validation/i.test(limit))
+              .map((limit) => (
+                <li key={limit}>{limit}</li>
+              ))}
+          </ul>
+          {model.diagnostics
+            .filter((d) => d.phase === 'resolution')
+            .map((d, i) => (
+              <p key={i}>{d.message}</p>
             ))}
-        </ul>
-        {model.diagnostics
-          .filter((d) => d.phase === 'resolution')
-          .map((d, i) => (
-            <p key={i}>{d.message}</p>
-          ))}
-        <p>
-          Understood local workflow calls remain inspectable. Missing and ambiguous targets are
-          marked at their occurrences; external content is not expanded.
-        </p>
+          <p>
+            Understood local workflow calls remain inspectable. Missing and ambiguous targets are
+            marked at their occurrences; external workflow loading remains explicit.
+          </p>
+        </details>
       </div>
     </details>
   );

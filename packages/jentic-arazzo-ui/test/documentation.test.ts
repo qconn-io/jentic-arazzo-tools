@@ -290,3 +290,22 @@ describe('schematic Mermaid consumers', () => {
     ).resolves.toBeTruthy();
   });
 });
+
+test('authored-only source cards and support describe evidence scope without live fetch claims', () => {
+  const input = document({
+    ...asynchronous,
+    sourceDescriptions: [{ name: 'api', type: 'openapi', url: './api.yaml' }],
+  });
+  const model = buildViewerModel(inspect(createSnapshot(input)));
+  const before = [...model.support.limitations];
+  const output = generateDocumentation(input, { model, documentURL: 'https://test/workflow.yaml' });
+  expect(output.headerMarkdown).toContain('Declared openapi source');
+  expect(output.headerMarkdown).toContain('Authored-only');
+  expect(output.headerMarkdown).not.toMatch(
+    /not been fetched|were not fetched|sources.*unverified|unverified authored declaration/i,
+  );
+  expect(output.metadata.support?.limitations).not.toContain(
+    'Source documents and their versions have not been fetched or verified.',
+  );
+  expect(model.support.limitations).toEqual(before);
+});

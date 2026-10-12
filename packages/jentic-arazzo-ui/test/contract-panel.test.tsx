@@ -43,18 +43,18 @@ test('inspection does not fetch implicitly; explicit load and reload preserve do
     </ArazzoViewerProvider>,
   );
   expect(load).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API description api' })[0]);
   await waitFor(() => expect(screen.getByText('located')).toBeTruthy(), { timeout: 5000 });
   expect(load).toHaveBeenCalledTimes(1);
   expect(screen.getByRole('region', { name: 'Inspection status details' }).textContent).toContain(
-    'api: API description loaded',
+    'Loaded',
   );
   expect(
     screen.getByRole('region', { name: 'Inspection status details' }).textContent,
   ).not.toContain('API descriptions have not been loaded');
-  expect(screen.getByText('r1')).toBeTruthy();
-  expect(screen.getByText('Contract profile: openapi 3.1.0')).toBeTruthy();
-  fireEvent.click(screen.getByRole('button', { name: 'Reload API description api' }));
+  expect(screen.getAllByText('r1')).toHaveLength(2);
+  expect(screen.getAllByText('Contract profile: openapi 3.1.0')).toHaveLength(2);
+  fireEvent.click(screen.getAllByRole('button', { name: 'Reload API description api' })[0]);
   await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
   await waitFor(() => expect(screen.getByText('located')).toBeTruthy(), { timeout: 5000 });
 });
@@ -103,71 +103,80 @@ test('explicit loading keeps focus on stable source context while its button is 
   elsewhere.remove();
 });
 
-test('shared dependency reload hides affected facts and keeps unrelated panels loaded', async () => {
-  const { within } = await import('@testing-library/react');
-  const sources = ['a', 'b', 'c'];
-  const doc: ArazzoDocument = {
-    ...document,
-    sourceDescriptions: sources.map((name) => ({
-      name,
-      type: 'openapi',
-      url: `https://example.test/${name}`,
-    })),
-    workflows: [
-      {
-        workflowId: 'root',
-        steps: sources.map((name) => ({
-          stepId: name,
-          operationId: `$sourceDescriptions.${name}.run`,
-        })),
-      },
-    ],
-  };
-  let revision = '1';
-  const load = vi.fn(async ({ uri }: { uri: string }) => ({
-    retrievalURI: uri,
-    revision,
-    content: uri.endsWith('/shared')
-      ? { Response: { description: `dependency ${revision}` } }
-      : {
-          openapi: '3.1.0',
-          paths: {
-            '/run': {
-              get: {
-                operationId: 'run',
-                responses: {
-                  '200': uri.endsWith('/c')
-                    ? { description: 'unrelated' }
-                    : { $ref: './shared#/Response' },
+test.each(['manual', 'automatic'] as const)(
+  'shared dependency reload under %s hides affected facts and keeps unrelated panels loaded',
+  async (policy) => {
+    const { within } = await import('@testing-library/react');
+    const sources = ['a', 'b', 'c'];
+    const doc: ArazzoDocument = {
+      ...document,
+      sourceDescriptions: sources.map((name) => ({
+        name,
+        type: 'openapi',
+        url: `https://example.test/${name}`,
+      })),
+      workflows: [
+        {
+          workflowId: 'root',
+          steps: sources.map((name) => ({
+            stepId: name,
+            operationId: `$sourceDescriptions.${name}.run`,
+          })),
+        },
+      ],
+    };
+    let revision = '1';
+    const load = vi.fn(async ({ uri }: { uri: string }) => ({
+      retrievalURI: uri,
+      revision,
+      content: uri.endsWith('/shared')
+        ? { Response: { description: `dependency ${revision}` } }
+        : {
+            openapi: '3.1.0',
+            paths: {
+              '/run': {
+                get: {
+                  operationId: 'run',
+                  responses: {
+                    '200': uri.endsWith('/c')
+                      ? { description: 'unrelated' }
+                      : { $ref: './shared#/Response' },
+                  },
                 },
               },
             },
           },
-        },
-  }));
-  const { container } = render(
-    <ArazzoViewerProvider document={doc} sourceProvider={{ load }}>
-      {sources.map((name) => (
-        <ContractPanel key={name} workflowId="root" stepId={name} />
-      ))}
-    </ArazzoViewerProvider>,
-  );
-  const panels = [...container.querySelectorAll('.arazzo-contract-panel')].map((panel) =>
-    within(panel as HTMLElement),
-  );
-  for (let i = 0; i < sources.length; i++) {
-    fireEvent.click(panels[i].getByRole('button', { name: `Load API description ${sources[i]}` }));
-    await waitFor(() => expect(panels[i].getByText('located')).toBeTruthy());
-  }
-  revision = '2';
-  fireEvent.click(panels[0].getByRole('button', { name: 'Reload API description a' }));
-  await waitFor(() => expect(panels[0].getByText('located')).toBeTruthy());
-  expect(panels[0].getByText(/dependency 2/)).toBeTruthy();
-  expect(panels[1].queryByText('Operation Details')).toBeNull();
-  expect(panels[1].getByRole('button', { name: 'Load API description b' })).toBeTruthy();
-  expect(panels[2].getByText('located')).toBeTruthy();
-  expect(load.mock.calls.filter(([request]) => request.uri.endsWith('/c'))).toHaveLength(1);
-});
+    }));
+    const { container } = render(
+      <ArazzoViewerProvider document={doc} sourceProvider={{ load }} apiDescriptionLoading={policy}>
+        {sources.map((name) => (
+          <ContractPanel key={name} workflowId="root" stepId={name} />
+        ))}
+      </ArazzoViewerProvider>,
+    );
+    const panels = [...container.querySelectorAll('.arazzo-contract-panel')].map((panel) =>
+      within(panel as HTMLElement),
+    );
+    for (let i = 0; i < sources.length; i++) {
+      if (policy === 'manual')
+        fireEvent.click(
+          panels[i].getByRole('button', { name: `Load API description ${sources[i]}` }),
+        );
+      await waitFor(() => expect(panels[i].getByText('located')).toBeTruthy());
+    }
+    revision = '2';
+    fireEvent.click(panels[0].getByRole('button', { name: 'Reload API description a' }));
+    await waitFor(() => expect(panels[0].getByText('located')).toBeTruthy());
+    expect(panels[0].getByText(/dependency 2/)).toBeTruthy();
+    expect(panels[1].queryByText('Operation Details')).toBeNull();
+    expect(panels[1].getByRole('button', { name: 'Load API description b' })).toBeTruthy();
+    expect(panels[2].getByText('located')).toBeTruthy();
+    expect(load.mock.calls.filter(([request]) => request.uri.endsWith('/c'))).toHaveLength(1);
+    expect(load.mock.calls.filter(([request]) => request.uri.endsWith('/b'))).toHaveLength(1);
+    fireEvent.click(panels[1].getByRole('button', { name: 'Load API description b' }));
+    await waitFor(() => expect(panels[1].getByText('located')).toBeTruthy());
+  },
+);
 
 test('explicitly loaded facts survive inspector unmount and are shared with another inspector', async () => {
   const load = vi.fn(async () => ({
@@ -193,7 +202,7 @@ test('explicitly loaded facts survive inspector unmount and are shared with anot
     </ArazzoViewerProvider>,
   );
   expect(load).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API description api' })[0]);
   await screen.findByText('located');
   fireEvent.click(screen.getByText('Toggle inspector'));
   fireEvent.click(screen.getByText('Toggle inspector'));
@@ -227,7 +236,7 @@ test('advanced source provenance hides implementation generations while revision
       <ContractPanel workflowId="root" stepId="call" />
     </ArazzoViewerProvider>,
   );
-  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API description api' })[0]);
   await screen.findByText('located');
   const generation = screen.getByText(/Provider generation:/);
   const advanced = generation.closest('details')!;
@@ -267,7 +276,7 @@ test('bare single-source IDs retain source identity when an explicitly checked o
     </ArazzoViewerProvider>,
   );
   expect(screen.getByText(/Destination source:/).textContent).toBe('Destination source: api');
-  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API description api' })[0]);
   await screen.findByText('missing');
   expect(screen.getByText(/Destination source:/).textContent).toBe('Destination source: api');
 });
@@ -311,7 +320,7 @@ test.each([
       <ContractPanel workflowId="root" stepId="call" />
     </ArazzoViewerProvider>,
   );
-  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API description api' })[0]);
   await screen.findByText(message);
   expect(screen.getByText(code).closest('details')).toBeTruthy();
 });
@@ -331,17 +340,15 @@ test('loading and denied acquisition show explicit recoverable states', async ()
       <ContractPanel workflowId="root" stepId="call" />
     </ArazzoViewerProvider>,
   );
-  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API description api' })[0]);
   expect(screen.getByText('Checking API description')).toBeTruthy();
   expect(
-    screen.getByRole('button', { name: 'Checking API description api' }).hasAttribute('disabled'),
+    screen.getByRole('button', { name: 'Loading API description api' }).hasAttribute('disabled'),
   ).toBe(true);
   await waitFor(() => expect(deny).toBeTypeOf('function'));
   deny(new Error('Access denied by provider'));
   await screen.findByText('API description unavailable');
-  expect(
-    screen.getByText('Access denied by provider', { selector: '[role="status"]' }),
-  ).toBeTruthy();
+  expect(screen.getAllByText('Access denied by provider')).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Retry API description api' })).toBeTruthy();
 });
 

@@ -1,0 +1,21 @@
+{
+  "runId": "ebaacd2b-0c46-4dc0-bcfa-90f1768b2640",
+  "startedAt": "2026-10-12T20:03:08.425Z",
+  "documents": 10,
+  "workflows": 46,
+  "projects": [
+    "desktop",
+    "mobile"
+  ],
+  "rootStatesPerProject": 70,
+  "tests": 172,
+  "candidate": {
+    "head": "07982d22ebbc7a280f5e683df5e11fe6a0f51bee",
+    "base": "49dd8ef814637b481c0a1998f586ce2785812f5d",
+    "trackedDiffSha256": "34693562c4780a5e20041dbe77a3f866d867e8d2ca82a175abdd2d391888705d"
+  },
+  "identitySha256": "d981923429009f3324b14330e79dee2e93167dc902119995b7cc90b59607fad2",
+  "inputsSha256": "74ff1ae7292bac6b86294b8fcee7326fb05855140fb81b9b8c958159c7b37350",
+  "state": "passed",
+  "finishedAt": "2026-10-12T20:10:09.421Z"
+}

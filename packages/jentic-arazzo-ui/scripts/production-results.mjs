@@ -92,7 +92,7 @@ export const faultCases = [
   },
   {
     name: 'missing-discovery',
-    title: 'UX first-use guide discovery starts at plain entry and help performs no acquisition',
+    title: 'UX first-use guide discovery starts at plain entry and help performs no guide acquisition',
     reason: 'UX first-use discovery must reveal guide purpose without injected setup',
   },
   {
@@ -113,10 +113,12 @@ export const faultCases = [
   },
 ];
 export const requiredUXTitles = [
+  'API descriptions discovery, delayed recovery and missing lookup preserve reading and focus',
+  'API descriptions long source labels wrap and manual bulk loading remains explicit',
   'UX installed embed preserves prerequisite order, geometry modality and raw sizing',
   ...faultCases.map((fault) => fault.title),
   'identified installed ESM plain viewing and provider denial',
-  'standalone viewing discloses setup and acquires only explicitly loaded contracts',
+  'standalone viewing discloses setup and automatically loads declared API descriptions',
   'repeated calls retain distinct contexts and helpers have Unknown actor',
   'operation panel opens both entry occurrences without another workflow choice',
   'shared defaults show scoped before and after potential impact',

@@ -99,7 +99,9 @@ const scenarioProps: ArazzoUIProps = {document: '{}', ...scenarioControls};
 const executionFocus: ScenarioFocus = { kind: 'execute', pointer: '/workflows/0' };
 const address: WorkflowActionAddress = { document: 'host:doc', pointer: '/workflows/0/onFailure/0', usePointer: '/workflows/0/onFailure/0', channel: 'onFailure', index: 0 };
 const location: WorkflowLocation = { version: 1, document: 'host:doc', root: 'root', view: 'docs', subview: 'sequence', selection: { kind: 'action', workflowId: 'child', stepId: 'capture', occurrence: [{ workflowId: 'root', stepId: 'second-item' }], action: address } };
-const props: ArazzoUIProps = { document: '{}', location, defaultLocation: location, documentIdentity: 'host:doc', onLocationChange: value => value.selection?.occurrence, onLocationStatus: (status: WorkflowLocationStatus) => status.state };
+const props: ArazzoUIProps = { document: '{}', apiDescriptionLoading: 'manual', location, defaultLocation: location, documentIdentity: 'host:doc', onLocationChange: value => value.selection?.occurrence, onLocationStatus: (status: WorkflowLocationStatus) => status.state };
+// @ts-expect-error Only manual and automatic policies are supported.
+const badPolicy: ArazzoUIProps = { document: '{}', apiDescriptionLoading: 'eager' };
 const eventProps: ArazzoUIProps = { document: '{}', onNodeSelect: (id, node) => [id, node.data.type], onWorkflowSelect: id => id, onViewChange: view => view, onEdgeSelect: (id, edge) => [id, edge.data?.type] }; void eventProps;
 const sourceProvider: SourceDocumentProvider = {
   async load(request: SourceDocumentRequest): Promise<SourceDocumentContent> {
@@ -109,7 +111,7 @@ const sourceProvider: SourceDocumentProvider = {
   },
 };
 const contractProps: ArazzoUIProps = {
-  document: '{}', sourceProvider,
+  document: '{}', sourceProvider, apiDescriptionLoading: 'automatic',
   onExternalNavigation(request: ExternalNavigationRequest) {
     const uri: string = request.documentUri;
     const workflow: string | undefined = request.workflowId;

@@ -1,5 +1,11 @@
 import { test, expect, type Page } from '@playwright/test';
-import { staticPaths, installProductionChecks, inspector } from './productionSupport';
+import {
+  staticPaths,
+  installProductionChecks,
+  inspector,
+  automaticSources,
+  explicitSources,
+} from './productionSupport';
 
 type HostState = {
   providerRequests: string[];
@@ -164,6 +170,10 @@ test('UX installed embed preserves prerequisite order, geometry modality and raw
   expect((await viewer.boundingBox())?.height).toBe(700);
 });
 async function choose(page: Page, name: string) {
+  if (['Step descriptions', 'Sequence diagram'].includes(name)) {
+    await page.getByRole('button', { name, exact: true }).click();
+    return;
+  }
   const disclosure = page.locator('details.arazzo-more-views');
   if (!(await disclosure.evaluate((element) => (element as HTMLDetailsElement).open)))
     await disclosure.locator(':scope > summary').click();
@@ -188,7 +198,7 @@ test('identified installed ESM plain viewing and provider denial', async ({ page
   expect((await hostState(page)).providerRequests).toEqual(['https://example.test/pay.json']);
 });
 
-test('standalone viewing discloses setup and acquires only explicitly loaded contracts', async ({
+test('standalone viewing discloses setup and automatically loads declared API descriptions', async ({
   page,
   baseURL,
 }) => {
@@ -206,19 +216,13 @@ test('standalone viewing discloses setup and acquires only explicitly loaded con
   await page.keyboard.press('Enter');
   await page.getByText('Load guides from a URL', { exact: true }).click();
   await expect(page.getByRole('textbox', { name: 'Guide file URL' })).toBeVisible();
-  expect(contractRequests).toEqual([]);
+  await expect(page.locator('.arazzo-inspection-status > summary')).toContainText('4 of 4 loaded');
+  expect(contractRequests).toHaveLength(4);
   await choose(page, 'Workflow diagram');
   await page.getByRole('button', { name: 'Inspect client-journey.purchase', exact: true }).click();
-  expect(contractRequests).toEqual([]);
-  (page as Page & { acceptanceExplicitSources: Set<string> }).acceptanceExplicitSources.add(
-    `${baseURL}/examples/digital-product/coordinator.openapi.yaml`,
-  );
-  await inspector(page)
-    .getByRole('button', { name: 'Load API description coordinator', exact: true })
-    .click();
   await expect(inspector(page)).toContainText('purchaseProduct');
   await expect(inspector(page)).toContainText('requestBody');
-  expect(contractRequests).toHaveLength(1);
+  expect(contractRequests).toHaveLength(4);
 });
 
 test('repeated calls retain distinct contexts and helpers have Unknown actor', async ({ page }) => {
@@ -322,6 +326,7 @@ test('scenario focus, dismissal and restored guide context', async ({
   const restoredErrors: string[] = [],
     restoredForbidden: string[] = [];
   restored.on('pageerror', (error) => restoredErrors.push(error.message));
+  const restoredSources = await automaticSources(new URL(shared).searchParams.get('document')!);
   restored.on('request', (request) => {
     if (
       request.method() !== 'GET' ||
@@ -331,6 +336,7 @@ test('scenario focus, dismissal and restored guide context', async ({
         ![
           new URL(shared).searchParams.get('document'),
           new URL(shared).searchParams.get('scenarios'),
+          ...restoredSources,
         ].includes(request.url()))
     )
       restoredForbidden.push(request.url());
@@ -372,6 +378,14 @@ for (const fixture of ['petstore', 'long-label'] as const) {
   }, info) => {
     if (fixture === 'long-label') {
       const url = `${baseURL}/examples/acceptance-long.arazzo.yaml`;
+      const api = `${baseURL}/examples/api.yaml`;
+      explicitSources(page).add(api);
+      await page.route(api, (route) =>
+        route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({ openapi: '3.1.0', paths: {} }),
+        }),
+      );
       await page.route(url, (route) =>
         route.fulfill({
           contentType: 'application/json',
@@ -432,3 +446,135 @@ for (const fixture of ['petstore', 'long-label'] as const) {
     });
   });
 }
+
+test('API descriptions discovery, delayed recovery and missing lookup preserve reading and focus', async ({
+  page,
+  baseURL,
+}, info) => {
+  const coordinator = `${baseURL}/examples/digital-product/coordinator.openapi.yaml`;
+  const payment = `${baseURL}/examples/digital-product/payment.openapi.yaml`;
+  let release!: () => void;
+  let paymentAttempts = 0;
+  await page.route(coordinator, async (route) => {
+    await new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ openapi: '3.1.0', paths: {} }),
+    });
+  });
+  await page.route(payment, async (route) => {
+    paymentAttempts++;
+    if (paymentAttempts === 1)
+      await route.fulfill({ status: 503, body: 'Temporarily unavailable' });
+    else await route.continue();
+  });
+  await page.goto(
+    `/?document=${encodeURIComponent(`${baseURL}/examples/digital-product/arazzo.yaml`)}`,
+  );
+  const summary = page.locator('.arazzo-inspection-status > summary');
+  await expect(page.getByRole('list', { name: 'Ordered interactions' })).toBeVisible();
+  await expect(summary).toContainText('1 loading');
+  await info.attach('api-entry-pending', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await summary.focus();
+  await page.keyboard.press('Enter');
+  const status = page.getByRole('region', { name: 'Inspection status details' });
+  for (const name of ['coordinator', 'inventory', 'payment', 'license'])
+    await expect(status.getByRole('region', { name: `Source ${name}`, exact: true })).toBeVisible();
+  const failed = status.getByRole('region', { name: 'Source payment', exact: true });
+  const retry = failed.getByRole('button', { name: 'Retry API description payment', exact: true });
+  await expect(retry).toBeVisible();
+  await info.attach('api-source-discovery-failed', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await retry.focus();
+  await page.keyboard.press('Enter');
+  await expect(failed).toBeFocused();
+  await expect(failed).toContainText('Loaded');
+  expect(paymentAttempts).toBe(2);
+  await summary.focus();
+  release();
+  await expect(summary).toContainText('4 of 4 loaded');
+  await expect(summary).toBeFocused();
+  await info.attach('api-retry-loaded', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await summary.click();
+  await page
+    .getByRole('list', { name: 'Ordered interactions' })
+    .getByRole('button', { name: /^Inspect client-journey.purchase/ })
+    .click();
+  await expect(inspector(page)).toContainText('Operation not found');
+  await expect(
+    inspector(page).getByRole('region', { name: 'Source coordinator', exact: true }),
+  ).toContainText('Loaded');
+  await info.attach('api-loaded-missing-operation', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  await page.keyboard.press('Escape');
+  for (const view of ['Step descriptions', 'Workflow diagram', 'Side by side']) {
+    await choose(page, view);
+    await expect(page.locator('.arazzo-inspection-status')).toHaveCount(1);
+    await expect(summary).toContainText('4 of 4 loaded');
+  }
+  await page.getByRole('button', { name: 'All workflows', exact: true }).click();
+  await summary.click();
+  await expect(status.getByRole('region', { name: 'Source payment', exact: true })).toContainText(
+    'Loaded',
+  );
+  await info.attach('api-overview-discovery', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+});
+
+test('API descriptions long source labels wrap and manual bulk loading remains explicit', async ({
+  page,
+  baseURL,
+}, info) => {
+  const { manualStandalone } = await import('./productionSupport');
+  await manualStandalone(page);
+  const name = 'A source with a long authored name '.repeat(8);
+  const url = `${baseURL}/${'long-source-url-'.repeat(16)}.json`;
+  const primary = `${baseURL}/long-sources.arazzo.yaml`;
+  explicitSources(page).add(url);
+  await page.route(primary, (route) =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        arazzo: '1.0.1',
+        info: { title: 'Long sources', version: '1' },
+        sourceDescriptions: [{ name, type: 'openapi', url }],
+        workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'run' }] }],
+      }),
+    }),
+  );
+  let attempts = 0;
+  await page.route(url, (route) => {
+    attempts++;
+    return route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ openapi: '3.1.0', paths: {} }),
+    });
+  });
+  await page.goto(`/?document=${encodeURIComponent(primary)}`);
+  await page.locator('.arazzo-inspection-status > summary').click();
+  expect(attempts).toBe(0);
+  const status = page.getByRole('region', { name: 'Inspection status details' });
+  const bulk = status.getByRole('button', { name: 'Load API descriptions', exact: true });
+  await bulk.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.arazzo-inspection-status > summary')).toContainText('1 of 1 loaded');
+  expect(attempts).toBe(1);
+  await info.attach('api-long-labels-manual', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+});

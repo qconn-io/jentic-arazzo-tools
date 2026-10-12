@@ -5,7 +5,12 @@ import {
   type AcceptanceDocument,
   type AcceptanceWorkflow,
 } from '../fixtures/workflowUxInventory';
-import { installProductionChecks, inspector, explicitSources } from './productionSupport';
+import {
+  installProductionChecks,
+  inspector,
+  explicitSources,
+  manualStandalone,
+} from './productionSupport';
 
 installProductionChecks();
 const inventory = readInventory();
@@ -141,10 +146,9 @@ async function assertSequenceSemantics(page: Page, workflow: AcceptanceWorkflow)
     const destination = step.action === 'receive' ? row.from : row.to;
     expect(step.action === 'receive' ? row.to : row.from).toBe(workflow.workflowId);
     if (step.kind === 'operation') {
-      if (step.source)
-        expect(destination, `${workflow.workflowId}.${step.stepId}: source endpoint`).toBe(
-          step.source,
-        );
+      const source = step.locatedSource ?? step.source;
+      if (source)
+        expect(destination, `${workflow.workflowId}.${step.stepId}: source endpoint`).toBe(source);
       else expect(destination).toContain(`destination · ${step.stepId}`);
     } else if (step.targetKind === 'local-workflow') expect(destination).toBe(step.locator);
     else {
@@ -430,6 +434,10 @@ for (const entry of inventory.documents) {
       );
       await select.selectOption(workflow.workflowId);
       await page.getByRole('button', { name: `Sequence diagram`, exact: true }).click();
+      if (workflow.steps.some((step) => step.locatedSource))
+        await expect(page.locator('.arazzo-inspection-status > summary')).toContainText(
+          '2 of 2 loaded',
+        );
       const participants = page.getByLabel('Sequence participants');
       const sources = await participants.evaluate((node) =>
         [...node.children]
@@ -438,7 +446,12 @@ for (const entry of inventory.documents) {
           .sort(),
       );
       expect(sources, `${workflow.workflowId}: independently expected API lanes`).toEqual(
-        [...workflow.sources].sort(),
+        [
+          ...new Set([
+            ...workflow.sources,
+            ...workflow.steps.flatMap((step) => (step.locatedSource ? [step.locatedSource] : [])),
+          ]),
+        ].sort(),
       );
       expect(await participants.innerText()).not.toMatch(/\bP\d+\b/);
       const ordered = page.locator('ol[aria-label="Ordered interactions"]');
@@ -451,7 +464,11 @@ for (const entry of inventory.documents) {
         await expect(ordered).toContainText(
           /Collapsed call|limit|boundary|Recursion|external document has not been fetched|workflow is not present/i,
         );
-      if (workflow.steps.some((step) => step.kind === 'operation' && step.source === null))
+      if (
+        workflow.steps.some(
+          (step) => step.kind === 'operation' && step.source === null && !step.locatedSource,
+        )
+      )
         await expect(ordered).toContainText('The API destination is not established');
       if (workflow.limits.includes('rows')) {
         await expect(ordered.locator(':scope > li')).toHaveCount(199);
@@ -487,6 +504,7 @@ for (const entry of inventory.documents) {
 test('UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current', async ({
   page,
 }) => {
+  await manualStandalone(page);
   const requests: string[] = [];
   let mode = 'complete';
   let release: (() => void) | undefined;
@@ -565,6 +583,7 @@ test('UX partial and duplicate candidate coverage never promotes an unchecked un
   page,
   baseURL,
 }) => {
+  await manualStandalone(page);
   const documentURL = `${baseURL}/acceptance-multi.yaml`;
   const a = `${baseURL}/acceptance-a.json`,
     b = `${baseURL}/acceptance-b.json`;
@@ -614,14 +633,13 @@ test('UX partial and duplicate candidate coverage never promotes an unchecked un
   await expect(participants).toContainText('Ambiguous destination');
 });
 
-test('UX first-use guide discovery starts at plain entry and help performs no acquisition', async ({
+test('UX first-use guide discovery starts at plain entry and help performs no guide acquisition', async ({
   page,
   baseURL,
 }, info) => {
   const acquisitions: string[] = [];
   page.on('request', (request) => {
-    if (/scenarios\.json|openapi\.yaml|asyncapi\.yaml|openapi\.json/.test(request.url()))
-      acquisitions.push(request.url());
+    if (/scenarios\.json/.test(request.url())) acquisitions.push(request.url());
   });
   await page.goto('/');
   expect(new URL(page.url()).search).toBe('');

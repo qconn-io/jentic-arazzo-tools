@@ -80,6 +80,8 @@ export interface ArazzoUIProps
   /** Base URI for relative sources in inline/uploaded documents. */
   baseURI?: string;
   sourceProvider?: SourceDocumentProvider;
+  /** Embedded defaults to manual; standalone document viewing defaults to automatic. */
+  apiDescriptionLoading?: 'manual' | 'automatic';
   onExternalNavigation?: (request: ExternalNavigationRequest) => void;
 }
 

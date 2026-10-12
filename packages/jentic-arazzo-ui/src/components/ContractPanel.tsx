@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { SourceDescription } from './SourceDescriptions';
 import { contractReadingStatus } from '../utils/contract/readingStatus';
 import { useContractFacts } from '../context/ContractFactsContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
@@ -15,10 +16,10 @@ function Declaration({ title, value }: { title: string; value: unknown }) {
   );
 }
 export function ContractPanel({ workflowId, stepId }: { workflowId: string; stepId?: string }) {
-  const { model, sourceRegistry, sourceProvider, onExternalNavigation } = useArazzoViewer();
+  const { model, sourceProvider, onExternalNavigation } = useArazzoViewer();
   const step = stepId ? model.stepsByWorkflow.get(workflowId)?.get(stepId) : undefined;
   const binding = step?.sourceBinding;
-  const { loaded: currentLoaded, load } = useContractFacts();
+  const { loaded: currentLoaded } = useContractFacts();
   if (!binding || !Object.keys(binding.locators).length) return null;
   const sources = (model.document.sourceDescriptions ?? []).filter((source) =>
     binding.candidates.includes(source.name),
@@ -61,7 +62,6 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
       </details>
       {!sourceProvider && (
         <>
-          <p>API-description loading is unavailable in this viewer.</p>
           <details data-advanced>
             <summary>Developer configuration</summary>
             <p>This host has no source provider configured for API-description loading.</p>
@@ -73,71 +73,7 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
         const target = typeof locators.workflowId === 'string' ? locators.workflowId : undefined;
         const workflow = target ? value?.workflowModel?.workflowsById.get(target) : undefined;
         return (
-          <section key={source.name} aria-label={`Source ${source.name}`} tabIndex={-1}>
-            <h4>{source.name}</h4>
-            <details>
-              <summary>Source acquisition details</summary>
-              <p>
-                Source URL: <code>{source.url}</code>
-              </p>
-              <p>Source state: {value?.state ?? 'idle'}</p>
-              {value?.content && (
-                <>
-                  <p>
-                    Retrieval URI: <code>{value.content.retrievalURI}</code>
-                  </p>
-                  <p>
-                    Revision: <code>{value.content.revision ?? 'unpinned'}</code>
-                  </p>
-                </>
-              )}
-            </details>
-            {sourceProvider && (
-              <button
-                type="button"
-                disabled={value?.state === 'loading'}
-                onClick={(event) => {
-                  if (document.activeElement === event.currentTarget)
-                    event.currentTarget.parentElement?.focus();
-                  void load(source, !!value);
-                }}
-              >
-                {' '}
-                {value?.state === 'loading'
-                  ? 'Checking'
-                  : value?.state === 'error'
-                    ? 'Retry'
-                    : value
-                      ? 'Reload'
-                      : 'Load'}{' '}
-                API description {source.name}
-              </button>
-            )}
-            {value?.error && <p role="status">{value.error.message}</p>}
-            {value?.facts && (
-              <p>
-                Contract profile: {value.facts.dialect} {value.facts.version}
-              </p>
-            )}
-            {value?.facts?.unsupportedDiagnostics.map((message) => (
-              <p key={message}>{message}</p>
-            ))}
-            {value?.content && (
-              <>
-                <details data-advanced>
-                  <summary>Advanced source provenance</summary>
-                  <p>Provider generation: {sourceRegistry.getProviderGeneration()}</p>
-                  <details>
-                    <summary>Raw Source Document</summary>
-                    <pre>
-                      {typeof value.content.content === 'string'
-                        ? value.content.content
-                        : JSON.stringify(value.content.content, null, 2)}
-                    </pre>
-                  </details>
-                </details>
-              </>
-            )}
+          <SourceDescription key={`${source.name}:${source.url}`} source={source}>
             {value?.workflowModel && (
               <>
                 <p>{workflow ? 'Workflow found' : 'Workflow not found'}</p>
@@ -157,7 +93,7 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
                 )}
               </>
             )}
-          </section>
+          </SourceDescription>
         );
       })}
       {operation && (

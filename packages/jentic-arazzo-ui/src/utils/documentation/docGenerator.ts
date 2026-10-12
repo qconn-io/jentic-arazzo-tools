@@ -59,7 +59,9 @@ export function generateDocumentation(
         ? model.support.profile
         : undefined,
     semanticInspection: model.support.semanticInspection !== 'unsupported',
-    limitations: model.support.limitations,
+    limitations: model.support.limitations.filter(
+      (limit) => !/source documents.*(?:fetched|verified)/i.test(limit),
+    ),
   };
   const provenance = (fact?: Provenance): DocumentationProvenance => ({
     retrievalURI: snapshot.retrievalURI,

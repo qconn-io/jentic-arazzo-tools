@@ -57,6 +57,7 @@ interface InternalContext extends ArazzoViewerContextValue {
   getNodeOwner: (node: ArazzoNode) => string | undefined;
   sourceRegistry: SourceRegistry;
   sourceProvider?: SourceDocumentProvider;
+  apiDescriptionLoading?: 'manual' | 'automatic';
   onExternalNavigation?: (request: ExternalNavigationRequest) => void;
 }
 const ArazzoViewerContext = createContext<InternalContext | null>(null);
@@ -74,6 +75,7 @@ interface StandaloneProviderProps {
   initialSelectedNodeId?: string | null;
   events?: ViewerEvents;
   sourceProvider?: SourceDocumentProvider;
+  apiDescriptionLoading?: 'manual' | 'automatic';
   onExternalNavigation?: (request: ExternalNavigationRequest) => void;
   initialReadingView?: 'docs' | 'sequence' | 'flowchart';
   children: React.ReactNode;
@@ -287,6 +289,7 @@ function StandaloneProvider({
   initialSelectedNodeId,
   events,
   sourceProvider,
+  apiDescriptionLoading = 'manual',
   onExternalNavigation,
   initialReadingView,
   children,
@@ -473,6 +476,7 @@ function StandaloneProvider({
     getNodeOwner: (node) => ownerLookup(node, model, rawDocument),
     sourceRegistry,
     sourceProvider,
+    apiDescriptionLoading,
     onExternalNavigation,
   };
   return (

@@ -65,7 +65,13 @@ test('loads only an explicitly supplied manifest and restores a fresh namespaced
       },
     ),
   );
-  render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
+  render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      documentIdentity="https://test/doc"
+    />,
+  );
   const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   await waitFor(() => expect(panel.textContent).toContain('Read authored charge evidence.'));
   await screen.findByRole('region', { name: 'Selection details' });
@@ -86,7 +92,13 @@ test('replacement cancels obsolete manifest loading and valid new guides remain 
     return Promise.resolve({ ok: true, url: uri, json: async () => manifest });
   });
   vi.stubGlobal('fetch', fetch);
-  render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
+  render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      documentIdentity="https://test/doc"
+    />,
+  );
   fireEvent.click(screen.getByText('Load guides from a URL'));
   const input = await screen.findByRole('textbox', { name: 'Guide file URL' });
   fireEvent.change(input, { target: { value: 'https://test/old' } });
@@ -127,6 +139,7 @@ test('leaving a guide cancels a pending document handoff and ignores its late re
   };
   render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="https://test/doc"
       scenarioManifest={remote}
@@ -150,6 +163,7 @@ test('controlled prose-only selection opens its declared workflow', async () => 
   history.replaceState({}, '', '/');
   render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="https://test/doc"
       scenarioManifest={[
@@ -191,6 +205,7 @@ test('a rejected controlled selection cannot acquire or replace a document', asy
   const changed = vi.fn();
   render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="https://test/doc"
       scenarioManifest={remote}
@@ -223,6 +238,7 @@ test('a standalone host supplying the requested document preserves the guide and
   };
   const { rerender } = render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="https://test/doc"
       scenarioManifest={remote}
@@ -234,6 +250,7 @@ test('a standalone host supplying the requested document preserves the guide and
   await waitFor(() => expect(handoff).toHaveBeenCalled());
   rerender(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={structuredClone(nestedCalls)}
       documentIdentity="https://test/remote"
       scenarioManifest={remote}
@@ -270,7 +287,13 @@ test('guide reconstruction retains the shared document digest check', async () =
       },
     }),
   );
-  render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
+  render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      documentIdentity="https://test/doc"
+    />,
+  );
   const panel = await screen.findByRole('region', { name: 'Guided walkthroughs' });
   await waitFor(() =>
     expect(

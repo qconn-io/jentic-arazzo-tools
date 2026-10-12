@@ -257,6 +257,7 @@ export const ArazzoUI = forwardRef<ArazzoUIRef, ArazzoUIProps>(function ArazzoUI
         initialSelectedNodeId={controlledSelectedNodeId}
         events={events}
         sourceProvider={props.sourceProvider}
+        apiDescriptionLoading={props.apiDescriptionLoading}
         onExternalNavigation={props.onExternalNavigation}
         initialReadingView={implicitSequence ? 'sequence' : 'docs'}
       >

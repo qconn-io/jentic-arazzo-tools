@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from 'react';
 import { it, expect, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor, within } from '@testing-library/react';
 import { ArazzoCatalog } from '../src/ArazzoCatalog';
 import type { WorkflowCatalogManifest } from '../src/types/catalog';
 vi.mock('mermaid', () => ({
@@ -79,13 +79,13 @@ it('inspects the same exact contract revision as the index, including two source
       }}
     />,
   );
-  const load = await screen.findByRole(
+  const details = await screen.findByRole('region', { name: 'Selection details' });
+  const load = await within(details).findByRole(
     'button',
     { name: 'Load API description pay-new' },
     { timeout: 5000 },
   );
   fireEvent.click(load);
-  const details = await screen.findByRole('region', { name: 'Selection details' });
   await waitFor(() => expect(details.textContent).toContain('Revision: new'));
   expect(details.textContent).toContain('New capture declaration');
   expect(details.textContent).toContain('Revision: new');

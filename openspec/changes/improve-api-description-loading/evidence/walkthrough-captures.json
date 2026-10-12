@@ -1,0 +1,118 @@
+{
+  "candidate": {
+    "head": "07982d22ebbc7a280f5e683df5e11fe6a0f51bee",
+    "base": "49dd8ef814637b481c0a1998f586ce2785812f5d",
+    "trackedDiffSha256": "34693562c4780a5e20041dbe77a3f866d867e8d2ca82a175abdd2d391888705d"
+  },
+  "builtAt": "2026-10-12T20:04:28.444Z",
+  "captures": [
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "desktop",
+      "file": "captures/desktop/api-entry-pending.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "46194f27fbfe6d473e2018dd9c4af0774d5eb255d25fac76792bf25ca54b6989",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "desktop",
+      "file": "captures/desktop/api-source-discovery-failed.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "b7937ff5bcf4fd51e1b3e0024bb174d0bb6a1e4837255e38bcd47635b5ed072e",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "desktop",
+      "file": "captures/desktop/api-retry-loaded.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "ef98311914898f7416ac1d4142948727517b2df2c17119e89c4955af09a35041",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "desktop",
+      "file": "captures/desktop/api-loaded-missing-operation.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "b1b2426ba65505adc9bc023fc73854a0c3754736e4c92553ce233d3f210998eb",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "desktop",
+      "file": "captures/desktop/api-overview-discovery.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "f4644558122e1f71026cf86dda4442ad61d8571bbe8eaec12ee08af537097b1d",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+      "project": "desktop",
+      "file": "captures/desktop/api-long-labels-manual.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "356892b3f74514f97857128990b4567e740167c413d21b77d75bc86142b0fd5e",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "mobile",
+      "file": "captures/mobile/api-entry-pending.png",
+      "width": 480,
+      "height": 900,
+      "sha256": "d886847ad9ae709bf36fe70bb70b04ebff962b104490d3c008e018b58f3c4a8e",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "mobile",
+      "file": "captures/mobile/api-source-discovery-failed.png",
+      "width": 480,
+      "height": 900,
+      "sha256": "c01060c453b040f61ef05e0859e12ed6afb53dec75933ae00d15fe6a986dad46",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "mobile",
+      "file": "captures/mobile/api-retry-loaded.png",
+      "width": 480,
+      "height": 900,
+      "sha256": "09ca0e41e3f1e8e44464804a64bc1c1332aef3a97a4430d66cbef96058f48eb3",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "mobile",
+      "file": "captures/mobile/api-loaded-missing-operation.png",
+      "width": 480,
+      "height": 900,
+      "sha256": "390f09316cf6603d4c9c936ba5dc4eea29de0c2c7e6c91f64ff4c67005992195",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+      "project": "mobile",
+      "file": "captures/mobile/api-overview-discovery.png",
+      "width": 480,
+      "height": 900,
+      "sha256": "c496edbf2454a907009c64ae39ab780d1d22987fe54209d130b7f7606a7d4fb4",
+      "outcome": "passed"
+    },
+    {
+      "scenario": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+      "project": "mobile",
+      "file": "captures/mobile/api-long-labels-manual.png",
+      "width": 480,
+      "height": 900,
+      "sha256": "086371bb990c75b715a82a769b2e9ae310112236bec2c4cb0dd1b048488798b3",
+      "outcome": "passed"
+    }
+  ]
+}

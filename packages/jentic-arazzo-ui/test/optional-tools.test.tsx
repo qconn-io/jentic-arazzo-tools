@@ -23,7 +23,13 @@ test('ordinary viewing keeps optional setup closed and disclosure itself acquire
   const fetch = vi.fn();
   const load = vi.fn();
   vi.stubGlobal('fetch', fetch);
-  render(<ArazzoUIStandalone document={nestedCalls} sourceProvider={{ load }} />);
+  render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      sourceProvider={{ load }}
+    />,
+  );
   await screen.findByRole('combobox', { name: 'Select workflow' });
   expect(screen.getByRole('textbox', { name: 'Arazzo document URL' })).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Upload Arazzo document' })).toBeTruthy();
@@ -54,7 +60,13 @@ test('a restored guide keeps status visible without repeatedly opening URL setup
     ),
   );
   history.replaceState({}, '', '/?scenarios=https%3A%2F%2Ftest%2Fguide.json');
-  render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="https://test/doc" />);
+  render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      documentIdentity="https://test/doc"
+    />,
+  );
   await screen.findByText('Loading guided walkthroughs…');
   const disclosure = screen.getByText('Load guides from a URL').closest('details')!;
   expect(disclosure.open).toBe(false);
@@ -68,6 +80,7 @@ test('a host-configured profile exposes Systems beside reading controls', async 
   setupURL();
   render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="host:doc"
       viewProfile={{
@@ -118,6 +131,7 @@ test('covering details excludes advanced setup from background interaction and r
   });
   render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="host:doc"
       scenarioManifest={{

@@ -1332,3 +1332,9 @@
   align-items: center;
   flex-shrink: 0;
 }
+
+.arazzo-source-descriptions { min-width: 0; }
+.arazzo-source-description { padding: 8px 0; border-bottom: 1px solid #cbd5e1; overflow-wrap: anywhere; }
+.arazzo-source-description h4, .arazzo-source-description p { margin: 4px 0; }
+.arazzo-source-description button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.arazzo-source-description pre { max-width: 100%; overflow: auto; }

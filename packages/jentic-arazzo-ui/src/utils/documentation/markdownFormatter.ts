@@ -145,11 +145,11 @@ export function formatHeaderAsMarkdown(
   if (metadata.support && options.includeStatus !== false)
     sections.push(
       '<details class="inspection-support"><summary>Inspection status</summary>',
-      `<div class="inspection-support">Semantic inspection: ${metadata.support.semanticInspection ? `profile ${escapeHTML(metadata.support.profile ?? 'selected')}` : 'unsupported version; raw content only'}. Schema validation and execution support are not established. Source documents and versions are unverified.</div>`,
+      `<div class="inspection-support">Semantic inspection: ${metadata.support.semanticInspection ? `profile ${escapeHTML(metadata.support.profile ?? 'selected')}` : 'unsupported version; raw content only'}. Schema validation and execution support are not established. Authored-only documentation; live API-description availability and operation lookup are not supplied.</div>`,
       ...(metadata.support.limitations ?? []).map(
         (limit) => `<div class="inspection-warning">${escapeHTML(limit)}</div>`,
       ),
-      '<p>Source documents were not fetched; this does not establish that they are invalid or inaccessible.</p>',
+      '<p>Declared sources identify authored metadata; this export does not report live loading outcomes.</p>',
       warnings(details.diagnostics?.filter((diagnostic) => diagnostic.phase === 'resolution')),
       '</details>',
     );
@@ -159,7 +159,7 @@ export function formatHeaderAsMarkdown(
       '<div class="sources-section"><h2>Source Descriptions</h2>',
       ...metadata.sourceDescriptions.map(
         (source) =>
-          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>${escapeHTML(source.type ?? 'unknown')} — unverified authored declaration (loaded status in inspector)</span> <a href="${sourceURL(source.url, metadata.documentURL)}">${escapeHTML(source.url)}</a></div>`,
+          `<div class="source-card"><strong>${escapeHTML(source.name)}</strong> <span>Declared ${escapeHTML(source.type ?? 'unknown')} source</span> <a href="${sourceURL(source.url, metadata.documentURL)}">${escapeHTML(source.url)}</a></div>`,
       ),
       '</div>',
     );
@@ -204,9 +204,7 @@ export function formatWorkflowAsMarkdown(
       if (locator !== undefined)
         sections.push(`<div>${key}: <code>${escapeHTML(locator)}</code></div>`);
     if (!options.compact && step.sourceBinding)
-      sections.push(
-        rawDetails('Source binding — unverified authored metadata', step.sourceBinding),
-      );
+      sections.push(rawDetails('Source binding — authored metadata', step.sourceBinding));
     sections.push(
       prerequisites(step.prerequisites),
       options.compact ? '' : parameters(step.parameters, step.parameterDetails),

@@ -5,6 +5,7 @@ export interface AcceptanceStep {
   kind: 'operation' | 'call';
   locator: string;
   source: string | null;
+  locatedSource?: string;
   targetKind?: string;
   action?: string;
   prerequisites: string[];

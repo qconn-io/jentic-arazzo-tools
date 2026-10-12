@@ -1,0 +1,762 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test:browser:negative
+> node scripts/run-production-browser.mjs --negative
+
+[WebServer] (node:1120647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1120659) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (2.2s)
+(node:1120762) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (2.0s)
+
+  2 passed (7.0s)
+[WebServer] (node:1120901) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1120914) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (6.3s)
+(node:1121045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (6.3s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+
+    Error: UX Petstore lanes must identify the known petstoreAPI destination
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByLabel('Sequence participants')
+    Expected substring: "petstoreAPI"
+    Received string:    "Unknown destination · loginUser"
+    Timeout: 5000ms
+
+    Call log:
+      - UX Petstore lanes must identify the known petstoreAPI destination getByLabel('Sequence participants') with timeout 5000ms
+      - waiting for getByLabel('Sequence participants')
+        14 × locator resolved to <div aria-label="Sequence participants" class="arazzo-sequence-participants">Unknown destination · loginUser</div>
+           - unexpected value "Unknown destination · loginUser"
+
+
+      217 |     participants,
+      218 |     'UX Petstore lanes must identify the known petstoreAPI destination',
+    > 219 |   ).toContainText('petstoreAPI');
+          |     ^
+      220 |   await expect(participants.locator(':scope > div')).toHaveCount(2);
+      221 |   await expect(participants).not.toContainText('Destination not established');
+      222 |   const initialRows = page.locator('.arazzo-sequence svg [data-sequence-id]');
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:219:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+
+    Error: UX Petstore lanes must identify the known petstoreAPI destination
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByLabel('Sequence participants')
+    Expected substring: "petstoreAPI"
+    Received string:    "Unknown destination · loginUser"
+    Timeout: 5000ms
+
+    Call log:
+      - UX Petstore lanes must identify the known petstoreAPI destination getByLabel('Sequence participants') with timeout 5000ms
+      - waiting for getByLabel('Sequence participants')
+        14 × locator resolved to <div aria-label="Sequence participants" class="arazzo-sequence-participants">Unknown destination · loginUser</div>
+           - unexpected value "Unknown destination · loginUser"
+
+
+      217 |     participants,
+      218 |     'UX Petstore lanes must identify the known petstoreAPI destination',
+    > 219 |   ).toContainText('petstoreAPI');
+          |     ^
+      220 |   await expect(participants.locator(':scope > div')).toHaveCount(2);
+      221 |   await expect(participants).not.toContainText('Destination not established');
+      222 |   const initialRows = page.locator('.arazzo-sequence svg [data-sequence-id]');
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:219:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/petstore-lanes/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+    [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+[WebServer] (node:1121221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1121233) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current (1.6s)
+(node:1121335) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current (1.9s)
+
+  2 passed (6.4s)
+[WebServer] (node:1121468) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1121480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current (6.4s)
+(node:1121584) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current (6.7s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current 
+
+    Error: UX stale destination evidence must disappear after reload
+
+    expect(locator).not.toContainText(expected) failed
+
+    Locator: locator('ol[aria-label="Ordered interactions"]')
+    Expected substring: not "Log in with authored credentials"
+    Received string: "1. loginUser · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · loginUser (local-step) · returns to retry loginUser · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action2. findAvailablePets · findPetsByStatus · Operation Operation not foundConditions and recovery (3)Possible authored actions; criteria are not evaluated.Failure · noPetsAvailable · end · EndInspect authored actionFailure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · findAvailablePets (local-step) · returns to retry findAvailablePets · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action3. placeOrder · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · placeOrder (local-step) · returns to retry placeOrder · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action4. retrieveOrderedPetDetails · getPetById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · retrieveOrderedPetDetails (local-step) · returns to retry retrieveOrderedPetDetails · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action5. verifyOrderConfirmation · getOrderById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · verifyOrderConfirmation (local-step) · returns to retry verifyOrderConfirmation · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action Log in with authored credentials"
+    Timeout: 5000ms
+
+    Call log:
+      - UX stale destination evidence must disappear after reload locator('ol[aria-label="Ordered interactions"]') with timeout 5000ms
+      - waiting for locator('ol[aria-label="Ordered interactions"]')
+        14 × locator resolved to <ol class="arazzo-sequence-list" aria-label="Ordered interactions">1. loginUser · Operation Operation not foundCondi…</ol>
+           - unexpected value "1. loginUser · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · loginUser (local-step) · returns to retry loginUser · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action2. findAvailablePets · findPetsByStatus · Operation Operation not foundConditions and recovery (3)Possible authored actions; criteria are not evaluated.Failure · noPetsAvailable · end · EndInspect authored actionFailure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · findAvailablePets (local-step) · returns to retry findAvailablePets · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action3. placeOrder · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · placeOrder (local-step) · returns to retry placeOrder · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action4. retrieveOrderedPetDetails · getPetById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · retrieveOrderedPetDetails (local-step) · returns to retry retrieveOrderedPetDetails · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action5. verifyOrderConfirmation · getOrderById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · verifyOrderConfirmation (local-step) · returns to retry verifyOrderConfirmation · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action Log in with authored credentials"
+
+
+      561 |     ordered,
+      562 |     'UX stale destination evidence must disappear after reload',
+    > 563 |   ).not.toContainText('Log in with authored credentials');
+          |         ^
+      564 |   for (const [next, expected] of [
+      565 |     ['duplicate', 'Multiple matching operations'],
+      566 |     ['failed', 'API description unavailable'],
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:563:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-desktop/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current 
+
+    Error: UX stale destination evidence must disappear after reload
+
+    expect(locator).not.toContainText(expected) failed
+
+    Locator: locator('ol[aria-label="Ordered interactions"]')
+    Expected substring: not "Log in with authored credentials"
+    Received string: "1. loginUser · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · loginUser (local-step) · returns to retry loginUser · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action2. findAvailablePets · findPetsByStatus · Operation Operation not foundConditions and recovery (3)Possible authored actions; criteria are not evaluated.Failure · noPetsAvailable · end · EndInspect authored actionFailure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · findAvailablePets (local-step) · returns to retry findAvailablePets · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action3. placeOrder · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · placeOrder (local-step) · returns to retry placeOrder · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action4. retrieveOrderedPetDetails · getPetById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · retrieveOrderedPetDetails (local-step) · returns to retry retrieveOrderedPetDetails · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action5. verifyOrderConfirmation · getOrderById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{\"condition\":\"$statusCode == 500\"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · verifyOrderConfirmation (local-step) · returns to retry verifyOrderConfirmation · criteria [{\"condition\":\"$statusCode == 503\"}] · retry limit 3 · retry delay 1Inspect authored action Log in with authored credentials"
+    Timeout: 5000ms
+
+    Call log:
+      - UX stale destination evidence must disappear after reload locator('ol[aria-label="Ordered interactions"]') with timeout 5000ms
+      - waiting for locator('ol[aria-label="Ordered interactions"]')
+        14 × locator resolved to <ol class="arazzo-sequence-list" aria-label="Ordered interactions">1. loginUser · Operation Operation not foundCondi…</ol>
+           - unexpected value "1. loginUser · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · loginUser (local-step) · returns to retry loginUser · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action2. findAvailablePets · findPetsByStatus · Operation Operation not foundConditions and recovery (3)Possible authored actions; criteria are not evaluated.Failure · noPetsAvailable · end · EndInspect authored actionFailure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · findAvailablePets (local-step) · returns to retry findAvailablePets · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action3. placeOrder · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · placeOrder (local-step) · returns to retry placeOrder · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action4. retrieveOrderedPetDetails · getPetById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · retrieveOrderedPetDetails (local-step) · returns to retry retrieveOrderedPetDetails · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action5. verifyOrderConfirmation · getOrderById · Operation Operation not foundConditions and recovery (2)Possible authored actions; criteria are not evaluated.Failure · orderFailed · end · End · criteria [{"condition":"$statusCode == 500"}]Inspect authored actionFailure · retryOnServiceUnavailable · retry · verifyOrderConfirmation (local-step) · returns to retry verifyOrderConfirmation · criteria [{"condition":"$statusCode == 503"}] · retry limit 3 · retry delay 1Inspect authored action Log in with authored credentials"
+
+
+      561 |     ordered,
+      562 |     'UX stale destination evidence must disappear after reload',
+    > 563 |   ).not.toContainText('Log in with authored credentials');
+          |         ^
+      564 |   for (const [next, expected] of [
+      565 |     ['duplicate', 'Multiple matching operations'],
+      566 |     ['failed', 'API description unavailable'],
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:563:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-mobile/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/stale-destination/fault-results/workflow-ux-UX-Petstore-ex-ebfe4-pector-and-sequence-current-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current 
+    [mobile] › test/e2e/workflow-ux.spec.ts:504:1 › UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current 
+[WebServer] (node:1121713) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1121726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success (1.4s)
+(node:1121824) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success (1.4s)
+
+  2 passed (5.5s)
+[WebServer] (node:1121966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1121980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success (6.3s)
+(node:1122086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success (6.5s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success 
+
+    Error: UX render rejection must expose localized recovery rather than blank success
+
+    expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Flowchart', exact: true }).getByRole('alert')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX render rejection must expose localized recovery rather than blank success getByRole('region', { name: 'Flowchart', exact: true }).getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Flowchart', exact: true }).getByRole('alert')
+
+
+      820 |     region.getByRole('alert'),
+      821 |     'UX render rejection must expose localized recovery rather than blank success',
+    > 822 |   ).toBeVisible();
+          |     ^
+      823 |   await region.getByRole('button', { name: 'Read step descriptions', exact: true }).click();
+      824 |   await expect(
+      825 |     page.getByRole('button', { name: 'Step descriptions', exact: true }),
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:822:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-desktop/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success 
+
+    Error: UX render rejection must expose localized recovery rather than blank success
+
+    expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Flowchart', exact: true }).getByRole('alert')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX render rejection must expose localized recovery rather than blank success getByRole('region', { name: 'Flowchart', exact: true }).getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Flowchart', exact: true }).getByRole('alert')
+
+
+      820 |     region.getByRole('alert'),
+      821 |     'UX render rejection must expose localized recovery rather than blank success',
+    > 822 |   ).toBeVisible();
+          |     ^
+      823 |   await region.getByRole('button', { name: 'Read step descriptions', exact: true }).click();
+      824 |   await expect(
+      825 |     page.getByRole('button', { name: 'Step descriptions', exact: true }),
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:822:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-mobile/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/silent-render/fault-results/workflow-ux-UX-rejected-fl-551d9-tions-without-blank-success-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success 
+    [mobile] › test/e2e/workflow-ux.spec.ts:801:1 › UX rejected flowchart exposes retry and descriptions without blank success 
+[WebServer] (node:1122262) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1122275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition (1.8s)
+(node:1122376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition (1.4s)
+
+  2 passed (5.8s)
+[WebServer] (node:1122525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1122537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition (6.5s)
+(node:1122643) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition (6.3s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition 
+
+    Error: UX first-use discovery must reveal guide purpose without injected setup
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: locator('.arazzo-guide-setup')
+    Expected substring: "Follow an author-provided walkthrough"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX first-use discovery must reveal guide purpose without injected setup locator('.arazzo-guide-setup') with timeout 5000ms
+      - waiting for locator('.arazzo-guide-setup')
+
+
+      654 |     page.locator('.arazzo-guide-setup'),
+      655 |     'UX first-use discovery must reveal guide purpose without injected setup',
+    > 656 |   ).toContainText('Follow an author-provided walkthrough');
+          |     ^
+      657 |   await page.getByText('Load guides from a URL', { exact: true }).click();
+      658 |   await page.getByText('Guide file format', { exact: true }).click();
+      659 |   await expect(page.locator('.arazzo-guide-setup')).toContainText('JSON');
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:656:5
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-desktop/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition 
+
+    Error: UX first-use discovery must reveal guide purpose without injected setup
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: locator('.arazzo-guide-setup')
+    Expected substring: "Follow an author-provided walkthrough"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX first-use discovery must reveal guide purpose without injected setup locator('.arazzo-guide-setup') with timeout 5000ms
+      - waiting for locator('.arazzo-guide-setup')
+
+
+      654 |     page.locator('.arazzo-guide-setup'),
+      655 |     'UX first-use discovery must reveal guide purpose without injected setup',
+    > 656 |   ).toContainText('Follow an author-provided walkthrough');
+          |     ^
+      657 |   await page.getByText('Load guides from a URL', { exact: true }).click();
+      658 |   await page.getByText('Guide file format', { exact: true }).click();
+      659 |   await expect(page.locator('.arazzo-guide-setup')).toContainText('JSON');
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:656:5
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-mobile/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/missing-discovery/fault-results/workflow-ux-UX-first-use-g-0fe0f-rforms-no-guide-acquisition-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition 
+    [mobile] › test/e2e/workflow-ux.spec.ts:636:1 › UX first-use guide discovery starts at plain entry and help performs no guide acquisition 
+[WebServer] (node:1122846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1122870) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 (3.1s)
+(node:1123051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 (3.2s)
+
+  2 passed (9.5s)
+[WebServer] (node:1123255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1123270) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 (6.7s)
+(node:1123383) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 (6.6s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 
+
+    Error: UX legacy hash must restore the authored stress document
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('combobox', { name: 'Select workflow' })
+    Expected substring: "batch-fulfilment"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX legacy hash must restore the authored stress document getByRole('combobox', { name: 'Select workflow' }) with timeout 5000ms
+      - waiting for getByRole('combobox', { name: 'Select workflow' })
+
+
+      758 |     page.getByRole('combobox', { name: 'Select workflow' }),
+      759 |     'UX legacy hash must restore the authored stress document',
+    > 760 |   ).toContainText('batch-fulfilment');
+          |     ^
+      761 |   await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('batch-fulfilment');
+      762 |   await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
+      763 |   const second = page.locator('.arazzo-sequence-list').getByRole('button', {
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:760:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-desktop/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 
+
+    Error: UX legacy hash must restore the authored stress document
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('combobox', { name: 'Select workflow' })
+    Expected substring: "batch-fulfilment"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX legacy hash must restore the authored stress document getByRole('combobox', { name: 'Select workflow' }) with timeout 5000ms
+      - waiting for getByRole('combobox', { name: 'Select workflow' })
+
+
+      758 |     page.getByRole('combobox', { name: 'Select workflow' }),
+      759 |     'UX legacy hash must restore the authored stress document',
+    > 760 |   ).toContainText('batch-fulfilment');
+          |     ^
+      761 |   await page.getByRole('combobox', { name: 'Select workflow' }).selectOption('batch-fulfilment');
+      762 |   await page.getByRole('button', { name: 'Sequence diagram', exact: true }).click();
+      763 |   const second = page.locator('.arazzo-sequence-list').getByRole('button', {
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:760:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-mobile/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/legacy-consumer/fault-results/workflow-ux-UX-legacy-docu-c5594-erve-exact-second-item-2499-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 
+    [mobile] › test/e2e/workflow-ux.spec.ts:743:1 › UX legacy document query/hash and shared occurrence history preserve exact second-item 2499 
+[WebServer] (node:1123527) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1123543) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (1.8s)
+(node:1123646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (2.1s)
+
+  2 passed (6.8s)
+[WebServer] (node:1123774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1123786) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (6.5s)
+(node:1123907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details (6.3s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+
+    Error: UX direct identity activation must inspect the authored step
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByLabel('Selection details', { exact: true })
+    Expected substring: "authenticateAndOrderPet.loginUser"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX direct identity activation must inspect the authored step getByLabel('Selection details', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('Selection details', { exact: true })
+
+
+      265 |     inspector(page),
+      266 |     'UX direct identity activation must inspect the authored step',
+    > 267 |   ).toContainText('authenticateAndOrderPet.loginUser');
+          |     ^
+      268 |   await page.keyboard.press('Escape');
+      269 |   for (const [step, operation] of [
+      270 |     ['loginUser', 'loginUser'],
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:267:5
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+
+    Error: UX direct identity activation must inspect the authored step
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByLabel('Selection details', { exact: true })
+    Expected substring: "authenticateAndOrderPet.loginUser"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX direct identity activation must inspect the authored step getByLabel('Selection details', { exact: true }) with timeout 5000ms
+      - waiting for getByLabel('Selection details', { exact: true })
+
+
+      265 |     inspector(page),
+      266 |     'UX direct identity activation must inspect the authored step',
+    > 267 |   ).toContainText('authenticateAndOrderPet.loginUser');
+          |     ^
+      268 |   await page.keyboard.press('Escape');
+      269 |   for (const [step, operation] of [
+      270 |     ['loginUser', 'loginUser'],
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:267:5
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/lost-identity/fault-results/workflow-ux-UX-default-bar-b6e9c-ctions-and-readable-details-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+    [mobile] › test/e2e/workflow-ux.spec.ts:201:1 › UX default bare entry preserves five known Petstore interactions and readable details 
+[WebServer] (node:1124064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1124077) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [desktop] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return (1.3s)
+(node:1124175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  2 [mobile] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return (1.5s)
+
+  2 passed (5.4s)
+[WebServer] (node:1124307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:1124319) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [desktop] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return (6.3s)
+(node:1124425) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [mobile] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return (6.5s)
+
+
+  1) [desktop] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return 
+
+    Error: UX sequence follow must open the accepted callee in sequence
+
+    expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Sequence reserve-and-capture' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX sequence follow must open the accepted callee in sequence getByRole('region', { name: 'Sequence reserve-and-capture' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Sequence reserve-and-capture' })
+
+
+      348 |     page.getByRole('region', { name: 'Sequence reserve-and-capture' }),
+      349 |     'UX sequence follow must open the accepted callee in sequence',
+    > 350 |   ).toBeVisible();
+          |     ^
+      351 |   await page
+      352 |     .getByRole('button', { name: 'Back to caller fulfil-purchase.reserve-and-pay' })
+      353 |     .click();
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:350:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-desktop/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-desktop/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-desktop/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-desktop/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [mobile] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return 
+
+    Error: UX sequence follow must open the accepted callee in sequence
+
+    expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Sequence reserve-and-capture' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - UX sequence follow must open the accepted callee in sequence getByRole('region', { name: 'Sequence reserve-and-capture' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Sequence reserve-and-capture' })
+
+
+      348 |     page.getByRole('region', { name: 'Sequence reserve-and-capture' }),
+      349 |     'UX sequence follow must open the accepted callee in sequence',
+    > 350 |   ).toBeVisible();
+          |     ^
+      351 |   await page
+      352 |     .getByRole('button', { name: 'Back to caller fulfil-purchase.reserve-and-pay' })
+      353 |     .click();
+        at /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/test/e2e/workflow-ux.spec.ts:350:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-mobile/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-mobile/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-mobile/trace.zip
+    Usage:
+
+        npx playwright show-trace test-output/browser/negative/lost-sequence-follow/fault-results/workflow-ux-UX-following-a-53bb5-nce-and-exact-caller-return-mobile/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [desktop] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return 
+    [mobile] › test/e2e/workflow-ux.spec.ts:323:1 › UX following a local call retains sequence and exact caller return 
+PASS all 7 named UX negative controls and their normal controls at both widths

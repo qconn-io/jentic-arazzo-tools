@@ -404,6 +404,7 @@ const DocumentStandalone = forwardRef<ArazzoUIRef, ArazzoUIStandaloneProps>(
                 defaultLocation={hydration.location}
                 onLocationChange={props.onLocationChange}
                 sourceProvider={props.sourceProvider ?? browserProvider}
+                apiDescriptionLoading={props.apiDescriptionLoading ?? 'automatic'}
                 baseURI={externalSource?.uri ?? props.baseURI}
                 activeWorkflowId={externalSource?.root ?? props.activeWorkflowId}
                 onExternalNavigation={async (request) => {

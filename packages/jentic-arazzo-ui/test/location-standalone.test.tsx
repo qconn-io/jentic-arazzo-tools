@@ -48,7 +48,7 @@ test('copy link reproduces URL-loaded occurrence and committed history excludes 
     configurable: true,
   });
   const push = vi.spyOn(history, 'pushState');
-  render(<ArazzoUIStandalone document={nestedCalls} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={nestedCalls} />);
   expect((await screen.findByRole('region', { name: 'Selection details' })).textContent).toContain(
     'secondPayment',
   );
@@ -74,7 +74,7 @@ test('copy link reproduces URL-loaded occurrence and committed history excludes 
 });
 test('popstate restores once without pushing a new entry', async () => {
   const push = vi.spyOn(history, 'pushState');
-  render(<ArazzoUIStandalone document={location.document} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={location.document} />);
   await screen.findByRole('button', { name: 'Copy link' });
   await waitFor(() =>
     expect(new URL(window.location.href).searchParams.has('location')).toBe(true),
@@ -93,7 +93,7 @@ test('supplied uploads without an identity explain addressability and do not cla
     value: { writeText: clipboard },
     configurable: true,
   });
-  render(<ArazzoUIStandalone document={nestedCalls} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={nestedCalls} />);
   fireEvent.click(await screen.findByRole('button', { name: 'Copy link' }));
   expect(await screen.findByText(/published at an addressable source/)).toBeTruthy();
   expect(clipboard).not.toHaveBeenCalled();
@@ -109,7 +109,7 @@ test('Forward hydration reconstructs the authored caller context for a callee ro
     subview: 'docs',
     selection: undefined,
   };
-  render(<ArazzoUIStandalone document={location.document} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={location.document} />);
   await screen.findByRole('combobox', { name: 'Select workflow' });
   history.replaceState(
     { arazzoCallers: [caller] },
@@ -127,7 +127,7 @@ test('Forward hydration reconstructs the authored caller context for a callee ro
   );
 });
 test('committing a followed call saves its public caller address for Forward', async () => {
-  render(<ArazzoUIStandalone document={location.document} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={location.document} />);
   fireEvent.click(await screen.findByRole('button', { name: 'Sequence diagram' }));
   fireEvent.click(
     screen.getByRole('button', { name: /Open workflow payment from checkout.secondPayment/ }),
@@ -146,6 +146,7 @@ test('uploading another document drops the previous stable host identity', async
   });
   const { container } = render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="host:original"
       onLocationChange={changed}
@@ -165,6 +166,7 @@ test('uploading another document drops the previous stable host identity', async
 test('standalone defaultLocation controls its initial view', async () => {
   render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={location.document}
       defaultLocation={{ ...location, view: 'split' }}
     />,
@@ -176,22 +178,30 @@ test('standalone defaultLocation controls its initial view', async () => {
 });
 test('bare standalone starts in sequence and explicit initialView keeps descriptions', async () => {
   const change = vi.fn();
-  const { unmount } = render(<ArazzoUIStandalone document={nestedCalls} onViewChange={change} />);
+  const { unmount } = render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      onViewChange={change}
+    />,
+  );
   expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
   expect(change).not.toHaveBeenCalled();
   unmount();
-  render(<ArazzoUIStandalone document={nestedCalls} initialView="docs" />);
+  render(
+    <ArazzoUIStandalone apiDescriptionLoading="manual" document={nestedCalls} initialView="docs" />,
+  );
   await screen.findByRole('button', { name: 'Inspect checkout.firstPayment' });
   expect(screen.queryByRole('region', { name: 'Sequence checkout' })).toBeNull();
 });
 test('a document-only URL does not request a reading representation', async () => {
   history.replaceState(null, '', '/?document=https%3A%2F%2Fexample.test%2Fdoc.yaml');
-  render(<ArazzoUIStandalone document={nestedCalls} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={nestedCalls} />);
   expect(await screen.findByRole('region', { name: 'Sequence checkout' })).toBeTruthy();
 });
 test('unaddressable content retains local Back/Forward locations without claiming shareability', async () => {
   const push = vi.spyOn(history, 'pushState');
-  render(<ArazzoUIStandalone document={nestedCalls} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={nestedCalls} />);
   await screen.findByRole('button', { name: 'All workflows' });
   await waitFor(() => expect(history.state?.arazzoLocation?.root).toBe('checkout'));
   const previous = structuredClone(history.state);
@@ -213,6 +223,7 @@ test('controlled location mode requests preserve the host view and do not commit
   const controlled = { ...location, selection: undefined };
   const { rerender } = render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={location.document}
       location={controlled}
       onLocationChange={changed}
@@ -226,6 +237,7 @@ test('controlled location mode requests preserve the host view and do not commit
   expect(window.location.href).toBe(before);
   rerender(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={location.document}
       location={{ ...controlled, view: 'split' }}
       onLocationChange={changed}
@@ -256,7 +268,13 @@ test('an unavailable restored guide preserves the exact base occurrence without 
         },
       }),
     );
-    render(<ArazzoUIStandalone document={nestedCalls} documentIdentity={location.document} />);
+    render(
+      <ArazzoUIStandalone
+        apiDescriptionLoading="manual"
+        document={nestedCalls}
+        documentIdentity={location.document}
+      />,
+    );
     const details = await screen.findByRole('region', { name: 'Selection details' });
     expect(details.textContent).toContain('payment.charge');
     await screen.findByText('Guide file unavailable (404).');

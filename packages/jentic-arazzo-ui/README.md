@@ -198,9 +198,8 @@ The overview shows prerequisites, workflow calls, and understood
 success/failure transitions, including parallel relationships and loops. Select a
 workflow card to open its steps; prerequisite links navigate to local workflow or
 step destinations. External and missing targets remain visible with their status
-and do not navigate to a guessed local target. Source-description documents are
-not fetched for inspection, so OpenAPI/AsyncAPI source content and versions remain
-unverified.
+and do not navigate to a guessed local target. API-description availability is shown in the shared **API descriptions** summary.
+Loaded descriptions and located operations do not establish schema validation or execution.
 
 An omitted `activeWorkflowId` starts with the first workflow and lets the viewer
 manage navigation. Explicit `null` selects the overview. In controlled mode,
@@ -466,7 +465,11 @@ Extensions cannot replace document, root, or occurrence identity.
 
 ## API Contract Inspection
 
-Select a step to inspect its authored source binding in **Contract & Source**. Selecting a step does not fetch a contract: use **Load API description <name>** to request a declared source and **Reload API description <name>** to refresh it. Standalone viewing supplies a browser fetch provider; embedded viewing uses the optional `sourceProvider` supplied by the host. Browser fetches omit credentials and remain subject to browser CORS rules.
+Standalone document viewing automatically loads declared eligible OpenAPI and Arazzo 1.1 AsyncAPI descriptions in the background while workflows remain readable. Embedded `ArazzoUI` defaults to manual loading. Set `apiDescriptionLoading="manual"` on `ArazzoUIStandalone` to preserve the former request behavior, or `apiDescriptionLoading="automatic"` on an embedded viewer to opt in. Catalog and revision-review defaults remain manual.
+
+Open **API descriptions** beside the reading controls to see current source availability without selecting a step. Manual mode offers **Load API descriptions**; each source offers Load, Retry, or Reload as applicable. Select a step for its operation lookup in **Contract & Source**. Loaded means a supported description was projected; Operation found means a declaration was located, and neither establishes validation or execution.
+
+Standalone viewing supplies a browser fetch provider; embedded viewing uses the optional `sourceProvider` supplied by the host. All acquisition uses that authority and the existing bounded SourceRegistry, with no fallback transport. Browser fetches omit credentials and remain subject to browser CORS rules. Relative source URLs need a supported declaring-document base; failures remain visible until explicit recovery. External Arazzo workflows stay explicit actions; sources, guides and primary-schema dependencies are never guessed.
 
 Supported inspection profiles are OpenAPI 3.0/3.1 and AsyncAPI 3. OpenAPI details retain parameters, request bodies, response alternatives, examples and effective security. AsyncAPI details retain send/receive direction, channel, messages, payloads, headers, correlation information and bindings. AsyncAPI 2 and Swagger 2 are reported as unsupported. Inspection displays authored contract facts; it does not execute requests, validate runtime values, select a successful response, or infer message delivery guarantees.
 

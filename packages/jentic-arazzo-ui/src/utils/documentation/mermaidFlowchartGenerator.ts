@@ -41,7 +41,7 @@ export function generateMermaidFlowchart(
   if (!fact) return '';
   const lines = ['flowchart TD', '    Start([Start])', '    End([End])'];
   lines.push(
-    `    Inspection["${mermaidLabel(`${model.orderLabel}; schema validation and execution support not established; sources unverified`)}"]`,
+    `    Inspection["${mermaidLabel(`${model.orderLabel}; schema validation and execution support not established; authored-only API source metadata`)}"]`,
   );
   const stepIds = new Map(fact.steps.map((step, index) => [step.stepId, `Step${index}`]));
   lines.push(`    Start --> ${fact.steps.length ? 'Step0' : 'End'}`);

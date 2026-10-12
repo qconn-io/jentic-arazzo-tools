@@ -278,7 +278,9 @@ fetch('/fixtures/readiness.json')
           <ArazzoCatalog manifest={fixtures.catalog} onLocationChange={onLocationChange} />,
         );
       else if (surface === 'standalone')
-        root.render(<ArazzoUIStandalone document={fixtures.document} />);
+        root.render(
+          <ArazzoUIStandalone document={fixtures.document} apiDescriptionLoading="manual" />,
+        );
       else
         root.render(
           <ArazzoUI

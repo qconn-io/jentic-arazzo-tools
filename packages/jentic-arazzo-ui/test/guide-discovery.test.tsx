@@ -25,7 +25,7 @@ test('guide help is associated, normalizes and acquires nothing until explicit e
   history.replaceState({}, '', '/?keep=value');
   const fetch = vi.fn(async () => ({ ok: false, status: 404 }));
   vi.stubGlobal('fetch', fetch);
-  render(<ArazzoUIStandalone document={nestedCalls} />);
+  render(<ArazzoUIStandalone apiDescriptionLoading="manual" document={nestedCalls} />);
   await screen.findByRole('combobox', { name: 'Select workflow' });
   fireEvent.click(screen.getByText('Load guides from a URL'));
   const input = screen.getByRole('textbox', { name: 'Guide file URL' });
@@ -122,7 +122,13 @@ test('unavailable and malformed replacements retain valid guides and retry only 
     json: async () => content,
   }));
   vi.stubGlobal('fetch', fetch);
-  render(<ArazzoUIStandalone document={nestedCalls} documentIdentity="host:doc" />);
+  render(
+    <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
+      document={nestedCalls}
+      documentIdentity="host:doc"
+    />,
+  );
   fireEvent.click(screen.getByText('Load guides from a URL'));
   const input = screen.getByRole('textbox', { name: 'Guide file URL' });
   fireEvent.change(input, { target: { value: 'https://test/good' } });
@@ -215,6 +221,7 @@ test('explicit guided example replaces supplied guides and later host updates re
   vi.stubGlobal('fetch', fetch);
   const { rerender } = render(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="host:doc"
       scenarioManifest={host}
@@ -242,6 +249,7 @@ test('explicit guided example replaces supplied guides and later host updates re
   expect(changed).toHaveBeenCalledWith(null);
   rerender(
     <ArazzoUIStandalone
+      apiDescriptionLoading="manual"
       document={nestedCalls}
       documentIdentity="host:doc"
       scenarioManifest={[{ ...host[0], id: 'host-update' }]}

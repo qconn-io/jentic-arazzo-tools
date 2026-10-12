@@ -38,11 +38,11 @@ test('resolution preflight reports only actually detected causes, retaining comb
 
 test('one shared status distinguishes unchecked source content and available local calls', async () => {
   const { rerender, container } = render(<ArazzoUI document={nestedCalls} />);
-  const control = await screen.findByText('Inspection status');
+  const control = await screen.findByText(/^API descriptions ·/);
   fireEvent.click(control);
   const status = screen.getByRole('region', { name: 'Inspection status details' });
-  expect(status.textContent).toContain('API descriptions have not been loaded');
-  expect(status.textContent).toContain('does not mean they are invalid or inaccessible');
+  expect(status.textContent).toContain('Loading unavailable');
+  expect(status.textContent).toContain('Inspection scope');
   fireEvent.click(screen.getByRole('button', { name: 'Sequence diagram' }));
   const sequence = screen.getByRole('region', { name: 'Sequence checkout' });
   expect(sequence.textContent).not.toContain('Schema validation');
