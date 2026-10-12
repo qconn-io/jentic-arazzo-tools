@@ -56,6 +56,8 @@ import type { WorkflowRelationship } from ${JSON.stringify(declaration)};
 import type { EffectiveAction } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private viewer projections must not become public exports.
 import type { ArazzoViewerModel } from ${JSON.stringify(declaration)};
+// @ts-expect-error Private viewer context must not become a public export.
+import type { ArazzoViewerContextValue } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private effective-use records must not become public exports.
 import type { EffectiveActionUse } from ${JSON.stringify(declaration)};
 // @ts-expect-error Private native snapshots must not become public exports.

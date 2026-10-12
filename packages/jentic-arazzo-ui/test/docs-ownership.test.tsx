@@ -4,7 +4,8 @@ import { expect, test, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { ArazzoViewerProvider } from '../src/context/ArazzoViewerContext';
 import { DocsView } from '../src/components/DocsView';
-import type { ArazzoViewerContextValue, WorkflowRefNodeData } from '../src/types/viewer';
+import type { ArazzoViewerContextValue } from '../src/context/ArazzoViewerContext';
+import type { WorkflowRefNodeData } from '../src/types/viewer';
 vi.mock('mermaid', () => ({
   default: { initialize: vi.fn(), render: vi.fn(async () => ({ svg: '<svg></svg>' })) },
 }));

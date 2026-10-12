@@ -3,7 +3,7 @@ import React from 'react';
 import { expect, test, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { ArazzoViewerProvider } from '../src/context/ArazzoViewerContext';
-import type { ArazzoViewerContextValue } from '../src/types/viewer';
+import type { ArazzoViewerContextValue } from '../src/context/ArazzoViewerContext';
 
 const control = vi.hoisted(() => ({
   ready: false,

@@ -12,8 +12,8 @@ import type {
   ArazzoDocument,
   ArazzoNode,
   ArazzoEdge,
-  ArazzoViewerContextValue,
   ViewerEvents,
+  Workflow,
 } from '../types/index';
 import { convertWorkflowToFlow, convertDocumentToFlow } from '../utils/conversion/index';
 import { applySequentialLayout } from '../utils/sequentialLayout';
@@ -30,6 +30,22 @@ import type { SourceRegistry } from '../utils/source/SourceRegistry';
 import type { SourceDocumentProvider, ExternalNavigationRequest } from '../types/source';
 import { ContractFactsProvider } from './ContractFactsContext';
 import { ViewerSessionProvider } from './ViewerSessionContext';
+
+export interface ArazzoViewerContextValue {
+  document: ArazzoDocument;
+  documentURL: string | null;
+  activeWorkflowId: string | null;
+  setActiveWorkflow: (id: string | null) => void;
+  activeWorkflow: Workflow | null;
+  selectedNodeId: string | null;
+  setSelectedNode: (id: string | null) => void;
+  nodes: ArazzoNode[];
+  edges: ArazzoEdge[];
+  setNodes: (nodes: ArazzoNode[]) => void;
+  setEdges: (edges: ArazzoEdge[]) => void;
+  readOnly: boolean;
+  events?: ViewerEvents;
+}
 
 interface InternalContext extends ArazzoViewerContextValue {
   snapshot: DocumentSnapshot;

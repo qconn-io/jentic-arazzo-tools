@@ -3,7 +3,7 @@ import React from 'react';
 import { expect, test, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ArazzoViewerProvider, useArazzoViewer } from '../src/context/ArazzoViewerContext';
-import type { ArazzoViewerContextValue } from '../src/types/viewer';
+import type { ArazzoViewerContextValue } from '../src/context/ArazzoViewerContext';
 const document = {
   arazzo: '1.1.0',
   info: { title: 'injected', version: '1' },

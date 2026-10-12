@@ -96,27 +96,6 @@ export interface ArazzoUIRef {
 }
 
 // ============================================================================
-// Context
-// ============================================================================
-
-/** @public */
-export interface ArazzoViewerContextValue {
-  document: ArazzoDocument;
-  documentURL: string | null;
-  activeWorkflowId: string | null;
-  setActiveWorkflow: (id: string | null) => void;
-  activeWorkflow: Workflow | null;
-  selectedNodeId: string | null;
-  setSelectedNode: (id: string | null) => void;
-  nodes: ArazzoNode[];
-  edges: ArazzoEdge[];
-  setNodes: (nodes: ArazzoNode[]) => void;
-  setEdges: (edges: ArazzoEdge[]) => void;
-  readOnly: boolean;
-  events?: ViewerEvents;
-}
-
-// ============================================================================
 // Documentation Types
 // ============================================================================
 
