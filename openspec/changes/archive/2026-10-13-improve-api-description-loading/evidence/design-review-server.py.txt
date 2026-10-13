@@ -1,0 +1,21 @@
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+from pathlib import Path
+import os
+os.chdir('/home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui/build')
+class Handler(SimpleHTTPRequestHandler):
+    failed = False
+    def do_GET(self):
+        if self.path in ('/review.html','/missing.html'):
+            html = Path('index.html').read_text().replace('./petstore-order-workflow.arazzo.yaml', './examples/digital-product/arazzo.yaml')
+            if self.path == '/missing.html': html = html.replace('./examples/digital-product/arazzo.yaml','./missing.arazzo.yaml')
+            self.send_response(200); self.send_header('Content-Type','text/html'); self.end_headers(); self.wfile.write(html.encode()); return
+        if self.path in ('/missing.arazzo.yaml','/review-coordinator.yaml'):
+            file = 'examples/digital-product/' + ('arazzo.yaml' if self.path == '/missing.arazzo.yaml' else 'coordinator.openapi.yaml')
+            body = Path(file).read_text().replace('./coordinator.openapi.yaml','/review-coordinator.yaml').replace('./inventory.openapi.yaml','/examples/digital-product/inventory.openapi.yaml').replace('./payment.openapi.yaml','/examples/digital-product/payment.openapi.yaml').replace('./license.openapi.yaml','/examples/digital-product/license.openapi.yaml')
+            if self.path == '/review-coordinator.yaml': body = body.replace('operationId: purchaseProduct','operationId: reviewMissingPurchase')
+            self.send_response(200); self.send_header('Content-Type','text/yaml'); self.end_headers(); self.wfile.write(body.encode()); return
+        if 'payment.openapi' in self.path and not Handler.failed:
+            Handler.failed = True
+            self.send_error(503, 'Temporary review source failure'); return
+        super().do_GET()
+ThreadingHTTPServer(('127.0.0.1', 3000), Handler).serve_forever()

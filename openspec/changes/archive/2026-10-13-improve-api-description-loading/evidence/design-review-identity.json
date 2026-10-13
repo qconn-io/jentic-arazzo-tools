@@ -1,0 +1,26 @@
+{
+  "candidate": "2fce262",
+  "date": "2026-10-12",
+  "driver": "gstack Chromium 151.0.7922.34",
+  "viewports": [
+    [
+      1440,
+      1000
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      480,
+      900
+    ]
+  ],
+  "build": "Reused existing production assets; no fresh rebuild or independent source-to-build verification in this design review.",
+  "hashes": {
+    "packages/jentic-arazzo-ui/build/arazzo-ui-standalone.85a44716.js": "7a548f60a8e411897de3638567d6ccf39ce87a8936724fe020242a82f144d024",
+    "packages/jentic-arazzo-ui/build/arazzo-ui.b9d81822.css": "ef9e723f89da5020183ace41f75af272cc7ebf9f501614fc4aa4087799a8da0a",
+    "packages/jentic-arazzo-ui/public/examples/digital-product/arazzo.yaml": "a07ef6f54bc2414340d7a54f0ed533ede6178131457a27dbc90e2ed68c73974e",
+    "/tmp/api-loading-design-review-server.py": "74c56f78001bfcfb0d4834c55e860a1fe2180aadf3489cd99eba057a7d5847a6"
+  }
+}
