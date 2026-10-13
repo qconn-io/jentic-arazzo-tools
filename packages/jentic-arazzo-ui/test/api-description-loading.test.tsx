@@ -349,3 +349,219 @@ test('unsupported relative base does not authorize a guessed request', async () 
   await screen.findByText('api:error');
   expect(load).not.toHaveBeenCalled();
 });
+
+test('explicit source feedback is stable, local and stops following later actions', async () => {
+  const { SourceDescriptions } = await import('../src/components/SourceDescriptions');
+  const { within } = await import('@testing-library/react');
+  let settle!: (content: object) => void;
+  const load = vi.fn(
+    (request: SourceDocumentRequest) =>
+      new Promise<SourceDocumentContent>((resolve) => {
+        settle = (content) => resolve({ content, retrievalURI: request.uri });
+      }),
+  );
+  const provider = { load };
+  const node = () => (
+    <ArazzoViewerProvider
+      document={document}
+      snapshot={snapshots.get(document)}
+      sourceProvider={provider}
+      apiDescriptionLoading="manual"
+    >
+      <SourceDescriptions />
+      <SourceDescriptions />
+    </ArazzoViewerProvider>
+  );
+  const { container, rerender } = render(node());
+  const copies = container.querySelectorAll('.arazzo-source-descriptions');
+  const first = within(copies[0] as HTMLElement);
+  const second = within(copies[1] as HTMLElement);
+  const live = first.getByRole('status', { name: 'Source action result' });
+  expect(live.getAttribute('aria-live')).toBe('polite');
+  expect(live.getAttribute('aria-atomic')).toBe('true');
+  expect(live.textContent).toBe('');
+  const button = first.getByRole('button', { name: 'Load API description api' });
+  button.focus();
+  fireEvent.click(button);
+  expect(live.textContent).toBe('api: Loading.');
+  expect(second.getByRole('status', { name: 'Source action result' }).textContent).toBe('');
+  await waitFor(() => expect(load).toHaveBeenCalledTimes(1));
+  await act(async () => settle(contract));
+  await waitFor(() => expect(live.textContent).toBe('api: Loaded.'));
+  expect(globalThis.document.activeElement).toBe(copies[0].querySelector('section'));
+  rerender(node());
+  expect(first.getByRole('status', { name: 'Source action result' })).toBe(live);
+  fireEvent.click(second.getByRole('button', { name: 'Reload API description api' }));
+  expect(live.textContent).toBe('api: Loaded.');
+  await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
+  await act(async () => settle({ openapi: '9.0.0' }));
+  await waitFor(() =>
+    expect(second.getByRole('status', { name: 'Source action result' }).textContent).toContain(
+      'Unsupported',
+    ),
+  );
+  expect(live.textContent).toBe('api: Loaded.');
+  expect(load).toHaveBeenCalledTimes(2);
+});
+
+test('manual batch reports mixed results once and background copies stay silent', async () => {
+  const { SourceDescriptions } = await import('../src/components/SourceDescriptions');
+  const doc = {
+    ...document,
+    sourceDescriptions: ['good', 'bad', 'unsupported'].map((name) => ({
+      name,
+      type: 'openapi' as const,
+      url: `https://test/${name}`,
+    })),
+  };
+  const load = vi.fn(async ({ uri }: SourceDocumentRequest) => {
+    if (uri.endsWith('/bad')) throw new Error('raw secret failure');
+    return { content: uri.endsWith('/good') ? contract : { openapi: '9.0.0' }, retrievalURI: uri };
+  });
+  render(
+    <ArazzoViewerProvider document={doc} sourceProvider={{ load }} apiDescriptionLoading="manual">
+      <SourceDescriptions />
+      <SourceDescriptions />
+    </ArazzoViewerProvider>,
+  );
+  const regions = screen.getAllByRole('status', { name: 'API description batch result' });
+  fireEvent.click(screen.getAllByRole('button', { name: 'Load API descriptions' })[0]);
+  expect(regions[0].textContent).toBe(
+    'API descriptions: 3 loading, 0 loaded, 0 failed, 0 unsupported.',
+  );
+  await waitFor(() =>
+    expect(regions[0].textContent).toBe(
+      'API descriptions: 0 loading, 1 loaded, 1 failed, 1 unsupported.',
+    ),
+  );
+  expect(regions[1].textContent).toBe('');
+  expect(
+    screen
+      .getAllByRole('status', { name: 'Source action result' })
+      .every((node) => !node.textContent),
+  ).toBe(true);
+  fireEvent.click(screen.getAllByRole('button', { name: 'Retry API description bad' })[1]);
+  await waitFor(() =>
+    expect(
+      screen.getAllByRole('status', { name: 'Source action result' })[4].textContent,
+    ).toContain('Failed'),
+  );
+  expect(
+    screen.getAllByRole('status', { name: 'Source action result' })[4].textContent,
+  ).not.toContain('raw secret');
+  expect(regions[0].textContent).toBe(
+    'API descriptions: 0 loading, 1 loaded, 1 failed, 1 unsupported.',
+  );
+});
+
+test.each(['document', 'provider', 'revision'] as const)(
+  'replacement of %s clears explicit pending and retained feedback',
+  async (replacement) => {
+    const { SourceDescriptions } = await import('../src/components/SourceDescriptions');
+    const { SourceRevisionContext } = await import('../src/context/SourceRevisionContext');
+    let settle!: () => void;
+    const provider = {
+      load: vi.fn(
+        (request: SourceDocumentRequest) =>
+          new Promise<SourceDocumentContent>((resolve) => {
+            settle = () =>
+              resolve({ content: contract, retrievalURI: request.uri, revision: request.revision });
+          }),
+      ),
+    };
+    const nextProvider = {
+      load: vi.fn(async ({ uri, revision }: SourceDocumentRequest) => ({
+        content: contract,
+        retrievalURI: uri,
+        revision,
+      })),
+    };
+    const nextDocument = { ...document, info: { title: 'Replacement', version: '2' } };
+    const oldSnapshot = createSnapshot(document, { baseURI: 'https://test/workflow.yaml' });
+    const newSnapshot = createSnapshot(nextDocument, { baseURI: 'https://test/workflow.yaml' });
+    const node = (changed: boolean) => (
+      <SourceRevisionContext.Provider
+        value={{ api: changed && replacement === 'revision' ? 'new' : 'old' }}
+      >
+        <ArazzoViewerProvider
+          document={changed && replacement === 'document' ? nextDocument : document}
+          snapshot={changed && replacement === 'document' ? newSnapshot : oldSnapshot}
+          sourceProvider={changed && replacement === 'provider' ? nextProvider : provider}
+          apiDescriptionLoading="manual"
+        >
+          <SourceDescriptions />
+        </ArazzoViewerProvider>
+      </SourceRevisionContext.Provider>
+    );
+    const { rerender, unmount } = render(node(false));
+    fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+    await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(1));
+    rerender(node(true));
+    await act(async () => settle());
+    expect(screen.getByRole('status', { name: 'Source action result' }).textContent).toBe('');
+    expect(screen.getByRole('status', { name: 'API description batch result' }).textContent).toBe(
+      '',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Load API descriptions' }));
+    if (replacement !== 'provider') {
+      await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(2));
+      await act(async () => settle());
+    }
+    await waitFor(() =>
+      expect(
+        screen.getByRole('status', { name: 'API description batch result' }).textContent,
+      ).toContain('1 loaded'),
+    );
+    rerender(node(false));
+    expect(screen.getByRole('status', { name: 'API description batch result' }).textContent).toBe(
+      '',
+    );
+    unmount();
+    expect(nextProvider.load).toHaveBeenCalledTimes(replacement === 'provider' ? 1 : 0);
+  },
+);
+
+test('background results are silent and the status meaning precedes source entries', async () => {
+  const { container } = render(
+    viewer(document, { load: async ({ uri }) => ({ content: contract, retrievalURI: uri }) }),
+  );
+  await screen.findByText('api:success');
+  expect(
+    screen
+      .getAllByRole('status', { name: /action result|batch result/ })
+      .every((node) => !node.textContent),
+  ).toBe(true);
+  const meaning = container.querySelector('.arazzo-source-meaning')!;
+  expect(meaning.textContent).toContain('Neither establishes schema validation or execution');
+  expect(
+    meaning.compareDocumentPosition(container.querySelector('.arazzo-source-description')!) &
+      Node.DOCUMENT_POSITION_FOLLOWING,
+  ).toBeTruthy();
+});
+
+test('unmounting an explicit action aborts work and a new surface does not replay it', async () => {
+  let release!: () => void;
+  let signal: AbortSignal | undefined;
+  const provider = {
+    load: vi.fn((request: SourceDocumentRequest) => {
+      signal = request.signal;
+      return new Promise<SourceDocumentContent>((resolve) => {
+        release = () => resolve({ content: contract, retrievalURI: request.uri });
+      });
+    }),
+  };
+  const first = render(viewer(document, provider, 'manual'));
+  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
+  await screen.findByText('api:loading');
+  await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(1));
+  first.unmount();
+  expect(signal?.aborted).toBe(true);
+  await act(async () => release());
+  render(viewer(document, provider, 'manual'));
+  expect(
+    screen
+      .getAllByRole('status', { name: /action result|batch result/ })
+      .every((node) => !node.textContent),
+  ).toBe(true);
+  expect(provider.load).toHaveBeenCalledTimes(1);
+});

@@ -1,0 +1,184 @@
+[
+  {
+    "project": "desktop",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-entry-pending",
+    "path": "captures/desktop/api-entry-pending.png",
+    "sha256": "46194f27fbfe6d473e2018dd9c4af0774d5eb255d25fac76792bf25ca54b6989"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-source-discovery-failed",
+    "path": "captures/desktop/api-source-discovery-failed.png",
+    "sha256": "38b23ab9733ce2747a13e949bc3e60102d96b764cc90887612103b647b0d55db"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-retry-loaded",
+    "path": "captures/desktop/api-retry-loaded.png",
+    "sha256": "31e76f321c224d335b80f0ca227793896533230eb1069c4d2fa237c506591b11"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-loaded-missing-operation",
+    "path": "captures/desktop/api-loaded-missing-operation.png",
+    "sha256": "cb11baebcb0a9431a35432149f1e11d29be817920094238ace5737873f9eb53b"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-overview-discovery",
+    "path": "captures/desktop/api-overview-discovery.png",
+    "sha256": "8b2658370f5d094dc80f710cae82b1aefeb7615f5bd5b445246c97819de519c0"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-labels-manual",
+    "path": "captures/desktop/api-long-labels-manual.png",
+    "sha256": "686ce5d1d259a9d86f2848b8dac7d18fbfb931a304b989a7154e52ee9b518a85"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-inspector-standalone",
+    "path": "captures/desktop/api-long-inspector-standalone.png",
+    "sha256": "4055de883d0151f1f865aa9dedd1710b39c7e071b587ffcb42c1b5320704a996"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-labels-embedded",
+    "path": "captures/desktop/api-long-labels-embedded.png",
+    "sha256": "9599048e08427058ac89788ec73bb6cfae0840bd2cf0197066cdc86c9d929c6a"
+  },
+  {
+    "project": "desktop",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-inspector-embedded",
+    "path": "captures/desktop/api-long-inspector-embedded.png",
+    "sha256": "ae52590523de2745f77fab9bd692829eeeb3de61a06359fcc3c7bf6f6f3cedb5"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-entry-pending",
+    "path": "captures/mobile/api-entry-pending.png",
+    "sha256": "d886847ad9ae709bf36fe70bb70b04ebff962b104490d3c008e018b58f3c4a8e"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-source-discovery-failed",
+    "path": "captures/mobile/api-source-discovery-failed.png",
+    "sha256": "44af14bb5c66b4d23d5425dbbbe8f5376efa811850abd087e292e84757794501"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-retry-loaded",
+    "path": "captures/mobile/api-retry-loaded.png",
+    "sha256": "00222faaa1eaea4f14b80279d621b060c8b197d42deafaf89841eaaf02f94420"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-loaded-missing-operation",
+    "path": "captures/mobile/api-loaded-missing-operation.png",
+    "sha256": "390f09316cf6603d4c9c936ba5dc4eea29de0c2c7e6c91f64ff4c67005992195"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions discovery, delayed recovery and missing lookup preserve reading and focus",
+    "name": "api-overview-discovery",
+    "path": "captures/mobile/api-overview-discovery.png",
+    "sha256": "4a22814c50e0d8cf70660903c57690a8fbe538f81a3bb9eee83fffee2a04475c"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-labels-manual",
+    "path": "captures/mobile/api-long-labels-manual.png",
+    "sha256": "cfad0d6c3c2e33d02f3533063cae5ccc5209ea5f7a41d851c497665686857258"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-inspector-standalone",
+    "path": "captures/mobile/api-long-inspector-standalone.png",
+    "sha256": "0c0d6a45cdb3ff8591538f9ead9d3af9fc9c5924416d1be65664ecf3856c155d"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-labels-embedded",
+    "path": "captures/mobile/api-long-labels-embedded.png",
+    "sha256": "6405cea36a154a59ea01690c49c30b66aa8be12d11dd3da50df489e50fa5cdca"
+  },
+  {
+    "project": "mobile",
+    "test": "API descriptions long source labels wrap and manual bulk loading remains explicit",
+    "name": "api-long-inspector-embedded",
+    "path": "captures/mobile/api-long-inspector-embedded.png",
+    "sha256": "bbd85e1f4d6bef0fc698fccf61a003c0ec43bf6d7067ffeaa510e1815bd10a66"
+  },
+  {
+    "project": "desktop",
+    "name": "api-document-information-standalone",
+    "path": "captures/desktop/api-document-information-standalone.png",
+    "sha256": "beb95eb82b87b82ac05849a91320eb71bed1043e4218d35874e792db86186097",
+    "test": "supplemental Document information capture"
+  },
+  {
+    "project": "desktop",
+    "name": "api-document-information-embedded",
+    "path": "captures/desktop/api-document-information-embedded.png",
+    "sha256": "c448150db4b1adaec075e72057e7f80e4851c666261005364052bb257ee982a6",
+    "test": "supplemental Document information capture"
+  },
+  {
+    "project": "mobile",
+    "name": "api-document-information-standalone",
+    "path": "captures/mobile/api-document-information-standalone.png",
+    "sha256": "306e29a11060e5b1526012a0501cc01d565343830ed1e63ef3036d6cf2f0febc",
+    "test": "supplemental Document information capture"
+  },
+  {
+    "project": "mobile",
+    "name": "api-document-information-embedded",
+    "path": "captures/mobile/api-document-information-embedded.png",
+    "sha256": "3d231bed216ffc397661037b0e69776752c57a098a56b75693ba37452f08f2c3",
+    "test": "supplemental Document information capture"
+  },
+  {
+    "project": "desktop",
+    "name": "api-inspector-scope-embedded",
+    "path": "captures/desktop/api-inspector-scope-embedded.png",
+    "sha256": "ab131dcabf766eb17d4c1c13d699b6cbe27d22043da6b9dfb263c2d55956ee31",
+    "test": "supplemental scope capture"
+  },
+  {
+    "project": "desktop",
+    "name": "api-inspector-scope-standalone",
+    "path": "captures/desktop/api-inspector-scope-standalone.png",
+    "sha256": "7fe90eedac9a55a7cc7a620e1519076349d375179b63b51a13c003ddd7ff2285",
+    "test": "supplemental scope capture"
+  },
+  {
+    "project": "mobile",
+    "name": "api-inspector-scope-embedded",
+    "path": "captures/mobile/api-inspector-scope-embedded.png",
+    "sha256": "0a6ac698aef1521ca3402892b5c6d862f0d6f45e58ceb7b315cf76ce4e5ab79d",
+    "test": "supplemental scope capture"
+  },
+  {
+    "project": "mobile",
+    "name": "api-inspector-scope-standalone",
+    "path": "captures/mobile/api-inspector-scope-standalone.png",
+    "sha256": "06b8dec986ca86768c019e0ee58de162ef1278b302b2b94106969860fc383e53",
+    "test": "supplemental scope capture"
+  }
+]

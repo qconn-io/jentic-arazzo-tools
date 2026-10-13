@@ -1,0 +1,12 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4} api-description-loading contract-panel
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+
+ Test Files  2 passed (2)
+      Tests  40 passed (40)
+   Start at  06:41:33
+   Duration  3.14s (tests 54%, environment 20%, import 13%, transform 10%, setup 3%)

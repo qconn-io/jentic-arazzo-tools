@@ -1,0 +1,52 @@
+- Validating...
+✓ spec/api-contract-inspection
+  ℹ [INFO] requirements[6]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[7]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/authored-scenario-exploration
+  ℹ [INFO] requirements[5]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/chained-workflow-visualization
+  ℹ [INFO] requirements[0]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[1]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[2]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[3]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[15]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[16]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[17]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ change/improve-api-description-recovery-ux
+✓ spec/system-interaction-perspective
+  ℹ [INFO] requirements[6]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/upstream-contribution-readiness
+  ℹ [INFO] requirements[0]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[1]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[2]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[3]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[4]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[5]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[7]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[8]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[9]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[10]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[11]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/workflow-capability-catalog
+✓ spec/workflow-inspection-integrity
+  ℹ [INFO] requirements[0]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[1]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[4]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[5]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[6]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[7]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[8]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/workflow-locations
+  ℹ [INFO] requirements[0]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/workflow-reading
+  ℹ [INFO] requirements[3]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[4]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[5]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[6]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[7]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[9]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[13]: Requirement text is very long (>500 characters). Consider breaking it down.
+  ℹ [INFO] requirements[16]: Requirement text is very long (>500 characters). Consider breaking it down.
+✓ spec/workflow-revision-review
+  ℹ [INFO] requirements[1]: Requirement text is very long (>500 characters). Consider breaking it down.
+Totals: 11 passed, 0 failed (11 items)

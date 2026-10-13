@@ -1,0 +1,788 @@
+diff --git a/packages/jentic-arazzo-ui/src/components/ContractPanel.tsx b/packages/jentic-arazzo-ui/src/components/ContractPanel.tsx
+index 8fe4919..bd8205c 100644
+--- a/packages/jentic-arazzo-ui/src/components/ContractPanel.tsx
++++ b/packages/jentic-arazzo-ui/src/components/ContractPanel.tsx
+@@ -1,6 +1,6 @@
+ import React from 'react';
+ 
+-import { SourceDescription } from './SourceDescriptions';
++import { SourceDescription, descriptionStatusMeaning } from './SourceDescriptions';
+ import { contractReadingStatus } from '../utils/contract/readingStatus';
+ import { useContractFacts } from '../context/ContractFactsContext';
+ import { useArazzoViewer } from '../context/ArazzoViewerContext';
+@@ -31,8 +31,16 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
+     <section className="arazzo-contract-panel" aria-label="Contract and source">
+       <h3>Contract &amp; Source</h3>
+       {!Object.hasOwn(binding.locators, 'workflowId') && (
+-        <p role="status">
++        <p>
+           <strong>{contractReadingStatus[result.status]}</strong>
++          <span className="arazzo-source-meaning"> {descriptionStatusMeaning}</span>
++        </p>
++      )}
++      {Object.hasOwn(binding.locators, 'workflowId') && (
++        <p>
++          External workflow lookup is explicit. Loaded means a workflow description is available;
++          Workflow found means the selected workflow was located. Neither establishes schema
++          validation or execution.
+         </p>
+       )}
+       {result.sourceName && (
+@@ -102,10 +110,6 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
+           <p>
+             {operation.operationId} {operation.method} {operation.path}
+           </p>
+-          <p>
+-            Operation found means located in this source; it does not establish full contract
+-            validity or execution.
+-          </p>
+           {!!operation.schemaReferences?.length && (
+             <section aria-label="Referenced schema declarations">
+               <h4>Referenced schema declarations</h4>
+diff --git a/packages/jentic-arazzo-ui/src/components/InspectionStatus.tsx b/packages/jentic-arazzo-ui/src/components/InspectionStatus.tsx
+index a94f82b..c8b8610 100644
+--- a/packages/jentic-arazzo-ui/src/components/InspectionStatus.tsx
++++ b/packages/jentic-arazzo-ui/src/components/InspectionStatus.tsx
+@@ -27,15 +27,7 @@ export function InspectionStatus() {
+           : 'Inspection status'}
+       </summary>
+       <div role="region" aria-label="Inspection status details">
+-        {sources.length > 0 && (
+-          <>
+-            <SourceDescriptions />
+-            <p>
+-              Loading a description does not establish contract validity. View step details to check
+-              an operation.
+-            </p>
+-          </>
+-        )}
++        {sources.length > 0 && <SourceDescriptions />}
+         <details>
+           <summary>Inspection scope</summary>
+           <p>
+diff --git a/packages/jentic-arazzo-ui/src/components/SourceDescriptions.tsx b/packages/jentic-arazzo-ui/src/components/SourceDescriptions.tsx
+index 4618f7e..57ddc29 100644
+--- a/packages/jentic-arazzo-ui/src/components/SourceDescriptions.tsx
++++ b/packages/jentic-arazzo-ui/src/components/SourceDescriptions.tsx
+@@ -1,5 +1,6 @@
+-import React from 'react';
++import React, { useContext, useEffect, useState } from 'react';
+ 
++import { SourceRevisionContext } from '../context/SourceRevisionContext';
+ import { useArazzoViewer } from '../context/ArazzoViewerContext';
+ import {
+   useContractFacts,
+@@ -21,6 +22,63 @@ export function sourceAvailability(
+   return 'Not loaded';
+ }
+ 
++export const descriptionStatusMeaning =
++  'Loaded: description available under a supported profile. Operation found: selected declaration located. Neither establishes schema validation or execution.';
++
++function useSourceAnnouncement() {
++  const { model, sourceProvider } = useArazzoViewer();
++  const revisions = useContext(SourceRevisionContext);
++  const { loaded } = useContractFacts();
++  const scope = model.inspection.snapshot;
++  const [attempt, setAttempt] = useState<{
++    scope: typeof scope;
++    provider: typeof sourceProvider;
++    sources: DeclaredSource[];
++    pins: (string | undefined)[];
++    bulk: boolean;
++    pending: boolean;
++    message: string;
++  }>();
++  const current =
++    attempt &&
++    attempt.scope === scope &&
++    attempt.provider === sourceProvider &&
++    attempt.sources.every((source, index) => attempt.pins[index] === revisions[source.name]);
++  useEffect(() => {
++    if (!attempt) return;
++    if (!current) {
++      setAttempt(undefined);
++      return;
++    }
++    if (!attempt.pending) return;
++    const values = attempt.sources.map((source) => loaded[source.name]);
++    const states = values.map((value) => sourceAvailability(value));
++    // wait for current projections; acquisition promises are not evidence.
++    if (states.includes('Not loaded')) return;
++    const pending = states.includes('Loading');
++    const message = attempt.bulk
++      ? `API descriptions: ${states.filter((s) => s === 'Loading').length} loading, ${states.filter((s) => s === 'Loaded').length} loaded, ${states.filter((s) => s === 'Failed').length} failed, ${states.filter((s) => s === 'Unsupported').length} unsupported.`
++      : `${attempt.sources[0].name}: ${states[0]}.${states[0] === 'Failed' ? ' Description could not be loaded. Retry available.' : states[0] === 'Unsupported' ? ' Description has an unsupported inspection profile.' : ''}`;
++    if (message !== attempt.message || pending !== attempt.pending)
++      setAttempt({ ...attempt, pending, message });
++  }, [attempt, current, loaded]);
++  return {
++    message: current ? attempt.message : '',
++    announce: (sources: DeclaredSource[], bulk = false) =>
++      setAttempt({
++        scope,
++        provider: sourceProvider,
++        sources,
++        pins: sources.map((source) => revisions[source.name]),
++        bulk,
++        pending: true,
++        message: bulk
++          ? `API descriptions: ${sources.length} loading, 0 loaded, 0 failed, 0 unsupported.`
++          : `${sources[0].name}: Loading.`,
++      }),
++  };
++}
++
+ export function SourceDescription({
+   source,
+   children,
+@@ -30,6 +88,7 @@ export function SourceDescription({
+ }) {
+   const { model, sourceRegistry, sourceProvider } = useArazzoViewer();
+   const { loaded, load, eligibility } = useContractFacts();
++  const announcement = useSourceAnnouncement();
+   const reason = eligibility(source);
+   const value = reason ? undefined : loaded[source.name];
+   const status = sourceAvailability(value, reason, !!sourceProvider);
+@@ -51,6 +110,15 @@ export function SourceDescription({
+       aria-label={`Source ${source.name}`}
+       tabIndex={-1}
+     >
++      <p
++        className="arazzo-source-announcement"
++        role="status"
++        aria-label="Source action result"
++        aria-live="polite"
++        aria-atomic="true"
++      >
++        {announcement.message}
++      </p>
+       <h4>{source.name}</h4>
+       <p>
+         {source.type ?? 'unknown'} · <strong>{status}</strong>
+@@ -72,6 +140,7 @@ export function SourceDescription({
+           onClick={(event) => {
+             if (document.activeElement === event.currentTarget)
+               event.currentTarget.closest<HTMLElement>('section')?.focus();
++            announcement.announce([source]);
+             void load(source, !!value && value.state !== 'loading');
+           }}
+         >
+@@ -128,6 +197,7 @@ export function SourceDescription({
+ export function SourceDescriptions() {
+   const { model, sourceProvider, apiDescriptionLoading } = useArazzoViewer();
+   const { load, eligibility, unattempted } = useContractFacts();
++  const announcement = useSourceAnnouncement();
+   const sources = model.document.sourceDescriptions ?? [];
+   const pending = sources.filter(
+     (source) => source.type !== 'arazzo' && !eligibility(source) && unattempted(source),
+@@ -135,12 +205,23 @@ export function SourceDescriptions() {
+   if (!sources.length) return null;
+   return (
+     <div className="arazzo-source-descriptions" tabIndex={-1}>
++      <p className="arazzo-source-meaning">{descriptionStatusMeaning}</p>
++      <p
++        className="arazzo-source-announcement"
++        role="status"
++        aria-label="API description batch result"
++        aria-live="polite"
++        aria-atomic="true"
++      >
++        {announcement.message}
++      </p>
+       {sourceProvider && apiDescriptionLoading !== 'automatic' && pending.length > 0 && (
+         <button
+           type="button"
+           onClick={(event) => {
+             if (document.activeElement === event.currentTarget)
+               event.currentTarget.parentElement?.focus();
++            announcement.announce(pending, true);
+             for (const source of pending) void load(source, false);
+           }}
+         >
+diff --git a/packages/jentic-arazzo-ui/src/styles/index.css b/packages/jentic-arazzo-ui/src/styles/index.css
+index 59a34c9..4b00c6e 100644
+--- a/packages/jentic-arazzo-ui/src/styles/index.css
++++ b/packages/jentic-arazzo-ui/src/styles/index.css
+@@ -1047,6 +1047,8 @@
+ .arazzo-detail-action,
+ .arazzo-sequence-list button,
+ .arazzo-contract-panel button,
++.arazzo-source-descriptions button[type='button'],
++.arazzo-source-description button[type='button'],
+ .workflow-view-toggle button {
+   box-sizing: border-box;
+   font: inherit;
+@@ -1068,6 +1070,8 @@
+     .arazzo-detail-action,
+     .arazzo-sequence-list button,
+     .arazzo-contract-panel button,
++    .arazzo-source-descriptions button[type='button'],
++    .arazzo-source-description button[type='button'],
+     .workflow-view-toggle button
+   ):hover:not(:disabled) {
+   background: #f1f5f9;
+@@ -1079,7 +1083,7 @@
+   outline-offset: 2px;
+ }
+ .arazzo-ui
+-  :is(.arazzo-detail-action, .arazzo-sequence-list button, .arazzo-contract-panel button):disabled {
++  :is(.arazzo-detail-action, .arazzo-sequence-list button, .arazzo-contract-panel button, .arazzo-source-descriptions button[type='button'], .arazzo-source-description button[type='button']):disabled {
+   opacity: 0.6;
+   cursor: default;
+ }
+@@ -1336,5 +1340,26 @@
+ .arazzo-source-descriptions { min-width: 0; }
+ .arazzo-source-description { padding: 8px 0; border-bottom: 1px solid #cbd5e1; overflow-wrap: anywhere; }
+ .arazzo-source-description h4, .arazzo-source-description p { margin: 4px 0; }
+-.arazzo-source-description button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
++.arazzo-source-description button[type='button'] { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+ .arazzo-source-description pre { max-width: 100%; overflow: auto; }
++
++.arazzo-source-descriptions button[type='button'],
++.arazzo-source-description button[type='button'] {
++  min-width: 44px;
++  min-height: 44px;
++}
++.arazzo-source-description:focus-visible,
++.arazzo-source-descriptions:focus-visible {
++  outline: 3px solid #2563eb;
++  outline-offset: 2px;
++}
++.arazzo-source-announcement {
++  position: absolute;
++  width: 1px;
++  height: 1px;
++  padding: 0;
++  margin: -1px;
++  overflow: hidden;
++  clip-path: inset(50%);
++  white-space: nowrap;
++}
+diff --git a/packages/jentic-arazzo-ui/test/api-description-loading.test.tsx b/packages/jentic-arazzo-ui/test/api-description-loading.test.tsx
+index bc8c032..be77f8e 100644
+--- a/packages/jentic-arazzo-ui/test/api-description-loading.test.tsx
++++ b/packages/jentic-arazzo-ui/test/api-description-loading.test.tsx
+@@ -349,3 +349,219 @@ test('unsupported relative base does not authorize a guessed request', async ()
+   await screen.findByText('api:error');
+   expect(load).not.toHaveBeenCalled();
+ });
++
++test('explicit source feedback is stable, local and stops following later actions', async () => {
++  const { SourceDescriptions } = await import('../src/components/SourceDescriptions');
++  const { within } = await import('@testing-library/react');
++  let settle!: (content: object) => void;
++  const load = vi.fn(
++    (request: SourceDocumentRequest) =>
++      new Promise<SourceDocumentContent>((resolve) => {
++        settle = (content) => resolve({ content, retrievalURI: request.uri });
++      }),
++  );
++  const provider = { load };
++  const node = () => (
++    <ArazzoViewerProvider
++      document={document}
++      snapshot={snapshots.get(document)}
++      sourceProvider={provider}
++      apiDescriptionLoading="manual"
++    >
++      <SourceDescriptions />
++      <SourceDescriptions />
++    </ArazzoViewerProvider>
++  );
++  const { container, rerender } = render(node());
++  const copies = container.querySelectorAll('.arazzo-source-descriptions');
++  const first = within(copies[0] as HTMLElement);
++  const second = within(copies[1] as HTMLElement);
++  const live = first.getByRole('status', { name: 'Source action result' });
++  expect(live.getAttribute('aria-live')).toBe('polite');
++  expect(live.getAttribute('aria-atomic')).toBe('true');
++  expect(live.textContent).toBe('');
++  const button = first.getByRole('button', { name: 'Load API description api' });
++  button.focus();
++  fireEvent.click(button);
++  expect(live.textContent).toBe('api: Loading.');
++  expect(second.getByRole('status', { name: 'Source action result' }).textContent).toBe('');
++  await waitFor(() => expect(load).toHaveBeenCalledTimes(1));
++  await act(async () => settle(contract));
++  await waitFor(() => expect(live.textContent).toBe('api: Loaded.'));
++  expect(globalThis.document.activeElement).toBe(copies[0].querySelector('section'));
++  rerender(node());
++  expect(first.getByRole('status', { name: 'Source action result' })).toBe(live);
++  fireEvent.click(second.getByRole('button', { name: 'Reload API description api' }));
++  expect(live.textContent).toBe('api: Loaded.');
++  await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
++  await act(async () => settle({ openapi: '9.0.0' }));
++  await waitFor(() =>
++    expect(second.getByRole('status', { name: 'Source action result' }).textContent).toContain(
++      'Unsupported',
++    ),
++  );
++  expect(live.textContent).toBe('api: Loaded.');
++  expect(load).toHaveBeenCalledTimes(2);
++});
++
++test('manual batch reports mixed results once and background copies stay silent', async () => {
++  const { SourceDescriptions } = await import('../src/components/SourceDescriptions');
++  const doc = {
++    ...document,
++    sourceDescriptions: ['good', 'bad', 'unsupported'].map((name) => ({
++      name,
++      type: 'openapi' as const,
++      url: `https://test/${name}`,
++    })),
++  };
++  const load = vi.fn(async ({ uri }: SourceDocumentRequest) => {
++    if (uri.endsWith('/bad')) throw new Error('raw secret failure');
++    return { content: uri.endsWith('/good') ? contract : { openapi: '9.0.0' }, retrievalURI: uri };
++  });
++  render(
++    <ArazzoViewerProvider document={doc} sourceProvider={{ load }} apiDescriptionLoading="manual">
++      <SourceDescriptions />
++      <SourceDescriptions />
++    </ArazzoViewerProvider>,
++  );
++  const regions = screen.getAllByRole('status', { name: 'API description batch result' });
++  fireEvent.click(screen.getAllByRole('button', { name: 'Load API descriptions' })[0]);
++  expect(regions[0].textContent).toBe(
++    'API descriptions: 3 loading, 0 loaded, 0 failed, 0 unsupported.',
++  );
++  await waitFor(() =>
++    expect(regions[0].textContent).toBe(
++      'API descriptions: 0 loading, 1 loaded, 1 failed, 1 unsupported.',
++    ),
++  );
++  expect(regions[1].textContent).toBe('');
++  expect(
++    screen
++      .getAllByRole('status', { name: 'Source action result' })
++      .every((node) => !node.textContent),
++  ).toBe(true);
++  fireEvent.click(screen.getAllByRole('button', { name: 'Retry API description bad' })[1]);
++  await waitFor(() =>
++    expect(
++      screen.getAllByRole('status', { name: 'Source action result' })[4].textContent,
++    ).toContain('Failed'),
++  );
++  expect(
++    screen.getAllByRole('status', { name: 'Source action result' })[4].textContent,
++  ).not.toContain('raw secret');
++  expect(regions[0].textContent).toBe(
++    'API descriptions: 0 loading, 1 loaded, 1 failed, 1 unsupported.',
++  );
++});
++
++test.each(['document', 'provider', 'revision'] as const)(
++  'replacement of %s clears explicit pending and retained feedback',
++  async (replacement) => {
++    const { SourceDescriptions } = await import('../src/components/SourceDescriptions');
++    const { SourceRevisionContext } = await import('../src/context/SourceRevisionContext');
++    let settle!: () => void;
++    const provider = {
++      load: vi.fn(
++        (request: SourceDocumentRequest) =>
++          new Promise<SourceDocumentContent>((resolve) => {
++            settle = () =>
++              resolve({ content: contract, retrievalURI: request.uri, revision: request.revision });
++          }),
++      ),
++    };
++    const nextProvider = {
++      load: vi.fn(async ({ uri, revision }: SourceDocumentRequest) => ({
++        content: contract,
++        retrievalURI: uri,
++        revision,
++      })),
++    };
++    const nextDocument = { ...document, info: { title: 'Replacement', version: '2' } };
++    const oldSnapshot = createSnapshot(document, { baseURI: 'https://test/workflow.yaml' });
++    const newSnapshot = createSnapshot(nextDocument, { baseURI: 'https://test/workflow.yaml' });
++    const node = (changed: boolean) => (
++      <SourceRevisionContext.Provider
++        value={{ api: changed && replacement === 'revision' ? 'new' : 'old' }}
++      >
++        <ArazzoViewerProvider
++          document={changed && replacement === 'document' ? nextDocument : document}
++          snapshot={changed && replacement === 'document' ? newSnapshot : oldSnapshot}
++          sourceProvider={changed && replacement === 'provider' ? nextProvider : provider}
++          apiDescriptionLoading="manual"
++        >
++          <SourceDescriptions />
++        </ArazzoViewerProvider>
++      </SourceRevisionContext.Provider>
++    );
++    const { rerender, unmount } = render(node(false));
++    fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
++    await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(1));
++    rerender(node(true));
++    await act(async () => settle());
++    expect(screen.getByRole('status', { name: 'Source action result' }).textContent).toBe('');
++    expect(screen.getByRole('status', { name: 'API description batch result' }).textContent).toBe(
++      '',
++    );
++    fireEvent.click(screen.getByRole('button', { name: 'Load API descriptions' }));
++    if (replacement !== 'provider') {
++      await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(2));
++      await act(async () => settle());
++    }
++    await waitFor(() =>
++      expect(
++        screen.getByRole('status', { name: 'API description batch result' }).textContent,
++      ).toContain('1 loaded'),
++    );
++    rerender(node(false));
++    expect(screen.getByRole('status', { name: 'API description batch result' }).textContent).toBe(
++      '',
++    );
++    unmount();
++    expect(nextProvider.load).toHaveBeenCalledTimes(replacement === 'provider' ? 1 : 0);
++  },
++);
++
++test('background results are silent and the status meaning precedes source entries', async () => {
++  const { container } = render(
++    viewer(document, { load: async ({ uri }) => ({ content: contract, retrievalURI: uri }) }),
++  );
++  await screen.findByText('api:success');
++  expect(
++    screen
++      .getAllByRole('status', { name: /action result|batch result/ })
++      .every((node) => !node.textContent),
++  ).toBe(true);
++  const meaning = container.querySelector('.arazzo-source-meaning')!;
++  expect(meaning.textContent).toContain('Neither establishes schema validation or execution');
++  expect(
++    meaning.compareDocumentPosition(container.querySelector('.arazzo-source-description')!) &
++      Node.DOCUMENT_POSITION_FOLLOWING,
++  ).toBeTruthy();
++});
++
++test('unmounting an explicit action aborts work and a new surface does not replay it', async () => {
++  let release!: () => void;
++  let signal: AbortSignal | undefined;
++  const provider = {
++    load: vi.fn((request: SourceDocumentRequest) => {
++      signal = request.signal;
++      return new Promise<SourceDocumentContent>((resolve) => {
++        release = () => resolve({ content: contract, retrievalURI: request.uri });
++      });
++    }),
++  };
++  const first = render(viewer(document, provider, 'manual'));
++  fireEvent.click(screen.getByRole('button', { name: 'Load API description api' }));
++  await screen.findByText('api:loading');
++  await waitFor(() => expect(provider.load).toHaveBeenCalledTimes(1));
++  first.unmount();
++  expect(signal?.aborted).toBe(true);
++  await act(async () => release());
++  render(viewer(document, provider, 'manual'));
++  expect(
++    screen
++      .getAllByRole('status', { name: /action result|batch result/ })
++      .every((node) => !node.textContent),
++  ).toBe(true);
++  expect(provider.load).toHaveBeenCalledTimes(1);
++});
+diff --git a/packages/jentic-arazzo-ui/test/contract-panel.test.tsx b/packages/jentic-arazzo-ui/test/contract-panel.test.tsx
+index d209e4a..a71daf5 100644
+--- a/packages/jentic-arazzo-ui/test/contract-panel.test.tsx
++++ b/packages/jentic-arazzo-ui/test/contract-panel.test.tsx
+@@ -380,3 +380,75 @@ test('partial candidate checking never presents a unique operation', async () =>
+   expect(screen.queryByText('Operation found')).toBeNull();
+   expect(screen.queryByRole('region', { name: 'Operation declaration' })).toBeNull();
+ });
++
++test.each([false, true])(
++  'status meanings remain beside missing/ambiguous lookup (ambiguous: %s)',
++  async (ambiguous) => {
++    const doc = {
++      ...document,
++      workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'missing' }] }],
++    };
++    render(
++      <ArazzoViewerProvider
++        document={doc}
++        snapshot={createSnapshot(doc, { baseURI: 'https://test/workflow.yaml' })}
++        sourceProvider={{
++          load: async () => ({
++            content: {
++              openapi: '3.1.0',
++              paths: ambiguous
++                ? {
++                    '/a': { get: { operationId: 'missing' } },
++                    '/b': { get: { operationId: 'missing' } },
++                  }
++                : {},
++            },
++            retrievalURI: 'https://test/api.yaml',
++          }),
++        }}
++        apiDescriptionLoading="automatic"
++      >
++        <ContractPanel workflowId="root" stepId="call" />
++      </ArazzoViewerProvider>,
++    );
++    await waitFor(() =>
++      expect(
++        screen.getByText(ambiguous ? 'Multiple matching operations' : 'Operation not found'),
++      ).toBeTruthy(),
++    );
++    const meaning = screen.getByText(/Loaded: description available under a supported profile/);
++    expect(meaning.parentElement?.textContent).toContain(
++      ambiguous ? 'Multiple matching operations' : 'Operation not found',
++    );
++    expect(screen.getAllByText(/Neither establishes schema validation or execution/)).toHaveLength(
++      1,
++    );
++  },
++);
++
++test('external workflow wording and no-source documents retain distinct scope', () => {
++  const doc = {
++    ...document,
++    sourceDescriptions: [{ name: 'external', type: 'arazzo' as const, url: 'https://test/remote' }],
++    workflows: [
++      {
++        workflowId: 'root',
++        steps: [{ stepId: 'call', workflowId: '$sourceDescriptions.external.remote' }],
++      },
++    ],
++  };
++  const { unmount } = render(
++    <ArazzoViewerProvider document={doc}>
++      <ContractPanel workflowId="root" stepId="call" />
++    </ArazzoViewerProvider>,
++  );
++  expect(screen.getByText(/External workflow lookup is explicit/)).toBeTruthy();
++  expect(screen.queryByText(/Operation found: selected declaration/)).toBeNull();
++  unmount();
++  const { container } = render(
++    <ArazzoViewerProvider document={{ ...document, sourceDescriptions: [] }}>
++      <InspectionStatus />
++    </ArazzoViewerProvider>,
++  );
++  expect(container.querySelector('.arazzo-source-descriptions')).toBeNull();
++});
+diff --git a/packages/jentic-arazzo-ui/test/e2e/production.spec.ts b/packages/jentic-arazzo-ui/test/e2e/production.spec.ts
+index 782907f..99c9e81 100644
+--- a/packages/jentic-arazzo-ui/test/e2e/production.spec.ts
++++ b/packages/jentic-arazzo-ui/test/e2e/production.spec.ts
+@@ -1,4 +1,4 @@
+-import { test, expect, type Page } from '@playwright/test';
++import { test, expect, type Page, type Locator } from '@playwright/test';
+ import {
+   staticPaths,
+   installProductionChecks,
+@@ -447,6 +447,37 @@ for (const fixture of ['petstore', 'long-label'] as const) {
+   });
+ }
+ 
++async function sourceTargets(surface: Locator) {
++  const buttons = surface.locator(
++    '.arazzo-source-description button, .arazzo-source-descriptions > button',
++  );
++  expect(await buttons.count()).toBeGreaterThan(0);
++  for (const button of await buttons.all()) {
++    const size = await button.boundingBox();
++    expect(size!.width).toBeGreaterThanOrEqual(44);
++    expect(size!.height).toBeGreaterThanOrEqual(44);
++    expect(await button.evaluate((node) => getComputedStyle(node).fontSize)).toBe('13px');
++  }
++}
++async function sourceMeaning(surface: Locator) {
++  const meaning = surface.locator('.arazzo-source-meaning').first();
++  await expect(meaning).toBeVisible();
++  await expect(meaning).toContainText('Neither establishes schema validation or execution');
++  expect(
++    await meaning.evaluate((node) => {
++      const source = node
++        .closest('.arazzo-source-descriptions, .arazzo-contract-panel')!
++        .querySelector('.arazzo-source-description')!;
++      const panel = node.closest('.arazzo-inspection-status > div');
++      const bounds = node.getBoundingClientRect();
++      return (
++        !!(node.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING) &&
++        (!panel || bounds.bottom <= panel.getBoundingClientRect().bottom)
++      );
++    }),
++  ).toBe(true);
++}
++
+ test('API descriptions discovery, delayed recovery and missing lookup preserve reading and focus', async ({
+   page,
+   baseURL,
+@@ -485,6 +516,11 @@ test('API descriptions discovery, delayed recovery and missing lookup preserve r
+   const status = page.getByRole('region', { name: 'Inspection status details' });
+   for (const name of ['coordinator', 'inventory', 'payment', 'license'])
+     await expect(status.getByRole('region', { name: `Source ${name}`, exact: true })).toBeVisible();
++  await sourceTargets(status);
++  await sourceMeaning(status);
++  await expect(
++    status.getByRole('status', { name: 'Source action result' }).filter({ hasText: /./ }),
++  ).toHaveCount(0);
+   const failed = status.getByRole('region', { name: 'Source payment', exact: true });
+   const retry = failed.getByRole('button', { name: 'Retry API description payment', exact: true });
+   await expect(retry).toBeVisible();
+@@ -496,6 +532,9 @@ test('API descriptions discovery, delayed recovery and missing lookup preserve r
+   await page.keyboard.press('Enter');
+   await expect(failed).toBeFocused();
+   await expect(failed).toContainText('Loaded');
++  await expect(failed.getByRole('status', { name: 'Source action result' })).toHaveText(
++    'payment: Loaded.',
++  );
+   expect(paymentAttempts).toBe(2);
+   await summary.focus();
+   release();
+@@ -514,6 +553,8 @@ test('API descriptions discovery, delayed recovery and missing lookup preserve r
+   await expect(
+     inspector(page).getByRole('region', { name: 'Source coordinator', exact: true }),
+   ).toContainText('Loaded');
++  await sourceTargets(inspector(page));
++  await sourceMeaning(inspector(page));
+   await info.attach('api-loaded-missing-operation', {
+     body: await page.screenshot(),
+     contentType: 'image/png',
+@@ -544,37 +585,94 @@ test('API descriptions long source labels wrap and manual bulk loading remains e
+   const name = 'A source with a long authored name '.repeat(8);
+   const url = `${baseURL}/${'long-source-url-'.repeat(16)}.json`;
+   const primary = `${baseURL}/long-sources.arazzo.yaml`;
++  const doc = {
++    arazzo: '1.0.1',
++    info: { title: 'Long sources', version: '1' },
++    sourceDescriptions: [{ name, type: 'openapi', url }],
++    workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'run' }] }],
++  };
+   explicitSources(page).add(url);
+   await page.route(primary, (route) =>
+-    route.fulfill({
+-      contentType: 'application/json',
+-      body: JSON.stringify({
+-        arazzo: '1.0.1',
+-        info: { title: 'Long sources', version: '1' },
+-        sourceDescriptions: [{ name, type: 'openapi', url }],
+-        workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'run' }] }],
+-      }),
+-    }),
++    route.fulfill({ contentType: 'application/json', body: JSON.stringify(doc) }),
+   );
++  await page.route('**/fixtures/readiness.json', async (route) => {
++    const response = await route.fetch();
++    const fixtures = await response.json();
++    await route.fulfill({ json: { ...fixtures, digitalProduct: doc } });
++  });
+   let attempts = 0;
+-  await page.route(url, (route) => {
++  let release!: () => void;
++  let delayed = false;
++  await page.route(url, async (route) => {
+     attempts++;
+-    return route.fulfill({
++    if (delayed)
++      await new Promise<void>((resolve) => {
++        release = resolve;
++      });
++    await route.fulfill({
+       contentType: 'application/json',
+       body: JSON.stringify({ openapi: '3.1.0', paths: {} }),
+     });
+   });
+-  await page.goto(`/?document=${encodeURIComponent(primary)}`);
+-  await page.locator('.arazzo-inspection-status > summary').click();
+-  expect(attempts).toBe(0);
+-  const status = page.getByRole('region', { name: 'Inspection status details' });
+-  const bulk = status.getByRole('button', { name: 'Load API descriptions', exact: true });
+-  await bulk.focus();
+-  await page.keyboard.press('Enter');
+-  await expect(page.locator('.arazzo-inspection-status > summary')).toContainText('1 of 1 loaded');
+-  expect(attempts).toBe(1);
+-  await info.attach('api-long-labels-manual', {
+-    body: await page.screenshot(),
+-    contentType: 'image/png',
+-  });
++  for (const embedded of [false, true]) {
++    const before = attempts;
++    await page.goto(
++      embedded ? '/consumer/?surface=source-recovery' : `/?document=${encodeURIComponent(primary)}`,
++    );
++    await page.locator('.arazzo-inspection-status > summary').click();
++    expect(attempts).toBe(before);
++    const status = page.getByRole('region', { name: 'Inspection status details' });
++    await sourceTargets(status);
++    await sourceMeaning(status);
++    const bulk = status.getByRole('button', { name: 'Load API descriptions', exact: true });
++    delayed = true;
++    await bulk.focus();
++    await page.keyboard.press('Enter');
++    await expect(status.locator('.arazzo-source-descriptions')).toBeFocused();
++    await expect(status.getByRole('status', { name: 'API description batch result' })).toHaveText(
++      'API descriptions: 1 loading, 0 loaded, 0 failed, 0 unsupported.',
++    );
++    await expect(status.getByRole('button', { name: /^Loading API description/ })).toBeDisabled();
++    await sourceTargets(status);
++    await expect.poll(() => attempts).toBe(before + 1);
++    delayed = false;
++    release();
++    await expect(status.getByRole('status', { name: 'API description batch result' })).toHaveText(
++      'API descriptions: 0 loading, 1 loaded, 0 failed, 0 unsupported.',
++    );
++    await expect(status.locator('.arazzo-source-descriptions')).toBeFocused();
++    await info.attach(embedded ? 'api-long-labels-embedded' : 'api-long-labels-manual', {
++      body: await page.screenshot(),
++      contentType: 'image/png',
++    });
++    await page.locator('.arazzo-inspection-status > summary').click();
++    if (!embedded) await choose(page, 'Step descriptions');
++    const information = page.locator('.arazzo-document-information');
++    await information.locator('summary').first().click();
++    await sourceTargets(information);
++    await sourceMeaning(information);
++    await expect(
++      information.getByRole('status', { name: 'API description batch result' }),
++    ).toHaveText('');
++    const reload = information.getByRole('button', { name: /^Reload API description/ });
++    await reload.focus();
++    await page.keyboard.press('Enter');
++    await expect(information.getByRole('status', { name: 'Source action result' })).toHaveText(
++      `${name}: Loaded.`,
++    );
++    await expect(information.locator('.arazzo-source-description')).toBeFocused();
++    await information.locator('summary').first().click();
++    await page.getByRole('button', { name: 'Inspect root.call', exact: true }).click();
++    await expect(inspector(page)).toContainText('Operation not found');
++    await sourceTargets(inspector(page));
++    await sourceMeaning(inspector(page));
++    await info.attach(embedded ? 'api-long-inspector-embedded' : 'api-long-inspector-standalone', {
++      body: await page.screenshot(),
++      contentType: 'image/png',
++    });
++    await page.keyboard.press('Escape');
++    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
++      true,
++    );
++  }
+ });
+diff --git a/packages/jentic-arazzo-ui/test/package/acceptance-app.tsx b/packages/jentic-arazzo-ui/test/package/acceptance-app.tsx
+index ebbafc0..f5a922e 100644
+--- a/packages/jentic-arazzo-ui/test/package/acceptance-app.tsx
++++ b/packages/jentic-arazzo-ui/test/package/acceptance-app.tsx
+@@ -219,6 +219,20 @@ fetch('/fixtures/readiness.json')
+       };
+       const surface = query.get('surface') ?? 'host';
+       if (surface === 'embedded-repair') root.render(<EmbeddedRepair input={fixtures.document} />);
++      else if (surface === 'source-recovery')
++        root.render(
++          <ArazzoUI
++            document={fixtures.digitalProduct}
++            baseURI={new URL('/examples/digital-product/arazzo.yaml', location.href).href}
++            view="docs"
++            sourceProvider={{
++              load: async ({ uri }) => ({
++                content: await (await fetch(uri)).text(),
++                retrievalURI: uri,
++              }),
++            }}
++          />,
++        );
+       else if (surface === 'controlled')
+         root.render(<ControlledAcceptance input={fixtures.document} />);
+       else if (surface === 'systems')

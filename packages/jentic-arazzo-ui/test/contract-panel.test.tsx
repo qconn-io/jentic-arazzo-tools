@@ -380,3 +380,75 @@ test('partial candidate checking never presents a unique operation', async () =>
   expect(screen.queryByText('Operation found')).toBeNull();
   expect(screen.queryByRole('region', { name: 'Operation declaration' })).toBeNull();
 });
+
+test.each([false, true])(
+  'status meanings remain beside missing/ambiguous lookup (ambiguous: %s)',
+  async (ambiguous) => {
+    const doc = {
+      ...document,
+      workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'missing' }] }],
+    };
+    render(
+      <ArazzoViewerProvider
+        document={doc}
+        snapshot={createSnapshot(doc, { baseURI: 'https://test/workflow.yaml' })}
+        sourceProvider={{
+          load: async () => ({
+            content: {
+              openapi: '3.1.0',
+              paths: ambiguous
+                ? {
+                    '/a': { get: { operationId: 'missing' } },
+                    '/b': { get: { operationId: 'missing' } },
+                  }
+                : {},
+            },
+            retrievalURI: 'https://test/api.yaml',
+          }),
+        }}
+        apiDescriptionLoading="automatic"
+      >
+        <ContractPanel workflowId="root" stepId="call" />
+      </ArazzoViewerProvider>,
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByText(ambiguous ? 'Multiple matching operations' : 'Operation not found'),
+      ).toBeTruthy(),
+    );
+    const meaning = screen.getByText(/Loaded: description available under a supported profile/);
+    expect(meaning.parentElement?.textContent).toContain(
+      ambiguous ? 'Multiple matching operations' : 'Operation not found',
+    );
+    expect(screen.getAllByText(/Neither establishes schema validation or execution/)).toHaveLength(
+      1,
+    );
+  },
+);
+
+test('external workflow wording and no-source documents retain distinct scope', () => {
+  const doc = {
+    ...document,
+    sourceDescriptions: [{ name: 'external', type: 'arazzo' as const, url: 'https://test/remote' }],
+    workflows: [
+      {
+        workflowId: 'root',
+        steps: [{ stepId: 'call', workflowId: '$sourceDescriptions.external.remote' }],
+      },
+    ],
+  };
+  const { unmount } = render(
+    <ArazzoViewerProvider document={doc}>
+      <ContractPanel workflowId="root" stepId="call" />
+    </ArazzoViewerProvider>,
+  );
+  expect(screen.getByText(/External workflow lookup is explicit/)).toBeTruthy();
+  expect(screen.queryByText(/Operation found: selected declaration/)).toBeNull();
+  unmount();
+  const { container } = render(
+    <ArazzoViewerProvider document={{ ...document, sourceDescriptions: [] }}>
+      <InspectionStatus />
+    </ArazzoViewerProvider>,
+  );
+  expect(container.querySelector('.arazzo-source-descriptions')).toBeNull();
+});

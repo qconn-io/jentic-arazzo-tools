@@ -1047,6 +1047,8 @@
 .arazzo-detail-action,
 .arazzo-sequence-list button,
 .arazzo-contract-panel button,
+.arazzo-source-descriptions button[type='button'],
+.arazzo-source-description button[type='button'],
 .workflow-view-toggle button {
   box-sizing: border-box;
   font: inherit;
@@ -1068,6 +1070,8 @@
     .arazzo-detail-action,
     .arazzo-sequence-list button,
     .arazzo-contract-panel button,
+    .arazzo-source-descriptions button[type='button'],
+    .arazzo-source-description button[type='button'],
     .workflow-view-toggle button
   ):hover:not(:disabled) {
   background: #f1f5f9;
@@ -1079,7 +1083,7 @@
   outline-offset: 2px;
 }
 .arazzo-ui
-  :is(.arazzo-detail-action, .arazzo-sequence-list button, .arazzo-contract-panel button):disabled {
+  :is(.arazzo-detail-action, .arazzo-sequence-list button, .arazzo-contract-panel button, .arazzo-source-descriptions button[type='button'], .arazzo-source-description button[type='button']):disabled {
   opacity: 0.6;
   cursor: default;
 }
@@ -1336,5 +1340,26 @@
 .arazzo-source-descriptions { min-width: 0; }
 .arazzo-source-description { padding: 8px 0; border-bottom: 1px solid #cbd5e1; overflow-wrap: anywhere; }
 .arazzo-source-description h4, .arazzo-source-description p { margin: 4px 0; }
-.arazzo-source-description button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+.arazzo-source-description button[type='button'] { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
 .arazzo-source-description pre { max-width: 100%; overflow: auto; }
+
+.arazzo-source-descriptions button[type='button'],
+.arazzo-source-description button[type='button'] {
+  min-width: 44px;
+  min-height: 44px;
+}
+.arazzo-source-description:focus-visible,
+.arazzo-source-descriptions:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+.arazzo-source-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

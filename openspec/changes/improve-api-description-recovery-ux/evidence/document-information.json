@@ -1,0 +1,106 @@
+[
+  {
+    "project": "desktop",
+    "embedded": false,
+    "geometry": {
+      "x": 16,
+      "y": 476.140625,
+      "width": 1408,
+      "height": 58.1875
+    },
+    "focus": {
+      "outlineStyle": "solid",
+      "outlineWidth": "3px",
+      "fontSize": "13px"
+    },
+    "path": "captures/desktop/api-document-information-standalone.png",
+    "explicitResult": "Loaded",
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "project": "desktop",
+    "embedded": false,
+    "path": "captures/desktop/api-inspector-scope-standalone.png",
+    "operation": "not found",
+    "description": "Loaded"
+  },
+  {
+    "project": "desktop",
+    "embedded": true,
+    "geometry": {
+      "x": 16,
+      "y": 433.140625,
+      "width": 1408,
+      "height": 58.1875
+    },
+    "focus": {
+      "outlineStyle": "solid",
+      "outlineWidth": "3px",
+      "fontSize": "13px"
+    },
+    "path": "captures/desktop/api-document-information-embedded.png",
+    "explicitResult": "Loaded",
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "project": "desktop",
+    "embedded": true,
+    "path": "captures/desktop/api-inspector-scope-embedded.png",
+    "operation": "not found",
+    "description": "Loaded"
+  },
+  {
+    "project": "mobile",
+    "embedded": false,
+    "geometry": {
+      "x": 8,
+      "y": 590.015625,
+      "width": 464,
+      "height": 124.46875
+    },
+    "focus": {
+      "outlineStyle": "solid",
+      "outlineWidth": "3px",
+      "fontSize": "13px"
+    },
+    "path": "captures/mobile/api-document-information-standalone.png",
+    "explicitResult": "Loaded",
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "project": "mobile",
+    "embedded": false,
+    "path": "captures/mobile/api-inspector-scope-standalone.png",
+    "operation": "not found",
+    "description": "Loaded"
+  },
+  {
+    "project": "mobile",
+    "embedded": true,
+    "geometry": {
+      "x": 8,
+      "y": 515.515625,
+      "width": 464,
+      "height": 124.46875
+    },
+    "focus": {
+      "outlineStyle": "solid",
+      "outlineWidth": "3px",
+      "fontSize": "13px"
+    },
+    "path": "captures/mobile/api-document-information-embedded.png",
+    "explicitResult": "Loaded",
+    "overflow": false,
+    "pageErrors": []
+  },
+  {
+    "project": "mobile",
+    "embedded": true,
+    "path": "captures/mobile/api-inspector-scope-embedded.png",
+    "operation": "not found",
+    "description": "Loaded"
+  }
+]

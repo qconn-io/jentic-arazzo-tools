@@ -27,15 +27,7 @@ export function InspectionStatus() {
           : 'Inspection status'}
       </summary>
       <div role="region" aria-label="Inspection status details">
-        {sources.length > 0 && (
-          <>
-            <SourceDescriptions />
-            <p>
-              Loading a description does not establish contract validity. View step details to check
-              an operation.
-            </p>
-          </>
-        )}
+        {sources.length > 0 && <SourceDescriptions />}
         <details>
           <summary>Inspection scope</summary>
           <p>

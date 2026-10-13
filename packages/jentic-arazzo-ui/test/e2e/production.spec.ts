@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 import {
   staticPaths,
   installProductionChecks,
@@ -447,6 +447,37 @@ for (const fixture of ['petstore', 'long-label'] as const) {
   });
 }
 
+async function sourceTargets(surface: Locator) {
+  const buttons = surface.locator(
+    '.arazzo-source-description button, .arazzo-source-descriptions > button',
+  );
+  expect(await buttons.count()).toBeGreaterThan(0);
+  for (const button of await buttons.all()) {
+    const size = await button.boundingBox();
+    expect(size!.width).toBeGreaterThanOrEqual(44);
+    expect(size!.height).toBeGreaterThanOrEqual(44);
+    expect(await button.evaluate((node) => getComputedStyle(node).fontSize)).toBe('13px');
+  }
+}
+async function sourceMeaning(surface: Locator) {
+  const meaning = surface.locator('.arazzo-source-meaning').first();
+  await expect(meaning).toBeVisible();
+  await expect(meaning).toContainText('Neither establishes schema validation or execution');
+  expect(
+    await meaning.evaluate((node) => {
+      const source = node
+        .closest('.arazzo-source-descriptions, .arazzo-contract-panel')!
+        .querySelector('.arazzo-source-description')!;
+      const panel = node.closest('.arazzo-inspection-status > div');
+      const bounds = node.getBoundingClientRect();
+      return (
+        !!(node.compareDocumentPosition(source) & Node.DOCUMENT_POSITION_FOLLOWING) &&
+        (!panel || bounds.bottom <= panel.getBoundingClientRect().bottom)
+      );
+    }),
+  ).toBe(true);
+}
+
 test('API descriptions discovery, delayed recovery and missing lookup preserve reading and focus', async ({
   page,
   baseURL,
@@ -485,6 +516,11 @@ test('API descriptions discovery, delayed recovery and missing lookup preserve r
   const status = page.getByRole('region', { name: 'Inspection status details' });
   for (const name of ['coordinator', 'inventory', 'payment', 'license'])
     await expect(status.getByRole('region', { name: `Source ${name}`, exact: true })).toBeVisible();
+  await sourceTargets(status);
+  await sourceMeaning(status);
+  await expect(
+    status.getByRole('status', { name: 'Source action result' }).filter({ hasText: /./ }),
+  ).toHaveCount(0);
   const failed = status.getByRole('region', { name: 'Source payment', exact: true });
   const retry = failed.getByRole('button', { name: 'Retry API description payment', exact: true });
   await expect(retry).toBeVisible();
@@ -496,6 +532,9 @@ test('API descriptions discovery, delayed recovery and missing lookup preserve r
   await page.keyboard.press('Enter');
   await expect(failed).toBeFocused();
   await expect(failed).toContainText('Loaded');
+  await expect(failed.getByRole('status', { name: 'Source action result' })).toHaveText(
+    'payment: Loaded.',
+  );
   expect(paymentAttempts).toBe(2);
   await summary.focus();
   release();
@@ -514,6 +553,8 @@ test('API descriptions discovery, delayed recovery and missing lookup preserve r
   await expect(
     inspector(page).getByRole('region', { name: 'Source coordinator', exact: true }),
   ).toContainText('Loaded');
+  await sourceTargets(inspector(page));
+  await sourceMeaning(inspector(page));
   await info.attach('api-loaded-missing-operation', {
     body: await page.screenshot(),
     contentType: 'image/png',
@@ -544,37 +585,94 @@ test('API descriptions long source labels wrap and manual bulk loading remains e
   const name = 'A source with a long authored name '.repeat(8);
   const url = `${baseURL}/${'long-source-url-'.repeat(16)}.json`;
   const primary = `${baseURL}/long-sources.arazzo.yaml`;
+  const doc = {
+    arazzo: '1.0.1',
+    info: { title: 'Long sources', version: '1' },
+    sourceDescriptions: [{ name, type: 'openapi', url }],
+    workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'run' }] }],
+  };
   explicitSources(page).add(url);
   await page.route(primary, (route) =>
-    route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({
-        arazzo: '1.0.1',
-        info: { title: 'Long sources', version: '1' },
-        sourceDescriptions: [{ name, type: 'openapi', url }],
-        workflows: [{ workflowId: 'root', steps: [{ stepId: 'call', operationId: 'run' }] }],
-      }),
-    }),
+    route.fulfill({ contentType: 'application/json', body: JSON.stringify(doc) }),
   );
+  await page.route('**/fixtures/readiness.json', async (route) => {
+    const response = await route.fetch();
+    const fixtures = await response.json();
+    await route.fulfill({ json: { ...fixtures, digitalProduct: doc } });
+  });
   let attempts = 0;
-  await page.route(url, (route) => {
+  let release!: () => void;
+  let delayed = false;
+  await page.route(url, async (route) => {
     attempts++;
-    return route.fulfill({
+    if (delayed)
+      await new Promise<void>((resolve) => {
+        release = resolve;
+      });
+    await route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({ openapi: '3.1.0', paths: {} }),
     });
   });
-  await page.goto(`/?document=${encodeURIComponent(primary)}`);
-  await page.locator('.arazzo-inspection-status > summary').click();
-  expect(attempts).toBe(0);
-  const status = page.getByRole('region', { name: 'Inspection status details' });
-  const bulk = status.getByRole('button', { name: 'Load API descriptions', exact: true });
-  await bulk.focus();
-  await page.keyboard.press('Enter');
-  await expect(page.locator('.arazzo-inspection-status > summary')).toContainText('1 of 1 loaded');
-  expect(attempts).toBe(1);
-  await info.attach('api-long-labels-manual', {
-    body: await page.screenshot(),
-    contentType: 'image/png',
-  });
+  for (const embedded of [false, true]) {
+    const before = attempts;
+    await page.goto(
+      embedded ? '/consumer/?surface=source-recovery' : `/?document=${encodeURIComponent(primary)}`,
+    );
+    await page.locator('.arazzo-inspection-status > summary').click();
+    expect(attempts).toBe(before);
+    const status = page.getByRole('region', { name: 'Inspection status details' });
+    await sourceTargets(status);
+    await sourceMeaning(status);
+    const bulk = status.getByRole('button', { name: 'Load API descriptions', exact: true });
+    delayed = true;
+    await bulk.focus();
+    await page.keyboard.press('Enter');
+    await expect(status.locator('.arazzo-source-descriptions')).toBeFocused();
+    await expect(status.getByRole('status', { name: 'API description batch result' })).toHaveText(
+      'API descriptions: 1 loading, 0 loaded, 0 failed, 0 unsupported.',
+    );
+    await expect(status.getByRole('button', { name: /^Loading API description/ })).toBeDisabled();
+    await sourceTargets(status);
+    await expect.poll(() => attempts).toBe(before + 1);
+    delayed = false;
+    release();
+    await expect(status.getByRole('status', { name: 'API description batch result' })).toHaveText(
+      'API descriptions: 0 loading, 1 loaded, 0 failed, 0 unsupported.',
+    );
+    await expect(status.locator('.arazzo-source-descriptions')).toBeFocused();
+    await info.attach(embedded ? 'api-long-labels-embedded' : 'api-long-labels-manual', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    await page.locator('.arazzo-inspection-status > summary').click();
+    if (!embedded) await choose(page, 'Step descriptions');
+    const information = page.locator('.arazzo-document-information');
+    await information.locator('summary').first().click();
+    await sourceTargets(information);
+    await sourceMeaning(information);
+    await expect(
+      information.getByRole('status', { name: 'API description batch result' }),
+    ).toHaveText('');
+    const reload = information.getByRole('button', { name: /^Reload API description/ });
+    await reload.focus();
+    await page.keyboard.press('Enter');
+    await expect(information.getByRole('status', { name: 'Source action result' })).toHaveText(
+      `${name}: Loaded.`,
+    );
+    await expect(information.locator('.arazzo-source-description')).toBeFocused();
+    await information.locator('summary').first().click();
+    await page.getByRole('button', { name: 'Inspect root.call', exact: true }).click();
+    await expect(inspector(page)).toContainText('Operation not found');
+    await sourceTargets(inspector(page));
+    await sourceMeaning(inspector(page));
+    await info.attach(embedded ? 'api-long-inspector-embedded' : 'api-long-inspector-standalone', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    await page.keyboard.press('Escape');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  }
 });

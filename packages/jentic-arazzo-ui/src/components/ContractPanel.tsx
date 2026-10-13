@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SourceDescription } from './SourceDescriptions';
+import { SourceDescription, descriptionStatusMeaning } from './SourceDescriptions';
 import { contractReadingStatus } from '../utils/contract/readingStatus';
 import { useContractFacts } from '../context/ContractFactsContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
@@ -31,8 +31,16 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
     <section className="arazzo-contract-panel" aria-label="Contract and source">
       <h3>Contract &amp; Source</h3>
       {!Object.hasOwn(binding.locators, 'workflowId') && (
-        <p role="status">
+        <p>
           <strong>{contractReadingStatus[result.status]}</strong>
+          <span className="arazzo-source-meaning"> {descriptionStatusMeaning}</span>
+        </p>
+      )}
+      {Object.hasOwn(binding.locators, 'workflowId') && (
+        <p>
+          External workflow lookup is explicit. Loaded means a workflow description is available;
+          Workflow found means the selected workflow was located. Neither establishes schema
+          validation or execution.
         </p>
       )}
       {result.sourceName && (
@@ -101,10 +109,6 @@ export function ContractPanel({ workflowId, stepId }: { workflowId: string; step
           <h4>Operation Details</h4>
           <p>
             {operation.operationId} {operation.method} {operation.path}
-          </p>
-          <p>
-            Operation found means located in this source; it does not establish full contract
-            validity or execution.
           </p>
           {!!operation.schemaReferences?.length && (
             <section aria-label="Referenced schema declarations">

@@ -1,0 +1,64 @@
+{
+  "runId": "5c9cc979-2dc8-4f9c-8389-c45ba4549177",
+  "startedAt": "2026-10-13T04:53:54.379Z",
+  "results": [
+    {
+      "name": "petstore-lanes",
+      "title": "UX default bare entry preserves five known Petstore interactions and readable details",
+      "reason": "UX Petstore lanes must identify the known petstoreAPI destination",
+      "control": "passed",
+      "fault": "detected"
+    },
+    {
+      "name": "stale-destination",
+      "title": "UX Petstore explicit lookup, duplicate, failure and reload keep inspector and sequence current",
+      "reason": "UX stale destination evidence must disappear after reload",
+      "control": "passed",
+      "fault": "detected"
+    },
+    {
+      "name": "silent-render",
+      "title": "UX rejected flowchart exposes retry and descriptions without blank success",
+      "reason": "UX render rejection must expose localized recovery rather than blank success",
+      "control": "passed",
+      "fault": "detected"
+    },
+    {
+      "name": "missing-discovery",
+      "title": "UX first-use guide discovery starts at plain entry and help performs no guide acquisition",
+      "reason": "UX first-use discovery must reveal guide purpose without injected setup",
+      "control": "passed",
+      "fault": "detected"
+    },
+    {
+      "name": "legacy-consumer",
+      "title": "UX legacy document query/hash and shared occurrence history preserve exact second-item 2499",
+      "reason": "UX legacy hash must restore the authored stress document",
+      "control": "passed",
+      "fault": "detected"
+    },
+    {
+      "name": "lost-identity",
+      "title": "UX default bare entry preserves five known Petstore interactions and readable details",
+      "reason": "UX direct identity activation must inspect the authored step",
+      "control": "passed",
+      "fault": "detected"
+    },
+    {
+      "name": "lost-sequence-follow",
+      "title": "UX following a local call retains sequence and exact caller return",
+      "reason": "UX sequence follow must open the accepted callee in sequence",
+      "control": "passed",
+      "fault": "detected"
+    }
+  ],
+  "candidate": {
+    "head": "2c1e0c6a21c5471c295f92b535fe5d0e2d51a80c",
+    "base": "49dd8ef814637b481c0a1998f586ce2785812f5d",
+    "trackedDiffSha256": "27b8060a7152472da3d1938da5aac7049fd7915e8e57a66329ac1a59b82d8d97"
+  },
+  "identitySha256": "a17dd34bb20d89114ef8de5f0067c97e27641cb00251d94a5943b8a7b589bf88",
+  "inputsSha256": "206df730867c782ca0bb1a671beee28c202b7b5ed9ff1abf9060f3da7800bef2",
+  "state": "passed",
+  "finishedAt": "2026-10-13T04:57:16.509Z"
+}

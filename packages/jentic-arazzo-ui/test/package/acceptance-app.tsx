@@ -219,6 +219,20 @@ fetch('/fixtures/readiness.json')
       };
       const surface = query.get('surface') ?? 'host';
       if (surface === 'embedded-repair') root.render(<EmbeddedRepair input={fixtures.document} />);
+      else if (surface === 'source-recovery')
+        root.render(
+          <ArazzoUI
+            document={fixtures.digitalProduct}
+            baseURI={new URL('/examples/digital-product/arazzo.yaml', location.href).href}
+            view="docs"
+            sourceProvider={{
+              load: async ({ uri }) => ({
+                content: await (await fetch(uri)).text(),
+                retrievalURI: uri,
+              }),
+            }}
+          />,
+        );
       else if (surface === 'controlled')
         root.render(<ControlledAcceptance input={fixtures.document} />);
       else if (surface === 'systems')

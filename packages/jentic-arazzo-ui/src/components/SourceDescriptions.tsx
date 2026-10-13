@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
+import { SourceRevisionContext } from '../context/SourceRevisionContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import {
   useContractFacts,
@@ -21,6 +22,63 @@ export function sourceAvailability(
   return 'Not loaded';
 }
 
+export const descriptionStatusMeaning =
+  'Loaded: description available under a supported profile. Operation found: selected declaration located. Neither establishes schema validation or execution.';
+
+function useSourceAnnouncement() {
+  const { model, sourceProvider } = useArazzoViewer();
+  const revisions = useContext(SourceRevisionContext);
+  const { loaded } = useContractFacts();
+  const scope = model.inspection.snapshot;
+  const [attempt, setAttempt] = useState<{
+    scope: typeof scope;
+    provider: typeof sourceProvider;
+    sources: DeclaredSource[];
+    pins: (string | undefined)[];
+    bulk: boolean;
+    pending: boolean;
+    message: string;
+  }>();
+  const current =
+    attempt &&
+    attempt.scope === scope &&
+    attempt.provider === sourceProvider &&
+    attempt.sources.every((source, index) => attempt.pins[index] === revisions[source.name]);
+  useEffect(() => {
+    if (!attempt) return;
+    if (!current) {
+      setAttempt(undefined);
+      return;
+    }
+    if (!attempt.pending) return;
+    const values = attempt.sources.map((source) => loaded[source.name]);
+    const states = values.map((value) => sourceAvailability(value));
+    // wait for current projections; acquisition promises are not evidence.
+    if (states.includes('Not loaded')) return;
+    const pending = states.includes('Loading');
+    const message = attempt.bulk
+      ? `API descriptions: ${states.filter((s) => s === 'Loading').length} loading, ${states.filter((s) => s === 'Loaded').length} loaded, ${states.filter((s) => s === 'Failed').length} failed, ${states.filter((s) => s === 'Unsupported').length} unsupported.`
+      : `${attempt.sources[0].name}: ${states[0]}.${states[0] === 'Failed' ? ' Description could not be loaded. Retry available.' : states[0] === 'Unsupported' ? ' Description has an unsupported inspection profile.' : ''}`;
+    if (message !== attempt.message || pending !== attempt.pending)
+      setAttempt({ ...attempt, pending, message });
+  }, [attempt, current, loaded]);
+  return {
+    message: current ? attempt.message : '',
+    announce: (sources: DeclaredSource[], bulk = false) =>
+      setAttempt({
+        scope,
+        provider: sourceProvider,
+        sources,
+        pins: sources.map((source) => revisions[source.name]),
+        bulk,
+        pending: true,
+        message: bulk
+          ? `API descriptions: ${sources.length} loading, 0 loaded, 0 failed, 0 unsupported.`
+          : `${sources[0].name}: Loading.`,
+      }),
+  };
+}
+
 export function SourceDescription({
   source,
   children,
@@ -30,6 +88,7 @@ export function SourceDescription({
 }) {
   const { model, sourceRegistry, sourceProvider } = useArazzoViewer();
   const { loaded, load, eligibility } = useContractFacts();
+  const announcement = useSourceAnnouncement();
   const reason = eligibility(source);
   const value = reason ? undefined : loaded[source.name];
   const status = sourceAvailability(value, reason, !!sourceProvider);
@@ -51,6 +110,15 @@ export function SourceDescription({
       aria-label={`Source ${source.name}`}
       tabIndex={-1}
     >
+      <p
+        className="arazzo-source-announcement"
+        role="status"
+        aria-label="Source action result"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {announcement.message}
+      </p>
       <h4>{source.name}</h4>
       <p>
         {source.type ?? 'unknown'} · <strong>{status}</strong>
@@ -72,6 +140,7 @@ export function SourceDescription({
           onClick={(event) => {
             if (document.activeElement === event.currentTarget)
               event.currentTarget.closest<HTMLElement>('section')?.focus();
+            announcement.announce([source]);
             void load(source, !!value && value.state !== 'loading');
           }}
         >
@@ -128,6 +197,7 @@ export function SourceDescription({
 export function SourceDescriptions() {
   const { model, sourceProvider, apiDescriptionLoading } = useArazzoViewer();
   const { load, eligibility, unattempted } = useContractFacts();
+  const announcement = useSourceAnnouncement();
   const sources = model.document.sourceDescriptions ?? [];
   const pending = sources.filter(
     (source) => source.type !== 'arazzo' && !eligibility(source) && unattempted(source),
@@ -135,12 +205,23 @@ export function SourceDescriptions() {
   if (!sources.length) return null;
   return (
     <div className="arazzo-source-descriptions" tabIndex={-1}>
+      <p className="arazzo-source-meaning">{descriptionStatusMeaning}</p>
+      <p
+        className="arazzo-source-announcement"
+        role="status"
+        aria-label="API description batch result"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {announcement.message}
+      </p>
       {sourceProvider && apiDescriptionLoading !== 'automatic' && pending.length > 0 && (
         <button
           type="button"
           onClick={(event) => {
             if (document.activeElement === event.currentTarget)
               event.currentTarget.parentElement?.focus();
+            announcement.announce(pending, true);
             for (const source of pending) void load(source, false);
           }}
         >

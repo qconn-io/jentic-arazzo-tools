@@ -1,0 +1,78 @@
+{
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/arazzo.yaml": {
+    "sha256": "58086e94bc72622b100c08d329ed3f06022d0b1f4a084f5d39b0c1c3b2e01fa0",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/boundaries/depth-limit.arazzo.yaml": {
+    "sha256": "62456e3fd5ec0d4aaa4818e7888d3d367e34cffa412a9de9cc71653b98bd0e0b",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/boundaries/metadata-heavy.arazzo.yaml": {
+    "sha256": "8fce882eb7ffee0dfb8f3a745b77cd1e01dbba53b05f0e28597c179e1bcafc54",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/boundaries/recursion.arazzo.yaml": {
+    "sha256": "92b3888975b45d1f207c4f7843451f32dd40dc27ef9c0873970ec261448857a8",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml": {
+    "sha256": "8089a1b1e28eb6e7f8e0f4d4b71c6910414b1cb5c62aec58f2ffa80f6a768dbc",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/coordinator.openapi.yaml": {
+    "sha256": "c700c404ad0abbb77800ae8cf496b3a89ae7f5a3e5b616facf65c42cdcb25312",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/diagnostics/prerequisite-cycle.arazzo.yaml": {
+    "sha256": "91e7b7fb1c2c7743e095fcfb035b375ad78b608ac74e1187fc651a64d6ffbb38",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/diagnostics/unavailable-targets.arazzo.yaml": {
+    "sha256": "40e57edaa566d0e645f643c4b60b4d9f8553a8bd2478880379bb019a46dee8b6",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/event-based.arazzo.yaml": {
+    "sha256": "8cf8380f3e9c296873ead824c011f52d0972968be70acf5ca45199b36311fad0",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/events.asyncapi.yaml": {
+    "sha256": "33ae21c35e9a0c92a1c3a564569434c8973167e2de7c4f6f9459ed6d468e21a8",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/inventory.openapi.yaml": {
+    "sha256": "e1377ed00151e57057100528cdf55ca5a037320e8345eec91522d4337347cd98",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/license.openapi.yaml": {
+    "sha256": "e596c8b34124220d066e4569a5eab672be8ffe19fb7eefba925ffef02b00d760",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product-stress/payment.openapi.yaml": {
+    "sha256": "d569d297557246a62f7eae4ff84c7252af918d5c9c2db2335a7ee420a181f51b",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product/arazzo.yaml": {
+    "sha256": "a07ef6f54bc2414340d7a54f0ed533ede6178131457a27dbc90e2ed68c73974e",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product/coordinator.openapi.yaml": {
+    "sha256": "8a4fabcd29873ada2fd00b69d1beeb9cf79a2e7647a8957c2c45a4606f27134e",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product/inventory.openapi.yaml": {
+    "sha256": "d2aa0ee9213e431fba2acd34245daf253efb26dc154eda7bf004571a3e84c680",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product/license.openapi.yaml": {
+    "sha256": "ae46a973b15dca234c7d5fc73b80ae68095ee1a25384bab631a76e0186b8e337",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/examples/digital-product/payment.openapi.yaml": {
+    "sha256": "1a2a88ad56fd116b2a041e3ec4bc1d88039dec163cdc434f2701d8353dd188b0",
+    "unchangedFromHEAD": true
+  },
+  "packages/jentic-arazzo-ui/public/petstore-order-workflow.arazzo.yaml": {
+    "sha256": "8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569",
+    "unchangedFromHEAD": true
+  }
+}

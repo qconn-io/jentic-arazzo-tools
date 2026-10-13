@@ -1,0 +1,16 @@
+
+> @jentic/arazzo-ui@1.0.0-alpha.32 test
+> vitest run --config config/vitest/vitest.config.ts --maxWorkers=${CPU_CORES:-4}
+
+
+ RUN  v5.0.3 /home/mkogan/work/jentic-arazzo-tools/packages/jentic-arazzo-ui
+
+
+ Test Files  101 passed (101)
+      Tests  671 passed (671)
+   Start at  06:45:47
+   Duration  29.73s (tests 47%, import 26%, environment 17%, setup 6%, transform 3%)
+
+     Import  283 modules were evaluated 4359 times · 28.55s total, 26% of tracked time
+             ~5.84s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
