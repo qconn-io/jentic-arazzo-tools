@@ -14,6 +14,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/types/**',
       '**/node_modules/**',
+      '**/test-output/**',
       '**/config/**',
       '**/.nyc_output/**',
       '**/*.js',
@@ -30,7 +31,7 @@ export default tseslint.config(
 
   // TypeScript source files configuration
   {
-    files: ['packages/*/src/**/*.ts'],
+    files: ['packages/*/src/**/*.ts', 'packages/*/src/**/*.tsx'],
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
@@ -111,7 +112,7 @@ export default tseslint.config(
 
   // Test files configuration
   {
-    files: ['packages/*/test/**/*.ts'],
+    files: ['packages/*/test/**/*.ts', 'packages/*/test/**/*.tsx'],
     plugins: {
       mocha: eslintPluginMocha,
       import: eslintPluginImportX,

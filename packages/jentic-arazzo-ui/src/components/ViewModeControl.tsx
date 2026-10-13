@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { ViewerMode } from '../types/index';
 
 const views: ViewerMode[] = ['diagram', 'docs', 'split'];
+const labels = { diagram: 'Workflow diagram', docs: 'Read workflow', split: 'Side by side' };
 
 export interface ViewModeControlProps {
   value: ViewerMode;
@@ -18,6 +20,8 @@ export const ViewModeControl: React.FC<ViewModeControlProps> = ({
 }) => {
   return (
     <div
+      role="group"
+      aria-label="Layout"
       className={`arazzo-view-mode-control ${className ?? ''}`}
       style={{
         display: 'inline-flex',
@@ -28,9 +32,11 @@ export const ViewModeControl: React.FC<ViewModeControlProps> = ({
         ...style,
       }}
     >
+      <span style={{ padding: '4px 8px', color: '#e2e8f0', background: '#2a2a2a' }}>Layout</span>
       {views.map((v) => (
         <button
           key={v}
+          aria-pressed={value === v}
           onClick={() => onChange(v)}
           style={{
             padding: '4px 12px',
@@ -40,10 +46,9 @@ export const ViewModeControl: React.FC<ViewModeControlProps> = ({
             color: value === v ? '#1B1B1B' : '#ccc',
             cursor: value === v ? 'default' : 'pointer',
             fontWeight: value === v ? 600 : 400,
-            textTransform: 'capitalize',
           }}
         >
-          {v}
+          {labels[v]}
         </button>
       ))}
     </div>

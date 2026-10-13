@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useRef,
   useMemo,
+  useState,
 } from 'react';
 import {
   ReactFlow,
@@ -15,8 +16,10 @@ import {
   NodeChange,
   EdgeChange,
   useReactFlow,
-  ReactFlowInstance,
+  useNodesInitialized,
+  type Edge,
 } from 'reactflow';
+
 import 'reactflow/dist/style.css';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import {
@@ -28,6 +31,7 @@ import {
   ExternalWorkflowNode,
 } from '../nodes/index';
 import {
+  RelationshipEdge,
   SequentialEdge,
   SuccessEdge,
   FailureEdge,
@@ -40,6 +44,7 @@ import { WorkflowTabs } from './WorkflowTabs';
 import { ArazzoNode, ArazzoEdge } from '../types/index';
 import { ErrorBoundary } from './ErrorBoundary';
 import './WorkflowTabs.css';
+import { publicEdgeSelection, type RelationshipEdgeData } from '../edges/RelationshipEdge';
 
 const nodeTypes = {
   step: StepNode,
@@ -51,6 +56,7 @@ const nodeTypes = {
 };
 
 const edgeTypes = {
+  relationship: RelationshipEdge,
   sequential: SequentialEdge,
   success: SuccessEdge,
   failure: FailureEdge,
@@ -86,14 +92,20 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
     selectedNodeId,
     setSelectedNode,
     activeWorkflowId,
+    model,
+    navigationDiagnostic,
   } = useArazzoViewer();
   const reactFlow = useReactFlow();
+  const relationshipEdges = edges.filter(
+    (edge) => edge.type === 'relationship',
+  ) as Edge<RelationshipEdgeData>[];
+  const selectedRelationship = relationshipEdges.find((edge) => edge.selected);
+  const relationshipData = selectedRelationship?.data;
+  const relationship = relationshipData?.relationship;
 
-  // Track which workflow we've set the view for
-  const viewSetForWorkflow = useRef<string | null>(null);
-  // Track if React Flow has initialized on this mount
-  const reactFlowInitialized = useRef<boolean>(false);
-
+  const [ready, setReady] = useState(false);
+  const nodesInitialized = useNodesInitialized();
+  const focused = useRef<string | null>(null);
   // Expose methods to parent via ref
   useImperativeHandle(ref, () => ({
     fitView: () => {
@@ -104,52 +116,35 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
     },
   }));
 
-  // Called when React Flow is initialized and ready
-  const onInit = useCallback(
-    (instance: ReactFlowInstance) => {
-      reactFlowInitialized.current = true;
-      // Center view when React Flow initializes
-      setTimeout(() => {
-        const startNode = nodes.find((n) => n.type === 'start') || nodes[0];
-        if (startNode && startNode.position) {
-          const zoom = 0.8;
-          const targetX = startNode.position.x + 150;
-          const targetY = startNode.position.y + 100;
-          const yOffset = 250;
+  const onInit = useCallback(() => setReady(true), []);
 
-          instance.setCenter(targetX, targetY + yOffset / zoom, { zoom, duration: 300 });
-        }
-      }, 50);
-    },
-    [nodes],
-  );
-
-  // Set view when workflow changes (while already in diagram view)
   useEffect(() => {
-    const currentView = activeWorkflowId ?? 'document';
-    const workflowChanged = viewSetForWorkflow.current !== currentView;
-
-    if (nodes.length === 0 || !reactFlowInitialized.current) {
-      return;
-    }
-
-    if (workflowChanged) {
-      viewSetForWorkflow.current = currentView;
-
-      // When switching workflows, position start node near top
-      const startNode = nodes.find((n) => n.type === 'start') || nodes[0];
-      if (startNode && startNode.position) {
-        setTimeout(() => {
-          const zoom = 0.8;
-          const targetX = startNode.position.x + 150;
-          const targetY = startNode.position.y + 100;
-          const yOffset = 250;
-
-          reactFlow.setCenter(targetX, targetY + yOffset / zoom, { zoom, duration: 0 });
-        }, 50);
-      }
-    }
-  }, [nodes, reactFlow, activeWorkflowId]);
+    if (!ready || !nodesInitialized || nodes.length === 0) return;
+    const node = selectedNodeId
+      ? nodes.find((n) => n.id === selectedNodeId)
+      : nodes.find((n) => n.type === 'start') || nodes[0];
+    if (!node) return;
+    const key = JSON.stringify([model.documentId, activeWorkflowId, selectedNodeId ?? 'default']);
+    if (focused.current === key) return;
+    const timer = setTimeout(() => {
+      const zoom = selectedNodeId ? reactFlow.getZoom() : 0.8;
+      reactFlow.setCenter(
+        node.position.x + (node.width ?? 420) / 2,
+        node.position.y + (node.height ?? 200) / 2 + (selectedNodeId ? 0 : 250 / zoom),
+        { zoom, duration: selectedNodeId ? 300 : 0 },
+      );
+      focused.current = key;
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [
+    ready,
+    nodesInitialized,
+    nodes,
+    selectedNodeId,
+    activeWorkflowId,
+    model.documentId,
+    reactFlow,
+  ]);
 
   // Store current nodes/edges in refs for stable callbacks
   const nodesRef = useRef(nodes);
@@ -174,9 +169,6 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: (typeof nodes)[0]) => {
       setSelectedNode(node.id);
-      if (events?.onNodeSelect) {
-        events.onNodeSelect(node.id, node);
-      }
     },
     [setSelectedNode, events],
   );
@@ -193,18 +185,12 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
           const targetNode = nodes.find((n) => n.id === edge.target);
           if (targetNode && targetNode.position) {
             setSelectedNode(edge.target);
-            setTimeout(() => {
-              reactFlow.setCenter(targetNode.position.x + 150, targetNode.position.y + 100, {
-                zoom: reactFlow.getZoom(),
-                duration: 300,
-              });
-            }, 0);
           }
         }
       }
 
       if (events?.onEdgeSelect) {
-        events.onEdgeSelect(edge.id, edge);
+        events.onEdgeSelect(edge.id, publicEdgeSelection(edge));
       }
     },
     [events, nodes, reactFlow, setSelectedNode],
@@ -225,23 +211,6 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
     [reactFlow],
   );
 
-  // Track previous selection to detect external selection changes
-  const prevSelectedNodeId = useRef<string | null>(null);
-
-  // Center on node when selection changes from outside
-  useEffect(() => {
-    if (selectedNodeId && selectedNodeId !== prevSelectedNodeId.current) {
-      const node = nodes.find((n) => n.id === selectedNodeId);
-      if (node && node.position) {
-        reactFlow.setCenter(node.position.x + 150, node.position.y + 100, {
-          zoom: reactFlow.getZoom(),
-          duration: 300,
-        });
-      }
-    }
-    prevSelectedNodeId.current = selectedNodeId;
-  }, [selectedNodeId, nodes, reactFlow]);
-
   // Memoize nodes with selection state
   const nodesWithSelection = useMemo(
     () =>
@@ -258,7 +227,69 @@ export const DiagramView = forwardRef<DiagramViewRef, DiagramViewProps>(function
       style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}
     >
       {/* Workflow Tabs */}
-      {showWorkflowTabs && <WorkflowTabs onWorkflowSelect={events?.onWorkflowSelect} />}
+      {showWorkflowTabs && <WorkflowTabs />}
+      <p style={{ margin: '6px 12px', fontSize: 12 }}>
+        {model.orderLabel}. {navigationDiagnostic}
+      </p>
+      {activeWorkflowId === null && relationshipEdges.length > 0 && (
+        <div style={{ margin: '0 12px 8px', fontSize: 12 }}>
+          <label>
+            Inspect relationship{' '}
+            <select
+              aria-label="Inspect relationship"
+              style={{ maxWidth: '100%', width: 640, display: 'block' }}
+              value={selectedRelationship?.id ?? ''}
+              onChange={(event) => {
+                const id = event.target.value;
+                setEdges(edges.map((edge) => ({ ...edge, selected: edge.id === id })));
+              }}
+            >
+              <option value="">Select a relationship</option>
+              {relationshipEdges.map((edge) => {
+                const data = edge.data!;
+                return (
+                  <option key={edge.id} value={edge.id}>
+                    {data.compactLabel} — {data.label}
+                  </option>
+                );
+              })}
+            </select>
+          </label>
+          {relationshipData && (
+            <section
+              aria-label="Selected relationship"
+              style={{ maxHeight: 160, overflow: 'auto', overflowWrap: 'anywhere' }}
+            >
+              <strong>{relationshipData.label}</strong>
+              {relationshipData.warning && <p>{relationshipData.warning}</p>}
+              {relationship && (
+                <>
+                  <p>
+                    {relationship.sourceWorkflowId}
+                    {relationship.sourceStepId ? `.${relationship.sourceStepId}` : ''} →{' '}
+                    {relationship.target.reference} ({relationship.target.kind})
+                  </p>
+                  {relationship.parameters.length > 0 && (
+                    <pre style={{ whiteSpace: 'pre-wrap' }}>
+                      Parameters:{' '}
+                      {JSON.stringify(
+                        relationship.parameters.map((parameter) => parameter.value),
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  )}
+                  {relationship.criteria?.length ? (
+                    <pre style={{ whiteSpace: 'pre-wrap' }}>
+                      Criteria: {JSON.stringify(relationship.criteria, null, 2)}
+                    </pre>
+                  ) : null}
+                </>
+              )}
+            </section>
+          )}
+        </div>
+      )}
 
       {/* React Flow Canvas */}
       <div style={{ flex: 1, minHeight: 0 }}>

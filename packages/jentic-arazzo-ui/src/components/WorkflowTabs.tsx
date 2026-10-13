@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 
 export interface WorkflowTabsProps {
@@ -13,9 +14,9 @@ export interface WorkflowTabsProps {
 export const WorkflowTabs: React.FC<WorkflowTabsProps> = ({ onWorkflowSelect }) => {
   const { document: arazzoDoc, activeWorkflowId, setActiveWorkflow } = useArazzoViewer();
 
-  const handleTabClick = (workflowId: string) => {
+  const handleTabClick = (workflowId: string | null) => {
     setActiveWorkflow(workflowId);
-    onWorkflowSelect?.(workflowId);
+    onWorkflowSelect?.(workflowId ?? '');
   };
 
   // Don't render if no workflows
@@ -30,6 +31,12 @@ export const WorkflowTabs: React.FC<WorkflowTabsProps> = ({ onWorkflowSelect }) 
   return (
     <div className="arazzo-workflow-tabs">
       <div className="arazzo-workflow-tabs__list">
+        <button
+          className={`arazzo-workflow-tabs__tab ${activeWorkflowId === null ? 'arazzo-workflow-tabs__tab--active' : ''}`}
+          onClick={() => handleTabClick(null)}
+        >
+          All workflows
+        </button>
         {arazzoDoc.workflows.map((workflow) => {
           const isActive = workflow.workflowId === activeWorkflowId;
           return (

@@ -3,6 +3,14 @@
  */
 
 import { Node, Edge } from 'reactflow';
+
+import type { ScenarioControls } from './scenario';
+import type {
+  WorkflowViewProfile,
+  WorkflowViewProfileAdapter,
+  WorkflowPerspective,
+} from './profile';
+import type { WorkflowLocation, WorkflowLocationStatus, WorkflowLocationAdapter } from './location';
 import {
   Step,
   Workflow,
@@ -14,6 +22,7 @@ import {
   ReusableObject,
   Parameter,
 } from './arazzo';
+import type { SourceDocumentProvider, ExternalNavigationRequest } from './source';
 
 // ============================================================================
 // Viewer Mode & Events
@@ -35,7 +44,28 @@ export interface ViewerEvents {
 // ============================================================================
 
 /** @public */
-export interface ArazzoUIProps {
+export interface WorkflowLocationProps {
+  /** explicit host identity for supplied/inline content */
+  documentIdentity?: string;
+  documentRevision?: string;
+  location?: WorkflowLocation;
+  defaultLocation?: WorkflowLocation;
+  onLocationChange?: (location: WorkflowLocation) => void;
+  onLocationStatus?: (status: WorkflowLocationStatus) => void;
+  locationAdapters?: readonly WorkflowLocationAdapter[];
+}
+
+/** @public */
+export interface WorkflowPerspectiveProps {
+  viewProfile?: WorkflowViewProfile;
+  viewProfileAdapter?: WorkflowViewProfileAdapter;
+  perspective?: WorkflowPerspective;
+  onPerspectiveChange?: (perspective: WorkflowPerspective) => void;
+}
+
+/** @public */
+export interface ArazzoUIProps
+  extends ScenarioControls, WorkflowLocationProps, WorkflowPerspectiveProps {
   document: ArazzoDocument | string;
   view?: ViewerMode;
   activeWorkflowId?: string | null;
@@ -47,6 +77,12 @@ export interface ArazzoUIProps {
   onEdgeSelect?: (edgeId: string, edge: ArazzoEdge) => void;
   onWorkflowSelect?: (workflowId: string) => void;
   onViewChange?: (view: ViewerMode) => void;
+  /** Base URI for relative sources in inline/uploaded documents. */
+  baseURI?: string;
+  sourceProvider?: SourceDocumentProvider;
+  /** Embedded defaults to manual; standalone document viewing defaults to automatic. */
+  apiDescriptionLoading?: 'manual' | 'automatic';
+  onExternalNavigation?: (request: ExternalNavigationRequest) => void;
 }
 
 /** @public */
@@ -59,26 +95,6 @@ export interface ArazzoUIRef {
   clearSelection(): void;
   getActiveWorkflowId(): string | null;
   getSelectedStepId(): string | null;
-}
-
-// ============================================================================
-// Context
-// ============================================================================
-
-export interface ArazzoViewerContextValue {
-  document: ArazzoDocument;
-  documentURL: string | null;
-  activeWorkflowId: string | null;
-  setActiveWorkflow: (id: string | null) => void;
-  activeWorkflow: Workflow | null;
-  selectedNodeId: string | null;
-  setSelectedNode: (id: string | null) => void;
-  nodes: ArazzoNode[];
-  edges: ArazzoEdge[];
-  setNodes: (nodes: ArazzoNode[]) => void;
-  setEdges: (edges: ArazzoEdge[]) => void;
-  readOnly: boolean;
-  events?: ViewerEvents;
 }
 
 // ============================================================================
@@ -95,12 +111,69 @@ export interface DocsViewConfig {
   diagramType?: DiagramType;
 }
 
+/**
+ * inspection limits for generated documentation; these do not certify conformance.
+ * @public
+ */
+export interface DocumentationSupport {
+  declaredVersion: string;
+  profile?: '1.0' | '1.1';
+  semanticInspection: boolean;
+  limitations?: string[];
+}
+
+/**
+ * available document and occurrence locations; absent metadata is not inferred.
+ * @public
+ */
+export interface DocumentationProvenance {
+  retrievalURI?: string;
+  baseURI?: string;
+  self?: string;
+  occurrencePath?: string;
+  declarationPath?: string;
+}
+
+/**
+ * authored source locators and intent without fetching the source document.
+ * @public
+ */
+export interface DocumentationSourceBinding {
+  sourceName?: string;
+  sourceType?: string;
+  sourceURL?: string;
+  operationId?: string;
+  operationPath?: string;
+  channelPath?: string;
+  workflowId?: string;
+  action?: 'send' | 'receive';
+  timeout?: number;
+  correlationId?: string;
+  verification: 'unverified' | 'ambiguous' | 'unresolved';
+}
+
+/**
+ * classified prerequisite information used by documentation links and badges.
+ * @public
+ */
+export interface DocumentationPrerequisite {
+  reference: string;
+  kind: 'local' | 'external' | 'missing' | 'malformed' | 'unsupported';
+  workflowId?: string;
+  stepId?: string;
+  sourceName?: string;
+  message?: string;
+  provenance?: DocumentationProvenance;
+}
+
 /** @public */
 export interface DocumentationMetadata {
   title: string;
   version: string;
   arazzoVersion: string;
   documentURL?: string | null;
+  support?: DocumentationSupport;
+  provenance?: DocumentationProvenance;
   summary?: string;
   description?: string;
   sourceDescriptions: Array<{
@@ -113,6 +186,10 @@ export interface DocumentationMetadata {
 /** @public */
 export interface WorkflowDocumentation {
   workflowId: string;
+  dependsOn?: string[];
+  prerequisites?: DocumentationPrerequisite[];
+  support?: DocumentationSupport;
+  provenance?: DocumentationProvenance;
   summary?: string;
   description?: string;
   inputs?: Record<string, any>;
@@ -125,6 +202,15 @@ export interface WorkflowDocumentation {
 /** @public */
 export interface StepDocumentation {
   stepId: string;
+  dependsOn?: string[];
+  prerequisites?: DocumentationPrerequisite[];
+  channelPath?: string;
+  action?: 'send' | 'receive';
+  timeout?: number;
+  correlationId?: string;
+  sourceBinding?: DocumentationSourceBinding;
+  support?: DocumentationSupport;
+  provenance?: DocumentationProvenance;
   description?: string;
   operationId?: string;
   operationPath?: string;
@@ -149,7 +235,8 @@ export interface DocumentationSection {
 // ============================================================================
 
 /** @public */
-export type ArazzoNodeType = 'start' | 'end' | 'step' | 'workflowRef' | 'workflow' | 'externalWorkflow';
+export type ArazzoNodeType =
+  'start' | 'end' | 'step' | 'workflowRef' | 'workflow' | 'externalWorkflow';
 
 /** @public */
 export interface StepNodeData {
@@ -169,6 +256,8 @@ export interface WorkflowRefNodeData {
   type: 'workflowRef';
   step: Step;
   targetWorkflowId: string;
+  /** workflow containing the calling step; optional for existing node consumers. */
+  workflowId?: string;
   workflowSuccessActions?: (SuccessAction | ReusableObject)[];
   workflowFailureActions?: (FailureAction | ReusableObject)[];
   isValid: boolean;
@@ -221,7 +310,30 @@ export type ArazzoNode = Node<ArazzoNodeData>;
 // ============================================================================
 
 /** @public */
-export type ArazzoEdgeType = 'sequential' | 'success' | 'failure' | 'retry' | 'bundled-success' | 'bundled-failure' | 'bundled-retry';
+export type ArazzoEdgeType =
+  | 'relationship'
+  | 'sequential'
+  | 'success'
+  | 'failure'
+  | 'retry'
+  | 'bundled-success'
+  | 'bundled-failure'
+  | 'bundled-retry';
+
+/**
+ * Public inspection details for a workflow relationship or step prerequisite.
+ * This describes authored relationships, not predicted execution. Rendering and
+ * internal inspection-model details are excluded from onEdgeSelect payloads.
+ * @public
+ */
+export interface RelationshipEdgeData {
+  type: 'relationship';
+  kind: 'prerequisite' | 'call' | 'action';
+  label: string;
+  warning?: string;
+  channel?: 'success' | 'failure';
+  actionType?: string;
+}
 
 /** @public */
 export interface SequentialEdgeData {
@@ -285,6 +397,7 @@ export interface BundledRetryEdgeData {
 
 /** @public */
 export type ArazzoEdgeData =
+  | RelationshipEdgeData
   | SequentialEdgeData
   | SuccessEdgeData
   | FailureEdgeData

@@ -7,200 +7,453 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import {
+
+import type {
   ArazzoDocument,
-  Workflow,
   ArazzoNode,
   ArazzoEdge,
-  ArazzoViewerContextValue,
   ViewerEvents,
+  Workflow,
 } from '../types/index';
 import { convertWorkflowToFlow, convertDocumentToFlow } from '../utils/conversion/index';
 import { applySequentialLayout } from '../utils/sequentialLayout';
-import { assignInternalIds } from '../utils/internalIds';
+import { createSnapshot, inspect } from '../utils/inspection';
+import type {
+  DocumentSnapshot,
+  InspectionResult,
+  ClassifiedTarget,
+  PendingSelection,
+} from '../utils/inspection';
+import { buildViewerModel, type ArazzoViewerModel } from '../utils/model/viewerModel';
+import { useSourceRegistry } from '../utils/source/useSourceRegistry';
+import type { SourceRegistry } from '../utils/source/SourceRegistry';
+import type { SourceDocumentProvider, ExternalNavigationRequest } from '../types/source';
+import { ContractFactsProvider } from './ContractFactsContext';
+import { ViewerSessionProvider } from './ViewerSessionContext';
 
-const ArazzoViewerContext = createContext<ArazzoViewerContextValue | null>(null);
-
-export const useArazzoViewer = () => {
-  const context = useContext(ArazzoViewerContext);
-  if (!context) {
-    throw new Error('useArazzoViewer must be used within ArazzoViewerProvider');
-  }
-  return context;
-};
-
-// ============================================================================
-// Injected Mode Provider — passes through pre-computed values
-// ============================================================================
-
-interface InjectedProviderProps {
-  value: ArazzoViewerContextValue;
-  children: React.ReactNode;
+export interface ArazzoViewerContextValue {
+  document: ArazzoDocument;
+  documentURL: string | null;
+  activeWorkflowId: string | null;
+  setActiveWorkflow: (id: string | null) => void;
+  activeWorkflow: Workflow | null;
+  selectedNodeId: string | null;
+  setSelectedNode: (id: string | null) => void;
+  nodes: ArazzoNode[];
+  edges: ArazzoEdge[];
+  setNodes: (nodes: ArazzoNode[]) => void;
+  setEdges: (edges: ArazzoEdge[]) => void;
+  readOnly: boolean;
+  events?: ViewerEvents;
 }
 
-// ============================================================================
-// Standalone Mode Provider — computes nodes/edges from document
-// ============================================================================
-
+interface InternalContext extends ArazzoViewerContextValue {
+  snapshot: DocumentSnapshot;
+  inspection: InspectionResult;
+  model: ArazzoViewerModel;
+  navigateToTarget: (target: ClassifiedTarget) => void;
+  navigationDiagnostic: string | null;
+  selectionRequestVersion: number;
+  getNodeOwner: (node: ArazzoNode) => string | undefined;
+  sourceRegistry: SourceRegistry;
+  sourceProvider?: SourceDocumentProvider;
+  apiDescriptionLoading?: 'manual' | 'automatic';
+  onExternalNavigation?: (request: ExternalNavigationRequest) => void;
+}
+const ArazzoViewerContext = createContext<InternalContext | null>(null);
+export const useArazzoViewer = () => {
+  const context = useContext(ArazzoViewerContext);
+  if (!context) throw new Error('useArazzoViewer must be used within ArazzoViewerProvider');
+  return context;
+};
 interface StandaloneProviderProps {
   document: ArazzoDocument;
+  snapshot?: DocumentSnapshot;
+  inspection?: InspectionResult;
   documentURL?: string | null;
   initialActiveWorkflowId?: string | null;
   initialSelectedNodeId?: string | null;
   events?: ViewerEvents;
+  sourceProvider?: SourceDocumentProvider;
+  apiDescriptionLoading?: 'manual' | 'automatic';
+  onExternalNavigation?: (request: ExternalNavigationRequest) => void;
+  initialReadingView?: 'docs' | 'sequence' | 'flowchart';
   children: React.ReactNode;
 }
+type ProviderProps =
+  StandaloneProviderProps | { value: ArazzoViewerContextValue; children: React.ReactNode };
 
-// ============================================================================
-// Combined Provider
-// ============================================================================
+function ownerLookup(
+  node: ArazzoNode,
+  model: ArazzoViewerModel,
+  document: ArazzoDocument,
+): string | undefined {
+  if ('workflowId' in node.data && node.data.workflowId) return node.data.workflowId;
+  const matches = model.workflows.filter((workflow) =>
+    workflow.steps.some((step) => step.nodeId === node.id),
+  );
+  if (matches.length === 1) return matches[0].workflowId;
+  // legacy injected nodes retain the original scoped converter identity.
+  const legacy = document.workflows.filter((workflow) =>
+    workflow.steps.some(
+      (step) =>
+        `${workflow._internalId || workflow.workflowId}-${step._internalId || step.stepId}` ===
+        node.id,
+    ),
+  );
+  return legacy.length === 1 ? legacy[0].workflowId : undefined;
+}
+function usePendingTargetNavigation({
+  model,
+  activeWorkflowId,
+  controlledWorkflowId,
+  controlledSelectedNodeId,
+  nodes,
+  onActivateWorkflow,
+  onResolvePendingNode,
+}: {
+  model: ArazzoViewerModel;
+  activeWorkflowId: string | null;
+  controlledWorkflowId: string | null | undefined;
+  controlledSelectedNodeId: string | null | undefined;
+  nodes: ArazzoNode[];
+  onActivateWorkflow: (workflowId: string) => void;
+  onResolvePendingNode: (node: ArazzoNode) => void;
+}) {
+  const [pending, setPending] = useState<PendingSelection | null>(null);
+  const [selectionRequestVersion, setSelectionRequestVersion] = useState(0);
+  const [navigationDiagnostic, setDiagnostic] = useState<string | null>(null);
+  const requestId = useRef(0);
+  const cancelledRequest = useRef<number | null>(null);
+  const previousControlledWorkflow = useRef(controlledWorkflowId);
+  const previousControlledSelection = useRef(controlledSelectedNodeId);
+  const latestCallbacks = useRef({ onActivateWorkflow, onResolvePendingNode });
+  latestCallbacks.current = { onActivateWorkflow, onResolvePendingNode };
 
-type ArazzoViewerProviderProps =
-  | ({ value: ArazzoViewerContextValue } & { children: React.ReactNode })
-  | ({
-      document: ArazzoDocument;
-      documentURL?: string | null;
-      initialActiveWorkflowId?: string | null;
-      initialSelectedNodeId?: string | null;
-      events?: ViewerEvents;
-    } & { children: React.ReactNode });
+  useEffect(() => {
+    if (previousControlledWorkflow.current !== controlledWorkflowId) {
+      previousControlledWorkflow.current = controlledWorkflowId;
+      if (pending && controlledWorkflowId !== pending.workflowId) {
+        cancelledRequest.current = pending.requestId;
+        setPending(null);
+      }
+    }
+    if (previousControlledSelection.current !== controlledSelectedNodeId) {
+      previousControlledSelection.current = controlledSelectedNodeId;
+      if (
+        pending &&
+        controlledSelectedNodeId !== model.nodeIds.get(pending.workflowId)?.get(pending.stepId)
+      ) {
+        cancelledRequest.current = pending.requestId;
+        setPending(null);
+      }
+    }
+  }, [controlledWorkflowId, controlledSelectedNodeId, pending, model]);
 
-function isInjectedMode(props: ArazzoViewerProviderProps): props is InjectedProviderProps {
-  return 'value' in props && props.value != null;
+  useEffect(() => {
+    if (
+      !pending ||
+      cancelledRequest.current === pending.requestId ||
+      pending.documentId !== model.documentId
+    ) {
+      if (pending && pending.documentId !== model.documentId) setPending(null);
+      return;
+    }
+    if (pending.workflowId !== activeWorkflowId) return;
+    const targetId = model.nodeIds.get(pending.workflowId)?.get(pending.stepId);
+    if (!targetId) {
+      setDiagnostic(`Missing step: ${pending.workflowId}.${pending.stepId}`);
+      setPending(null);
+      return;
+    }
+    const node = nodes.find((n) => n.id === targetId);
+    if (!node) return;
+    setPending(null);
+    latestCallbacks.current.onResolvePendingNode(node);
+  }, [pending, model, activeWorkflowId, nodes]);
+
+  const navigateToTarget = useCallback(
+    (target: ClassifiedTarget) => {
+      setPending(null);
+      if (!target.navigable || !target.workflowId || !model.workflowsById.has(target.workflowId)) {
+        setDiagnostic(target.reason || `Unavailable target: ${target.reference}`);
+        return;
+      }
+      if (target.stepId && !model.stepsByWorkflow.get(target.workflowId)?.has(target.stepId)) {
+        setDiagnostic(`Missing step: ${target.workflowId}.${target.stepId}`);
+        return;
+      }
+      setDiagnostic(null);
+      if (target.stepId)
+        setPending({
+          documentId: model.documentId,
+          requestId: ++requestId.current,
+          workflowId: target.workflowId,
+          stepId: target.stepId,
+        });
+      latestCallbacks.current.onActivateWorkflow(target.workflowId);
+    },
+    [model],
+  );
+
+  const beginManualSelection = useCallback(() => {
+    setSelectionRequestVersion((version) => version + 1);
+    setPending(null);
+  }, []);
+
+  const clearPendingNavigation = useCallback((clearDiagnostic = false) => {
+    setPending(null);
+    if (clearDiagnostic) setDiagnostic(null);
+  }, []);
+
+  return {
+    navigationDiagnostic,
+    setDiagnostic,
+    selectionRequestVersion,
+    navigateToTarget,
+    beginManualSelection,
+    clearPendingNavigation,
+  };
 }
 
-export const ArazzoViewerProvider: React.FC<ArazzoViewerProviderProps> = (props) => {
-  if (isInjectedMode(props)) {
-    return (
-      <ArazzoViewerContext.Provider value={props.value}>
-        {props.children}
-      </ArazzoViewerContext.Provider>
-    );
-  }
+function InjectedProvider({
+  value,
+  children,
+}: {
+  value: ArazzoViewerContextValue;
+  children: React.ReactNode;
+}) {
+  const sourceRegistry = useSourceRegistry(undefined, undefined, value.document);
+  const snapshot = useMemo(
+    () => createSnapshot(value.document, { trustedInternalIds: true }),
+    [value.document],
+  );
+  const inspection = useMemo(() => inspect(snapshot), [snapshot]);
+  const model = useMemo(() => buildViewerModel(inspection), [inspection]);
+  const {
+    navigationDiagnostic,
+    selectionRequestVersion,
+    navigateToTarget,
+    beginManualSelection,
+    clearPendingNavigation,
+  } = usePendingTargetNavigation({
+    model,
+    activeWorkflowId: value.activeWorkflowId,
+    controlledWorkflowId: value.activeWorkflowId,
+    controlledSelectedNodeId: value.selectedNodeId,
+    nodes: value.nodes,
+    onActivateWorkflow: (workflowId) => {
+      if (workflowId !== value.activeWorkflowId) value.setActiveWorkflow(workflowId);
+    },
+    onResolvePendingNode: (node) => {
+      value.setSelectedNode(node.id);
+    },
+  });
+  return (
+    <ArazzoViewerContext.Provider
+      value={{
+        ...value,
+        setSelectedNode: (id) => {
+          beginManualSelection();
+          value.setSelectedNode(id);
+        },
+        setActiveWorkflow: (id) => {
+          clearPendingNavigation();
+          value.setActiveWorkflow(id);
+        },
+        snapshot,
+        inspection,
+        model,
+        navigationDiagnostic,
+        selectionRequestVersion,
+        navigateToTarget,
+        getNodeOwner: (node) => ownerLookup(node, model, value.document),
+        sourceRegistry,
+      }}
+    >
+      <ContractFactsProvider key={model.documentId}>
+        <ViewerSessionProvider>{children}</ViewerSessionProvider>
+      </ContractFactsProvider>
+    </ArazzoViewerContext.Provider>
+  );
+}
+export const ArazzoViewerProvider: React.FC<ProviderProps> = (props) =>
+  'value' in props ? <InjectedProvider {...props} /> : <StandaloneProvider {...props} />;
 
-  return <StandaloneProvider {...props} />;
-};
-
-const StandaloneProvider: React.FC<StandaloneProviderProps> = ({
+function StandaloneProvider({
   document: rawDocument,
+  snapshot: suppliedSnapshot,
+  inspection: suppliedInspection,
   documentURL = null,
   initialActiveWorkflowId,
   initialSelectedNodeId,
   events,
+  sourceProvider,
+  apiDescriptionLoading = 'manual',
+  onExternalNavigation,
+  initialReadingView,
   children,
-}) => {
-  // Assign internal IDs for stable node ID generation
-  const document = useMemo(() => assignInternalIds(rawDocument), [rawDocument]);
-
-  const [activeWorkflowId, setActiveWorkflowId] = useState<string | null>(
-    initialActiveWorkflowId ?? document.workflows[0]?.workflowId ?? null,
+}: StandaloneProviderProps) {
+  const sourceRegistry = useSourceRegistry(
+    sourceProvider,
+    undefined,
+    suppliedSnapshot ?? rawDocument,
   );
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(
-    initialSelectedNodeId ?? null,
+  const snapshot = useMemo(
+    () => suppliedSnapshot ?? createSnapshot(rawDocument),
+    [suppliedSnapshot, rawDocument],
   );
-  const [nodes, setNodes] = useState<ArazzoNode[]>([]);
-  const [edges, setEdges] = useState<ArazzoEdge[]>([]);
+  const inspection = useMemo(
+    () => suppliedInspection ?? inspect(snapshot),
+    [suppliedInspection, snapshot],
+  );
+  const model = useMemo(() => buildViewerModel(inspection), [inspection]);
+  const document = model.document;
+  const [localWorkflow, setLocalWorkflow] = useState<string | null>(() =>
+    initialActiveWorkflowId === undefined
+      ? (model.workflows[0]?.workflowId ?? null)
+      : initialActiveWorkflowId,
+  );
+  const activeWorkflowId =
+    initialActiveWorkflowId === undefined ? localWorkflow : initialActiveWorkflowId;
+  const activeWorkflow =
+    document.workflows?.find((workflow) => workflow.workflowId === activeWorkflowId) ?? null;
+  const [localSelected, setLocalSelected] = useState<string | null>(initialSelectedNodeId ?? null);
+  const selectedNodeId =
+    initialSelectedNodeId === undefined ? localSelected : initialSelectedNodeId;
+  const previousModel = useRef(model);
 
-  // Sync controlled props
-  useEffect(() => {
-    if (initialActiveWorkflowId !== undefined) {
-      setActiveWorkflowId(initialActiveWorkflowId);
-    }
-  }, [initialActiveWorkflowId]);
+  const graph = useMemo(() => {
+    if (model.support.semanticInspection === 'unsupported') return { nodes: [], edges: [] };
+    if (!activeWorkflow) return convertDocumentToFlow(document, { model });
+    const converted = convertWorkflowToFlow(activeWorkflow, {}, document, model);
+    return applySequentialLayout(converted.nodes, converted.edges);
+  }, [model, document, activeWorkflow]);
+  const [overrides, setOverrides] = useState<{
+    graph: typeof graph;
+    nodes: ArazzoNode[];
+    edges: ArazzoEdge[];
+  } | null>(null);
+  const baseNodes = overrides?.graph === graph ? overrides.nodes : graph.nodes;
 
-  useEffect(() => {
-    if (initialSelectedNodeId !== undefined) {
-      setSelectedNodeId(initialSelectedNodeId);
-    }
-  }, [initialSelectedNodeId]);
+  const {
+    navigationDiagnostic,
+    setDiagnostic,
+    selectionRequestVersion,
+    navigateToTarget,
+    beginManualSelection,
+    clearPendingNavigation,
+  } = usePendingTargetNavigation({
+    model,
+    activeWorkflowId,
+    controlledWorkflowId: initialActiveWorkflowId,
+    controlledSelectedNodeId: initialSelectedNodeId,
+    nodes: baseNodes,
+    onActivateWorkflow: (id) => {
+      if (id === activeWorkflowId) return;
+      if (initialActiveWorkflowId === undefined) setLocalWorkflow(id);
+      if (initialSelectedNodeId === undefined) setLocalSelected(null);
+      events?.onWorkflowSelect?.(id);
+    },
+    onResolvePendingNode: (node) => {
+      if (initialSelectedNodeId === undefined) setLocalSelected(node.id);
+      events?.onNodeSelect?.(node.id, node);
+    },
+  });
 
-  // Memoize activeWorkflow to prevent unnecessary re-renders
-  const activeWorkflowRef = useRef<Workflow | null>(null);
-  const activeWorkflowHashRef = useRef<string>('');
-
-  const activeWorkflow = useMemo(() => {
-    const workflow = document.workflows.find((w) => w.workflowId === activeWorkflowId) || null;
-    const workflowHash = workflow ? JSON.stringify(workflow) : '';
-
-    if (workflowHash !== activeWorkflowHashRef.current) {
-      activeWorkflowHashRef.current = workflowHash;
-      activeWorkflowRef.current = workflow;
-      return workflow;
-    }
-
-    return activeWorkflowRef.current;
-  }, [document, activeWorkflowId]);
-
-  // Ref to hold the navigation handler for external workflow nodes
-  const navigateToWorkflowRef = useRef<(workflowId: string) => void>(() => {});
-  navigateToWorkflowRef.current = (workflowId: string) => {
-    setActiveWorkflowId(workflowId);
-    setSelectedNodeId(null);
-  };
-
-  // Store document in a ref to avoid regenerating the diagram
-  // when non-workflow parts of the document change
-  const currentDocRef = useRef(document);
-  currentDocRef.current = document;
-
-  // Convert active workflow to React Flow nodes/edges with sequential layout
-  useEffect(() => {
-    if (activeWorkflow) {
-      const { nodes: flowNodes, edges: flowEdges } = convertWorkflowToFlow(
-        activeWorkflow,
-        {},
-        currentDocRef.current,
-      );
-
-      const { nodes: layoutedNodes, edges: layoutedEdges } = applySequentialLayout(
-        flowNodes,
-        flowEdges,
-        { direction: 'DOWN' },
-      );
-
-      // Add onClick handlers to external workflow nodes for navigation
-      const nodesWithHandlers = layoutedNodes.map((node) => {
-        if (node.type === 'externalWorkflow') {
+  const requestWorkflow = useCallback(
+    (id: string | null) => {
+      if (id !== null && !model.workflowsById.has(id)) {
+        setDiagnostic(`Missing workflow: ${id}`);
+        return;
+      }
+      if (id === activeWorkflowId) return;
+      if (initialActiveWorkflowId === undefined) setLocalWorkflow(id);
+      if (initialSelectedNodeId === undefined) setLocalSelected(null);
+      events?.onWorkflowSelect?.(id ?? '');
+    },
+    [
+      model,
+      activeWorkflowId,
+      initialActiveWorkflowId,
+      initialSelectedNodeId,
+      events,
+      setDiagnostic,
+    ],
+  );
+  const setActiveWorkflow = useCallback(
+    (id: string | null) => {
+      clearPendingNavigation(true);
+      requestWorkflow(id);
+    },
+    [clearPendingNavigation, requestWorkflow],
+  );
+  const wiredGraph = useMemo(
+    () => ({
+      ...graph,
+      nodes: graph.nodes.map((node) => {
+        if (node.type === 'workflow' && !('referenceKind' in node.data))
           return {
             ...node,
             data: {
               ...node.data,
-              onClick: (workflowId: string) => navigateToWorkflowRef.current(workflowId),
+              onClick: (reference: string) =>
+                navigateToTarget(
+                  inspection.classifyTarget(reference, {
+                    role: 'call',
+                    workflowId: activeWorkflowId ?? undefined,
+                  }),
+                ),
             },
           };
-        }
         return node;
-      });
-
-      setNodes(nodesWithHandlers);
-      setEdges(layoutedEdges);
-    } else if (currentDocRef.current.workflows?.length > 0) {
-      // Show document-level view with workflow nodes
-      const { nodes: docNodes, edges: docEdges } = convertDocumentToFlow(currentDocRef.current, {
-        onWorkflowClick: (workflowId) => setActiveWorkflowId(workflowId),
-      });
-      setNodes(docNodes);
-      setEdges(docEdges);
-    } else {
-      setNodes([]);
-      setEdges([]);
-    }
-  }, [activeWorkflow]);
-
-  const setActiveWorkflow = useCallback(
+      }),
+    }),
+    [graph, navigateToTarget, inspection, activeWorkflowId],
+  );
+  const nodes = overrides?.graph === graph ? overrides.nodes : wiredGraph.nodes;
+  const edges = overrides?.graph === graph ? overrides.edges : wiredGraph.edges;
+  const setNodes = useCallback(
+    (next: ArazzoNode[]) => setOverrides({ graph, nodes: next, edges }),
+    [graph, edges],
+  );
+  const setEdges = useCallback(
+    (next: ArazzoEdge[]) => setOverrides({ graph, nodes, edges: next }),
+    [graph, nodes],
+  );
+  const setSelectedNode = useCallback(
     (id: string | null) => {
-      setActiveWorkflowId(id);
-      setSelectedNodeId(null);
-      events?.onWorkflowSelect?.(id ?? '');
+      beginManualSelection();
+      if (initialSelectedNodeId === undefined) setLocalSelected(id);
+      if (id) {
+        const node = nodes.find((n) => n.id === id);
+        if (node) events?.onNodeSelect?.(id, node);
+      }
     },
-    [events],
+    [beginManualSelection, nodes, events, initialSelectedNodeId],
   );
 
-  const setSelectedNode = useCallback((id: string | null) => {
-    setSelectedNodeId(id);
-  }, []);
+  useEffect(() => {
+    if (previousModel.current !== model) {
+      previousModel.current = model;
+      clearPendingNavigation(true);
+      if (initialSelectedNodeId === undefined) setLocalSelected(null);
+      if (
+        initialActiveWorkflowId === undefined &&
+        activeWorkflowId !== null &&
+        !model.workflowsById.has(activeWorkflowId)
+      )
+        setLocalWorkflow(model.workflows[0]?.workflowId ?? null);
+    }
+  }, [
+    model,
+    initialActiveWorkflowId,
+    initialSelectedNodeId,
+    activeWorkflowId,
+    clearPendingNavigation,
+  ]);
 
-  const value: ArazzoViewerContextValue = {
+  const value: InternalContext = {
     document,
     documentURL,
     activeWorkflowId,
@@ -214,7 +467,23 @@ const StandaloneProvider: React.FC<StandaloneProviderProps> = ({
     setEdges,
     readOnly: true,
     events,
+    snapshot,
+    inspection,
+    model,
+    navigateToTarget,
+    navigationDiagnostic,
+    selectionRequestVersion,
+    getNodeOwner: (node) => ownerLookup(node, model, rawDocument),
+    sourceRegistry,
+    sourceProvider,
+    apiDescriptionLoading,
+    onExternalNavigation,
   };
-
-  return <ArazzoViewerContext.Provider value={value}>{children}</ArazzoViewerContext.Provider>;
-};
+  return (
+    <ArazzoViewerContext.Provider value={value}>
+      <ContractFactsProvider key={model.documentId}>
+        <ViewerSessionProvider defaultView={initialReadingView}>{children}</ViewerSessionProvider>
+      </ContractFactsProvider>
+    </ArazzoViewerContext.Provider>
+  );
+}

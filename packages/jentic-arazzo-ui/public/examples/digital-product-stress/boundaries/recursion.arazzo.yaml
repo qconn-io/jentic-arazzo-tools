@@ -1,0 +1,36 @@
+arazzo: 1.1.0
+info:
+  title: Active-path recursion rendering probe
+  version: 1.0.0
+sourceDescriptions:
+  - name: coordinator
+    url: ../coordinator.openapi.yaml
+    type: openapi
+workflows:
+  - workflowId: recursive-A
+    description: Structurally valid, intentionally nonterminating call graph. Inspection only; do not execute.
+    steps:
+      - stepId: observe-A
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: enter-B
+        workflowId: recursive-B
+        parameters: []
+  - workflowId: recursive-B
+    steps:
+      - stepId: observe-B
+        operationId: $sourceDescriptions.coordinator.checkReadiness
+        parameters:
+          - name: Authorization
+            in: header
+            value: Bearer demo-service-token
+        successCriteria:
+          - condition: $statusCode == 200
+      - stepId: return-A
+        workflowId: recursive-A
+        parameters: []

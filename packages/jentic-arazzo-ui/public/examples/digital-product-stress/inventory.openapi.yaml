@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: Inventory Service API — stress contracts
+  version: 1.0.0
+  description: Fictional local contract for the digital-product example. Servers under example.test
+    are illustrative, not live services.
+servers:
+  - url: https://inventory.example.test
+security:
+  - bearerAuth: []
+paths:
+  /reservations:
+    post:
+      operationId: reserveProduct
+      summary: Reserve one unit and return its current price
+      description: Return the current authoritative price and currency. The caller must compare them with
+        customer authorization before capturing payment.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Stable for this operation and payload. Reuse returns its original result; different
+            payload with the same key returns 409. Never use a new key to resolve an uncertain
+            outcome.
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "201":
+          description: Reservation created at the current product price.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+              example:
+                reservationId: reservation-2001
+                productId: digital-kit
+                amountMinor: 1299
+                currency: EUR
+                state: RESERVED
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationRequest"
+            example:
+              productId: digital-kit
+              quantity: 1
+  /reservations/{reservationId}:
+    get:
+      operationId: getReservation
+      summary: Observe the original reservation
+      description: Observe the original reservation
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationObservation"
+              example:
+                reservationId: reservation-2001
+                productId: digital-kit
+                amountMinor: 1299
+                currency: EUR
+                state: RESERVED
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+  /reservations/{reservationId}/release:
+    post:
+      operationId: releaseReservation
+      summary: Release only the identified original reservation
+      description: Release only the identified original reservation
+      parameters:
+        - name: reservationId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationObservation"
+              example:
+                reservationId: reservation-2001
+                productId: digital-kit
+                amountMinor: 1299
+                currency: EUR
+                state: RELEASED
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Client or service identity appropriate to this API. Tokens in example inputs are
+        placeholders.
+  schemas:
+    Problem:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+    ReservationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - productId
+        - quantity
+      properties:
+        productId:
+          type: string
+          minLength: 1
+        quantity:
+          type: integer
+          const: 1
+    Reservation:
+      type: object
+      additionalProperties: false
+      required:
+        - reservationId
+        - productId
+        - amountMinor
+        - currency
+        - state
+      properties:
+        reservationId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+          description: Amount in minor currency units; 1299 means EUR 12.99.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        state:
+          type: string
+          enum:
+            - RESERVED
+    ReservationObservation:
+      type: object
+      additionalProperties: false
+      required:
+        - reservationId
+        - productId
+        - amountMinor
+        - currency
+        - state
+      properties:
+        reservationId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        state:
+          type: string
+          enum:
+            - RESERVED
+            - RELEASED

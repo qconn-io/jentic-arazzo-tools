@@ -1,0 +1,191 @@
+[
+  {
+    "id": "two-successful-items",
+    "document": "arazzo.yaml",
+    "workflow": "full-stress-journey",
+    "expected": "Each fulfil-item call retains its own purchase/product/amount and output mapping; two READY results.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "price-drift",
+    "document": "arazzo.yaml",
+    "workflow": "reserve-inventory",
+    "expected": "Reservation amount or currency differs from authorization; stop before capture.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "reservation-transient-503",
+    "document": "arazzo.yaml",
+    "workflow": "reserve-inventory",
+    "expected": "Same-key reserve retry, 1-second delay, at most two retries; then stop.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "capture-uncertain-then-confirmed",
+    "document": "arazzo.yaml",
+    "workflow": "capture-authorized-payment",
+    "expected": "UNKNOWN/503 -> reconcile original key -> retry same source step; confirm CAPTURED evidence.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "capture-retries-exhausted",
+    "document": "arazzo.yaml",
+    "workflow": "capture-authorized-payment",
+    "expected": "At most three capture retries, each preceded by reconciliation; fallback end after exhaustion.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "definite-payment-decline",
+    "document": "arazzo.yaml",
+    "workflow": "capture-authorized-payment",
+    "expected": "DECLINED -> one-way abort-purchase -> release and record failure; no refund.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "capture-evidence-mismatch",
+    "document": "arazzo.yaml",
+    "workflow": "capture-authorized-payment",
+    "expected": "Wrong reservation, amount or currency -> stop; no issuance.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "issuance-uncertain",
+    "document": "arazzo.yaml",
+    "workflow": "fulfil-item",
+    "expected": "503 -> reconcile-license -> same-key issuance retry; at most two retries.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "issuance-rejected-compensation",
+    "document": "arazzo.yaml",
+    "workflow": "compensate-purchase",
+    "expected": "Observe original license first; revoke READY license, refund captured payment, release reservation and record failure.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "license-absent-during-compensation",
+    "document": "arazzo.yaml",
+    "workflow": "compensate-purchase",
+    "expected": "ABSENT or REVOKED -> one-way goto refund-payment; skip revoke.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "refund-transient-error",
+    "document": "arazzo.yaml",
+    "workflow": "compensate-purchase",
+    "expected": "Retry original refund key at most twice; never infer later cleanup if refund still fails.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "resume-existing-license",
+    "document": "arazzo.yaml",
+    "workflow": "resume-existing-purchase",
+    "expected": "READY -> one-way transfer to record-ready with observed license identity; no return arrow.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "pending-status-read",
+    "document": "arazzo.yaml",
+    "workflow": "poll-purchase-until-ready",
+    "expected": "Retry current read at most three times; READY passes and FAILED stops.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "local-step-recovery",
+    "document": "arazzo.yaml",
+    "workflow": "step-recovery-probe",
+    "expected": "PENDING -> refresh-state recovery step -> retry require-ready; successful goto skips recovery in the normal path.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "command-and-completion",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "event-driven-purchase",
+    "expected": "Send command; receive correlated READY event; report actual activation; wait for audit receipt and read authoritative state.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "unrelated-event",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "event-driven-purchase",
+    "expected": "Different correlationId does not satisfy receive; continue waiting until a matching event or timeout.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "completion-timeout",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "event-driven-purchase",
+    "expected": "12-second receive timeout; two bounded receive retries without republishing command; then one-way HTTP polling fallback.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "completion-failed",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "event-driven-purchase",
+    "expected": "FAILED event fails receive criteria; bounded receive retries and polling fallback cannot authorize activation from FAILED state.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "failed-device-activation",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "activation-audit-worker",
+    "expected": "Record FAILED outcome and publish RECORDED receipt; receipt does not assert successful activation.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "audit-join",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "event-driven-purchase",
+    "expected": "Final read requires both await-ready and await-audit; receipt eventId must match the original activation event.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "worker-perspective",
+    "document": "event-based.arazzo.yaml",
+    "workflow": "purchase-event-worker",
+    "expected": "Receive command -> external supplied HTTP fulfil-item -> read confirmed state -> publish completion.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "large-structured-details",
+    "document": "boundaries/metadata-heavy.arazzo.yaml",
+    "workflow": "metadata-heavy-entry",
+    "expected": "Long labels remain identifiable and 0/false/null/empty/nested values remain in authored details.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "recursive-call",
+    "document": "boundaries/recursion.arazzo.yaml",
+    "workflow": "recursive-A",
+    "expected": "Active-path recursion marker; finite scene; inspection-only nonterminating execution graph.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "depth-budget",
+    "document": "boundaries/depth-limit.arazzo.yaml",
+    "workflow": "layer-0",
+    "expected": "Expand until an eight-level boundary marker; open the target as a new root for deeper content.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "row-budget",
+    "document": "boundaries/row-limit.arazzo.yaml",
+    "workflow": "row-limit",
+    "expected": "250 authored read operations; 200-row scene with omitted-content marker and full documentation access.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "unavailable-targets",
+    "document": "diagnostics/unavailable-targets.arazzo.yaml",
+    "workflow": "diagnostic-probe",
+    "expected": "Healthy, supplied external, unfetched external, missing local and ambiguous operation coexist; deliberately incomplete/invalid.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  },
+  {
+    "id": "prerequisite-cycle",
+    "document": "diagnostics/prerequisite-cycle.arazzo.yaml",
+    "workflow": "cycle-A",
+    "expected": "Prerequisite-only cycle warning; intentionally semantically invalid.",
+    "evidence": "Authored scenario and viewer inspection; not a live execution trace."
+  }
+]

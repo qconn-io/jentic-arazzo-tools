@@ -6,3 +6,9 @@ node_modules/
 isolate-*.log
 .log*
 .claude/
+.agents/
+/openspec/
+# Browser acceptance test output
+**/test-results/
+**/playwright-report/
+**/test-output/

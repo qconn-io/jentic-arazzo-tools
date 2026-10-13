@@ -57,10 +57,8 @@ npm run lint       # Lint code
 
 ## Testing
 
-- Tests use Mocha and Chai
-- Test files are in `test/` directories with `.ts` extension
-- Tests are transpiled to `.mjs` before running
-- Snapshot testing uses `@speclynx/jest-snapshot-mocha-adapter`
+- Core packages (`parser`, `resolver`, `runner`, `validator`) use Mocha and Chai with `.ts` test files in `test/` transpiled to `.mjs` before running, plus `@speclynx/jest-snapshot-mocha-adapter` for snapshots
+- `@jentic/arazzo-ui` uses Vitest and Testing Library (`test/**/*.test.ts` and `test/**/*.test.tsx`) for unit and component tests, and Playwright (`test/e2e/**/*.spec.ts`) for browser acceptance tests
 
 ## Code Conventions
 
@@ -75,10 +73,12 @@ npm run lint       # Lint code
 
 ### Architecture
 
-Two-tier component architecture:
+Core viewer tiers and opt-in portfolio/review surfaces:
 
 - **ArazzoUI** — headless viewer component, controlled via `view` prop. Entry points: `src/ArazzoUI.tsx` (ESM), `src/ArazzoUI.umd.ts` (UMD imperative API)
 - **ArazzoUIStandalone** — self-contained viewer with built-in header (logo, URL input, view mode toggle). Entry points: `src/ArazzoUIStandalone.tsx` (ESM), `src/ArazzoUIStandalone.umd.ts` (UMD imperative API)
+- **ArazzoCatalog** — opt-in multi-document workflow capability catalog (`src/ArazzoCatalog.tsx`, re-exported from main/standalone ESM entry points and the ESM-only `@jentic/arazzo-ui/catalog` subpath)
+- **ArazzoWorkflowReview** — opt-in offline workflow revision comparison component and utilities (`src/ArazzoWorkflowReview.tsx`, `compareWorkflowRevisions`, `exportWorkflowReview`, re-exported from main/standalone ESM entry points)
 
 UMD builds bundle all dependencies into a single file. ESM builds externalize all bare imports.
 
@@ -105,6 +105,7 @@ npm run dev                # Vite dev server
 ### Static App Build
 
 `npm run build:app` produces a self-contained app in `build/`:
+
 - `index.html` — loads UMD bundle + CSS, calls imperative API
 - `arazzo-ui-standalone.js` — UMD bundle with all deps
 - `arazzo-ui.css` — styles
@@ -123,10 +124,11 @@ Deployed to https://arazzo-ui.jentic.com via `gh-pages` branch.
 ### API Extractor
 
 Two configs in `config/api-extractor/`:
-- `api-extractor.ArazzoUI.json` — generates `types/arazzo-ui.d.ts`
-- `api-extractor.ArazzoUIStandalone.json` — generates `types/arazzo-ui-standalone.d.ts`
 
-All exported types must have `/** @public */` JSDoc tag. Both entry points re-export all public types to avoid `ae-forgotten-export` warnings. `@jentic` in JSDoc must be escaped as `\@jentic`.
+- `api-extractor.ArazzoUI.json` — generates `types/arazzo-ui.d.ts` (for `@jentic/arazzo-ui` and `@jentic/arazzo-ui/catalog`)
+- `api-extractor.ArazzoUIStandalone.json` — generates `types/arazzo-ui-standalone.d.ts` (for `@jentic/arazzo-ui/standalone`)
+
+All exported types and components (`ArazzoUI`, `ArazzoUIStandalone`, `ArazzoCatalog`, `ArazzoWorkflowReview`, and helper functions) must have `/** @public */` JSDoc tag. Both entry points re-export all public types and opt-in components/utilities to avoid `ae-forgotten-export` warnings. `@jentic` in JSDoc must be escaped as `\@jentic`.
 
 ### Cross-View Synchronization (Split View)
 

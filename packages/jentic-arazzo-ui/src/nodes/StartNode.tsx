@@ -1,5 +1,6 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
+
 import { StartNodeData } from '../types/index';
 
 export const StartNode: React.FC<NodeProps<StartNodeData>> = ({ data, selected }) => {

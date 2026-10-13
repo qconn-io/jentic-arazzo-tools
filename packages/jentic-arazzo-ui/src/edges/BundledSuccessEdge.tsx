@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { EdgeProps, EdgeLabelRenderer, useReactFlow } from 'reactflow';
+
 import { BundledSuccessEdgeData } from '../types/index';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
 import { getInheritedSuccessActionYOffset } from '../utils/nodeLayout';

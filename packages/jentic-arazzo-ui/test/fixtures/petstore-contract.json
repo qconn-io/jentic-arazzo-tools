@@ -1,0 +1,48 @@
+{
+  "openapi": "3.1.0",
+  "info": { "title": "Deterministic Petstore acceptance contract", "version": "test-owned-1" },
+  "paths": {
+    "/user/login": {
+      "get": {
+        "operationId": "loginUser",
+        "summary": "Log in with authored credentials",
+        "responses": { "200": { "description": "Authored session token" } }
+      }
+    },
+    "/pet/findByStatus": {
+      "get": {
+        "operationId": "findPetsByStatus",
+        "summary": "Find pets by status",
+        "parameters": [{ "name": "status", "in": "query", "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "Authored pet collection" } }
+      }
+    },
+    "/store/order": {
+      "post": {
+        "operationId": "placeOrder",
+        "summary": "Place an authored order",
+        "responses": { "200": { "description": "Authored order" } }
+      }
+    },
+    "/pet/{petId}": {
+      "get": {
+        "operationId": "getPetById",
+        "summary": "Read ordered pet",
+        "parameters": [
+          { "name": "petId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Authored pet" } }
+      }
+    },
+    "/store/order/{orderId}": {
+      "get": {
+        "operationId": "getOrderById",
+        "summary": "Read order confirmation",
+        "parameters": [
+          { "name": "orderId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "Authored confirmation" } }
+      }
+    }
+  }
+}

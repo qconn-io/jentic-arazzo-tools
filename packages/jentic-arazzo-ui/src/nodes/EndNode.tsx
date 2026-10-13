@@ -1,5 +1,6 @@
 import React from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
+
 import { EndNodeData } from '../types/index';
 
 export const EndNode: React.FC<NodeProps<EndNodeData>> = ({ data, selected }) => {

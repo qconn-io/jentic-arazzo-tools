@@ -1,0 +1,237 @@
+openapi: 3.1.0
+info:
+  title: License Service API — stress contracts
+  version: 1.0.0
+  description: Fictional local contract for the digital-product example. Servers under example.test
+    are illustrative, not live services.
+servers:
+  - url: https://license.example.test
+security:
+  - bearerAuth: []
+paths:
+  /licenses:
+    post:
+      operationId: issueLicense
+      summary: Issue one license for a paid reservation
+      description: Accept only an authenticated coordinator request with confirmed reservation and
+        captured-payment evidence matching this customer, product and purchase. Return the existing
+        license for a replay of the original issuance key.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Stable for this operation and payload. Reuse returns its original result; different
+            payload with the same key returns 409. Never use a new key to resolve an uncertain
+            outcome.
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "201":
+          description: A single READY license is issued for the scoped purchase.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IssuedLicense"
+              example:
+                licenseId: license-3001
+                purchaseId: purchase-1001
+                state: READY
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueLicenseRequest"
+            example:
+              purchaseId: purchase-1001
+              customerId: customer-7
+              productId: digital-kit
+              reservationId: reservation-2001
+              paymentId: payment-4001
+  /licenses/by-key:
+    get:
+      operationId: getLicenseByKey
+      summary: Read issuance state for the original stable key; ABSENT has an empty licenseId
+      description: Read issuance state for the original stable key; ABSENT has an empty licenseId
+      parameters:
+        - name: attemptKey
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LicenseObservation"
+              example:
+                purchaseId: purchase-1001-A
+                licenseId: license-3001
+                state: READY
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+  /licenses/{licenseId}/revoke:
+    post:
+      operationId: revokeLicense
+      summary: Revoke the scoped known license before refunding; never guess an identity
+      description: Revoke the scoped known license before refunding; never guess an identity
+      parameters:
+        - name: licenseId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Authoritative state for the original scoped attempt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LicenseObservation"
+              example:
+                purchaseId: purchase-1001-A
+                licenseId: license-3001
+                state: REVOKED
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Client or service identity appropriate to this API. Tokens in example inputs are
+        placeholders.
+  schemas:
+    Problem:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+    IssueLicenseRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - reservationId
+        - paymentId
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        reservationId:
+          type: string
+          minLength: 1
+        paymentId:
+          type: string
+          minLength: 1
+    IssuedLicense:
+      type: object
+      additionalProperties: false
+      required:
+        - licenseId
+        - purchaseId
+        - state
+      properties:
+        licenseId:
+          type: string
+          minLength: 1
+        purchaseId:
+          type: string
+          minLength: 1
+        state:
+          type: string
+          enum:
+            - READY
+    LicenseObservation:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - licenseId
+        - state
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        licenseId:
+          type: string
+        state:
+          type: string
+          enum:
+            - ABSENT
+            - READY
+            - REVOKED

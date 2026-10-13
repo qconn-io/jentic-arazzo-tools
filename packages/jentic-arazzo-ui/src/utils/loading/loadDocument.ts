@@ -1,0 +1,343 @@
+import { parseArazzo } from '@jentic/arazzo-parser';
+import { defaultDereferenceArazzoOptions } from '@jentic/arazzo-resolver';
+import { toValue } from '@speclynx/apidom-core';
+import {
+  cloneDeep,
+  ObjectElement,
+  isObjectElement,
+  type Element,
+  type ParseResultElement,
+} from '@speclynx/apidom-datamodel';
+import { traverse, type Path } from '@speclynx/apidom-traverse';
+import {
+  dereferenceApiDOM,
+  mergeOptions,
+  options as nativeOptions,
+  type ApiDOMReferenceOptions,
+} from '@speclynx/apidom-reference/configuration/empty';
+
+import type { ArazzoDocument } from '../../types/arazzo';
+import { parseReusableReference, selectProfile } from '../inspection';
+import type { DocumentSnapshot, InspectionDiagnostic } from '../inspection/types';
+import { reusableOccurrenceFields } from '../inspection/reusable';
+import { parseContract } from '../contract/references';
+import type { SourceRegistry, SourceValidityToken } from '../source/SourceRegistry';
+import { createNativeAuthority } from './nativeAuthority';
+
+interface LoadOptions {
+  baseURI?: string;
+  contentOnly?: boolean;
+  secondaryRegistry?: SourceRegistry;
+  sourceRevision?: string;
+  sourceValidity?: SourceValidityToken;
+}
+interface LoadedDocument {
+  document: ArazzoDocument;
+  snapshot: DocumentSnapshot;
+  diagnostics: InspectionDiagnostic[];
+}
+
+function validateIdentities(document: ArazzoDocument): void {
+  if (
+    !Array.isArray(document.workflows) ||
+    !Array.isArray(document.sourceDescriptions) ||
+    !document.info ||
+    typeof document.info !== 'object'
+  ) {
+    throw new Error('Parsing: unusable Arazzo document root');
+  }
+  const workflows = new Set<string>();
+  for (const workflow of document.workflows) {
+    if (
+      typeof workflow.workflowId !== 'string' ||
+      !workflow.workflowId ||
+      workflows.has(workflow.workflowId)
+    ) {
+      throw new Error('Parsing: missing or duplicate workflow ID');
+    }
+    workflows.add(workflow.workflowId);
+    if (!Array.isArray(workflow.steps)) throw new Error('Parsing: workflow steps must be an array');
+    const steps = new Set<string>();
+    for (const step of workflow.steps) {
+      if (typeof step.stepId !== 'string' || !step.stepId || steps.has(step.stepId))
+        throw new Error('Parsing: missing or duplicate scoped step ID');
+      steps.add(step.stepId);
+    }
+  }
+}
+
+// traverse known schema locations only. Map keys are authored names; literal and
+// extension payloads (including unknown vocabulary) are not schema locations.
+function hasCustomDialect(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const schema = value as Record<string, unknown>;
+  if (
+    typeof schema.$schema === 'string' &&
+    !/^https?:\/\/json-schema.org\/draft\/(2020-12|2019-09)\/schema#?$/.test(schema.$schema) &&
+    !/^https?:\/\/json-schema.org\/draft-0[467]\/schema#?$/.test(schema.$schema)
+  )
+    return true;
+  for (const keyword of [
+    'properties',
+    'patternProperties',
+    '$defs',
+    'definitions',
+    'dependentSchemas',
+  ]) {
+    const map = schema[keyword];
+    if (
+      map &&
+      typeof map === 'object' &&
+      !Array.isArray(map) &&
+      Object.values(map).some(hasCustomDialect)
+    )
+      return true;
+  }
+  // draft 4–7 dependencies can contain schemas or arrays of property names.
+  const dependencies = schema.dependencies;
+  if (
+    dependencies &&
+    typeof dependencies === 'object' &&
+    !Array.isArray(dependencies) &&
+    Object.values(dependencies).some(hasCustomDialect)
+  )
+    return true;
+  for (const keyword of ['allOf', 'anyOf', 'oneOf', 'prefixItems']) {
+    const schemas = schema[keyword];
+    if (Array.isArray(schemas) && schemas.some(hasCustomDialect)) return true;
+  }
+  // older drafts permit tuple items; newer drafts use a single schema.
+  if (
+    Array.isArray(schema.items)
+      ? schema.items.some(hasCustomDialect)
+      : hasCustomDialect(schema.items)
+  )
+    return true;
+  return [
+    'additionalProperties',
+    'additionalItems',
+    'contains',
+    'not',
+    'if',
+    'then',
+    'else',
+    'propertyNames',
+    'unevaluatedProperties',
+    'unevaluatedItems',
+    'contentSchema',
+  ].some((keyword) => hasCustomDialect(schema[keyword]));
+}
+
+function transformApi(root: ParseResultElement, visitor: object): ParseResultElement {
+  const index = root.map((element) => element === root.api).indexOf(true);
+  const transformed = traverse(root.api!, visitor);
+  root.set(index, transformed);
+  return root;
+}
+
+export async function loadDocument(
+  input: ArazzoDocument | Record<string, unknown> | string,
+  options: LoadOptions = {},
+): Promise<LoadedDocument> {
+  const parsed = await parseArazzo(
+    options.contentOnly
+      ? await parseContract(input)
+      : typeof input === 'string'
+        ? input
+        : (structuredClone(input) as unknown as Record<string, unknown>),
+  );
+  if (!parsed.api || !isObjectElement(parsed.api))
+    throw new Error('Parsing: unusable Arazzo document root');
+  const authored = cloneDeep(parsed);
+  const authoredDocument = toValue(authored.api) as ArazzoDocument;
+  if (typeof authoredDocument.arazzo !== 'string')
+    throw new Error('Parsing: missing specification version');
+  const profile = selectProfile(authoredDocument.arazzo);
+  if (profile) validateIdentities(authoredDocument);
+  const retrievalURI = parsed.hasMetaProperty('retrievalURI')
+    ? (toValue(parsed.meta.get('retrievalURI')!) as string)
+    : undefined;
+  const baseURI = retrievalURI || options.baseURI;
+  const diagnostics: InspectionDiagnostic[] = [];
+  const self = (authoredDocument as ArazzoDocument & { $self?: string }).$self;
+  let restored = parsed;
+  const occurrences = profile?.inventory(authoredDocument) ?? [];
+  for (const occurrence of occurrences) {
+    if (!parseReusableReference(occurrence.reference))
+      throw new Error(`Resolution: malformed reusable reference ${occurrence.reference}`);
+  }
+  const resolutionReasons: NonNullable<InspectionDiagnostic['resolutionReasons']> = [];
+  if (self !== undefined) resolutionReasons.push('self');
+  if (
+    authoredDocument.workflows?.some((workflow) => hasCustomDialect(workflow.inputs)) ||
+    Object.values(authoredDocument.components?.inputs ?? {}).some(hasCustomDialect)
+  )
+    resolutionReasons.push('schema-dialect');
+  if (!baseURI) resolutionReasons.push('base-uri');
+  const unsupportedResolution = resolutionReasons.length > 0;
+  if (profile && !unsupportedResolution) {
+    const missing = new Map<
+      string,
+      { original: Element; occurrence: (typeof occurrences)[number] }
+    >();
+    const missingPaths = new Map<string, string>();
+    for (const occurrence of occurrences) {
+      const match = parseReusableReference(occurrence.reference)!;
+      const bucket = authoredDocument.components?.[match.bucket];
+      if (!bucket || !Object.prototype.hasOwnProperty.call(bucket, match.key))
+        missingPaths.set(JSON.stringify(occurrence.path), crypto.randomUUID());
+    }
+    restored = transformApi(restored, {
+      enter(path: Path<Element>) {
+        const token = missingPaths.get(JSON.stringify(path.getPathKeys()));
+        if (!token) return;
+        const occurrence = occurrences.find(
+          (o) => JSON.stringify(o.path) === JSON.stringify(path.getPathKeys()),
+        )!;
+        missing.set(token, { original: cloneDeep(path.node), occurrence });
+        const placeholder = new ObjectElement();
+        placeholder.meta.set('viewerRecoveryToken', token);
+        path.replaceWith(placeholder);
+        path.skip();
+      },
+    });
+    // native resolution can read the supplied root, but has no independent transport.
+    // only the explicitly enabled secondary projection may acquire dependencies.
+    const rootURI = new URL(baseURI!).href;
+    const registry = options.secondaryRegistry;
+    const authority = createNativeAuthority(
+      restored,
+      rootURI,
+      registry,
+      options.sourceRevision,
+      options.sourceValidity,
+    );
+    const defaults = mergeOptions(nativeOptions, defaultDereferenceArazzoOptions);
+    const projectionOptions: ApiDOMReferenceOptions = {
+      ...defaults,
+      parse: {
+        ...defaults.parse,
+        parserOpts: { ...defaults.parse.parserOpts, sourceDescriptions: false },
+      },
+      resolve: {
+        ...defaults.resolve,
+        baseURI: rootURI,
+        resolvers: [authority.resolver],
+      },
+      dereference: {
+        ...defaults.dereference,
+        refSet: authority.refSet,
+        circular: 'error',
+        immutable: false,
+        strategyOpts: { sourceDescriptions: false },
+        continueOnError(error) {
+          authority.ensureCurrent();
+          const context = error as unknown as {
+            uri?: string;
+            refFieldValue?: string;
+            location?: string;
+            trace?: { uri: string; refFieldValue: string; location?: string }[];
+          };
+          const rootHop = context.trace?.find((hop) => hop.uri === rootURI);
+          const reference = rootHop?.refFieldValue ?? context.refFieldValue;
+          // supported local schema errors retain the existing fatal-load contract.
+          if (!reference || new URL(reference, rootURI).href.split('#')[0] === rootURI) throw error;
+          const tokens = (rootHop?.location ?? context.location ?? '')
+            .replace(/^#?\//, '')
+            .split('/')
+            .filter(Boolean);
+          const causes: string[] = [];
+          let cause: unknown = error;
+          for (let depth = 0; cause instanceof Error && depth < 10; depth++) {
+            causes.push(cause.message);
+            cause = cause.cause;
+          }
+          diagnostics.push({
+            phase: 'resolution',
+            category: 'missing-reference',
+            severity: 'warning',
+            code: 'secondary-reference-unavailable',
+            path: tokens.map((token) => token.replace(/~1/g, '/').replace(/~0/g, '~')),
+            originalReference: reference,
+            workflowId:
+              tokens[0] === 'workflows'
+                ? authoredDocument.workflows[Number(tokens[1])]?.workflowId
+                : undefined,
+            message: [...new Set(causes)].join(': '),
+          });
+        },
+      },
+    };
+    restored = await dereferenceApiDOM(restored, projectionOptions);
+    authority.ensureCurrent();
+    restored.meta.set('viewerSourceReferences', authority.references);
+    restored = transformApi(restored, {
+      enter(path: Path<Element>) {
+        if (!path.node.hasMetaProperty('viewerRecoveryToken')) return;
+        const token = toValue(path.node.meta.get('viewerRecoveryToken')!) as string;
+        const entry = missing.get(token);
+        if (!entry) return;
+        path.replaceWith(cloneDeep(entry.original));
+        path.skip();
+      },
+    });
+    // native reusable expansion copies declaration fields; retain opaque use-site data too.
+    const uses = new Map(
+      occurrences.map((occurrence) => [JSON.stringify(occurrence.path), occurrence]),
+    );
+    restored = transformApi(restored, {
+      enter(path: Path<Element>) {
+        const occurrence = uses.get(JSON.stringify(path.getPathKeys()));
+        if (!occurrence || !isObjectElement(path.node) || !path.node.hasMetaProperty('ref-fields'))
+          return;
+        const fields = toValue(path.node.meta.get('ref-fields')!) as { reference?: string };
+        if (fields.reference !== occurrence.reference) return;
+        let original: unknown = authoredDocument;
+        for (const key of occurrence.path) {
+          if (!original || typeof original !== 'object') return;
+          original = (original as Record<string, unknown>)[key];
+        }
+        if (!original || typeof original !== 'object') return;
+        for (const [key, value] of Object.entries(reusableOccurrenceFields(original))) {
+          path.node.set(key, value);
+        }
+      },
+    });
+    for (const { occurrence } of missing.values()) {
+      diagnostics.push({
+        phase: 'resolution',
+        category: 'missing-reference',
+        severity: 'warning',
+        message: `Missing reusable ${occurrence.reference}`,
+        ...occurrence.owner,
+        path: occurrence.path,
+        code: 'missing-reusable',
+        declarationPath: occurrence.declarationPath,
+      });
+    }
+  } else if (profile) {
+    diagnostics.push({
+      phase: 'resolution',
+      category: 'unsupported-resolution',
+      severity: 'warning',
+      message: `Reference expansion bypassed: ${resolutionReasons.map((reason) => ({ self: 'unsupported $self semantics', 'schema-dialect': 'unsupported schema dialect', 'base-uri': 'unavailable base URI' })[reason]).join('; ')}. Authored references are preserved.`,
+      resolutionReasons,
+      path: [],
+      code: 'expansion-bypassed',
+    });
+  }
+  const document = toValue(restored.api) as ArazzoDocument;
+  const snapshot: DocumentSnapshot = {
+    id: crypto.randomUUID(),
+    authored,
+    restored,
+    authoredDocument: authoredDocument as DocumentSnapshot['authoredDocument'],
+    document: document as DocumentSnapshot['document'],
+    exactVersion: authoredDocument.arazzo,
+    retrievalURI,
+    baseURI,
+    self,
+    diagnostics,
+  };
+  return { document, snapshot, diagnostics };
+}

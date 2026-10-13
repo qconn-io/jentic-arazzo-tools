@@ -1,0 +1,404 @@
+arazzo: 1.1.0
+info:
+  title: Digital product stress pack — event-based purchase
+  version: 1.0.0
+  summary: Correlated AsyncAPI commands/events, receive timeouts, bounded retries and an explicit join.
+  description: Client/orchestrator, purchase worker and activation audit worker are independent
+    actors, not three workflows invoked consecutively. Start consumers before publishing. No broker
+    acknowledgement or delivery guarantee is inferred from action send. Server credentials stay out
+    of message payloads.
+sourceDescriptions:
+  - name: coordinator
+    url: ./coordinator.openapi.yaml
+    type: openapi
+  - name: inventory
+    url: ./inventory.openapi.yaml
+    type: openapi
+  - name: payment
+    url: ./payment.openapi.yaml
+    type: openapi
+  - name: license
+    url: ./license.openapi.yaml
+    type: openapi
+  - name: events
+    url: ./events.asyncapi.yaml
+    type: asyncapi
+  - name: commerce
+    url: ./arazzo.yaml
+    type: arazzo
+components:
+  parameters:
+    service-authorization:
+      name: Authorization
+      in: header
+      value: Bearer {$inputs.serviceToken}
+    operation-key:
+      name: Idempotency-Key
+      in: header
+      value: $inputs.purchaseId
+  failureActions:
+    stop-and-reconcile:
+      name: stop-and-reconcile
+      type: end
+    retry-transient:
+      name: retry-transient
+      type: retry
+      retryAfter: 1
+      retryLimit: 2
+      criteria:
+        - condition: $statusCode == 503
+  successActions:
+    finish:
+      name: finish
+      type: end
+workflows:
+  - workflowId: event-driven-purchase
+    summary: Send purchase command, await readiness, report activation and join audit confirmation
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - customerId
+        - productId
+        - amountMinor
+        - currency
+        - paymentToken
+        - serviceToken
+        - deviceId
+        - activationOutcome
+        - activationEventId
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        customerId:
+          type: string
+          minLength: 1
+        productId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        deviceId:
+          type: string
+          minLength: 1
+        activationOutcome:
+          type: string
+          enum:
+            - ACTIVATED
+            - FAILED
+        activationEventId:
+          type: string
+          minLength: 1
+    failureActions:
+      - name: stop-event-journey
+        type: end
+    steps:
+      - stepId: publish-command
+        operationId: $sourceDescriptions.events.sendPurchaseRequested
+        action: send
+        parameters:
+          - name: correlationId
+            in: header
+            value: $inputs.purchaseId
+          - name: eventId
+            in: header
+            value: "{$inputs.purchaseId}-publish-command"
+        requestBody:
+          contentType: application/json
+          payload:
+            purchaseId: $inputs.purchaseId
+            customerId: $inputs.customerId
+            productId: $inputs.productId
+            amountMinor: $inputs.amountMinor
+            currency: $inputs.currency
+            paymentToken: $inputs.paymentToken
+      - stepId: await-ready
+        operationId: $sourceDescriptions.events.receivePurchaseCompleted
+        action: receive
+        correlationId: $inputs.purchaseId
+        timeout: 12000
+        successCriteria:
+          - condition: $message.payload#/state == 'READY'
+          - condition: $message.payload#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $message.payload#/licenseId
+        dependsOn:
+          - publish-command
+        onFailure:
+          - name: receive-again-without-republishing
+            type: retry
+            retryAfter: 0.5
+            retryLimit: 2
+          - name: fallback-to-authoritative-state
+            type: goto
+            workflowId: poll-purchase-until-ready
+            parameters:
+              - name: purchaseId
+                value: $inputs.purchaseId
+              - name: serviceToken
+                value: $inputs.serviceToken
+      - stepId: publish-activation
+        operationId: $sourceDescriptions.events.sendActivationReported
+        action: send
+        parameters:
+          - name: correlationId
+            in: header
+            value: $inputs.purchaseId
+          - name: eventId
+            in: header
+            value: $inputs.activationEventId
+        requestBody:
+          contentType: application/json
+          payload:
+            purchaseId: $inputs.purchaseId
+            licenseId: $steps.await-ready.outputs.licenseId
+            deviceId: $inputs.deviceId
+            outcome: $inputs.activationOutcome
+        dependsOn:
+          - await-ready
+      - stepId: await-audit
+        operationId: $sourceDescriptions.events.receiveAuditRecorded
+        action: receive
+        correlationId: $inputs.purchaseId
+        timeout: 12000
+        successCriteria:
+          - condition: $message.payload#/state == 'RECORDED'
+          - condition: $message.payload#/purchaseId == $inputs.purchaseId
+          - condition: $message.payload#/eventId == $inputs.activationEventId
+        dependsOn:
+          - publish-activation
+      - stepId: read-authoritative-state
+        operationId: $sourceDescriptions.coordinator.getPurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/licenseId == $steps.await-ready.outputs.licenseId
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        dependsOn:
+          - await-ready
+          - await-audit
+  - workflowId: purchase-event-worker
+    summary: Receive a command, invoke supplied external HTTP implementation, then publish confirmed
+      readiness
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+        - context
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+        context:
+          type: object
+    failureActions:
+      - name: stop-worker-and-reconcile
+        type: end
+    steps:
+      - stepId: receive-command
+        operationId: $sourceDescriptions.events.receivePurchaseRequested
+        action: receive
+        correlationId: $inputs.purchaseId
+        timeout: 12000
+        successCriteria:
+          - condition: $message.payload#/purchaseId == $inputs.purchaseId
+        outputs:
+          customerId: $message.payload#/customerId
+          productId: $message.payload#/productId
+          amountMinor: $message.payload#/amountMinor
+          currency: $message.payload#/currency
+          paymentToken: $message.payload#/paymentToken
+      - stepId: fulfil-command
+        workflowId: $sourceDescriptions.commerce.fulfil-item
+        parameters:
+          - name: purchaseId
+            value: $inputs.purchaseId
+          - name: serviceToken
+            value: $inputs.serviceToken
+          - name: context
+            value: $inputs.context
+          - name: customerId
+            value: $steps.receive-command.outputs.customerId
+          - name: productId
+            value: $steps.receive-command.outputs.productId
+          - name: amountMinor
+            value: $steps.receive-command.outputs.amountMinor
+          - name: currency
+            value: $steps.receive-command.outputs.currency
+          - name: paymentToken
+            value: $steps.receive-command.outputs.paymentToken
+        dependsOn:
+          - receive-command
+      - stepId: verify-ready
+        operationId: $sourceDescriptions.coordinator.getPurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        dependsOn:
+          - fulfil-command
+      - stepId: publish-ready
+        operationId: $sourceDescriptions.events.sendPurchaseCompleted
+        action: send
+        parameters:
+          - name: correlationId
+            in: header
+            value: $inputs.purchaseId
+          - name: eventId
+            in: header
+            value: "{$inputs.purchaseId}-publish-ready"
+        requestBody:
+          contentType: application/json
+          payload:
+            purchaseId: $inputs.purchaseId
+            licenseId: $steps.verify-ready.outputs.licenseId
+            state: READY
+        dependsOn:
+          - verify-ready
+  - workflowId: activation-audit-worker
+    summary: Receive actual activation outcome, durably record it, then publish receipt
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - activationEventId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        activationEventId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - name: stop-audit-worker
+        type: end
+    steps:
+      - stepId: receive-activation
+        operationId: $sourceDescriptions.events.receiveActivationReported
+        action: receive
+        correlationId: $inputs.purchaseId
+        timeout: 12000
+        successCriteria:
+          - condition: $message.payload#/purchaseId == $inputs.purchaseId
+          - condition: $message.header#/eventId == $inputs.activationEventId
+        outputs:
+          licenseId: $message.payload#/licenseId
+          deviceId: $message.payload#/deviceId
+          outcome: $message.payload#/outcome
+      - stepId: record-event
+        operationId: $sourceDescriptions.coordinator.recordActivation
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+          - reference: $components.parameters.operation-key
+            value: $inputs.activationEventId
+        requestBody:
+          contentType: application/json
+          payload:
+            licenseId: $steps.receive-activation.outputs.licenseId
+            deviceId: $steps.receive-activation.outputs.deviceId
+            outcome: $steps.receive-activation.outputs.outcome
+        successCriteria:
+          - condition: $statusCode == 204
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        dependsOn:
+          - receive-activation
+      - stepId: publish-receipt
+        operationId: $sourceDescriptions.events.sendAuditRecorded
+        action: send
+        parameters:
+          - name: correlationId
+            in: header
+            value: $inputs.purchaseId
+          - name: eventId
+            in: header
+            value: "{$inputs.purchaseId}-publish-receipt"
+        requestBody:
+          contentType: application/json
+          payload:
+            purchaseId: $inputs.purchaseId
+            eventId: $inputs.activationEventId
+            state: RECORDED
+        dependsOn:
+          - record-event
+  - workflowId: poll-purchase-until-ready
+    summary: Bounded same-step retry for PENDING; end for FAILED
+    inputs:
+      type: object
+      additionalProperties: false
+      required:
+        - purchaseId
+        - serviceToken
+      properties:
+        purchaseId:
+          type: string
+          minLength: 1
+        serviceToken:
+          type: string
+          minLength: 1
+    failureActions:
+      - reference: $components.failureActions.stop-and-reconcile
+    steps:
+      - stepId: poll
+        operationId: $sourceDescriptions.coordinator.getPurchaseState
+        parameters:
+          - reference: $components.parameters.service-authorization
+          - name: purchaseId
+            in: path
+            value: $inputs.purchaseId
+        successCriteria:
+          - condition: $statusCode == 200
+          - condition: $response.body#/state == 'READY'
+          - condition: $response.body#/purchaseId == $inputs.purchaseId
+        outputs:
+          licenseId: $response.body#/licenseId
+        x-example-actor: coordinator
+        x-example-target: coordinator
+        onFailure:
+          - name: wait-for-ready
+            type: retry
+            retryAfter: 1
+            retryLimit: 3
+            criteria:
+              - condition: $statusCode == 200 && $response.body#/state == 'PENDING'
+          - reference: $components.failureActions.stop-and-reconcile

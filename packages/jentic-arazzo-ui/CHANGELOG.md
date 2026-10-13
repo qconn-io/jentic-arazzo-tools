@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## Unreleased
+
+### Features
+
+- **ui:** expose shared All workflows navigation and a labeled workflow selector in Docs, Diagram, and Split, with a relationship overview in Docs.
+- **ui:** add connected React/SVG sequences with per-occurrence expansion, bounded recursion, accessible interaction controls, caller breadcrumbs and exact Back to caller navigation.
+- **ui:** share complete mapping/action details across documentation, graphs and sequences; use concise default graph/Mermaid labels and one inspection-status control with detected resolution causes.
+- **ui:** add All workflows navigation and chained relationship inspection, shared documentation/Mermaid semantics, and selected Arazzo 1.1 inspection with explicit support limits.
+- **ui:** export `RelationshipEdgeData` through both entry points and include `relationship` in edge unions. Exhaustive edge-data consumers must handle the additive variant; callback signatures remain unchanged.
+- **ui:** open bare entries in Sequence diagram, with Step descriptions as the other primary reading view, progressively disclosed controls, full-document search, and accessible occurrence-scoped selection details. Explicit view settings and restored locations retain precedence.
+- **ui:** add exact workflow locations, shareable links, standalone history, and controlled embedded navigation across nested calls and action declarations.
+- **ui:** inspect supported OpenAPI, AsyncAPI, and external Arazzo descriptions through the supplied source authority. Standalone automatically loads declared eligible descriptions; embedded viewers remain manual. Set `apiDescriptionLoading="manual"` to retain standalone manual loading.
+- **ui:** add shared API-description discovery, source availability and operation lookup messages, Load/Retry/Reload controls, and announcements for explicit loading results.
+- **ui:** add optional explicit Systems profiles and authored scenario guides with focused waypoints and shareable navigation, without execution or pass/fail claims.
+- **ui:** add the optional `ArazzoCatalog` component and typed ESM catalog entry point with scoped coverage, filters, reverse usage, and classified entry paths.
+- **ui:** add offline immutable revision comparison through `ArazzoWorkflowReview`, `compareWorkflowRevisions`, and deterministic JSON/Markdown export.
+
+### Bug Fixes
+
+- **ui:** exclude local `openapi_samples` from standalone app packaging.
+- **ui:** preserve references under unsupported schema dialects regardless of component or subschema names, while keeping literal and extension payloads opaque.
+- **ui:** project relationship selection events onto the public contract without leaking private model or routing data.
+- **ui:** preserve authored parameters separately from applicable workflow/step parameters, override only resolved equal name/location pairs, and retain unsupported locator/source-kind evidence.
+- **ui:** enforce provider authority for referenced descriptions, keep helper actors explicit, and scope inherited-action and consumer-impact evidence to justified users and relationship paths.
+- **ui:** align the YAML adapter with the ApiDOM 5 dependency family and verify fresh installed consumers, public declarations, package exports, and desktop/mobile production behavior in maintained acceptance gates.
+
 # [1.0.0-alpha.32](https://github.com/jentic/jentic-arazzo-tools/compare/v1.0.0-alpha.31...v1.0.0-alpha.32) (2026-07-21)
 
 **Note:** Version bump only for package @jentic/arazzo-ui

@@ -2,10 +2,16 @@ import React, { createRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 
 import { ArazzoUI as ArazzoUIComponent } from './ArazzoUI';
-import type { ArazzoUIProps, ArazzoUIRef, ViewerMode } from './types/index';
+import type {
+  ArazzoUIProps,
+  ArazzoUIRef,
+  ViewerMode,
+  WorkflowLocationProps,
+  WorkflowPerspectiveProps,
+} from './types/index';
 import type { ArazzoDocument } from './types/arazzo';
 
-export interface ArazzoUIConfig {
+export interface ArazzoUIConfig extends WorkflowLocationProps, WorkflowPerspectiveProps {
   dom_id?: string;
   domNode?: HTMLElement;
   document: ArazzoDocument | string;

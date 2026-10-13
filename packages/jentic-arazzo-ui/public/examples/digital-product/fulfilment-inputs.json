@@ -1,0 +1,9 @@
+{
+  "purchaseId": "purchase-1001",
+  "customerId": "customer-7",
+  "productId": "digital-kit",
+  "amountMinor": 1299,
+  "currency": "EUR",
+  "paymentToken": "authorization-demo-7",
+  "serviceToken": "demo-service-token"
+}

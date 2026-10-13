@@ -1,15 +1,25 @@
-import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
-import ReactMarkdown from 'react-markdown';
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+} from 'react';
+import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import mermaid from 'mermaid';
+
+import { SourceDescriptions } from './SourceDescriptions';
+import { MermaidDiagram } from './MermaidDiagram';
+import { WorkflowOverview } from './WorkflowOverview';
+import { SequenceView } from './SequenceView';
+import { useViewerSession } from '../context/ViewerSessionContext';
 import { useArazzoViewer } from '../context/ArazzoViewerContext';
-import {
-  generateDocumentation,
-  generateMermaidSequence,
-  generateMermaidFlowchart,
-} from '../utils/documentation/index';
+import { generateDocumentation, generateMermaidFlowchart } from '../utils/documentation/index';
 
 export interface DocsViewProps {
   diagramType?: string;
@@ -18,88 +28,66 @@ export interface DocsViewProps {
 
 type WorkflowViewMode = 'docs' | 'sequence' | 'flowchart';
 
-let mermaidIdCounter = 0;
-
-function getHiddenContainer(): HTMLDivElement {
-  let el = globalThis.document.getElementById('mermaid-sandbox') as HTMLDivElement | null;
-  if (!el) {
-    el = globalThis.document.createElement('div');
-    el.id = 'mermaid-sandbox';
-    el.style.position = 'absolute';
-    el.style.left = '-9999px';
-    el.style.top = '-9999px';
-    el.style.visibility = 'hidden';
-    el.style.overflow = 'hidden';
-    el.style.height = '0';
-    el.style.width = '0';
-    globalThis.document.body.appendChild(el);
-  }
-  return el;
-}
-
-const MermaidDiagram: React.FC<{ source: string }> = ({ source }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    const id = `mermaid-diagram-${++mermaidIdCounter}`;
-    const sandbox = getHiddenContainer();
-
-    mermaid.render(id, source, sandbox).then(
-      ({ svg }) => {
-        if (!cancelled && containerRef.current) {
-          containerRef.current.innerHTML = svg;
-        }
-      },
-      () => {
-        // render failed, leave empty
-      },
-    );
-
-    return () => {
-      cancelled = true;
-    };
-  }, [source]);
-
-  return <div ref={containerRef} className="mermaid-rendered" />;
-};
-
 const markdownPlugins = [remarkGfm];
 const rehypePlugins = [rehypeHighlight, rehypeRaw];
+const StepHeadingContext = createContext<{
+  workflowId: string;
+  stepIds: ReadonlySet<string>;
+  inspect: (workflowId: string, stepId: string, origin?: HTMLElement) => void;
+} | null>(null);
+const StepDescriptionHeading: NonNullable<Components['h3']> = ({ node, children }) => {
+  const context = useContext(StepHeadingContext);
+  const stepId = String(node?.properties?.dataStepId ?? '');
+  if (!context?.stepIds.has(stepId)) return <h3>{children}</h3>;
+  return (
+    <h3>
+      <button
+        className="arazzo-reading-identity"
+        aria-label={`Inspect ${context.workflowId}.${stepId}`}
+        onClick={(event) => context.inspect(context.workflowId, stepId, event.currentTarget)}
+      >
+        {children}
+      </button>
+    </h3>
+  );
+};
+const descriptionComponents: Components = { h3: StepDescriptionHeading };
 
 export const DocsView: React.FC<DocsViewProps> = () => {
-  const { document, documentURL, selectedNodeId, nodes, activeWorkflowId } = useArazzoViewer();
+  const {
+    document,
+    documentURL,
+    selectedNodeId,
+    nodes,
+    activeWorkflowId,
+    model,
+    getNodeOwner,
+    navigateToTarget,
+    navigationDiagnostic,
+  } = useArazzoViewer();
+  const [ownershipDiagnostic, setOwnershipDiagnostic] = useState<string | null>(null);
   const mermaidInitialized = useRef(false);
   const docsContainerRef = useRef<HTMLDivElement>(null);
-  const [workflowViews, setWorkflowViews] = useState<Record<string, WorkflowViewMode>>({});
-  const [expandedWorkflows, setExpandedWorkflows] = useState<Set<string>>(new Set());
+  const session = useViewerSession();
+  const workflowViews = session.views;
 
   const getWorkflowView = useCallback(
-    (workflowId: string): WorkflowViewMode => workflowViews[workflowId] || 'docs',
-    [workflowViews],
+    (workflowId: string): WorkflowViewMode => workflowViews[workflowId] || session.defaultView,
+    [workflowViews, session.defaultView],
   );
 
   const setWorkflowView = useCallback(
-    (workflowId: string, view: WorkflowViewMode) =>
-      setWorkflowViews((prev) => ({ ...prev, [workflowId]: view })),
-    [],
+    (workflowId: string, view: WorkflowViewMode) => session.setView(workflowId, view),
+    [session],
   );
 
-  const handleToggle = useCallback(
-    (workflowId: string, e: React.SyntheticEvent<HTMLDetailsElement>) => {
-      const isOpen = (e.currentTarget as HTMLDetailsElement).open;
-      if (isOpen) {
-        setExpandedWorkflows((prev) => new Set(prev).add(workflowId));
-      }
-      // sync allExpanded state by checking DOM
-      const container = docsContainerRef.current;
-      if (container) {
-        const details = container.querySelectorAll('.workflow-details');
-        setAllExpanded(Array.from(details).every((d) => (d as HTMLDetailsElement).open));
-      }
-    },
-    [],
-  );
+  const handleToggle = useCallback(() => {
+    const container = docsContainerRef.current;
+    if (container) {
+      const details = container.querySelectorAll('.workflow-details');
+      setAllExpanded(Array.from(details).every((d) => (d as HTMLDetailsElement).open));
+    }
+  }, []);
 
   // Initialize Mermaid
   useEffect(() => {
@@ -122,24 +110,30 @@ export const DocsView: React.FC<DocsViewProps> = () => {
     if (!node || (node.data.type !== 'step' && node.data.type !== 'workflowRef')) return;
 
     const stepId = node.data.step.stepId;
-    const workflowId =
-      node.data.type === 'step' ? node.data.workflowId : node.data.targetWorkflowId;
+    const workflowId = getNodeOwner(node);
+    if (!workflowId) {
+      setOwnershipDiagnostic('Selected card has unavailable ownership.');
+      return;
+    }
+    setOwnershipDiagnostic(null);
 
     // expand the workflow <details> if closed
-    const details = docsContainerRef.current.querySelector(
-      `details[data-workflow-id="${workflowId}"]`,
-    ) as HTMLDetailsElement | null;
+    const details = Array.from(
+      docsContainerRef.current.querySelectorAll<HTMLDetailsElement>('details[data-workflow-id]'),
+    ).find((element) => element.getAttribute('data-workflow-id') === workflowId);
     if (details && !details.open) {
       details.open = true;
-      setExpandedWorkflows((prev) => new Set(prev).add(workflowId));
     }
 
     // scroll to the step after DOM updates
-    requestAnimationFrame(() => {
-      const stepEl = docsContainerRef.current?.querySelector(`[data-step-id="${stepId}"]`);
+    const frame = requestAnimationFrame(() => {
+      const stepEl = Array.from(
+        details?.querySelectorAll<HTMLElement>('[data-step-id]') ?? [],
+      ).find((element) => element.getAttribute('data-step-id') === stepId);
       stepEl?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
-  }, [selectedNodeId, nodes]);
+    return () => cancelAnimationFrame(frame);
+  }, [selectedNodeId, nodes, getNodeOwner]);
 
   // Scroll to workflow when switching workflow tabs in diagram (skip initial value)
   const prevActiveWorkflowId = useRef(activeWorkflowId);
@@ -148,53 +142,57 @@ export const DocsView: React.FC<DocsViewProps> = () => {
     prevActiveWorkflowId.current = activeWorkflowId;
 
     if (!activeWorkflowId || !docsContainerRef.current) return;
+    if (
+      selectedNodeId &&
+      nodes.some((node) => node.id === selectedNodeId && getNodeOwner(node) === activeWorkflowId)
+    )
+      return;
 
-    const details = docsContainerRef.current.querySelector(
-      `details[data-workflow-id="${activeWorkflowId}"]`,
-    ) as HTMLDetailsElement | null;
+    const details = Array.from(
+      docsContainerRef.current.querySelectorAll<HTMLDetailsElement>('details[data-workflow-id]'),
+    ).find((element) => element.getAttribute('data-workflow-id') === activeWorkflowId);
     if (!details) return;
 
     if (!details.open) {
       details.open = true;
-      setExpandedWorkflows((prev) => new Set(prev).add(activeWorkflowId));
     }
 
-    requestAnimationFrame(() => {
+    const frame = requestAnimationFrame(() => {
       details.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
-  }, [activeWorkflowId]);
+    return () => cancelAnimationFrame(frame);
+  }, [activeWorkflowId, selectedNodeId, nodes, getNodeOwner]);
 
   // Generate documentation (memoized)
   const documentation = useMemo(() => {
     if (!document) return null;
     return generateDocumentation(document, {
-      includeMetadata: true,
+      compact: true,
+      includeMetadata: false,
       includeDiagrams: false,
+      includeStatus: false,
       documentURL,
+      model,
     });
-  }, [document, documentURL]);
+  }, [document, documentURL, model]);
 
   // Pre-generate all diagrams (memoized)
-  const sequenceDiagrams = useMemo(() => {
-    if (!document) return new Map<string, string>();
-    const diagrams = new Map<string, string>();
-    document.workflows.forEach((workflow) => {
-      diagrams.set(workflow.workflowId, generateMermaidSequence(workflow, document));
-    });
-    return diagrams;
-  }, [document]);
 
   const flowchartDiagrams = useMemo(() => {
     if (!document) return new Map<string, string>();
     const diagrams = new Map<string, string>();
     document.workflows.forEach((workflow) => {
-      diagrams.set(workflow.workflowId, generateMermaidFlowchart(workflow));
+      diagrams.set(workflow.workflowId, generateMermaidFlowchart(workflow, model));
     });
     return diagrams;
-  }, [document]);
+  }, [document, model]);
 
   // Handle expand/collapse all button
-  const [allExpanded, setAllExpanded] = useState(false);
+  const [allExpanded, setAllExpanded] = useState(true);
+
+  useEffect(() => {
+    setAllExpanded(true);
+  }, [activeWorkflowId]);
 
   const handleExpandAll = useCallback(() => {
     const container = docsContainerRef.current;
@@ -205,12 +203,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
       (d as HTMLDetailsElement).open = !allOpen;
     });
     setAllExpanded(!allOpen);
-    if (!allOpen && document) {
-      setExpandedWorkflows(
-        (prev) => new Set([...prev, ...document.workflows.map((w) => w.workflowId)]),
-      );
-    }
-  }, [document]);
+  }, []);
 
   if (!document || !documentation) {
     return (
@@ -219,13 +212,6 @@ export const DocsView: React.FC<DocsViewProps> = () => {
       </div>
     );
   }
-
-  const viewModes: WorkflowViewMode[] = ['docs', 'sequence', 'flowchart'];
-  const viewLabels: Record<WorkflowViewMode, string> = {
-    docs: 'Docs',
-    sequence: 'Sequence',
-    flowchart: 'Flowchart',
-  };
 
   return (
     <div
@@ -303,37 +289,6 @@ export const DocsView: React.FC<DocsViewProps> = () => {
           .workflow-details-content {
             padding: 4px 20px 20px;
             border-top: 1px solid #e5e7eb;
-          }
-
-          .workflow-view-toggle {
-            display: flex;
-            gap: 0;
-            border-bottom: 1px solid #e5e7eb;
-            margin-bottom: 16px;
-            margin-top: 8px;
-          }
-
-          .workflow-view-btn {
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: 500;
-            border: none;
-            background: none;
-            color: #9ca3af;
-            cursor: pointer;
-            transition: all 0.15s;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -1px;
-          }
-
-          .workflow-view-btn:hover {
-            color: #374151;
-          }
-
-          .workflow-view-btn-active {
-            color: #111827;
-            font-weight: 600;
-            border-bottom-color: #111827;
           }
 
           .workflow-description {
@@ -513,6 +468,7 @@ export const DocsView: React.FC<DocsViewProps> = () => {
 
           .timeline-content {
             flex: 1;
+            min-width: 0;
             padding-bottom: 20px;
           }
 
@@ -892,78 +848,140 @@ export const DocsView: React.FC<DocsViewProps> = () => {
           }
 
         `}</style>
-        <article className="arazzo-docs-prose">
-          {/* Header: title, version, sources */}
-          <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
-            {documentation.headerMarkdown}
-          </ReactMarkdown>
+        <p role="status">
+          {ownershipDiagnostic} {navigationDiagnostic}
+        </p>
+        <article
+          className="arazzo-docs-prose"
+          onClick={(event) => {
+            const anchor = (event.target as Element).closest<HTMLAnchorElement>('a');
+            const href = anchor?.getAttribute('href');
+            if (!href?.startsWith('#arazzo-target=')) return;
+            event.preventDefault();
+            try {
+              const destination = JSON.parse(
+                decodeURIComponent(href.slice('#arazzo-target='.length)),
+              ) as { workflowId?: string; stepId?: string };
+              if (!destination.workflowId) return;
+              const target = destination.stepId
+                ? model.stepsByWorkflow.get(destination.workflowId)?.get(destination.stepId)
+                : model.workflowsById.get(destination.workflowId);
+              if (target)
+                navigateToTarget({
+                  kind: destination.stepId ? 'local-step' : 'local-workflow',
+                  role: 'step-prerequisite',
+                  reference: href,
+                  workflowId: destination.workflowId,
+                  stepId: destination.stepId,
+                  navigable: true,
+                });
+            } catch {
+              /* authored links outside the classified target grammar stay inert. */
+            }
+          }}
+        >
+          <div className="arazzo-document-identity">
+            <strong>{documentation.metadata.title}</strong>
+            {documentation.metadata.summary && <span>{documentation.metadata.summary}</span>}
+          </div>
+          <details className="arazzo-document-information">
+            <summary>Document information</summary>
+            <SourceDescriptions />
+            <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
+              {documentation.headerMarkdown}
+            </ReactMarkdown>
+          </details>
 
           {/* Workflows */}
           <div className="workflows-header-row">
             <span className="sources-header" style={{ margin: 0 }}>
               Workflows
             </span>
-            <button className="expand-all-btn" onClick={handleExpandAll}>
-              {allExpanded ? 'Collapse All' : 'Expand All'}
-            </button>
+            {activeWorkflowId !== null &&
+              documentation.workflows.some(
+                (workflow) => workflow.workflowId === activeWorkflowId,
+              ) && (
+                <button className="expand-all-btn" onClick={handleExpandAll}>
+                  {allExpanded ? 'Collapse All' : 'Expand All'}
+                </button>
+              )}
           </div>
 
-          {documentation.workflows.map((workflow) => {
-            const stepCount = workflow.steps.length;
-            const currentView = getWorkflowView(workflow.workflowId);
-            const workflowMd = documentation.workflowMarkdowns.get(workflow.workflowId) || '';
+          {activeWorkflowId === null && <WorkflowOverview />}
+          {documentation.workflows
+            .filter((workflow) => workflow.workflowId === activeWorkflowId)
+            .map((workflow) => {
+              const stepCount = workflow.steps.length;
+              const currentView = getWorkflowView(workflow.workflowId);
+              const workflowMd = documentation.workflowMarkdowns.get(workflow.workflowId) || '';
 
-            const sequenceSource = sequenceDiagrams.get(workflow.workflowId) || null;
-            const flowchartSource = flowchartDiagrams.get(workflow.workflowId) || null;
+              const flowchartSource = flowchartDiagrams.get(workflow.workflowId) || null;
 
-            return (
-              <details
-                key={workflow.workflowId}
-                className="workflow-details"
-                data-workflow-id={workflow.workflowId}
-                onToggle={(e) => handleToggle(workflow.workflowId, e)}
-              >
-                <summary className="workflow-summary-bar">
-                  <span className="step-count-badge">
-                    {stepCount} {stepCount === 1 ? 'Step' : 'Steps'}
-                  </span>
-                  <span className="workflow-summary-title">{workflow.workflowId}</span>
-                  {workflow.summary && (
-                    <span className="workflow-summary-text">{workflow.summary}</span>
-                  )}
-                </summary>
-                <div className="workflow-details-content">
-                  <div className="workflow-view-toggle">
-                    {viewModes.map((mode) => (
-                      <button
-                        key={mode}
-                        className={`workflow-view-btn ${currentView === mode ? 'workflow-view-btn-active' : ''}`}
-                        onClick={() => setWorkflowView(workflow.workflowId, mode)}
+              return (
+                <details
+                  key={workflow.workflowId}
+                  className="workflow-details"
+                  data-workflow-id={workflow.workflowId}
+                  onToggle={handleToggle}
+                  open
+                >
+                  <summary className="workflow-summary-bar">
+                    <span className="step-count-badge">
+                      {stepCount} {stepCount === 1 ? 'Step' : 'Steps'}
+                    </span>
+                    <span className="workflow-summary-title">{workflow.workflowId}</span>
+                    {workflow.summary && (
+                      <span className="workflow-summary-text">{workflow.summary}</span>
+                    )}
+                  </summary>
+                  <div className="workflow-details-content">
+                    <div style={{ display: currentView === 'docs' ? 'block' : 'none' }}>
+                      <StepHeadingContext.Provider
+                        value={{
+                          workflowId: workflow.workflowId,
+                          stepIds: new Set(workflow.steps.map((step) => step.stepId)),
+                          inspect: session.inspectStep,
+                        }}
                       >
-                        {viewLabels[mode]}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div style={{ display: currentView === 'docs' ? 'block' : 'none' }}>
-                    <ReactMarkdown remarkPlugins={markdownPlugins} rehypePlugins={rehypePlugins}>
-                      {workflowMd}
-                    </ReactMarkdown>
-                  </div>
-                  {sequenceSource && expandedWorkflows.has(workflow.workflowId) && (
-                    <div style={{ display: currentView === 'sequence' ? 'block' : 'none' }}>
-                      <MermaidDiagram source={sequenceSource} />
+                        <ReactMarkdown
+                          remarkPlugins={markdownPlugins}
+                          rehypePlugins={rehypePlugins}
+                          components={descriptionComponents}
+                        >
+                          {workflowMd}
+                        </ReactMarkdown>
+                      </StepHeadingContext.Provider>
                     </div>
-                  )}
-                  {flowchartSource && expandedWorkflows.has(workflow.workflowId) && (
-                    <div style={{ display: currentView === 'flowchart' ? 'block' : 'none' }}>
-                      <MermaidDiagram source={flowchartSource} />
-                    </div>
-                  )}
-                </div>
-              </details>
-            );
-          })}
+                    {currentView === 'sequence' && (
+                      <SequenceView workflowId={workflow.workflowId} />
+                    )}
+                    {flowchartSource && currentView === 'flowchart' && (
+                      <div style={{ display: currentView === 'flowchart' ? 'block' : 'none' }}>
+                        <MermaidDiagram
+                          key={`${model.documentId}:${workflow.workflowId}`}
+                          source={flowchartSource}
+                          onReadDescriptions={() => {
+                            setWorkflowView(workflow.workflowId, 'docs');
+                            const workflowElement = Array.from(
+                              docsContainerRef.current?.querySelectorAll<HTMLElement>(
+                                '[data-workflow-id]',
+                              ) ?? [],
+                            ).find((element) => element.dataset.workflowId === workflow.workflowId);
+                            if (workflowElement) {
+                              globalThis.document
+                                .querySelector<HTMLButtonElement>(
+                                  '[aria-label="Reading view"] button[aria-pressed="true"]',
+                                )
+                                ?.focus();
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </details>
+              );
+            })}
         </article>
       </div>
     </div>

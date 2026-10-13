@@ -1,0 +1,145 @@
+openapi: 3.1.0
+info:
+  title: Payment Service API
+  version: 1.0.0
+  description: Fictional local contract for the digital-product example. Servers under example.test
+    are illustrative, not live services.
+servers:
+  - url: https://payment.example.test
+security:
+  - bearerAuth: []
+paths:
+  /captures:
+    post:
+      operationId: capturePayment
+      summary: Capture the authorized payment
+      description: Capture the exact amount and currency for the reservation. CAPTURED confirms capture;
+        DECLINED and UNKNOWN must stop this fulfilment. Correlate retries with the original
+        Idempotency-Key.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Stable for this operation and payload. Reuse returns its original result; different
+            payload with the same key returns 409. Never use a new key to resolve an uncertain
+            outcome.
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: "Original attempt state: CAPTURED, DECLINED or UNKNOWN. HTTP 200 alone does not
+            authorize issuance."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Capture"
+              example:
+                paymentId: payment-4001
+                reservationId: reservation-2001
+                amountMinor: 1299
+                currency: EUR
+                state: CAPTURED
+        "409":
+          description: Identity, authorization, readiness or idempotency conflict.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: CONFLICT
+                message: Identity, authorization, readiness or idempotency conflict.
+        "503":
+          description: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue
+            or charge again blindly.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+              example:
+                code: UNAVAILABLE
+                message: Service unavailable or outcome uncertain. Reconcile the original attempt; do not issue or
+                  charge again blindly.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaptureRequest"
+            example:
+              reservationId: reservation-2001
+              amountMinor: 1299
+              currency: EUR
+              paymentToken: authorization-demo-7
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Client or service identity appropriate to this API. Tokens in example inputs are
+        placeholders.
+  schemas:
+    Problem:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          minLength: 1
+        message:
+          type: string
+          minLength: 1
+    CaptureRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - reservationId
+        - amountMinor
+        - currency
+        - paymentToken
+      properties:
+        reservationId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+          description: Amount in minor currency units; 1299 means EUR 12.99.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        paymentToken:
+          type: string
+          minLength: 1
+    Capture:
+      type: object
+      additionalProperties: false
+      required:
+        - paymentId
+        - reservationId
+        - amountMinor
+        - currency
+        - state
+      properties:
+        paymentId:
+          type: string
+          minLength: 1
+        reservationId:
+          type: string
+          minLength: 1
+        amountMinor:
+          type: integer
+          minimum: 1
+          description: Amount in minor currency units; 1299 means EUR 12.99.
+        currency:
+          type: string
+          pattern: ^[A-Z]{3}$
+        state:
+          type: string
+          enum:
+            - CAPTURED
+            - DECLINED
+            - UNKNOWN
