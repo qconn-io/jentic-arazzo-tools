@@ -40,10 +40,6 @@ The [HTTP reference sequence](http-sequence.puml) and [event reference sequence]
 show the intended system-level exchanges and possible recovery paths. Adding these examples does
 not change the renderer.
 
-Captured previews: [expanded HTTP journey](previews/http-expanded-1440.png),
-[compensation](previews/compensation-1440.png), and [event sequence](previews/events-1440.png).
-The `previews` directory also contains captures at a constrained 480-pixel width.
-
 ## Contracts and inputs
 
 | File | Contents |
@@ -166,20 +162,16 @@ make the limits explicit without introducing broken references into the referenc
 
 ## Verification
 
-Checks use the published [Arazzo 1.1 schema](https://spec.openapis.org/arazzo/1.1/schema/2026-04-15),
-the published [OpenAPI 3.1 document schema](https://spec.openapis.org/oas/3.1/schema/2022-10-07),
-and the official [AsyncAPI parser](https://github.com/asyncapi/parser-js). Local checks validate
-operation/action/prerequisite targets, required workflow mappings, HTTP and event examples, and
-input examples. The real viewer loader/model checks repeated occurrences, transfer/recovery
-classes, event direction and boundary markers; generated Mermaid is checked for parseability.
+From the repository root, run `npm test --workspace=@jentic/arazzo-ui` for the
+loader/model, contract projection, authored guide and example inventory checks.
+Run `npm run test:browser --workspace=@jentic/arazzo-ui` for production Chromium
+acceptance at 1440 and 480 pixels, including repeated occurrences, navigation,
+recovery, event declarations and visible display limits. Fresh reports and
+captures stay under ignored `test-output/browser` and are retained by CI.
 
-Built-browser checks cover default navigation, expansion, event direction, details and limits.
-They inspect the current built viewer rather than execute APIs or broker transports. The 27
-scenarios are documented expectations; a schema pass or screenshot does not prove their live
-runtime outcomes. See [verification.json](verification.json) for the recorded checks and limits.
-
-The event semantics follow [Arazzo 1.1.0](https://spec.openapis.org/arazzo/v1.1.0.html) and
-[AsyncAPI 3.0.0](https://www.asyncapi.com/docs/reference/specification/v3.0.0).
+The 27 scenarios describe authored expectations. These checks inspect documents
+and the viewer; they do not execute APIs, evaluate business outcomes or establish
+reader comprehension.
 
 ## Authored reading guides
 

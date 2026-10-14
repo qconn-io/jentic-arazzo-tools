@@ -171,7 +171,7 @@ await withRecordedRun(resolve(output, negative ? 'negative.json' : 'coverage.jso
   const inventory = JSON.parse(
     await readFile(resolve(root, 'test/fixtures/workflow-ux-acceptance.json'), 'utf8'),
   );
-  const args = ['playwright', 'test', '--config', 'playwright.production.config.ts'];
+  const args = ['playwright', 'test', '--config', 'playwright.config.ts'];
   if (!negative) {
     await run('npx', args, { ARAZZO_BROWSER_PORT: String(port) });
     const report = JSON.parse(await readFile(resolve(output, 'positive.json'), 'utf8'));

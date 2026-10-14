@@ -113,6 +113,9 @@ export const faultCases = [
   },
 ];
 export const requiredUXTitles = [
+  'referenced contract constraints stay separate and reload refreshes every dependency',
+  'event contract inspection retains receive direction, message alternatives and correlation',
+  'standalone catalog shares exact selection and rejects unavailable revisions',
   'API descriptions discovery, delayed recovery and missing lookup preserve reading and focus',
   'API descriptions long source labels wrap and manual bulk loading remains explicit',
   'UX installed embed preserves prerequisite order, geometry modality and raw sizing',

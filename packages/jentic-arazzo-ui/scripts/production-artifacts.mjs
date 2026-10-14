@@ -52,7 +52,7 @@ export async function currentIdentity() {
     'README.md',
     'tsconfig.json',
     'tsconfig.declaration.json',
-    'playwright.production.config.ts',
+    'playwright.config.ts',
     'test/e2e/production.spec.ts',
     '../jentic-arazzo-parser/package.json',
     '../jentic-arazzo-resolver/package.json',

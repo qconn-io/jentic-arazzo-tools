@@ -1,10 +1,12 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 import {
   staticPaths,
   installProductionChecks,
   inspector,
   automaticSources,
   explicitSources,
+  manualStandalone,
 } from './productionSupport';
 
 type HostState = {
@@ -222,7 +224,204 @@ test('standalone viewing discloses setup and automatically loads declared API de
   await page.getByRole('button', { name: 'Inspect client-journey.purchase', exact: true }).click();
   await expect(inspector(page)).toContainText('purchaseProduct');
   await expect(inspector(page)).toContainText('requestBody');
+  for (const declaration of ['Idempotency-Key', 'bearerAuth', '201', '409', '503', 'paymentToken'])
+    await expect(inspector(page)).toContainText(declaration);
   expect(contractRequests).toHaveLength(4);
+});
+
+test('referenced contract constraints stay separate and reload refreshes every dependency', async ({
+  page,
+  baseURL,
+}) => {
+  const document = `${baseURL}/examples/digital-product/arazzo.yaml`;
+  const state = { revision: 1, roots: 0, schemas: 0, responses: 0 };
+  const schema = new URL('./repair-schema.json', document).href;
+  const response = new URL('./repair-response.json', document).href;
+  explicitSources(page)
+    .add(new URL('./coordinator.openapi.yaml', document).href)
+    .add(schema)
+    .add(response);
+  await manualStandalone(page);
+  await page.route('**/coordinator.openapi.yaml', async (route) => {
+    state.roots++;
+    await route.fulfill({
+      json: {
+        openapi: '3.1.0',
+        info: { title: 'Reference regression', version: String(state.revision) },
+        paths: {
+          '/purchase': {
+            post: {
+              operationId: 'purchaseProduct',
+              requestBody: {
+                content: {
+                  'application/json': {
+                    schema: {
+                      $ref: './repair-schema.json#/Base',
+                      required: ['name'],
+                      properties: { name: { type: 'string' } },
+                    },
+                  },
+                },
+              },
+              responses: { '200': { $ref: './repair-response.json#/Response' } },
+            },
+          },
+        },
+      },
+    });
+  });
+  await page.route(schema, async (route) => {
+    state.schemas++;
+    await route.fulfill({
+      json: { Base: { type: 'object', required: [`id${state.revision}`] } },
+    });
+  });
+  await page.route(response, async (route) => {
+    state.responses++;
+    await route.fulfill({
+      json: { Response: { description: `refreshed dependency ${state.revision}` } },
+    });
+  });
+  await page.goto(`/?document=${encodeURIComponent(document)}`);
+  await page
+    .getByRole('list', { name: 'Ordered interactions' })
+    .getByRole('button', { name: /^Inspect client-journey.purchase/ })
+    .click();
+  const panel = inspector(page);
+  expect(state.roots + state.schemas + state.responses).toBe(0);
+  await panel
+    .getByRole('button', { name: 'Load API description coordinator', exact: true })
+    .click();
+  await expect(panel).toContainText('refreshed dependency 1');
+  await panel.getByText('Request media types and schemas', { exact: true }).click();
+  const request = panel.locator('details').filter({
+    has: page.locator('summary', { hasText: /^Request media types and schemas$/ }),
+  });
+  await expect(request.locator('pre')).toContainText('"name"');
+  await expect(request.locator('pre')).toContainText('"$ref"');
+  await expect(request.locator('pre')).not.toContainText('"id1"');
+  const references = panel.getByRole('region', {
+    name: 'Referenced schema declarations',
+    exact: true,
+  });
+  await references.getByText('./repair-schema.json#/Base — located', { exact: true }).click();
+  await expect(references.locator('pre')).toBeVisible();
+  await expect(references.locator('pre')).toContainText('"id1"');
+  await expect(references).toContainText('Revision: unpinned');
+  state.revision = 2;
+  await panel
+    .getByRole('button', { name: 'Reload API description coordinator', exact: true })
+    .click();
+  await expect(panel).toContainText('refreshed dependency 2');
+  await expect(panel).not.toContainText('refreshed dependency 1');
+  await references.getByText('./repair-schema.json#/Base — located', { exact: true }).click();
+  await expect(references.locator('pre')).toContainText('"id2"');
+  await expect(references.locator('pre')).not.toContainText('"id1"');
+  expect(state).toEqual({ revision: 2, roots: 2, schemas: 2, responses: 2 });
+});
+
+test('event contract inspection retains receive direction, message alternatives and correlation', async ({
+  page,
+  baseURL,
+}) => {
+  await page.goto(
+    `/?document=${encodeURIComponent(`${baseURL}/examples/digital-product-stress/event-based.arazzo.yaml`)}`,
+  );
+  await expect(page.locator('.arazzo-inspection-status > summary')).toContainText('5 of 5 loaded');
+  await page
+    .getByRole('list', { name: 'Ordered interactions' })
+    .getByRole('button', { name: /^Inspect event-driven-purchase\.await-ready · operation/ })
+    .click();
+  for (const declaration of [
+    'receivePurchaseCompleted',
+    'receive',
+    'purchase.completed',
+    'PurchaseCompleted',
+    'payload',
+    'correlationId',
+    'headers',
+    'READY',
+    'FAILED',
+  ])
+    await expect(inspector(page)).toContainText(declaration);
+});
+
+test('standalone catalog shares exact selection and rejects unavailable revisions', async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  const catalog = `${baseURL}/examples/catalog.json`;
+  const manifest = JSON.parse(readFileSync('public/examples/catalog.json', 'utf8'));
+  const allowed = explicitSources(page);
+  allowed.add(catalog);
+  for (const document of manifest.documents) allowed.add(new URL(document.uri, catalog).href);
+  allowed.add(`${baseURL}/examples/digital-product-stress/diagnostics/not-supplied.arazzo.yaml`);
+  await page.goto(`/?catalog=${encodeURIComponent(catalog)}`);
+  const coverage = page.getByRole('region', { name: 'Catalog coverage' });
+  await expect(coverage).toContainText('Partial coverage');
+  await page.getByLabel('Capability', { exact: true }).selectOption('purchase');
+  await page
+    .getByRole('button', {
+      name: 'full-stress-journey — http-commerce / sample-2026-10-07',
+      exact: true,
+    })
+    .click();
+  const details = page.getByRole('region', { name: 'Catalog details' });
+  await expect(details).toContainText('Owner: unknown');
+  await expect(details).toContainText('Role: entry');
+  const shared = new URL(page.url());
+  expect(shared.searchParams.get('catalog')).toBe(catalog);
+  const restored = await context.newPage();
+  const errors: string[] = [],
+    forbidden: string[] = [];
+  restored.on('pageerror', (error) => errors.push(error.message));
+  restored.on('request', (request) => {
+    if (
+      request.method() !== 'GET' ||
+      (!request.isNavigationRequest() &&
+        !staticPaths.has(new URL(request.url()).pathname) &&
+        !allowed.has(request.url()))
+    )
+      forbidden.push(request.url());
+  });
+  await restored.goto(shared.href);
+  await expect(
+    restored.getByRole('region', { name: 'Catalog details' }).getByRole('heading', {
+      name: 'full-stress-journey',
+      exact: true,
+    }),
+  ).toBeVisible();
+  expect(errors).toEqual([]);
+  expect(forbidden).toEqual([]);
+  await restored.close();
+  await page.getByLabel('Search', { exact: true }).fill('reconcile-payment');
+  await page
+    .getByRole('button', {
+      name: 'reconcile-payment — http-commerce / sample-2026-10-07',
+      exact: true,
+    })
+    .click();
+  await expect(details).toContainText('retry from capture-authorized-payment');
+  await page.getByLabel('Capability', { exact: true }).selectOption('inspection-diagnostics');
+  await page.getByLabel('Search', { exact: true }).fill('cycle-A');
+  await page
+    .getByRole('button', {
+      name: 'cycle-A — prerequisite-cycle / sample-2026-10-07',
+      exact: true,
+    })
+    .click();
+  await expect(details).toContainText('prerequisite from cycle-B');
+  await expect(page.getByRole('region', { name: 'Selected workflow viewer' })).toContainText(
+    'prerequisite-only cycle',
+  );
+  await coverage.getByText(/Source coverage/).click();
+  await expect(coverage).toContainText('not-supplied.arazzo.yaml');
+  const location = JSON.parse(shared.searchParams.get('location')!);
+  location.extensions['jentic.catalog'].catalogRevision = 'missing';
+  shared.searchParams.set('location', JSON.stringify(location));
+  await page.goto(shared.href);
+  await expect(page.getByRole('alert')).toContainText('Unavailable catalog revision');
 });
 
 test('repeated calls retain distinct contexts and helpers have Unknown actor', async ({ page }) => {
@@ -292,6 +491,13 @@ test('shared defaults show scoped before and after potential impact', async ({ p
     await expect(side.getByLabel('Selection details', { exact: true })).toContainText('recover');
     await side.getByRole('button', { name: 'Close details' }).click();
   }
+  const pending = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export JSON', exact: true }).click();
+  const downloaded = await pending;
+  const exported = JSON.parse(readFileSync((await downloaded.path())!, 'utf8'));
+  expect(exported.runtimeEffect).toBe('undetermined');
+  expect(exported.baseline.revision).toBe('old');
+  expect(exported.candidate.revision).toBe('new');
 });
 
 test('scenario focus, dismissal and restored guide context', async ({

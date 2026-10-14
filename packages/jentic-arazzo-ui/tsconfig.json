@@ -14,9 +14,6 @@
       "emscripten"
     ]
   },
-  "files": [
-    "test/harness.test.tsx"
-  ],
   "include": [
     "src/**/*",
     "test/**/*",

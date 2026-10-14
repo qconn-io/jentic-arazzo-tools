@@ -769,10 +769,8 @@ Viewing/exporting creates no approval or test status. Runtime effect stays **und
 reviewers retain responsibility for compatibility and business judgment.
 
 Synthetic purchase/event, partial and formatting-only pairs live in
-`public/examples/revision-review`. The longer archival walkthrough remains runnable with
-`node scripts/build-review-browser.mjs` after `npm run build`, a static `build` server at port
-3000, and `npx playwright test test/e2e/review.spec.ts`. Its generated evidence goes to ignored
-`test-output/browser/archival/review`.
+`public/examples/revision-review`. Unit and component tests cover these revision
+cases; maintained production acceptance exercises the installed review component.
 
 For maintained production acceptance, from a clean checkout run `nvm use`, `npm ci`,
 `npm run build:es`, and `npx playwright install chromium`.
@@ -834,8 +832,8 @@ typed ESM-only `@jentic/arazzo-ui/catalog` path. Public location/provider/scenar
 profile, catalog, review and selection callbacks compile with strict checking;
 private inspection/model imports are expected to fail. No UI source alias is used.
 The generated declarations are checked with `skipLibCheck: false`.
-The measurement host pins the SpecLynx family to the repository lockfile's
-versions for comparable bundle measurements; those pins are recorded in
+The acceptance host pins the SpecLynx family to the repository lockfile's
+versions for reproducible consumer builds; those pins are recorded in
 `metadata.json`. The same acceptance command also creates two separate fresh
 installed hosts without SpecLynx overrides, exercising supplied-object and YAML
 catalog inputs against the advertised ranges. Aligning the generic YAML adapter
@@ -855,16 +853,5 @@ source HEAD, tarball SHA-256 identities, installed versions and consumer reports
 The installed host is built from `test/package/acceptance-app.tsx`; its imports
 resolve through the unpacked package's export map.
 
-After package acceptance, `npm run test:bundle -w @jentic/arazzo-ui` compares the
-minimal embedded viewer with pinned upstream commit
-`49dd8ef814637b481c0a1998f586ce2785812f5d`. It uses a temporary detached upstream
-worktree and the same installed dependency graph, React, Vite settings and
-minification. The source branch/history is preserved and the temporary worktree
-is removed. `bundle-comparison.json` reports initial and deferred JS gzip sums,
-separate CSS, retained implementation symbols/module contributions, and whole
-ESM/UMD file sizes. These are different measurements: whole library bytes are
-not the initial download of a tree-shaken host. Minimal viewer, direct standalone
-and deferred standalone workloads are identical in both runs. Baseline has no
-catalog/review; the repaired catalog/review workload is measured additionally.
 The maintained minimal consumer fails if unused catalog/review implementation
 survives tree shaking. Shared inspection and rendering costs remain included.

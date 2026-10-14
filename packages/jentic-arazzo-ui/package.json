@@ -63,7 +63,6 @@
     "postpack": "rimraf NOTICE LICENSE",
     "test:package": "node scripts/check-package-consumer.mjs",
     "test:package:built": "node scripts/check-package-consumer.mjs --built",
-    "test:bundle": "node scripts/measure-package-consumers.mjs",
     "test:browser": "node scripts/run-production-browser.mjs",
     "test:browser:negative": "node scripts/run-production-browser.mjs --negative"
   },
