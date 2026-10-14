@@ -75,6 +75,7 @@ export async function installedConsumer(directory, uiPackageRoot = uiRoot) {
 }
 const retainedSymbols = [
   'ArazzoCatalog',
+  'normalizeCatalogManifest',
   'ArazzoWorkflowReview',
   'compareWorkflowRevisions',
   'buildCatalogIndex',
@@ -125,6 +126,7 @@ function retainedRegions(map) {
   const retained = new Set();
   const regions = {
     'src/ArazzoCatalog.tsx': 'ArazzoCatalog',
+    'src/utils/catalog/manifest.ts': 'normalizeCatalogManifest',
     'src/ArazzoWorkflowReview.tsx': 'ArazzoWorkflowReview',
     'src/utils/review/compare.ts': 'compareWorkflowRevisions',
     'src/utils/review/index.ts': 'compareWorkflowRevisions',
@@ -154,6 +156,11 @@ export async function consumerBuild(directory, name, source, { assertMinimal = f
     '<!doctype html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div id="root"></div><script type="module" src="/main.tsx"></script></body></html>',
   );
   await writeFile(join(inputDirectory, 'main.tsx'), source);
+  if (name === 'optional')
+    await writeFile(
+      join(inputDirectory, 'catalog.ts'),
+      "export { ArazzoCatalog, normalizeCatalogManifest, ArazzoWorkflowReview, compareWorkflowRevisions } from '@jentic/arazzo-ui/catalog';",
+    );
   const beforeMinify = new Map();
   let report;
   await build({
@@ -287,5 +294,5 @@ createRoot(document.getElementById('root')!).render(React.createElement(ArazzoUI
 export const optionalSource = `import React from 'react';
 import { createRoot } from 'react-dom/client';
 import '@jentic/arazzo-ui/styles.css';
-async function optional() { const {ArazzoCatalog, ArazzoWorkflowReview, compareWorkflowRevisions} = await import('@jentic/arazzo-ui/catalog'); window.optional = {ArazzoCatalog,ArazzoWorkflowReview,compareWorkflowRevisions}; return ArazzoCatalog; }
+async function optional() { const {ArazzoCatalog, normalizeCatalogManifest, ArazzoWorkflowReview, compareWorkflowRevisions} = await import('./catalog'); window.optional = {ArazzoCatalog,normalizeCatalogManifest,ArazzoWorkflowReview,compareWorkflowRevisions}; return ArazzoCatalog; }
 document.getElementById('root')!.onclick = () => optional().then(component => createRoot(document.getElementById('root')!).render(React.createElement(component,{manifest:{version:1,id:'consumer',revision:'r1',documents:[]}})));`;

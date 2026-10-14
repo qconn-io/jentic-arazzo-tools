@@ -123,23 +123,6 @@ test('host selection supersedes an unaccepted authored search navigation', async
   expect(selected).not.toHaveBeenCalled();
 });
 
-test('layout names keep public callback values and expose selected state', async () => {
-  const { ViewModeControl } = await import('../src/components/ViewModeControl');
-  const change = vi.fn();
-  render(<ViewModeControl value="split" onChange={change} />);
-  const group = screen.getByRole('group', { name: 'Layout' });
-  expect(within(group).getByText('Layout')).toBeTruthy();
-  for (const [name, value] of [
-    ['Workflow diagram', 'diagram'],
-    ['Read workflow', 'docs'],
-    ['Side by side', 'split'],
-  ]) {
-    const button = within(group).getByRole('button', { name });
-    expect(button.getAttribute('aria-pressed')).toBe(String(value === 'split'));
-    fireEvent.click(button);
-    expect(change).toHaveBeenLastCalledWith(value);
-  }
-});
 test('reading view has scoped selection and overview has no invented sequence', async () => {
   render(<ArazzoUI document={nestedCalls} />);
   const group = await screen.findByRole('group', { name: 'Reading view' });

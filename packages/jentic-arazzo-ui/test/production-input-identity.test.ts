@@ -48,6 +48,7 @@ test('production identity includes default bytes, inventory, help and every main
   const input = JSON.parse(result.stdout);
   expect(input.fixtures).toHaveProperty(['public/petstore-order-workflow.arazzo.yaml']);
   expect(input.tests).toHaveProperty(['test/fixtures/workflow-ux-acceptance.json']);
+  expect(input.tests).toHaveProperty(['test/fixtures/workflowUxInventory.ts']);
   expect(input.tests).toHaveProperty(['test/e2e/production.spec.ts']);
   expect(input.tests).toHaveProperty(['test/workflow-ux-inventory.test.ts']);
   expect(input.buildInputs).toHaveProperty(['README.md']);

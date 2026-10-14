@@ -38,9 +38,3 @@ export function projectSequenceSteps(scene: SequenceScene): Map<string, StepPres
   }
   return steps;
 }
-
-// display numbering follows the visible authored-step hierarchy. Scene row IDs,
-// occurrence paths, traversal and limits remain the source of identity.
-export function projectSequenceNumbers(scene: SequenceScene): Map<string, string> {
-  return new Map(Array.from(projectSequenceSteps(scene), ([id, step]) => [id, step.number]));
-}

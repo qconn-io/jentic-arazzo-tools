@@ -1,20 +1,22 @@
 import { describe, it, expect } from 'vitest';
-import { resolveOperationStatus } from '../../../src/utils/contract/OperationStatusResolver';
+import { resolveScopedOperation } from '../../../src/utils/contract/OperationStatusResolver';
 import { ContractDocumentFacts } from '../../../src/utils/contract/types';
 
 describe('OperationStatusResolver', () => {
   it('returns not-loaded for idle state', () => {
-    const result = resolveOperationStatus('op1', 'idle');
+    const result = resolveScopedOperation({ operationId: 'op1' }, [{ state: 'idle' }]);
     expect(result.status).toBe('not-loaded');
   });
 
   it('returns loading for loading state', () => {
-    const result = resolveOperationStatus('op1', 'loading');
+    const result = resolveScopedOperation({ operationId: 'op1' }, [{ state: 'loading' }]);
     expect(result.status).toBe('loading');
   });
 
   it('returns failed with error diagnostics', () => {
-    const result = resolveOperationStatus('op1', 'error', undefined, new Error('Network error'));
+    const result = resolveScopedOperation({ operationId: 'op1' }, [
+      { state: 'error', error: new Error('Network error') },
+    ]);
     expect(result.status).toBe('failed');
     expect(result.diagnostics).toContain('Network error');
   });
@@ -28,7 +30,7 @@ describe('OperationStatusResolver', () => {
       rawContent: '',
       unsupportedDiagnostics: ['Swagger not supported'],
     };
-    const result = resolveOperationStatus('op1', 'success', facts);
+    const result = resolveScopedOperation({ operationId: 'op1' }, [{ state: 'success', facts }]);
     expect(result.status).toBe('unsupported');
     expect(result.diagnostics).toContain('Swagger not supported');
   });
@@ -42,7 +44,7 @@ describe('OperationStatusResolver', () => {
       rawContent: '',
       unsupportedDiagnostics: [],
     };
-    const result = resolveOperationStatus('op1', 'success', facts);
+    const result = resolveScopedOperation({ operationId: 'op1' }, [{ state: 'success', facts }]);
     expect(result.status).toBe('missing');
   });
 
@@ -56,7 +58,7 @@ describe('OperationStatusResolver', () => {
       rawContent: '',
       unsupportedDiagnostics: [],
     };
-    const result = resolveOperationStatus('op1', 'success', facts);
+    const result = resolveScopedOperation({ operationId: 'op1' }, [{ state: 'success', facts }]);
     expect(result.status).toBe('located');
     expect(result.operation).toBe(op);
   });
@@ -73,7 +75,7 @@ describe('OperationStatusResolver', () => {
       rawContent: '',
       unsupportedDiagnostics: [],
     };
-    const result = resolveOperationStatus('op1', 'success', facts);
+    const result = resolveScopedOperation({ operationId: 'op1' }, [{ state: 'success', facts }]);
     expect(result.status).toBe('ambiguous');
     expect(result.diagnostics?.[0]).toMatch(/Found 2 operations/);
   });

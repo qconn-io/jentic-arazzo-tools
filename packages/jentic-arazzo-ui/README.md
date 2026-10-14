@@ -786,8 +786,9 @@ It checks browser errors, implicit dependencies, business requests, host history
 Evidence, traces, reports and current build identities live under ignored
 `test-output/browser`; the installed consumer metadata lives under ignored
 `test-output/package-consumer`. These runs do not write into active or archived OpenSpec
-changes. CI runs package/export acceptance and production Chromium in separate bounded
-jobs while retaining the existing monorepo test timeout.
+changes. CI runs package/export acceptance before production Chromium in one bounded
+job, with separate package and browser evidence uploads even on failure, while retaining
+the existing monorepo test timeout.
 
 The test-owned `test/fixtures/workflow-ux-acceptance.json` pins the unchanged
 default Petstore and all nine digital-product/stress documents: 46 workflows.

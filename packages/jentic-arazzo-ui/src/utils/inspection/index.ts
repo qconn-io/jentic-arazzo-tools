@@ -33,11 +33,8 @@ export function selectProfile(version: string): InspectionProfile | undefined {
   return match ? profiles.get(`${match[1]}.${match[2]}`) : undefined;
 }
 
-export function inspect(
-  snapshot: DocumentSnapshot,
-  privateProfile?: InspectionProfile,
-): InspectionResult {
-  const selected = privateProfile ?? selectProfile(snapshot.exactVersion);
+export function inspect(snapshot: DocumentSnapshot): InspectionResult {
+  const selected = selectProfile(snapshot.exactVersion);
   if (selected) {
     const workflowIds = new Set<string>();
     for (const workflow of snapshot.document.workflows ?? []) {

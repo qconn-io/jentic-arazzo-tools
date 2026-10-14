@@ -99,7 +99,7 @@ describe('private inspection profiles', () => {
   });
 });
 
-describe('source-neutral bindings and profile extension contract', () => {
+describe('source-neutral bindings', () => {
   it('binds supported single-source IDs without verifying operations, keeping conflicting locators ambiguous, and authored async metadata opaque', () => {
     const input = document();
     input.sourceDescriptions = [
@@ -139,22 +139,6 @@ describe('source-neutral bindings and profile extension contract', () => {
       buildViewerModel(inspected).relationships.filter((edge) => edge.kind === 'call'),
     ).toEqual([]);
     expect(inspected.support.execution).toBe('not-established');
-  });
-
-  it('permits a private future profile to reuse domain extraction without consumer version dispatch', () => {
-    const known = selectProfile('1.1.0')!;
-    const future = {
-      ...known,
-      id: '9.4',
-      extract: (snapshot: Parameters<typeof inspect>[0]) => ({
-        ...known.extract(snapshot),
-        profileId: '9.4',
-      }),
-    };
-    const inspection = inspect(createSnapshot(document('9.4.2')), future);
-    expect(inspection.profileId).toBe('9.4');
-    expect(buildViewerModel(inspection).workflows).toHaveLength(2);
-    expect(buildViewerModel(inspection).relationships).toHaveLength(2);
   });
 });
 

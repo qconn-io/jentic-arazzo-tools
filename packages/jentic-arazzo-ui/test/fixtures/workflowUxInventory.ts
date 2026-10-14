@@ -40,9 +40,21 @@ export interface AcceptanceInventory {
   documents: AcceptanceDocument[];
 }
 export function readInventory(): AcceptanceInventory {
-  return JSON.parse(
+  const inventory: AcceptanceInventory = JSON.parse(
     readFileSync(new URL('./workflow-ux-acceptance.json', import.meta.url), 'utf8'),
   );
+  const workflow = inventory.documents
+    .find(
+      (entry) =>
+        entry.path === 'public/examples/digital-product-stress/boundaries/row-limit.arazzo.yaml',
+    )!
+    .workflows.find((entry) => entry.workflowId === 'row-limit')!;
+  const template = workflow.steps[0];
+  workflow.steps = Array.from({ length: 250 }, (_, index) => ({
+    ...structuredClone(template),
+    stepId: `observation-${String(index + 1).padStart(3, '0')}`,
+  }));
+  return inventory;
 }
 export function validateInventory(inventory: AcceptanceInventory, discovered: string[]): void {
   if (inventory.version !== 1 || inventory.documents.length !== 10)

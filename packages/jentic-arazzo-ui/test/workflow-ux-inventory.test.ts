@@ -25,6 +25,25 @@ async function discover(path = 'public'): Promise<string[]> {
   }
   return found;
 }
+test('expanded inventory preserves every independent expectation', () => {
+  const inventory = readInventory();
+  expect(createHash('sha256').update(JSON.stringify(inventory)).digest('hex')).toBe(
+    '3f84e1468cd79efc14871e65ebd5001944461a6002f923a42d60ae96802800f5',
+  );
+  expect(inventory.documents).toHaveLength(10);
+  expect(inventory.documents.flatMap((entry) => entry.workflows)).toHaveLength(46);
+});
+
+test('raw inventory preserves the runner document and workflow title inventory', async () => {
+  const raw = JSON.parse(await readFile('test/fixtures/workflow-ux-acceptance.json', 'utf8'));
+  const titles = (inventory: ReturnType<typeof readInventory>) =>
+    inventory.documents.map((entry) => ({
+      path: entry.path,
+      workflows: entry.workflows.map((workflow) => workflow.workflowId),
+    }));
+  expect(titles(raw)).toEqual(titles(readInventory()));
+});
+
 test('inventory rejects omitted/new unclassified examples, missing expectations and coverage drift', async () => {
   const inventory = readInventory();
   const paths = await discover();

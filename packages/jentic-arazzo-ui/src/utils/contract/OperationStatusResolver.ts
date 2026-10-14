@@ -115,14 +115,3 @@ export function resolveScopedOperation(
     ? { status: 'located', operation: candidates[0].operation, candidates }
     : { status: 'missing', candidates };
 }
-
-export function resolveOperationStatus(
-  operationId: string,
-  sourceDocumentState: OperationSourceCandidate['state'],
-  documentFacts?: ContractDocumentFacts,
-  error?: Error,
-): OperationLookupResult {
-  return resolveScopedOperation({ operationId }, [
-    { state: sourceDocumentState, facts: documentFacts, error },
-  ]);
-}

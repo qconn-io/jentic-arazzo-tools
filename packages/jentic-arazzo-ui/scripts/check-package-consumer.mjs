@@ -57,6 +57,7 @@ const standalone = await consumerBuild(
 const optional = await consumerBuild(outputRoot, 'optional', optionalSource);
 for (const symbol of [
   'ArazzoCatalog',
+  'normalizeCatalogManifest',
   'ArazzoWorkflowReview',
   'compareWorkflowRevisions',
   'loadCatalog',
