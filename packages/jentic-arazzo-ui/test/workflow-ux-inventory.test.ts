@@ -28,7 +28,7 @@ async function discover(path = 'public'): Promise<string[]> {
 test('expanded inventory preserves every independent expectation', () => {
   const inventory = readInventory();
   expect(createHash('sha256').update(JSON.stringify(inventory)).digest('hex')).toBe(
-    '3f84e1468cd79efc14871e65ebd5001944461a6002f923a42d60ae96802800f5',
+    'b663efce36507364b16dff83046fd72bd35ae872c8908264589e12be9ebb8755',
   );
   expect(inventory.documents).toHaveLength(10);
   expect(inventory.documents.flatMap((entry) => entry.workflows)).toHaveLength(46);

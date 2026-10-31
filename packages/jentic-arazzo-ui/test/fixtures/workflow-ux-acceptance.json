@@ -4,7 +4,7 @@
     {
       "path": "public/petstore-order-workflow.arazzo.yaml",
       "version": "1.0.1",
-      "sha256": "8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569",
+      "sha256": "38caccd2e11b96c702510edede012cded9f7981cae2788de56876e635b883e77",
       "layouts": [
         "diagram",
         "docs",

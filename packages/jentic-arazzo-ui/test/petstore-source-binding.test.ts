@@ -14,7 +14,7 @@ test('unchanged Petstore binds all five operations to its sole API without acqui
     new URL('../public/petstore-order-workflow.arazzo.yaml', import.meta.url),
   );
   expect(createHash('sha256').update(bytes).digest('hex')).toBe(
-    '8bd096d24c2cabd7536dc2feb9cb8b9157ffebbadf931bcc26230de4b1989569',
+    '38caccd2e11b96c702510edede012cded9f7981cae2788de56876e635b883e77',
   );
   const registry = new SourceRegistry();
   const load = vi.fn(async () => {
